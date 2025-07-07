@@ -1,0 +1,11 @@
+[
+  {
+    "Name": "Nuevo perfil",
+    "Projects": [
+      {
+        "Path": "SMSBackboneAPI\\SMSBackboneAPI.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

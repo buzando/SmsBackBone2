@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="25.084" height="22" viewBox="0 0 25.084 22">
+  <g id="Icono_avión" data-name="Icono avión" transform="translate(0.55)">
+    <rect id="Rectángulo_16632" data-name="Rectángulo 16632" width="22" height="22" fill="none"/>
+    <g id="money-alt-svgrepo-com" transform="translate(0.2 2.4)">
+      <path id="primary" d="M20.854,9H25.01A1.317,1.317,0,0,1,26.4,10.235v9.877a1.317,1.317,0,0,1-1.385,1.235H8.385A1.317,1.317,0,0,1,7,20.111v-3.7" transform="translate(-2.062 -3.568)" fill="#999295"/>
+      <path id="secondary" d="M0,0H19.88V13.333H0Z" fill="#999295"/>
+      <line id="primary-upstroke" x2="0.123" transform="translate(10.014 6.667)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <rect id="primary-2" data-name="primary" width="20.028" height="13.703" rx="2" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    </g>
+  </g>
+</svg>

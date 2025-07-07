@@ -1,0 +1,22 @@
+{
+  "pages": {
+    "testSMS": {
+      "title": "Teste de SMS",
+      "smsTestDescription": "O teste de SMS tem um custo que será descontado diretamente do saldo atual.",
+      "smsSelectDescription": "Selecione o número de onde deseja enviar o teste e o número para onde deve ser recebido.",
+      "from": "De:",
+      "to": "Para:",
+      "numberPlaceholder": "Número",
+      "writeMessageOrSelect": "Escreva uma mensagem ou selecione um modelo.",
+      "message": "Mensagem",
+      "template": "Modelo",
+      "selectMessagePlaceholder": "Selecione uma mensagem",
+      "invalidNumber": "Número inválido.",
+      "invalidFormat": "Formato inválido.",
+      "charactersCounter": "{{count}}/160 caracteres para completar o envio em uma única mensagem.",
+      "preview": "Visualização:",
+      "cancel": "Cancelar",
+      "send": "Enviar"
+    }
+  }
+}

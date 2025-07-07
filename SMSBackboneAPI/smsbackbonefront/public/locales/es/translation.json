@@ -1,0 +1,24 @@
+{
+  "pages": {
+    "testSMS": {
+      "title": "Prueba SMS",
+      "smsTestDescription": "La prueba SMS tiene un costo que será descontado directamente del saldo actual.",
+      "smsSelectDescription": "Seleccione el número desde el cual desea realizar la prueba y el número al cuál desea que llegue.",
+      "from": "Desde:",
+      "to": "Hacia:",
+      "numberPlaceholder": "Número",
+      "writeMessageOrSelect": "Escriba un mensaje o seleccione una plantilla.",
+      "message": "Mensaje",
+      "template": "Plantilla",
+      "selectMessagePlaceholder": "Seleccione un mensaje",
+      "invalidNumber": "Número inválido.",
+      "invalidFormat": "Formato inválido.",
+      "charactersCounter": "{{count}}/160 caracteres para que el mensaje se realice en un sólo envío.",
+      "preview": "Vista previa:",
+      "cancel": "Cancelar",
+      "send": "Enviar",
+      "tooltipOnlyNumbers": "Solo caracteres numéricos",
+      "tooltipTenDigits": "El teléfono debe incluir el código del país"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+projectKey=smsbackboneFront
+serverUrl=http://localhost:9000
+serverVersion=25.2.0.102705
+dashboardUrl=http://localhost:9000/dashboard?id=smsbackboneFront
+ceTaskId=b6515f4f-75e2-405d-ab28-95bf7c93bd70
+ceTaskUrl=http://localhost:9000/api/ce/task?id=b6515f4f-75e2-405d-ab28-95bf7c93bd70

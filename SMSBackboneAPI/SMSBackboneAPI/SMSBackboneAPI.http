@@ -1,0 +1,6 @@
+@SMSBackboneAPI_HostAddress = http://localhost:5197
+
+GET {{SMSBackboneAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

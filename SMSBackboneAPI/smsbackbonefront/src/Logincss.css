@@ -1,0 +1,103 @@
+.rfc-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    text-align: center;
+}
+
+.rfc-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+.rfc-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+
+    .rfc-input.invalid {
+        border-color: #ffe6e6;
+       
+    }
+
+.rfc-button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+}
+
+    .rfc-button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+/* Logincss.css */
+h2 {
+    font-size: 1.0rem; /* Reducimos el tamaño */
+    color: #330F1B;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem; /* Ajustamos el margen */
+}
+h5 {
+    font-size: 1.5rem;
+    color: #8F4D63;
+    margin-bottom: 1.5rem;
+}
+
+#formlogin {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+button {
+    background-color: #8F4D63;
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+}
+
+    button:hover {
+        background-color: #732d57;
+    }
+
+
+input:-webkit-autofill {
+    background-color: transparent !important;
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+    box-shadow: 0 0 0px 1000px transparent inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+input:focus {
+    background-color: transparent !important;
+    outline: none;
+    box-shadow: none;
+    border-color: inherit;
+}
+
+textarea:focus, select:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.MuiInputAdornment-root .extra-icon-selector {
+    display: none !important;
+}

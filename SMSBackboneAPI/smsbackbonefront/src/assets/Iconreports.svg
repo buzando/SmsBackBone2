@@ -1,0 +1,24 @@
+<svg id="Icon-sms" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="22" height="22" viewBox="0 0 22 22">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectángulo_14500" data-name="Rectángulo 14500" width="22" height="22" fill="none"/>
+    </clipPath>
+  </defs>
+  <g id="Grupo_17423" data-name="Grupo 17423" clip-path="url(#clip-path)">
+    <g id="Capa_4" data-name="Capa 4" transform="translate(22) rotate(90)">
+      <g id="Grupo_27065" data-name="Grupo 27065">
+        <rect id="Rectángulo_18477" data-name="Rectángulo 18477" width="6" height="7" rx="1" transform="translate(12 11)" fill="#fff"/>
+        <rect id="Rectángulo_18478" data-name="Rectángulo 18478" width="6" height="14" rx="1" transform="translate(4 4)" fill="#fff"/>
+        <g id="icono_sms" data-name="icono sms" transform="translate(0 22) rotate(-90)">
+          <g id="Icon-sms-2" data-name="Icon-sms">
+            <g id="Grupo_17423-2" data-name="Grupo 17423" clip-path="url(#clip-path)">
+              <g id="icons_Q2" data-name="icons Q2" transform="translate(6.007 169) rotate(90)">
+                <path id="Trazado_10380" data-name="Trazado 10380" d="M24.894,23.794H6.2V20.33h0V5.1A1.1,1.1,0,1,0,4,5.1V25.993H24.894a1.1,1.1,0,0,0,0-2.2Z" transform="translate(-173 -19.993)" fill="#fff"/>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

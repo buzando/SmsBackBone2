@@ -1,0 +1,158 @@
+/* General: Forzar fuente Poppins en todo */
+.date-picker-container,
+.date-picker-container * {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* Nombre del mes */
+.rdrMonthName {
+    text-align: center;
+    font-size: 16px;
+    color: #574B4F;
+    font-weight: 500;
+}
+
+/* Ocultar título superior (opcional) */
+.rdrMonthAndYearWrapper {
+    display: none !important;
+}
+
+/* Días deshabilitados → gris claro */
+.rdrDay.rdrDayDisabled span {
+    color: #CCCCCC !important;
+}
+
+/* Días normales (no seleccionados, no deshabilitados) → texto morado, fondo transparente */
+.rdrDay:not(.rdrDaySelected):not(.rdrDayDisabled) button {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.rdrDay:not(.rdrDaySelected):not(.rdrDayDisabled) span {
+    color: #8F4D63 !important;
+}
+
+/* Día en hover y día seleccionado → bolita morada, texto negro */
+.rdrDay:hover button,
+.rdrDay.rdrDaySelected button {
+    background-color: #8F4D63 !important;
+    border-radius: 50% !important;
+    border: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+.rdrDay:hover span,
+.rdrDay.rdrDaySelected span {
+    color: #000000 !important;
+}
+
+/* Día actual (hoy) → fondo suave */
+.rdrDayToday span {
+    background-color: #F2EBED !important;
+}
+
+/* Rango seleccionado → fondo suave, texto morado */
+.rdrInRange {
+    background-color: #F2EBED !important;
+    color: #8F4D63 !important;
+}
+
+/* Inicio y fin del rango → bolita morada */
+.rdrStartEdge,
+.rdrEndEdge {
+    background-color: #8F4D63 !important;
+}
+
+/* Quitar pseudo-elementos molestos y azul base */
+.rdrDay.rdrDaySelected::before,
+.rdrDay.rdrDaySelected::after,
+.rdrDay.rdrDaySelected button::before,
+.rdrDay.rdrDaySelected button::after {
+    display: none !important;
+    content: none !important;
+}
+
+.rdrDay span::after {
+    display: none !important;
+}
+
+/* Quitar bordes, outlines, sombras */
+.rdrDay:focus,
+.rdrDay:active,
+.rdrDay:focus-visible,
+.rdrDay button:focus,
+.rdrDay button:active,
+.rdrDay button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Divisores visuales */
+.date-picker-divider {
+    width: 100%;
+    height: 1px;
+    background: #E6E4E4;
+    margin: 8px 0;
+}
+
+/* Botones de control (fuera del calendario) */
+.date-button {
+    background: #F6F6F6;
+    border: 1px solid #C6BFC2;
+    border-radius: 18px;
+    width: 90px;
+    height: 36px;
+    opacity: 1;
+}
+
+.date-button.active {
+    background: #FEFEFE;
+    border: 1px solid #8F4E63CC;
+}
+
+/* Contenedor de las dos columnas (hora) */
+.time-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Columnas individuales */
+.time-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 48%;
+}
+
+/* Títulos "HORA INICIAL" y "HORA FINAL" */
+.time-section h3 {
+    text-align: center;
+    font-size: 16px;
+    color: #574B4F;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+/* Inputs de tiempo */
+.time-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.time-input input {
+    width: 45px;
+    height: 40px;
+    text-align: center;
+    border: 1px solid #9B9295;
+    border-radius: 4px;
+    font-size: 16px;
+}

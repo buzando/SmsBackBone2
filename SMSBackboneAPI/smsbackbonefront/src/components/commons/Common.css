@@ -1,0 +1,237 @@
+/* Common.css */
+
+/* Bot�n base */
+.main-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    /* Espacio entre el icono y el texto */
+    padding: 8px 16px;
+    height: 36px;
+    /* Alto del bot�n */
+    background: #833A53;
+    border: 1px solid #60293C;
+    border-radius: 4px;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1.12px;
+}
+
+/* Hover: Cambia el color, sombra y opacidad */
+.main-button:hover {
+    background: #90455F 0% 0% no-repeat padding-box;
+    box-shadow: 0px 0px 12px #C17D91;
+    border: 1px solid #60293C;
+    opacity: 0.85;
+}
+
+/* Active (Presionado): Cambia el color y opacidad */
+.main-button:active {
+    background: #6F1E3A 0% 0% no-repeat padding-box;
+    border: 1px solid #8D4860;
+    border-radius: 4px;
+    opacity: 0.9;
+}
+
+/* Focus: Cambia el color, sombra y opacidad */
+.main-button:focus {
+    background: #833A53 0% 0% no-repeat padding-box;
+    box-shadow: 0px 0px 8px #E6C2CD;
+    border: 1px solid #60293C;
+    border-radius: 4px;
+    opacity: 0.9;
+    outline: none;
+    /* Para evitar el borde azul por defecto */
+}
+
+/* Disabled: Cambia el color y desactiva el cursor */
+.main-button:disabled {
+    background: #d3d3d3;
+    border: 1px solid #b3b3b3;
+    color: #7a7a7a;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Spinner dentro del botón */
+.spinner {
+    border: 3px solid #f3f3f3;
+    /* Fondo del spinner */
+    border-top: 3px solid #60293C;
+    /* Color principal del spinner */
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+
+}
+
+/* Animación del spinner */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+.button-icon {
+    width: 16px;
+    /* Tamaño del ícono */
+    height: 16px;
+}
+
+.button-text {
+    line-height: 1;
+}
+
+
+/* SecondaryButton base */
+.secondary-button {
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #833A53;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    width: 116px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 1;
+    border: 1px solid #CCCFD2;
+    letter-spacing: 1.12px;
+}
+
+/* Hover state */
+.secondary-button:hover {
+    background: #F2E9EC 0% 0% no-repeat padding-box;
+    opacity: 1;
+}
+
+/* Active state (pressed) */
+.secondary-button:active {
+    background: #E6C2CD 0% 0% no-repeat padding-box;
+    border: 1px solid #BE93A0;
+    opacity: 1;
+}
+
+/* Disabled state */
+.secondary-button.disabled {
+    color: #C6BFC2;
+    cursor: not-allowed;
+    background: transparent;
+    opacity: 0.6;
+}
+
+
+/* Overlay del modal */
+.modal-error-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Contenido del modal */
+.modal-error-content {
+    background: #ffffff 0% 0% no-repeat padding-box;
+    box-shadow: 0px 0px 16px #00131f52;
+    border-radius: 8px;
+    width: 480px;
+    height: 228px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Título del modal */
+.modal-error-title {
+    text-align: left;
+    font: normal normal 600 20px/54px Poppins;
+    letter-spacing: 0px;
+    color: #574b4f;
+    opacity: 1;
+    font-size: 20px;
+    margin-top: -10px;
+    /* Sube el título 20px */
+    margin-bottom: 10px;
+}
+
+
+/* Mensaje del modal */
+.modal-error-message {
+    text-align: left;
+    font: normal normal normal 16px/22px Poppins;
+    letter-spacing: 0px;
+    color: #574b4f;
+    opacity: 1;
+    font-size: 16px;
+    margin-top: -25px;
+}
+
+/* Footer del modal */
+.modal-error-footer {
+    display: flex;
+    justify-content: flex-end;
+    /* 🔥 Mueve el botón a la derecha */
+    align-items: center;
+    width: 100%;
+}
+
+
+
+/* TertiaryButton base */
+.tertiary-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font: normal normal 600 14px/54px Poppins;
+    letter-spacing: 1.12px;
+    color: #833A53;
+    text-transform: uppercase;
+    opacity: 1;
+    background: transparent;
+    /* Fondo base transparente */
+    border: none;
+    /* Sin borde en el estado normal */
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 124px;
+    /* Mismo ancho que el MainButton */
+    height: 36px;
+    /* Mismo alto que el MainButton */
+}
+
+/* Estado hover */
+.tertiary-button:hover {
+    background: #F2E9EC 0% 0% no-repeat padding-box;
+    border-radius: 4px;
+    opacity: 1;
+}
+
+/* Estado presionado (active) */
+.tertiary-button:active {
+    background: #E6C2CD 0% 0% no-repeat padding-box;
+    border: 1px solid #BE93A0;
+    border-radius: 4px;
+    opacity: 1;
+}

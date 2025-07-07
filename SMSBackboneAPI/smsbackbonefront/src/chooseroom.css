@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+body {
+    background-color: #FFFFFF; 
+}
+
+/* Estilo para el bot�n de b�squeda */
+.search-button {
+    text-align: left; /* Alineaci�n del texto a la izquierda */
+    font-family: 'Poppins', sans-serif; /* Familia tipogr�fica Poppins */
+    font-weight: normal; /* Peso de la fuente */
+    font-size: 16px; /* Tama�o de la fuente */
+    line-height: 25px; /* Altura de l�nea */
+    letter-spacing: 0; /* Espaciado entre letras */
+    color: #9B9295; /* Color del texto */
+    opacity: 1; /* Opacidad */
+}
+
+/* Estilo para las cajas de "rooms" */
+.room-box {
+    background: #FFFFFF 0% 0% no-repeat padding-box; /* Fondo blanco con propiedades de repetici�n */
+    box-shadow: 0px 4px 4px #E1E4E6; /* Sombra sutil */
+    border: 1px solid #CED2D54D; /* Borde con un color ligeramente gris */
+    border-radius: 4px; /* Bordes redondeados */
+    opacity: 1; /* Opacidad */
+    padding: 20px; /* Relleno interno */
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
+    width: 100%;
+    max-width: 300px; /* Tama�o m�ximo para hacerlo m�s peque�o */
+    margin-bottom: 16px; /* Espaciado entre las cajas */
+}
+
+    /* Mejorar la apariencia de la caja de "rooms" */
+    .room-box .room-name {
+        font-size: 18px; /* Tama�o de la fuente del nombre de la sala */
+        font-weight: bold; /* Resaltar el nombre de la sala */
+        color: #330F1B; /* Color del texto */
+        margin-bottom: 10px; /* Espaciado debajo del nombre */
+    }
+
+    .room-box .room-details {
+        font-size: 14px; /* Tama�o de la fuente para los detalles */
+        color: #9B9295; /* Color gris para los detalles */
+        margin-bottom: 12px; /* Espaciado debajo de los detalles */
+    }
+
+    /* Estilo del bot�n para seleccionar la sala */
+    .room-box .select-button {
+        background-color: #646cff; /* Color de fondo del bot�n */
+        color: white; /* Color del texto del bot�n */
+        padding: 8px 16px; /* Relleno del bot�n */
+        border: none; /* Sin borde */
+        border-radius: 4px; /* Bordes redondeados */
+        cursor: pointer; /* Cambio de cursor para mostrar que es clickeable */
+        font-size: 14px; /* Tama�o de la fuente */
+    }
+
+        .room-box .select-button:hover {
+            background-color: #535bf2; /* Color de fondo al pasar el mouse */
+        }
+
+
+
+/* Contenedor general */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #FFFFFF; /* Fondo blanco puro */
+}
+
+
+/* Campo de b�squeda */
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: #F1F1F1; /* Fondo gris claro */
+    border-radius: 8px;
+    padding: 8px 16px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    .search-container input {
+        border: none;
+        outline: none;
+        background: transparent;
+        flex: 1;
+        font-family: 'Poppins', sans-serif;
+        font-size: 16px;
+        color: #9B9295;
+        margin-left: 8px;
+    }
+
+/* Contenedor general */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #F8F8F8; /* Fondo similar al mostrado */
+}
+
+/* Estilo para las cajas de salas (rooms) */
+.room-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #FFFFFF;
+    border: 1px solid #E6E6E6;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+    padding: 16px;
+    margin-bottom: 16px;
+    width: 100%;
+    max-width: 600px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+    .room-box:hover {
+        transform: scale(1.02);
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+/* Informaci�n de la sala */
+.room-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.room-icon {
+    font-size: 40px;
+    color: #9B9295;
+}
+
+.room-details {
+    font-family: 'Poppins', sans-serif;
+    color: #4A4A4A;
+}
+
+    .room-details h6 {
+        font-size: 18px;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .room-details p {
+        font-size: 14px;
+        margin: 4px 0;
+        color: #9B9295;
+    }
+
+/* Detalles adicionales */
+.room-extra {
+    text-align: right;
+    font-family: 'Poppins', sans-serif;
+    color: #A77A91;
+    font-size: 14px;
+}
+
+    .room-extra span {
+        display: block;
+    }
+
+/* Bot�n seleccionar o flecha */
+.room-action {
+    color: #A77A91;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+
+.floating-button {
+    position: fixed;
+    bottom: 10px; /* Asegura que est� al fondo */
+    left: 360px; /* Asegura que est� a la derecha */
+    background-color: #000; /* Fondo negro */
+    color: #FFF; /* Texto blanco */
+    border: none; /* Sin bordes */
+    border-radius: 50%; /* Hace que el bot�n sea circular */
+    width: 60px; /* Ancho del bot�n */
+    height: 60px; /* Altura del bot�n */
+    display: flex;
+    align-items: center; /* Centra el contenido verticalmente */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    font-size: 24px; /* Tama�o del signo de interrogaci�n */
+    font-weight: bold; /* Grosor del signo */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el bot�n */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Sombra del bot�n */
+    transition: transform 0.2s ease-in-out; /* Suaviza el efecto de zoom */
+    z-index: 9999; /* Asegura que est� por encima de otros elementos */
+}
+
+    .floating-button:hover {
+        background-color: #330F1B; /* Fondo oscuro al pasar el rat�n */
+        color: #FFFFFF; /* Icono blanco al pasar el rat�n */
+        transform: scale(1.1); /* Efecto de zoom */
+    }
+
+
+..custom-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    background-color: #8F4D63; /* Fondo del checkbox */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none; /* Elimina cualquier borde */
+    color: white; /* Color del check */
+}
+
+.custom-checkbox:hover {
+    background-color: #a25a74; /* Color al pasar el mouse */
+}
+
+.custom-checkbox svg {
+    fill: white; /* Color del check cuando est� marcado */
+}
+.icon-container {
+    width: 50px; /* Reducimos el tama�o del c�rculo */
+    height: 50px;
+    background-color: #6E6E6E; /* Fondo gris */
+    border-radius: 50%; /* Mantiene el contenedor circular */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .icon-container svg {
+        color: #FFFFFF; /* Color blanco para el �cono */
+        font-size: 28px; /* Ajustamos el tama�o del �cono para que sea proporcional */
+    }
+
+.repeat-box {
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 4px 4px #E1E4E6;
+    border: 1px solid #CED2D54D;
+    border-radius: 4px;
+    opacity: 1;
+    width: 430px; /* Ancho del recuadro */
+    padding: 20px; /* Espaciado interno opcional */
+    margin: 10px auto; /* Centrado horizontal y margen opcional */
+}
