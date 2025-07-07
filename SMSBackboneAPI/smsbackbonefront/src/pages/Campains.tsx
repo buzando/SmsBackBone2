@@ -1760,8 +1760,9 @@ const Campains: React.FC = () => {
                   ) : (
                     filteredCampaigns.map((campaign, index) => {
                       const isSelected = selectedCampaigns.includes(index);
-                      const progreso = (campaign.numeroActual / campaign.numeroInicial) * 100;
-
+                      const progreso = campaign.numeroInicial > 0
+                        ? Math.round((campaign.numeroActual / campaign.numeroInicial) * 100)
+                        : 0;
                       return (
                         <ListItem key={index} sx={{
                           background: "#FFFFFF",
@@ -6108,7 +6109,7 @@ const Campains: React.FC = () => {
         }}
       >
         {menuIndex === -1 ? (
-             <>
+          <>
             <Box
               sx={{
                 display: 'flex',

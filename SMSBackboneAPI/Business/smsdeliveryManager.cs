@@ -267,7 +267,7 @@ NumberType = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("NumberType"))),
                                     registryClient = msg.registryClient
                                 }).ToList();
 #endif
-
+                                double creditosConsumidos = 0;
                                 foreach (var message in sendResult)
                                 {
                                     var lada = message.phoneNumber.Substring(0, 2);
@@ -292,6 +292,15 @@ NumberType = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("NumberType"))),
                                         ResponseMessage = null,
                                         State = estado
                                     });
+
+                                    var room = ctx.Rooms.FirstOrDefault(r => r.id == campaign.RoomId);
+                                    if (room != null)
+                                    {
+                                        if (campaign.NumberType == 1)
+                                            room.short_sms = Math.Max(0, room.short_sms - creditosConsumidos); // no bajar de 0
+                                        else if (campaign.NumberType == 2)
+                                            room.long_sms = Math.Max(0, room.long_sms - creditosConsumidos);
+                                    }
                                 }
                                 ctx.SaveChanges();
                             }
