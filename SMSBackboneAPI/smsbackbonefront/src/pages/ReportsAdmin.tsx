@@ -3,7 +3,7 @@ import {
     Box, IconButton, Tab, Tabs, Typography, Divider, TextField, MenuItem, Menu, Checkbox, InputAdornment, ListItemText, Tooltip, CircularProgress,
     TableContainer, Table, Paper, TableHead, TableRow, TableCell, TableBody
 } from '@mui/material';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import { useNavigate } from 'react-router-dom';
 import CustomDateTimePicker from '../components/commons/DatePicker';
 import SecondaryButton from '../components/commons/SecondaryButton';
@@ -256,7 +256,7 @@ const ReportsAdmin = () => {
         <Box p={3} sx={{ marginTop: "-80px", width: '90%', minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             <Box display="flex" alignItems="center" mb={2}>
                 <IconButton onClick={() => navigate('/')}>
-                    <ArrowBackIosNewIcon sx={{ color: "#330F1B" }} />
+                    <img src={ArrowBackIosNewIcon} alt="Regresar" style={{ width: 24, transform: 'rotate(270deg)' }} />
                 </IconButton>
                 <Typography sx={{ fontSize: "24px", fontFamily: "Poppins", fontWeight: 500, color: "#330F1B", ml: 1 }}>
                     Reportes
@@ -371,12 +371,12 @@ const ReportsAdmin = () => {
 
 
                     {/* Flechas + Exportaciones */}
-                    <Box display="flex" alignItems="center" gap={1}>
+                    <Box display="flex" alignItems="center" gap={0}>
                         <Tooltip title="Primera página">
                             <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
                                 <Box
                                     display="flex"
-                                    gap="2px"
+                                    gap="0px"
                                     alignItems="center"
                                     sx={{
                                         opacity: currentPage === 1 ? 0.3 : 1
@@ -536,7 +536,7 @@ const ReportsAdmin = () => {
 
                     </Box>
                 </Box>
-                <Box mt={3}>
+                <Box mt={0}>
                     {!hasFiltered ? (
                         // Caja cerrada al entrar a la vista
                         <Box
@@ -551,7 +551,7 @@ const ReportsAdmin = () => {
                                 border: "1px solid #E0E0E0"
                             }}
                         >
-                            <img src={emptybox} alt="Sin resultados" style={{ width: 120, marginBottom: 16 }} />
+                            <img src={emptybox} alt="Sin resultados" style={{ width: 240, marginBottom: 16 }} />
                             <Typography
                                 sx={{
                                     fontFamily: "Poppins",

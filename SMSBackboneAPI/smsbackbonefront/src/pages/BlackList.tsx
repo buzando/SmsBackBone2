@@ -849,7 +849,7 @@ const BlackList: React.FC = () => {
     const [showColumnOptions, setShowColumnOptions] = useState(true);
 
     return (
-        <div style={{ padding: '20px', marginTop: '-70px', marginLeft: "40px", maxWidth: "1140px" }}>
+        <div style={{ padding: '20px', marginTop: '-70px', marginLeft: "40px", maxWidth: "1180px" }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
@@ -1541,7 +1541,7 @@ const BlackList: React.FC = () => {
                                     onDragOver={(e) => e.preventDefault()}
                                     onDrop={(e) => {
                                         e.preventDefault();
-                                        if (hasPhoneInput) return; // prevenir carga
+                                        if (hasPhoneInput) return;
                                         const file = e.dataTransfer.files?.[0];
                                         if (file) handleFile(file);
                                     }}
@@ -1549,12 +1549,12 @@ const BlackList: React.FC = () => {
                                         border: fileError
                                             ? '2px solid #EF5466'
                                             : fileSuccess
-                                                ? '2px solid #8F4E63CC' // ✅ borde éxito
+                                                ? '2px solid #8F4E63CC'
                                                 : '2px dashed #D9B4C3',
                                         backgroundColor: fileError
                                             ? '#FFF4F5'
                                             : fileSuccess
-                                                ? '#E5CBD333'           // ✅ fondo éxito
+                                                ? '#E5CBD333'
                                                 : 'transparent',
                                         borderRadius: '8px',
                                         width: '160px',
@@ -1668,7 +1668,7 @@ const BlackList: React.FC = () => {
                                                         {
                                                             name: 'offset',
                                                             options: {
-                                                                offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                offset: [0, -8]
                                                             }
                                                         }
                                                     ]
@@ -1676,7 +1676,7 @@ const BlackList: React.FC = () => {
                                             >
                                                 <IconButton
                                                     onClick={(e) => {
-                                                        e.stopPropagation(); // ❌ evita que el click se propague al Box que abre el file picker
+                                                        e.stopPropagation();
                                                         setSelectedFile(null);
                                                         setUploadedFile(null);
                                                         setFileSuccess(false);
@@ -1794,8 +1794,8 @@ const BlackList: React.FC = () => {
                                     sx={{
                                         width: "100%",
                                         display: "flex",
-                                        justifyContent: "center", // 🔥 centra horizontalmente
-                                        mt: -1 // o el margen superior que necesites para ajustarlo
+                                        justifyContent: "center",
+                                        mt: -1
                                     }}
                                 >
 
@@ -1841,8 +1841,8 @@ const BlackList: React.FC = () => {
                             <Box
                                 sx={{
                                     flex: 1,
-                                    opacity: fileSuccess ? 0.5 : 1,           // 🔥 se ve más tenue si hay archivo
-                                    pointerEvents: fileSuccess ? 'none' : 'auto' // 🔥 bloquea interacción
+                                    opacity: fileSuccess ? 0.5 : 1,
+                                    pointerEvents: fileSuccess ? 'none' : 'auto'
                                 }}
                             >
                                 <Typography sx={{ fontFamily: 'Poppins', fontSize: '18px', color: '#330F1B', mb: 1 }}>

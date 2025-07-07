@@ -47,6 +47,8 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ModalError from "../components/commons/ModalError";
 import LinearProgress from '@mui/material/LinearProgress';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import IconCheckBox1 from "../assets/IconCheckBox1.svg";
+import IconCheckBox2 from "../assets/IconCheckBox2.svg";
 
 interface NumberData {
     Id: number;
@@ -596,338 +598,379 @@ const NumbersDids: React.FC = () => {
         !!manageOperation;
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", width: '90%', minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box sx={{ padding: '20px', marginTop: "-70px", marginLeft: "10px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden', }}>
+
             {/* Header con título y flecha */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
                     <img src={ArrowBackIosNewIcon} alt="Regresar" style={{ width: 24, transform: 'rotate(270deg)' }} />
                 </IconButton>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', fontFamily: 'Poppins', fontSize: '26px', color: '#330F1B' }}>
+                <Typography variant="h4" sx={{ fontWeight: 500, fontFamily: 'Poppins', fontSize: '26px', color: '#330F1B' }}>
                     Números DIDS
                 </Typography>
             </Box>
+            <Box sx={{ marginLeft: "32px", }}>
+                <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
 
-            <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
+                {/* Controles de acción */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '20px',
+                        marginBottom: '24px',
+                    }}
+                >
+                    {/* Chips redonditos */}
+                    <Box sx={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        {['SERVICIO', 'CLIENTE', 'ESTATUS'].map((label) => {
+                            const isService = label === 'SERVICIO';
+                            const isClient = label === 'CLIENTE';
+                            const isStatus = label === 'ESTATUS';
 
-            {/* Controles de acción */}
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: '20px',
-                    marginBottom: '24px',
-                }}
-            >
-                {/* Chips redonditos */}
-                <Box sx={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    {['SERVICIO', 'CLIENTE', 'ESTATUS'].map((label) => {
-                        const isService = label === 'SERVICIO';
-                        const isClient = label === 'CLIENTE';
-                        const isStatus = label === 'ESTATUS';
+                            const count = isService
+                                ? selectedServices.length
+                                : isClient
+                                    ? selectedClients.length
+                                    : isStatus
+                                        ? selectedStatus.length
+                                        : 0;
 
-                        const count = isService
-                            ? selectedServices.length
-                            : isClient
-                                ? selectedClients.length
-                                : isStatus
-                                    ? selectedStatus.length
-                                    : 0;
+                            const labelDisplay = count > 0 ? `${count} ${label}` : label;
 
-                        const labelDisplay = count > 0 ? `${count} ${label}` : label;
+                            return (
+                                <Box
+                                    key={label}
+                                    onClick={(e) => {
+                                        if (label === 'SERVICIO') setServiceAnchorEl(e.currentTarget);
+                                        if (label === 'CLIENTE') {
+                                            setClientAnchorEl(e.currentTarget);
+                                            setClientMenuOpen(true);
+                                        }
+                                        if (label === 'ESTATUS') {
+                                            setStatusAnchorEl(e.currentTarget);
+                                            setStatusMenuOpen(true);
+                                        }
+                                        setActiveFilter(label.toLowerCase() as any);
+                                    }}
+                                    sx={{
+                                        px: '16px', py: '6px', border: '1px solid', borderColor: activeFilter === label.toLowerCase() ? '#7B354D' : '#CFCFCF',
+                                        borderRadius: '50px', cursor: 'pointer', fontFamily: 'Poppins', fontWeight: 600,
+                                        fontSize: '13px', backgroundColor: activeFilter === label.toLowerCase() ? '#F6EEF1' : '#FFFFFF',
+                                        color: activeFilter === label.toLowerCase() ? '#7B354D' : '#9B9295', transition: 'all 0.2s ease-in-out', userSelect: 'none',
+                                    }}
+                                >
+                                    {labelDisplay}
+                                </Box>
+                            );
+                        })}
 
-                        return (
+                    </Box>
+
+                    {/* Botón y buscador */}
+                    <Box sx={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
+                        <MainIcon text="Gestionar números" width="227px" onClick={() => setShowModal(true)} />
+                        <Box sx={{ position: 'relative', width: '220px' }}>
                             <Box
-                                key={label}
-                                onClick={(e) => {
-                                    if (label === 'SERVICIO') setServiceAnchorEl(e.currentTarget);
-                                    if (label === 'CLIENTE') {
-                                        setClientAnchorEl(e.currentTarget);
-                                        setClientMenuOpen(true);
-                                    }
-                                    if (label === 'ESTATUS') {
-                                        setStatusAnchorEl(e.currentTarget);
-                                        setStatusMenuOpen(true);
-                                    }
-                                    setActiveFilter(label.toLowerCase() as any);
-                                }}
+                                display="flex"
+                                alignItems="center"
                                 sx={{
-                                    px: '16px', py: '6px', border: '1px solid', borderColor: activeFilter === label.toLowerCase() ? '#7B354D' : '#CFCFCF',
-                                    borderRadius: '50px', cursor: 'pointer', fontFamily: 'Poppins', fontWeight: 600,
-                                    fontSize: '13px', backgroundColor: activeFilter === label.toLowerCase() ? '#F6EEF1' : '#FFFFFF',
-                                    color: activeFilter === label.toLowerCase() ? '#7B354D' : '#9B9295', transition: 'all 0.2s ease-in-out', userSelect: 'none',
+                                    backgroundColor: "#FFFFFF",
+                                    border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
+                                    borderRadius: "4px",
+                                    px: 2,
+                                    py: 1,
+                                    width: "100%",
+                                    height: "40px"
                                 }}
                             >
-                                {labelDisplay}
-                            </Box>
-                        );
-                    })}
-
-                </Box>
-
-                {/* Botón y buscador */}
-                <Box sx={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
-                    <MainIcon text="Gestionar números" width="218px" onClick={() => setShowModal(true)} />
-                    <Box sx={{ position: 'relative', width: '220px' }}>
-                        <Box
-                            display="flex"
-                            alignItems="center"
-                            sx={{
-                                backgroundColor: "#FFFFFF",
-                                border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
-                                borderRadius: "4px",
-                                px: 2,
-                                py: 1,
-                                width: "100%",
-                                height: "40px"
-                            }}
-                        >
-                            <img src={seachicon} alt="Buscar" style={{ marginRight: 8, width: 18 }} />
-                            <input
-                                type="text"
-                                placeholder="Buscar"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{
-                                    border: "none",
-                                    outline: "none",
-                                    width: "100%",
-                                    fontSize: "16px",
-                                    fontFamily: "Poppins",
-                                    color: searchTerm ? "#7B354D" : "#9B9295",
-                                    backgroundColor: "transparent",
-                                }}
-                            />
-                            {searchTerm && (
-                                <img
-                                    src={iconclose}
-                                    alt="Limpiar búsqueda"
-                                    onClick={() => {
-                                        setSearchTerm('');
-                                        // Aplica búsqueda vacía que muestre solo SMS cortos o largos
-                                        const filtered = numbersData.filter(
-                                            (item) =>
-                                                item.Service.toLowerCase().includes("sms cortos") ||
-                                                item.Service.toLowerCase().includes("sms largos")
-                                        );
-                                        setNumbersData(filtered);
+                                <img src={seachicon} alt="Buscar" style={{ marginRight: 8, width: 24 }} />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    style={{
+                                        border: "none",
+                                        outline: "none",
+                                        width: "100%",
+                                        fontSize: "16px",
+                                        fontFamily: "Poppins",
+                                        color: searchTerm ? "#7B354D" : "#9B9295",
+                                        backgroundColor: "transparent",
                                     }}
-                                    style={{ marginLeft: 8, width: 20, height: 20, cursor: 'pointer' }}
                                 />
+                                {searchTerm && (
+                                    <img
+                                        src={iconclose}
+                                        alt="Limpiar búsqueda"
+                                        onClick={() => {
+                                            setSearchTerm('');
+                                            // Aplica búsqueda vacía que muestre solo SMS cortos o largos
+                                            const filtered = numbersData.filter(
+                                                (item) =>
+                                                    item.Service.toLowerCase().includes("sms cortos") ||
+                                                    item.Service.toLowerCase().includes("sms largos")
+                                            );
+                                            setNumbersData(filtered);
+                                        }}
+                                        style={{ marginLeft: 8, width: 20, height: 20, cursor: 'pointer' }}
+                                    />
 
-                            )}
+                                )}
+                            </Box>
                         </Box>
                     </Box>
                 </Box>
-            </Box>
 
-            <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                mt={2}
-                p={2}
-                sx={{ backgroundColor: "#F6F6F6", borderRadius: "8px" }}
-            >
-                {/* Rango de resultados */}
-                <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#330F1B" }}>
-                    {(currentPage - 1) * itemsPerPage + 1}–
-                    {Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems}
-                </Typography>
+                <Divider sx={{ width: 'calc(100% + 0px)', mb: -2, mt: -1 }} />
+                <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mt={2}
+                    p={2}
+                    sx={{ backgroundColor: "#F2F2F2", borderRadius: "8px" }}
+                >
+                    {/* Rango de resultados */}
+                    <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#330F1B" }}>
+                        {(currentPage - 1) * itemsPerPage + 1}–
+                        {Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems}
+                    </Typography>
 
-                {/* Flechas + Exportaciones */}
-                <Box display="flex" alignItems="center" gap={1}>
-                    <Tooltip title="Primera página">
-                        <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
-                            <Box
-                                display="flex"
-                                gap="2px"
-                                alignItems="center"
-                                sx={{
-                                    opacity: currentPage === 1 ? 0.3 : 1
-                                }}
-                            >
-                                <img src={backarrow} style={{ width: 12 }} />
-                                <img src={backarrow} style={{ width: 12 }} />
-                            </Box>
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Página Anterior">
-                        <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
-                            <img src={backarrow} style={{ width: 12, opacity: currentPage === 1 ? 0.3 : 1 }} />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Siguiente página">
-                        <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
-                            <img src={backarrow} style={{ width: 12, transform: 'rotate(180deg)', opacity: currentPage === totalPages ? 0.3 : 1 }} />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Ultima Página">
-                        <IconButton onClick={goToLastPage} disabled={currentPage === totalPages}>
-                            <Box
-                                display="flex"
-                                gap="2px"
-                                alignItems="center"
-                                sx={{
-                                    opacity: currentPage === 1 ? 0.3 : 1
-                                }}
-                            >
-                                <img src={backarrow} style={{ width: 12, transform: 'rotate(180deg)' }} />
-                                <img src={backarrow} style={{ width: 12, transform: 'rotate(180deg)' }} />
-                            </Box>
-                        </IconButton>
-                    </Tooltip>
-
-
-                    {/* Exportaciones */}
-                    <Box display="flex" alignItems="center" gap={2} ml={3}>
-                        <Tooltip title="Exportar CSV" arrow>
-                            <IconButton
-                                onClick={() => handleExportClick('csv', setIsExportingCSV)}
-                                disabled={anyExporting && !isExportingCSV}
-                                sx={{ opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
-                            >
-                                {isExportingCSV ? <DualSpinner /> : <img src={IconDownloadCSV} alt="CSV" />}
+                    {/* Flechas + Exportaciones */}
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <Tooltip title="Primera página">
+                            <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
+                                <Box
+                                    display="flex"
+                                    gap="2px"
+                                    alignItems="center"
+                                    sx={{
+                                        opacity: currentPage === 1 ? 0.3 : 1
+                                    }}
+                                >
+                                    <img src={backarrow} style={{ width: 12 }} />
+                                    <img src={backarrow} style={{ width: 12 }} />
+                                </Box>
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Página Anterior">
+                            <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                                <img src={backarrow} style={{ width: 12, opacity: currentPage === 1 ? 0.3 : 1 }} />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Siguiente página">
+                            <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+                                <img src={backarrow} style={{ width: 12, transform: 'rotate(180deg)', opacity: currentPage === totalPages ? 0.3 : 1 }} />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Ultima Página">
+                            <IconButton onClick={goToLastPage} disabled={currentPage === totalPages}>
+                                <Box
+                                    display="flex"
+                                    gap="2px"
+                                    alignItems="center"
+                                    sx={{
+                                        opacity: currentPage === 1 ? 0.3 : 1
+                                    }}
+                                >
+                                    <img src={backarrow} style={{ width: 12, transform: 'rotate(180deg)' }} />
+                                    <img src={backarrow} style={{ width: 12, transform: 'rotate(180deg)' }} />
+                                </Box>
                             </IconButton>
                         </Tooltip>
 
-                        <Tooltip title="Exportar Excel" arrow>
-                            <IconButton
-                                onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
-                                disabled={anyExporting && !isExportingXLSX}
-                                sx={{ opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
-                            >
-                                {isExportingXLSX ? <DualSpinner /> : <img src={IconDownloadExcel} alt="Excel" />}
-                            </IconButton>
-                        </Tooltip>
 
-                        <Tooltip title="Exportar PDF" arrow>
-                            <IconButton
-                                onClick={() => handleExportClick('pdf', setIsExportingPDF)}
-                                disabled={anyExporting && !isExportingPDF}
-                                sx={{ opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
-                            >
-                                {isExportingPDF ? <DualSpinner /> : <img src={IconDownloadPDF} alt="PDF" />}
-                            </IconButton>
-                        </Tooltip>
+                        {/* Exportaciones */}
+                        <Box display="flex" alignItems="center" gap={2} ml={3}>
+                            <Tooltip title="Exportar CSV" arrow>
+                                <IconButton
+                                    onClick={() => handleExportClick('csv', setIsExportingCSV)}
+                                    disabled={anyExporting && !isExportingCSV}
+                                    sx={{ opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
+                                >
+                                    {isExportingCSV ? <DualSpinner /> : <img src={IconDownloadCSV} alt="CSV" />}
+                                </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title="Exportar Excel" arrow>
+                                <IconButton
+                                    onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
+                                    disabled={anyExporting && !isExportingXLSX}
+                                    sx={{ opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
+                                >
+                                    {isExportingXLSX ? <DualSpinner /> : <img src={IconDownloadExcel} alt="Excel" />}
+                                </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title="Exportar PDF" arrow>
+                                <IconButton
+                                    onClick={() => handleExportClick('pdf', setIsExportingPDF)}
+                                    disabled={anyExporting && !isExportingPDF}
+                                    sx={{ opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
+                                >
+                                    {isExportingPDF ? <DualSpinner /> : <img src={IconDownloadPDF} alt="PDF" />}
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+
                     </Box>
-
                 </Box>
+
+                {originalData.length === 0 ? (
+                    // Caja cerrada - sin registros cargados
+                    <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        sx={{
+                            width: '100%',
+                            minHeight: '300px',
+                            backgroundColor: '#F9F9F9',
+                            padding: 4,
+                            borderRadius: '12px',
+                            border: '1px solid #E0E0E0',
+                            mt: 2,
+                        }}
+                    >
+                        <img src={BoxEmpty} alt="Caja vacía" style={{ width: '120px', marginBottom: '16px' }} />
+                        <Typography
+                            sx={{
+                                fontFamily: 'Poppins',
+                                fontSize: '16px',
+                                color: '#7B354D',
+                                fontWeight: 500,
+                            }}
+                        >
+                            De de alta un número para comenzar.
+                        </Typography>
+                    </Box>
+                ) : paginatedData.length === 0 ? (
+                    // Caja abierta - no hay coincidencias con los filtros
+                    <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        sx={{
+                            width: '100%',
+                            minHeight: '300px',
+                            backgroundColor: '#F9F9F9',
+                            padding: 4,
+                            borderRadius: '12px',
+                            border: '1px solid #E0E0E0',
+                            mt: 2,
+                        }}
+                    >
+                        <img src={NoResult} alt="No resultados" style={{ width: '120px', marginBottom: '16px' }} />
+                        <Typography
+                            sx={{
+                                fontFamily: 'Poppins',
+                                fontSize: '16px',
+                                color: '#7B354D',
+                                fontWeight: 500,
+                            }}
+                        >
+                            No se encontraron resultados
+                        </Typography>
+                    </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '8px',
+                            padding: '8px 2px',
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            overflowX: 'auto',
+                            maxHeight: "400px"
+                        }}
+                    >
+                        <table style={{ minWidth: '1140px', borderCollapse: 'collapse', }}>
+                            <thead>
+                                <tr style={{
+                                    textAlign: 'left', fontFamily: 'Poppins', fontSize: '13px',
+                                    color: '#330F1B', fontWeight: 500, borderBottom: '1px solid #E0E0E0'
+                                }}>
+                                    <th style={{
+                                        padding: '10px', textAlign: 'left',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Número DID</th>
+                                    <th style={{
+                                        padding: '6px', textAlign: 'left',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Tipo</th>
+                                    <th style={{
+                                        padding: '6px', textAlign: 'left',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Estado</th>
+                                    <th style={{
+                                        padding: '6px', textAlign: 'left',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Municipio</th>
+                                    <th style={{
+                                        padding: '6px', textAlign: 'left',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Servicio</th>
+                                    <th style={{
+                                        padding: '6px', textAlign: 'left',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Estatus</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {paginatedData.map((number) => (
+                                    <tr key={number.Id} style={{ borderBottom: '1px solid #E0E0E0' }}>
+                                        <td style={{
+                                            padding: '10px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>{number.Number}</td>
+                                        <td style={{
+                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+
+                                        }}>{number.Type}</td>
+                                        <td style={{
+                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+
+                                        }}>{number.State}</td>
+                                        <td style={{
+                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+
+                                        }}>{number.Municipality}</td>
+                                        <td style={{
+                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+
+                                        }}>{number.Service}</td>
+                                        <td style={{
+                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            , borderRight: '1px solid #E0E0E0',
+
+                                        }}>{number.Estatus}</td>
+                                        <td style={{
+                                            padding: '6px', width: '35px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+
+                                        }}>
+                                            <IconButton onClick={(event) => handleMenuOpen(event, number.Id)}>
+                                                <MoreVertIcon />
+                                            </IconButton>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </Box>
+                )}
             </Box>
 
-            {originalData.length === 0 ? (
-                // Caja cerrada - sin registros cargados
-                <Box
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    sx={{
-                        width: '100%',
-                        minHeight: '300px',
-                        backgroundColor: '#F9F9F9',
-                        padding: 4,
-                        borderRadius: '12px',
-                        border: '1px solid #E0E0E0',
-                        mt: 2,
-                    }}
-                >
-                    <img src={BoxEmpty} alt="Caja vacía" style={{ width: '120px', marginBottom: '16px' }} />
-                    <Typography
-                        sx={{
-                            fontFamily: 'Poppins',
-                            fontSize: '16px',
-                            color: '#7B354D',
-                            fontWeight: 500,
-                        }}
-                    >
-                        De de alta un número para comenzar.
-                    </Typography>
-                </Box>
-            ) : paginatedData.length === 0 ? (
-                // Caja abierta - no hay coincidencias con los filtros
-                <Box
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    sx={{
-                        width: '100%',
-                        minHeight: '300px',
-                        backgroundColor: '#F9F9F9',
-                        padding: 4,
-                        borderRadius: '12px',
-                        border: '1px solid #E0E0E0',
-                        mt: 2,
-                    }}
-                >
-                    <img src={NoResult} alt="No resultados" style={{ width: '120px', marginBottom: '16px' }} />
-                    <Typography
-                        sx={{
-                            fontFamily: 'Poppins',
-                            fontSize: '16px',
-                            color: '#7B354D',
-                            fontWeight: 500,
-                        }}
-                    >
-                        No se encontraron resultados
-                    </Typography>
-                </Box>
-            ) : (
-                <Box
-                    sx={{
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '8px',
-                        padding: '30px 20px',
-                        boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                    }}
-                >
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ textAlign: 'left', fontFamily: 'Poppins', fontSize: '13px', color: '#9B9295' }}>
-                                <th style={{ padding: '12px' }}>
-                                    <Checkbox
-                                        checked={selectedIds.length === numbersData.length}
-                                        indeterminate={selectedIds.length > 0 && selectedIds.length < numbersData.length}
-                                        onChange={handleSelectAll}
-                                    />
-                                </th>
-                                <th style={{ padding: '12px 16px' }}>Número DID</th>
-                                <th style={{ padding: '12px 16px' }}>Tipo</th>
-                                <th style={{ padding: '12px 16px' }}>Estado</th>
-                                <th style={{ padding: '12px 16px' }}>Municipio</th>
-                                <th style={{ padding: '12px 16px' }}>Servicio</th>
-                                <th style={{ padding: '12px 16px' }}>Estatus</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {paginatedData.map((number) => (
-                                <tr key={number.Id} style={{ borderTop: '1px solid #E0E0E0' }}>
-                                    <td style={{ padding: '12px' }}>
-                                        <Checkbox
-                                            checked={selectedIds.includes(number.Id)}
-                                            onChange={() => handleSelect(number.Id)}
-                                        />
-                                    </td>
-                                    <td style={{ padding: '12px 16px', fontFamily: 'Poppins', fontSize: '14px', color: '#330F1B' }}>{number.Number}</td>
-                                    <td style={{ padding: '12px 16px' }}>{number.Type}</td>
-                                    <td style={{ padding: '12px 16px' }}>{number.State}</td>
-                                    <td style={{ padding: '12px 16px' }}>{number.Municipality}</td>
-                                    <td style={{ padding: '12px 16px' }}>{number.Service}</td>
-                                    <td style={{ padding: '12px 16px' }}>{number.Estatus}</td>
-                                    <td style={{ padding: '12px 16px' }}>
-                                        <IconButton onClick={(event) => handleMenuOpen(event, number.Id)}>
-                                            <MoreVertIcon />
-                                        </IconButton>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </Box>
-            )}
             <Menu
                 anchorEl={anchorEl}
                 open={open}
@@ -960,17 +1003,18 @@ const NumbersDids: React.FC = () => {
                 onClose={() => setServiceAnchorEl(null)}
                 PaperProps={{
                     sx: {
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                        width: 230,
+                        padding: 1,
+                        width: "280px",
+                        maxHeight: "200px",
+                        overflowY: "hidden",
                         borderRadius: '12px',
-                        boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
+                        boxShadow: '0px 8px 16px #00131F29',
                     },
                 }}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'left' }}
             >
-                {['SMS # cortos', 'SMS # largos', 'Llamada'].map((option) => (
+                {['SMS # cortos', 'SMS # largos',].map((option) => (
                     <MenuItem
                         key={option}
                         onClick={() =>
@@ -980,16 +1024,42 @@ const NumbersDids: React.FC = () => {
                                     : [...prev, option]
                             )
                         }
-                        sx={{ fontFamily: 'Poppins', fontSize: '14px' }}
+                        sx={{ height: "32px", marginLeft: "-12px" }}
                     >
-                        <Checkbox checked={selectedServices.includes(option)} />
-                        <ListItemText primary={option} />
+                        <Checkbox checked={selectedServices.includes(option)}
+                            checkedIcon={
+                                <Box
+                                    sx={{
+                                        width: '24px',
+                                        height: '24px',
+                                        position: 'relative',
+                                        marginTop: '0px',
+                                        marginLeft: '0px',
+                                    }}
+                                >
+                                    <img
+                                        src={IconCheckBox1}
+                                        alt="Seleccionado"
+                                        style={{ width: '24px', height: '24px' }}
+                                    />
+                                </Box>
+                            }
+                        />
+                        <ListItemText
+                            primary={option}
+                            primaryTypographyProps={{
+                                fontFamily: 'Poppins',
+                                fontSize: '16px',
+                                fontWeight: 500,
+                                color: selectedServices.includes(option) ? '#8F4E63' : '#786E71',
+                            }}
+                        />
                     </MenuItem>
                 ))}
 
-                <Divider sx={{ my: 1 }} />
+                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
 
-                <Box display="flex" justifyContent="space-between" px={2} pb={1} gap={1}>
+                <Box display="flex" justifyContent="space-between" px={1} pb={1} gap={2.5}>
                     <SecondaryButton onClick={handleClearServiceFilter} text="LIMPIAR" />
 
                     <MainButton onClick={handleApplyServiceFilter} text="APLICAR" />

@@ -493,7 +493,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                             >
                                 {/* Campo de texto para búsqueda */}
                                 <TextField
-                                    
+
                                     placeholder="Buscar"
                                     variant="outlined"
                                     size="small"
@@ -724,7 +724,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                             {/* Buscador */}
                             <Box sx={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
                                 <TextField
-                                    
+
                                     placeholder="Buscar"
                                     variant="outlined"
                                     size="small"
@@ -2126,7 +2126,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                 maxWidth={false}
                 disableGutters
                 sx={{
-                    width: '81.7%',
+                    width: '83%',
                     height: '100%',
                     overflowX: 'hidden',
                     overflowY: 'hidden',
@@ -2164,29 +2164,29 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                         {' Nuxiba. Todos los derechos reservados. Se prohíbe el uso no autorizado.'}
                     </Typography>
                     <img src={nuxiba_svg} alt="Nuxiba Logo" width="80" />
-                            {location.pathname === '/' && (
-                    <Fab
-                        aria-label="help"
-                        onClick={handleDownload}
-                        sx={{
-                            position: "fixed",
-                            bottom: 70,
-                            right: 30,
-                            zIndex: 1500,
-                            width: "60px",
-                            height: "60px",
-                            backgroundColor: "#FFFFFF",
-                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-                            border: "1px solid #D9C5CB",
-                            "&:hover": {
-                                background: "#EBE5E7 0% 0% no-repeat padding-box",
-                                boxShadow: "0px 8px 16px #00131F14",
+                    {location.pathname === '/' && (
+                        <Fab
+                            aria-label="help"
+                            onClick={handleDownload}
+                            sx={{
+                                position: "fixed",
+                                bottom: 70,
+                                right: 30,
+                                zIndex: 1500,
+                                width: "60px",
+                                height: "60px",
+                                backgroundColor: "#FFFFFF",
+                                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
                                 border: "1px solid #D9C5CB",
-                            },
-                        }}
-                    >
+                                "&:hover": {
+                                    background: "#EBE5E7 0% 0% no-repeat padding-box",
+                                    boxShadow: "0px 8px 16px #00131F14",
+                                    border: "1px solid #D9C5CB",
+                                },
+                            }}
+                        >
 
-                
+
                             <Tooltip
                                 title="Descargar API"
                                 arrow
@@ -2254,9 +2254,9 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                 </div>
 
                             </Tooltip>
-                      
-                    </Fab>
-  )}
+
+                        </Fab>
+                    )}
 
 
 
