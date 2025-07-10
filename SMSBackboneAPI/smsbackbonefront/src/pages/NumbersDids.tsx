@@ -674,10 +674,10 @@ const NumbersDids: React.FC = () => {
                                         setActiveFilter(label.toLowerCase() as any);
                                     }}
                                     sx={{
-                                        px: '16px', py: '6px', border: '1px solid', borderColor: activeFilter === label.toLowerCase() ? '#7B354D' : '#CFCFCF',
+                                        px: '16px', py: '6px', border: '1px solid', borderColor: activeFilter === label.toLowerCase() ? '#8F4E63CC' : '#C6BFC2',
                                         borderRadius: '50px', cursor: 'pointer', fontFamily: 'Poppins', fontWeight: 600,
-                                        fontSize: '13px', backgroundColor: activeFilter === label.toLowerCase() ? '#F6EEF1' : '#FFFFFF',
-                                        color: activeFilter === label.toLowerCase() ? '#7B354D' : '#9B9295', transition: 'all 0.2s ease-in-out', userSelect: 'none',
+                                        fontSize: '13px', backgroundColor: activeFilter === label.toLowerCase() ? '#FFFFFF' : '#F6F6F6',
+                                        color: activeFilter === label.toLowerCase() ? '#8F4E63' : '#9B9295', transition: 'all 0.2s ease-in-out', userSelect: 'none',
                                     }}
                                 >
                                     {labelDisplay}
@@ -689,7 +689,7 @@ const NumbersDids: React.FC = () => {
 
                     {/* Botón y buscador */}
                     <Box sx={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
-                        <MainIcon text="Gestionar números" width="227px" onClick={() => setShowModal(true)} />
+                        <MainIcon text="Gestionar números" width="228px" onClick={() => setShowModal(true)} />
                         <Box sx={{ position: 'relative', width: '220px' }}>
                             <Box
                                 display="flex"
@@ -753,58 +753,91 @@ const NumbersDids: React.FC = () => {
                     sx={{ backgroundColor: "#F2F2F2", borderRadius: "8px" }}
                 >
                     {/* Rango de resultados */}
-                    <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#330F1B" }}>
+                    <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E" }}>
                         {(currentPage - 1) * itemsPerPage + 1}–
                         {Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems}
                     </Typography>
 
                     {/* Flechas + Exportaciones */}
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <Tooltip title="Primera página">
-                            <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
-                                <Box
-                                    display="flex"
-                                    gap="2px"
-                                    alignItems="center"
-                                    sx={{
-                                        opacity: currentPage === 1 ? 0.3 : 1
-                                    }}
-                                >
-                                    <img src={backarrow} style={{ width: 12 }} />
-                                    <img src={backarrow} style={{ width: 12 }} />
-                                </Box>
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Página Anterior">
-                            <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
-                                <img src={backarrow} style={{ width: 12, opacity: currentPage === 1 ? 0.3 : 1 }} />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Siguiente página">
-                            <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
-                                <img src={backarrow} style={{ width: 12, transform: 'rotate(180deg)', opacity: currentPage === totalPages ? 0.3 : 1 }} />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Ultima Página">
-                            <IconButton onClick={goToLastPage} disabled={currentPage === totalPages}>
-                                <Box
-                                    display="flex"
-                                    gap="2px"
-                                    alignItems="center"
-                                    sx={{
-                                        opacity: currentPage === 1 ? 0.3 : 1
-                                    }}
-                                >
-                                    <img src={backarrow} style={{ width: 12, transform: 'rotate(180deg)' }} />
-                                    <img src={backarrow} style={{ width: 12, transform: 'rotate(180deg)' }} />
-                                </Box>
-                            </IconButton>
-                        </Tooltip>
-
+                    <Box display="flex" alignItems="center" gap={1} height={"25px"} marginBottom={"-5px"} marginTop={"-5px"}>
+                        <Box sx={{ marginRight: "750px" }}>
+                            <Tooltip title="Primera página">
+                                <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
+                                    <Box
+                                        display="flex"
+                                        gap="0px"
+                                        alignItems="center"
+                                        sx={{
+                                            opacity: currentPage === 1 ? 0.3 : 1
+                                        }}
+                                    >
+                                        <img src={backarrow} style={{ width: 24, marginRight: "-16px" }} />
+                                        <img src={backarrow} style={{ width: 24 }} />
+                                    </Box>
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Página Anterior">
+                                <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                                    <img src={backarrow} style={{ width: 24, opacity: currentPage === 1 ? 0.3 : 1, marginLeft: "-18px" }} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Siguiente página">
+                                <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+                                    <img src={backarrow} style={{
+                                        width: 24, transform: 'rotate(180deg)', marginRight: "-28px", marginLeft: "-28px",
+                                        opacity: currentPage === totalPages ? 0.3 : 1
+                                    }} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Ultima Página">
+                                <IconButton onClick={goToLastPage} disabled={currentPage === totalPages}>
+                                    <Box
+                                        display="flex"
+                                        gap="0px"
+                                        alignItems="center"
+                                        sx={{
+                                            opacity: currentPage === 1 ? 0.3 : 1
+                                        }}
+                                    >
+                                        <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-6px" }} />
+                                        <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-16px" }} />
+                                    </Box>
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
 
                         {/* Exportaciones */}
-                        <Box display="flex" alignItems="center" gap={2} ml={3}>
-                            <Tooltip title="Exportar CSV" arrow>
+                        <Box display="flex" alignItems="center" gap={0} mr={-2.5}>
+                            <Tooltip title="Exportar a CSV" placement="top"
+                                arrow
+                                PopperProps={{
+                                    modifiers: [
+                                        {
+                                            name: 'arrow',
+                                            options: {
+                                                padding: 0,
+                                            },
+                                        },
+                                    ],
+                                }}
+                                componentsProps={{
+                                    tooltip: {
+                                        sx: {
+                                            fontFamily: 'Poppins',
+                                            backgroundColor: '#312D2E',
+                                            color: '#DEDADA',
+                                            fontSize: '12px',
+                                            borderRadius: '6px',
+                                            padding: '6px 10px',
+                                        },
+                                    },
+                                    arrow: {
+                                        sx: {
+                                            color: '#322D2E',
+                                        },
+                                    },
+                                }}
+                            >
                                 <IconButton
                                     onClick={() => handleExportClick('csv', setIsExportingCSV)}
                                     disabled={anyExporting && !isExportingCSV}
@@ -814,7 +847,36 @@ const NumbersDids: React.FC = () => {
                                 </IconButton>
                             </Tooltip>
 
-                            <Tooltip title="Exportar Excel" arrow>
+                            <Tooltip title="Exportar a Excel" placement="top"
+                                arrow
+                                PopperProps={{
+                                    modifiers: [
+                                        {
+                                            name: 'arrow',
+                                            options: {
+                                                padding: 0,
+                                            },
+                                        },
+                                    ],
+                                }}
+                                componentsProps={{
+                                    tooltip: {
+                                        sx: {
+                                            fontFamily: 'Poppins',
+                                            backgroundColor: '#312D2E',
+                                            color: '#DEDADA',
+                                            fontSize: '12px',
+                                            borderRadius: '6px',
+                                            padding: '6px 10px',
+                                        },
+                                    },
+                                    arrow: {
+                                        sx: {
+                                            color: '#322D2E',
+                                        },
+                                    },
+                                }}
+                            >
                                 <IconButton
                                     onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
                                     disabled={anyExporting && !isExportingXLSX}
@@ -824,7 +886,36 @@ const NumbersDids: React.FC = () => {
                                 </IconButton>
                             </Tooltip>
 
-                            <Tooltip title="Exportar PDF" arrow>
+                            <Tooltip title="Exportar a PDF" placement="top"
+                                arrow
+                                PopperProps={{
+                                    modifiers: [
+                                        {
+                                            name: 'arrow',
+                                            options: {
+                                                padding: 0,
+                                            },
+                                        },
+                                    ],
+                                }}
+                                componentsProps={{
+                                    tooltip: {
+                                        sx: {
+                                            fontFamily: 'Poppins',
+                                            backgroundColor: '#312D2E',
+                                            color: '#DEDADA',
+                                            fontSize: '12px',
+                                            borderRadius: '6px',
+                                            padding: '6px 10px',
+                                        },
+                                    },
+                                    arrow: {
+                                        sx: {
+                                            color: '#322D2E',
+                                        },
+                                    },
+                                }}
+                            >
                                 <IconButton
                                     onClick={() => handleExportClick('pdf', setIsExportingPDF)}
                                     disabled={anyExporting && !isExportingPDF}
@@ -1037,6 +1128,9 @@ const NumbersDids: React.FC = () => {
                 anchorEl={serviceAnchorEl}
                 open={openServiceFilter}
                 onClose={() => setServiceAnchorEl(null)}
+                MenuListProps={{
+                    autoFocusItem: false,
+                }}
                 PaperProps={{
                     sx: {
                         padding: 1,
@@ -1050,7 +1144,7 @@ const NumbersDids: React.FC = () => {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'left' }}
             >
-                {['SMS # cortos', 'SMS # largos',].map((option) => (
+                {['SMS # cortos', 'SMS # largos'].map((option) => (
                     <MenuItem
                         key={option}
                         onClick={() =>
@@ -1109,9 +1203,11 @@ const NumbersDids: React.FC = () => {
                 PaperProps={{
                     sx: {
                         padding: 1,
-                        width: 250,
+                        width: "280px",
+                        height: "282px",
+                        overflowY: "hidden",
                         borderRadius: '12px',
-                        boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
+                        boxShadow: '0px 8px 16px #00131F29',
                     },
                 }}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
@@ -1126,19 +1222,55 @@ const NumbersDids: React.FC = () => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <img src={seachicon} alt="Buscar" style={{ width: 16 }} />
+                                <img
+                                    src={seachicon}
+                                    alt="Buscar"
+                                    style={{
+                                        width: 24,
+                                        filter: clientSearch ? 'invert(14%) sepia(58%) saturate(1253%) hue-rotate(316deg) brightness(90%) contrast(95%)' : 'none'
+                                    }}
+                                />
                             </InputAdornment>
                         ),
                         endAdornment: clientSearch && (
                             <IconButton onClick={() => setClientSearch('')}>
-                                <img src={iconclose} alt="Limpiar" style={{ width: 16 }} />
+                                <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
                             </IconButton>
                         ),
+                        sx: {
+                            fontFamily: 'Poppins',
+                            color: clientSearch ? '#7B354D' : '#000',
+                        }
                     }}
-                    sx={{ mb: 1 }}
+                    inputProps={{
+                        style: {
+                            fontFamily: 'Poppins',
+                            color: clientSearch ? '#7B354D' : '#000',
+                        }
+                    }}
+                    sx={{
+                        width: '248px',
+                        height: '40px',
+                        mb: 1,
+                        '& .MuiOutlinedInput-root': {
+                            height: '40px',
+                            border: '1px solid #9B9295',
+                            '& fieldset': {
+                                borderColor: clientSearch ? '#7B354D' : '#9B9295',
+                            },
+                            '&:hover fieldset': {
+                                borderColor: clientSearch ? '#7B354D' : '#9B9295',
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: clientSearch ? '#7B354D' : '#9B9295',
+                            },
+                        },
+                    }}
                 />
 
-                <Box sx={{ maxHeight: '200px', overflowY: 'auto' }}>
+                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+
+                <Box sx={{ height: '126px', overflowY: 'auto' }}>
                     {clientsList
                         .filter((c) => c.nombrecliente.toLowerCase().includes(clientSearch))
                         .map((client) => (
@@ -1151,20 +1283,51 @@ const NumbersDids: React.FC = () => {
                                             : [...prev, client.nombrecliente]
                                     )
                                 }
+                                sx={{ height: "32px", marginLeft: "-12px" }}
+
                             >
-                                <Checkbox checked={selectedClients.includes(client.nombrecliente)} />
-                                <ListItemText primary={client.nombrecliente} />
+                                <Checkbox checked={selectedClients.includes(client.nombrecliente)}
+                                    checkedIcon={
+                                        <Box
+                                            sx={{
+                                                width: '24px',
+                                                height: '24px',
+                                                position: 'relative',
+                                                marginTop: '0px',
+                                                marginLeft: '0px',
+                                            }}
+                                        >
+                                            <img
+                                                src={IconCheckBox1}
+                                                alt="Seleccionado"
+                                                style={{ width: '24px', height: '24px' }}
+                                            />
+                                        </Box>
+                                    }
+                                />
+                                <ListItemText
+                                    primary={client.nombrecliente}
+                                    primaryTypographyProps={{
+                                        fontFamily: 'Poppins',
+                                        fontSize: '16px',
+                                        fontWeight: 500,
+                                        color: selectedClients.includes(client.nombrecliente) ? '#8F4E63' : '#786E71',
+                                    }}
+                                />
                             </MenuItem>
                         ))}
                     {clientsList.filter((c) => c.nombrecliente.toLowerCase().includes(clientSearch)).length === 0 && (
-                        <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500 }}>
-                            No se encontraron resultados.
-                        </Typography>
+                        <Box sx={{ marginTop: "60px" }}>
+                            <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins" }}>
+                                No se encontraron resultados.
+                            </Typography>
+                        </Box>
                     )}
                 </Box>
 
-                <Divider sx={{ my: 1 }} />
-                <Box display="flex" justifyContent="space-between" px={2} pb={1} gap={1}>
+                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+
+                <Box display="flex" justifyContent="space-between" px={1} pb={1} gap={2.5}>
                     <SecondaryButton
                         onClick={() => {
                             setSelectedClients([]);
@@ -1200,11 +1363,11 @@ const NumbersDids: React.FC = () => {
                 anchorEl={statusAnchorEl}
                 open={statusMenuOpen}
                 onClose={() => setStatusMenuOpen(false)}
-                PaperProps={{ sx: { width: 250, borderRadius: '12px', padding: 1 } }}
+                PaperProps={{ sx: { width: "280px", borderRadius: '12px', padding: 1 } }}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'left' }}
             >
-                <Box sx={{ maxHeight: '230px', overflowY: 'auto' }}>
+                <Box sx={{ height: '126px', overflowY: 'auto' }}>
                     {['Disponible', 'Asignado', 'En prueba', 'Comprado', 'Asignado a prueba'].map((status) => (
                         <MenuItem
                             key={status}
@@ -1215,14 +1378,42 @@ const NumbersDids: React.FC = () => {
                                         : [...prev, status]
                                 )
                             }
+                            sx={{ height: "32px", marginLeft: "-12px" }}
+
                         >
-                            <Checkbox checked={selectedStatus.includes(status)} />
-                            <ListItemText primary={status} />
+                            <Checkbox checked={selectedStatus.includes(status)}
+                                checkedIcon={
+                                    <Box
+                                        sx={{
+                                            width: '24px',
+                                            height: '24px',
+                                            position: 'relative',
+                                            marginTop: '0px',
+                                            marginLeft: '0px',
+                                        }}
+                                    >
+                                        <img
+                                            src={IconCheckBox1}
+                                            alt="Seleccionado"
+                                            style={{ width: '24px', height: '24px' }}
+                                        />
+                                    </Box>
+                                }
+                            />
+                            <ListItemText primary={status}
+                                primaryTypographyProps={{
+                                    fontFamily: 'Poppins',
+                                    fontSize: '16px',
+                                    fontWeight: 500,
+                                    color: selectedStatus.includes(status) ? '#8F4E63' : '#786E71',
+                                }}
+                            />
                         </MenuItem>
                     ))}
                 </Box>
-                <Divider sx={{ my: 1 }} />
-                <Box display="flex" justifyContent="space-between" px={2} pb={1} gap={1}>
+                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+
+                <Box display="flex" justifyContent="space-between" px={0} pb={0} gap={2.5}>
                     <SecondaryButton
                         onClick={() => {
                             setSelectedStatus([]);
@@ -1281,13 +1472,44 @@ const NumbersDids: React.FC = () => {
 
                         <Divider sx={{
                             width: 'calc(100% + 64px)', marginLeft: '-32px',
-                            marginTop: "20px",
-                            marginBottom: "-15px"
+                            marginTop: "15px",
+                            marginBottom: "0px"
                         }} />
-                        <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)} sx={{ px: 3, pt: 1 }}>
-                            <Tab label="Números Generales" sx={{ fontFamily: 'Poppins', textTransform: 'none' }} />
-                            <Tab label="Números Especiales" sx={{ fontFamily: 'Poppins', textTransform: 'none' }} />
+                        <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)}
+                            sx={{
+                                marginLeft: "-32px",
+                                '.MuiTab-root': {
+                                    fontFamily: 'Poppins',
+                                    textTransform: 'none',
+                                    color: '#8F4E63',
+                                    '&:hover': {
+                                        backgroundColor: '#E9DBE0',
+                                        borderRadius: 0,
+                                    },
+                                },
+                                '.Mui-selected': {
+                                    color: '#8F4E63 !important',
+                                },
+                                '.MuiTabs-indicator': {
+                                    backgroundColor: '#8F4E63',
+                                    height: '2px',
+                                },
+                            }}
+                        >
+                            <Tab label="NÚMEROS GENERALES" sx={{
+                                fontFamily: 'Poppins', textTransform: 'none',
+                                letterSpacing: "0.96px", fontSize: "12px", fontWeight: 600,
+                            }} />
+                            <Tab label="NÚMEROS ESPECIALES" sx={{
+                                fontFamily: 'Poppins', textTransform: 'none',
+                                letterSpacing: "0.96px", fontSize: "12px", fontWeight: 600,
+                            }} />
                         </Tabs>
+                        <Divider sx={{
+                            width: 'calc(100% + 64px)', marginLeft: '-32px',
+                            marginTop: "0px",
+                            marginBottom: "0px"
+                        }} />
                         <Typography
                             mt={3}
                             fontWeight="500"
@@ -1308,7 +1530,7 @@ const NumbersDids: React.FC = () => {
                                 mt: 2,
                                 display: 'flex',
                                 justifyContent: 'center',
-                                gap: "25px",
+                                gap: "28px",
                             }}
                         >
                             {/* CARGAR */}
@@ -1454,8 +1676,9 @@ const NumbersDids: React.FC = () => {
                                             lineHeight: 1,
                                             color: '#8F4D63',
                                             textTransform: 'none',
-                                            marginLeft: "-2px",
-                                            marginTop: "6px"
+                                            marginLeft: "-10px",
+                                            marginTop: "6px",
+                                            whiteSpace: 'nowrap',
                                         }}
                                     >
                                         Dar de baja
@@ -1538,9 +1761,9 @@ const NumbersDids: React.FC = () => {
                             </Tooltip>
                         </ToggleButtonGroup>
 
-
-                        <Divider sx={{ my: 3, mt: 5 }} />
                     </Box>
+                    <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 6 }} />
+
                     <Grid container spacing={2} sx={{ mb: 2 }}>
                         {tab === 1 && (
                             <Grid item xs={6}>

@@ -813,7 +813,7 @@ const Clients: React.FC = () => {
                                     height: "40px"
                                 }}
                             >
-                                <img src={seachicon} alt="Buscar" style={{ marginRight: 8, width: 18 }} />
+                                <img src={seachicon} alt="Buscar" style={{ marginRight: 8, width: 24 }} />
                                 <input
                                     type="text"
                                     placeholder="Buscar"
@@ -836,7 +836,7 @@ const Clients: React.FC = () => {
                                         onClick={() => {
                                             setSearchTerm('');
                                         }}
-                                        style={{ marginLeft: 8, width: 20, height: 20, cursor: 'pointer' }}
+                                        style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
                                     />
 
                                 )}
@@ -845,67 +845,71 @@ const Clients: React.FC = () => {
                     </Box>
                 </Box>
 
-                <Divider sx={{ width: 'calc(100% + 0px)', mb: 0 }} />
+                <Divider sx={{ width: 'calc(100% + 0px)', mb: 0, mt: -1 }} />
                 <Box
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center"
                     mt={0}
                     p={2}
-                    sx={{ backgroundColor: "#F2F2F2", borderRadius: "8px" }}
-                >
+                    sx={{ backgroundColor: "#F2F2F2", borderRadius: "8px" }}>
+
                     {/* Rango de resultados */}
-                    <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#330F1B" }}>
+                    <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E" }}>
                         {(currentPage - 1) * itemsPerPage + 1}–
                         {Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems}
                     </Typography>
 
                     {/* Flechas + Exportaciones */}
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <Tooltip title="Primera página">
-                            <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
-                                <Box
-                                    display="flex"
-                                    gap="2px"
-                                    alignItems="center"
-                                    sx={{
-                                        opacity: currentPage === 1 ? 0.3 : 1
-                                    }}
-                                >
-                                    <img src={backarrow} style={{ width: 24 }} />
-                                    <img src={backarrow} style={{ width: 24 }} />
-                                </Box>
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Página Anterior">
-                            <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
-                                <img src={backarrow} style={{ width: 24, opacity: currentPage === 1 ? 0.3 : 1 }} />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Siguiente página">
-                            <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
-                                <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', opacity: currentPage === totalPages ? 0.3 : 1 }} />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Ultima Página">
-                            <IconButton onClick={goToLastPage} disabled={currentPage === totalPages}>
-                                <Box
-                                    display="flex"
-                                    gap="2px"
-                                    alignItems="center"
-                                    sx={{
-                                        opacity: currentPage === 1 ? 0.3 : 1
-                                    }}
-                                >
-                                    <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)' }} />
-                                    <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)' }} />
-                                </Box>
-                            </IconButton>
-                        </Tooltip>
-
+                    <Box display="flex" alignItems="center" gap={1} height={"25px"} marginBottom={"-5px"} marginTop={"-5px"}>
+                        <Box sx={{ marginRight: "750px" }}>
+                            <Tooltip title="Primera página">
+                                <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
+                                    <Box
+                                        display="flex"
+                                        gap="0px"
+                                        alignItems="center"
+                                        sx={{
+                                            opacity: currentPage === 1 ? 0.3 : 1
+                                        }}
+                                    >
+                                        <img src={backarrow} style={{ width: 24, marginRight: "-16px" }} />
+                                        <img src={backarrow} style={{ width: 24 }} />
+                                    </Box>
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Página Anterior">
+                                <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                                    <img src={backarrow} style={{ width: 24, opacity: currentPage === 1 ? 0.3 : 1, marginLeft: "-18px" }} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Siguiente página">
+                                <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+                                    <img src={backarrow} style={{
+                                        width: 24, transform: 'rotate(180deg)', marginRight: "-28px", marginLeft: "-28px",
+                                        opacity: currentPage === totalPages ? 0.3 : 1
+                                    }} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Ultima Página">
+                                <IconButton onClick={goToLastPage} disabled={currentPage === totalPages}>
+                                    <Box
+                                        display="flex"
+                                        gap="0px"
+                                        alignItems="center"
+                                        sx={{
+                                            opacity: currentPage === 1 ? 0.3 : 1
+                                        }}
+                                    >
+                                        <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-6px" }} />
+                                        <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-16px" }} />
+                                    </Box>
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
 
                         {/* Exportaciones */}
-                        <Box display="flex" alignItems="center" gap={2} ml={3}>
+                        <Box display="flex" alignItems="center" gap={0} mr={-2.5}>
                             <Tooltip title="Exportar a CSV" placement="top"
                                 arrow
                                 PopperProps={{
@@ -1476,13 +1480,16 @@ const Clients: React.FC = () => {
                             </MenuItem>
                         ))}
                     {clientsList.filter((c) => c.nombreCliente.toLowerCase().includes(clientSearch)).length === 0 && (
-                        <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins" }}>
-                            No se encontraron resultados.
-                        </Typography>
+                        <Box sx={{ marginTop: "60px" }}>
+                            <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins" }}>
+                                No se encontraron resultados.
+                            </Typography>
+                        </Box>
                     )}
                 </Box>
 
                 <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+
                 <Box display="flex" justifyContent="space-between" px={1} pb={1} gap={2.5}>
                     <SecondaryButton
                         onClick={() => {
