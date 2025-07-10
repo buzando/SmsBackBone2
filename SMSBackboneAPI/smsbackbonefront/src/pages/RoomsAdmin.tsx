@@ -28,6 +28,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MainModal from '../components/commons/MainModal'
 import Thrashicon from '../assets/Icon-trash-Card.svg'
+import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 
 interface Clients {
     id: number;
@@ -270,7 +271,7 @@ const RoomsAdmin: React.FC = () => {
     };
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", width: '90%', minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             {/* Header con título y flecha */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -344,7 +345,7 @@ const RoomsAdmin: React.FC = () => {
                                     height: "40px"
                                 }}
                             >
-                                <img src={seachicon} alt="Buscar" style={{ marginRight: 8, width: 18 }} />
+                                <img src={seachicon} alt="Buscar" style={{ marginRight: 8, width: 24 }} />
                                 <input
                                     type="text"
                                     placeholder="Buscar"
@@ -367,7 +368,7 @@ const RoomsAdmin: React.FC = () => {
                                         onClick={() => {
                                             setSearchTerm('');
                                         }}
-                                        style={{ marginLeft: 8, width: 20, height: 20, cursor: 'pointer' }}
+                                        style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
                                     />
 
                                 )}
@@ -376,7 +377,7 @@ const RoomsAdmin: React.FC = () => {
                     </Box>
                 </Box>
 
-                <Divider sx={{ width: 'calc(100% + 0px)', mb: 0 }} />
+                <Divider sx={{ width: 'calc(100% + 0px)', mb: 0, mt: -1 }} />
                 <Box
                     display="flex"
                     justifyContent="space-between"
@@ -386,57 +387,61 @@ const RoomsAdmin: React.FC = () => {
                     sx={{ backgroundColor: "#F2F2F2", borderRadius: "8px" }}
                 >
                     {/* Rango de resultados */}
-                    <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#330F1B" }}>
+                    <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E" }}>
                         {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, roomsData.length)} de {roomsData.length}
                     </Typography>
 
 
                     {/* Flechas + Exportaciones */}
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <Tooltip title="Primera página">
-                            <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
-                                <Box
-                                    display="flex"
-                                    gap="2px"
-                                    alignItems="center"
-                                    sx={{
-                                        opacity: currentPage === 1 ? 0.3 : 1
-                                    }}
-                                >
-                                    <img src={backarrow} style={{ width: 24 }} />
-                                    <img src={backarrow} style={{ width: 24 }} />
-                                </Box>
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Página Anterior">
-                            <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
-                                <img src={backarrow} style={{ width: 24, opacity: currentPage === 1 ? 0.3 : 1 }} />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Siguiente página">
-                            <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
-                                <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', opacity: currentPage === totalPages ? 0.3 : 1 }} />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Ultima Página">
-                            <IconButton onClick={goToLastPage} disabled={currentPage === totalPages}>
-                                <Box
-                                    display="flex"
-                                    gap="2px"
-                                    alignItems="center"
-                                    sx={{
-                                        opacity: currentPage === 1 ? 0.3 : 1
-                                    }}
-                                >
-                                    <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)' }} />
-                                    <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)' }} />
-                                </Box>
-                            </IconButton>
-                        </Tooltip>
-
+                    <Box display="flex" alignItems="center" gap={1} height={"25px"} marginBottom={"-5px"} marginTop={"-5px"}>
+                        <Box sx={{ marginRight: "750px" }}>
+                            <Tooltip title="Primera página">
+                                <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
+                                    <Box
+                                        display="flex"
+                                        gap="0px"
+                                        alignItems="center"
+                                        sx={{
+                                            opacity: currentPage === 1 ? 0.3 : 1
+                                        }}
+                                    >
+                                        <img src={backarrow} style={{ width: 24, marginRight: "-16px" }} />
+                                        <img src={backarrow} style={{ width: 24 }} />
+                                    </Box>
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Página Anterior">
+                                <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                                    <img src={backarrow} style={{ width: 24, opacity: currentPage === 1 ? 0.3 : 1, marginLeft: "-18px" }} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Siguiente página">
+                                <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+                                    <img src={backarrow} style={{
+                                        width: 24, transform: 'rotate(180deg)', marginRight: "-28px", marginLeft: "-28px",
+                                        opacity: currentPage === totalPages ? 0.3 : 1
+                                    }} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Ultima Página">
+                                <IconButton onClick={goToLastPage} disabled={currentPage === totalPages}>
+                                    <Box
+                                        display="flex"
+                                        gap="0px"
+                                        alignItems="center"
+                                        sx={{
+                                            opacity: currentPage === 1 ? 0.3 : 1
+                                        }}
+                                    >
+                                        <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-6px" }} />
+                                        <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-16px" }} />
+                                    </Box>
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
 
                         {/* Exportaciones */}
-                        <Box display="flex" alignItems="center" gap={2} ml={3}>
+                        <Box display="flex" alignItems="center" gap={0} mr={-2.5}>
                             <Tooltip title="Exportar a CSV" placement="top"
                                 arrow
                                 PopperProps={{
@@ -714,36 +719,75 @@ const RoomsAdmin: React.FC = () => {
                 PaperProps={{
                     sx: {
                         padding: 1,
-                        width: 250,
+                        width: "280px",
+                        height: "282px",
+                        overflowY: "hidden",
                         borderRadius: '12px',
-                        boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
+                        boxShadow: '0px 8px 16px #00131F29',
                     },
                 }}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'left' }}
             >
-                <TextField
-                    placeholder="Buscar cliente"
-                    variant="outlined"
-                    fullWidth
-                    value={clientSearch}
-                    onChange={(e) => setClientSearch(e.target.value.toLowerCase())}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <img src={seachicon} alt="Buscar" style={{ width: 16 }} />
-                            </InputAdornment>
-                        ),
-                        endAdornment: clientSearch && (
-                            <IconButton onClick={() => setClientSearch('')}>
-                                <img src={iconclose} alt="Limpiar" style={{ width: 16 }} />
-                            </IconButton>
-                        ),
-                    }}
-                    sx={{ mb: 1 }}
-                />
+                <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                    <TextField
+                        placeholder="Buscar cliente"
+                        variant="outlined"
+                        fullWidth
+                        value={clientSearch}
+                        onChange={(e) => setClientSearch(e.target.value.toLowerCase())}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <img
+                                        src={seachicon}
+                                        alt="Buscar"
+                                        style={{
+                                            width: 24,
+                                            filter: clientSearch ? 'invert(14%) sepia(58%) saturate(1253%) hue-rotate(316deg) brightness(90%) contrast(95%)' : 'none'
+                                        }}
+                                    />
+                                </InputAdornment>
+                            ),
+                            endAdornment: clientSearch && (
+                                <IconButton onClick={() => setClientSearch('')}>
+                                    <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
+                                </IconButton>
+                            ),
+                            sx: {
+                                fontFamily: 'Poppins',
+                                color: clientSearch ? '#7B354D' : '#000',
+                            }
+                        }}
+                        inputProps={{
+                            style: {
+                                fontFamily: 'Poppins',
+                                color: clientSearch ? '#7B354D' : '#000',
+                            }
+                        }}
+                        sx={{
+                            width: '248px',
+                            height: '40px',
+                            mb: 1,
+                            '& .MuiOutlinedInput-root': {
+                                height: '40px',
+                                border: '1px solid #9B9295',
+                                '& fieldset': {
+                                    borderColor: clientSearch ? '#7B354D' : '#9B9295',
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: clientSearch ? '#7B354D' : '#9B9295',
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: clientSearch ? '#7B354D' : '#9B9295',
+                                },
+                            },
+                        }}
+                    />
+                </Box>
+                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
 
-                <Box sx={{ maxHeight: '200px', overflowY: 'auto' }}>
+                <Box sx={{ height: '126px', overflowY: 'auto' }}>
                     {clientsList
                         .filter((c) => c.nombrecliente.toLowerCase().includes(clientSearch.toLowerCase()))
                         .map((client) => (
@@ -756,20 +800,48 @@ const RoomsAdmin: React.FC = () => {
                                             : [...prev, client.nombrecliente]
                                     )
                                 }
+                                sx={{ height: "32px", marginLeft: "-12px" }}
                             >
-                                <Checkbox checked={selectedClients.includes(client.nombrecliente)} />
-                                <ListItemText primary={client.nombrecliente} />
+                                <Checkbox checked={selectedClients.includes(client.nombrecliente)}
+                                    checkedIcon={
+                                        <Box
+                                            sx={{
+                                                width: '24px',
+                                                height: '24px',
+                                                position: 'relative',
+                                                marginTop: '0px',
+                                                marginLeft: '0px',
+                                            }}
+                                        >
+                                            <img
+                                                src={IconCheckBox1}
+                                                alt="Seleccionado"
+                                                style={{ width: '24px', height: '24px' }}
+                                            />
+                                        </Box>
+                                    }
+                                />
+                                <ListItemText primary={client.nombrecliente}
+                                    primaryTypographyProps={{
+                                        fontFamily: 'Poppins',
+                                        fontSize: '16px',
+                                        fontWeight: 500,
+                                        color: selectedClients.includes(client.nombrecliente) ? '#8F4E63' : '#786E71',
+                                    }}
+                                />
                             </MenuItem>
                         ))}
                     {clientsList.filter((c) => c.nombrecliente.toLowerCase().includes(clientSearch)).length === 0 && (
-                        <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500 }}>
-                            No se encontraron resultados.
-                        </Typography>
+                        <Box sx={{ marginTop: "60px" }}>
+                            <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins" }}>
+                                No se encontraron resultados.
+                            </Typography>
+                        </Box>
                     )}
                 </Box>
 
-                <Divider sx={{ my: 1 }} />
-                <Box display="flex" justifyContent="space-between" px={2} pb={1} gap={1}>
+                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+                <Box display="flex" justifyContent="space-between" px={1} pb={1} gap={2.5}>
                     <SecondaryButton
                         onClick={() => {
                             setSelectedClients([]);
