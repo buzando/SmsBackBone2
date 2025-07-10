@@ -408,48 +408,7 @@ namespace SMSBackboneAPI.Controllers
             }
             else
             {
-                var usuario = new UserManager().AddUserFromRegister(user);
-                if (usuario != null)
-                {
-                    var room = new roomsManager().addroomByNewUser(usuario.Id, usuario.IdCliente);
-                    if (room)
-                    {
-                        //var token = new UserManager().EnvioCodigo(user.email, "EMAIL");
-                        //if (string.IsNullOrEmpty(token))
-                        //{
-                        //    return BadRequest(new GeneralErrorResponseDto() { code = "ConfirmationUnsent", description = "ConfirmationUnsent" });
-
-                        //}
-                        var tokenHandler = new JwtSecurityTokenHandler();
-                        var byteKey = Encoding.UTF8.GetBytes(configuration.GetSection("SecretKey").Value);
-
-                        var tokenDescriptor = new SecurityTokenDescriptor
-                        {
-                            Subject = new ClaimsIdentity(new Claim[]
-                            {
-                        new Claim("User", JsonConvert.SerializeObject(responseDto))
-                            }),
-                            Expires = DateTime.UtcNow.AddDays(1),
-                            Issuer = JwtIssuer,
-                            Audience = JwtAudience,
-                            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(byteKey), SecurityAlgorithms.HmacSha256Signature)
-                        };
-                        var token = tokenHandler.CreateToken(tokenDescriptor);
-                        var respuesta = new ResponseDTO { user = usuario, token = token.ToString(), expiration = DateTime.Now.AddDays(1) };
-                        return Ok(respuesta);
-                        return Ok(usuario);
-                    }
-                    else
-                    {
-                        return BadRequest(new GeneralErrorResponseDto() { code = "agregarusuario", description = "Error al guardar usuario intente más tarde" });
-
-                    }
-                }
-                else
-                {
-                    return BadRequest(new GeneralErrorResponseDto() { code = "agregarusuario", description = "Error al guardar usuario intente más tarde" });
-
-                }
+                return BadRequest(new GeneralErrorResponseDto() { code = "agregarusuario", description = "Error Cliente ya existente usuario intente más tarde" });
 
             }
         }
@@ -936,7 +895,7 @@ namespace SMSBackboneAPI.Controllers
             log.Info(responseDto);
             if (responseDto.StartsWith("http"))
             {
-               return Ok(responseDto);
+                return Ok(responseDto);
             }
             if (!string.IsNullOrEmpty(responseDto))
             {
@@ -999,7 +958,7 @@ namespace SMSBackboneAPI.Controllers
 
         [HttpPost("SaveNotificationRecharge")]
         public async Task<IActionResult> SaveNotificationRecharge(AmountNotificationRequest Notification)
-         {
+        {
             GeneralErrorResponseDto[] errorResponse = new GeneralErrorResponseDto[1];
             var UserManager = new Business.UserManager();
             var responseDto = UserManager.SaveRechargeSettings(Notification);
@@ -1200,16 +1159,16 @@ namespace SMSBackboneAPI.Controllers
             //}
             var BlackListManager = new Business.BlackListManager();
 
-                var response = BlackListManager.DeletePhoneList(blacklist);
-                if (response)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(new GeneralErrorResponseDto() { code = "Error", description = "Adding Recharge" });
+            var response = BlackListManager.DeletePhoneList(blacklist);
+            if (response)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(new GeneralErrorResponseDto() { code = "Error", description = "Adding Recharge" });
 
-                }
+            }
 
 
 

@@ -31,5 +31,6 @@ namespace Modal.Model.Model
 
         public string? EstatusError { get; set; }
         public string? Invoice { get; set; }
+        public int idRoom { get; set; }
     }
 }

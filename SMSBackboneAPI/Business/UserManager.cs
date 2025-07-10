@@ -40,7 +40,8 @@ namespace Business
             /*Petición a base de datos*/
             using (var context = new Entities())
             {
-                var userdb = context.Users.FirstOrDefault(p => p.email == user && p.passwordHash == password);
+                var passwordhash = SecurityHelper.GenerarPasswordHash(password);
+                var userdb = context.Users.FirstOrDefault(p => p.email == user && p.passwordHash == passwordhash);
 
                 var config = new MapperConfiguration(cfg =>
 
@@ -410,6 +411,7 @@ namespace Business
         {
             try
             {
+                var password = SecurityHelper.GenerarPasswordHash(register.Password);
 
                 var user = new Modal.Model.Model.Users
                 {
@@ -423,7 +425,7 @@ namespace Business
                     lastName = register.lastName,
                     lastPasswordChangeDate = DateTime.Now,
                     lockoutEnabled = false,
-                    passwordHash = register.Password,
+                    passwordHash = password,
                     phonenumber = register.phone,
                     SMS = register.sms,
                     userName = register.email,
@@ -744,6 +746,7 @@ namespace Business
         {
             log.Info("Comenzando proceso");
             var tarjeta = new creditcards();
+            var room = new rooms();
             var usuario = new Modal.Model.Model.Users();
             try
             {
@@ -751,8 +754,14 @@ namespace Business
                 {
                     tarjeta = ctx.creditcards.Where(x => x.Id == credit.IdCreditCard).FirstOrDefault();
                     usuario = ctx.Users.Where(x => x.Id == credit.IdUser).FirstOrDefault();
+                    room = (from r in ctx.Rooms
+                                join rbu in ctx.roomsbyuser on r.id equals rbu.idRoom
+                                where r.name == credit.room && rbu.idUser == credit.IdUser
+                                select r).FirstOrDefault();
                 }
 
+                if (string.IsNullOrEmpty(tarjeta.token_id) || string.IsNullOrEmpty(tarjeta.token_id_customer))
+                    return "Error: Token de tarjeta o cliente no disponible";
 
                 var creditrecharge = new CreditRecharge
                 {
@@ -762,7 +771,8 @@ namespace Business
                     quantityMoney = credit.QuantityMoney,
                     RechargeDate = DateTime.Now,
                     idUser = credit.IdUser,
-                    AutomaticInvoice = credit.AutomaticInvoice
+                    AutomaticInvoice = credit.AutomaticInvoice,
+                    idRoom = room.id
                 };
                 //aqui va el openpay
 
@@ -772,37 +782,6 @@ namespace Business
                 var merchantId = Common.ConfigurationManagerJson("MERCHANTID"); // Tu merchant ID
                 var openpay = new OpenpayAPI(apiKey, merchantId);
 
-                var cardRequest = new Openpay.Entities.Card
-                {
-                    CardNumber = $"{tarjeta.card_number}",
-                    HolderName = $"{tarjeta.card_name}",
-                    ExpirationMonth = $"{tarjeta.expiration_month}",
-                    ExpirationYear = $"{tarjeta.expiration_year.ToString().Substring(2)}",
-                    Cvv2 = $"{tarjeta.CVV}",
-                    DeviceSessionId = "kR1v4EXgk0kpbv2e4HkQWg9oBytTR84f"
-                };
-                var card = new Card();
-                try
-                {
-                    card = openpay.CardService.Create(cardRequest);
-
-                }
-                catch (Exception e)
-                {
-                    using (var ctx = new Entities())
-                    {
-                        creditrecharge.Estatus = "Error";
-                        creditrecharge.EstatusError = e.Message;
-                        ctx.CreditRecharge.Add(creditrecharge);
-
-                        ctx.SaveChanges();
-
-
-                    }
-                    return "Error";
-                }
-
-
                 var boolproduction = Common.ConfigurationManagerJson("OPENPAYPRODUCTION");
                 var prodution = bool.Parse(boolproduction);
                 openpay.Production = prodution;
@@ -810,28 +789,13 @@ namespace Business
                 var chargeRequest = new ChargeRequest
                 {
                     Method = "card",
-                    SourceId = card.Id,
+                    SourceId = tarjeta.token_id,
                     Amount = credit.QuantityMoney,
                     Description = "Recarga de créditos",
                     Currency = "MXN",
                     DeviceSessionId = "kR1v4EXgk0kpbv2e4HkQWg9oBytTR84f",
                     Use3DSecure = true,
                     RedirectUrl = Common.ConfigurationManagerJson("OPENPAY_REDIRECT_URL"),
-                    Customer = new Openpay.Entities.Customer
-                    {
-                        Name = usuario.firstName,
-                        LastName = usuario.lastName,
-                        Email = usuario.email,
-                        PhoneNumber = usuario.phonenumber,
-                        Address = new Openpay.Entities.Address
-                        {
-                            Line1 = $"{tarjeta.street} {tarjeta.interior_number}",
-                            PostalCode = "57800",
-                            State = "Mexico",
-                            City = "Mexico",
-                            CountryCode = "MX",
-                        }
-                    }
                 };
 
                 var charge = new Charge();
@@ -839,7 +803,7 @@ namespace Business
                 try
                 {
 
-                    charge = openpay.ChargeService.Create(chargeRequest);
+                    charge = openpay.ChargeService.Create(tarjeta.token_id_customer,chargeRequest);
 
                 }
                 catch (Exception e)
@@ -901,27 +865,6 @@ namespace Business
 
                     ctx.CreditRechargeOpenPay.Add(openpayRecord);
                     ctx.SaveChanges();
-
-                    var room = (from r in ctx.Rooms
-                                join rbu in ctx.roomsbyuser on r.id equals rbu.idRoom
-                                where r.name == credit.room && rbu.idUser == credit.IdUser
-                                select r).FirstOrDefault();
-
-                    if (room != null)
-                    {
-                        if (credit.Chanel.ToLower() == "short_sms")
-                        {
-                            room.short_sms = room.short_sms + credit.QuantityCredits;
-                            room.credits = room.credits + credit.QuantityCredits;
-                        }
-                        else
-                        {
-                            room.long_sms = room.long_sms + credit.QuantityCredits;
-                            room.credits = room.credits + credit.QuantityCredits;
-
-                        }
-                        ctx.SaveChanges();
-                    }
                 }
                 return charge.PaymentMethod.Url;
             }
@@ -940,7 +883,7 @@ namespace Business
                 using (var ctx = new Entities())
                 {
                     // Busca el registro en tu base local
-                    var openpayRecord = ctx.CreditRechargeOpenPay.FirstOrDefault(x => x.IdCreditRecharge.ToString() == idRecharge);
+                    var openpayRecord = ctx.CreditRechargeOpenPay.FirstOrDefault(x => x.idopenpay.ToString() == idRecharge);
                     if (openpayRecord == null)
                     {
                         log.Warn($"No se encontró recarga con ID {idRecharge}");
@@ -966,21 +909,64 @@ namespace Business
                     };
 
                     // Consulta el charge en Openpay
-                    var chargeService = openpay.ChargeService;
-                    var charge = chargeService.Get(openpayRecord.CustomerId, openpayRecord.ChargeId);
+                    var charge = openpay.ChargeService.Get(openpayRecord.CustomerId, openpayRecord.ChargeId);
 
                     if (charge != null)
                     {
-                        // Actualiza los estatus locales según Openpay
-                        creditRecharge.Estatus = charge.Status;
+                        // Mapear estatus OpenPay a estatus local
+                        switch (charge.Status.ToLower())
+                        {
+                            case "completed":
+                                creditRecharge.Estatus = "Exitoso";
+                                break;
+                            case "in_progress":
+                                creditRecharge.Estatus = "En progreso";
+                                break;
+                            case "failed":
+                                creditRecharge.Estatus = "Fallida";
+                                creditRecharge.EstatusError = charge.ErrorMessage;
+                                break;
+                            case "cancelled":
+                                creditRecharge.Estatus = "Cancelada";
+                                break;
+                            case "charge_pending":
+                                creditRecharge.Estatus = "Cargo Pendiente";
+                                break;
+                            default:
+                                creditRecharge.Estatus = "Recarga fallida";
+                                creditRecharge.EstatusError = charge.ErrorMessage;
+                                break;
+                        }
+
+                        // Actualizar datos del cargo en tabla OpenPay
                         openpayRecord.Status = charge.Status;
                         openpayRecord.Conciliated = charge.Conciliated;
                         openpayRecord.Description = charge.Description;
                         openpayRecord.Amount = charge.Amount;
-                        openpayRecord.CreationDate = charge.CreationDate.HasValue ? charge.CreationDate.Value : DateTime.Now;
+                        openpayRecord.CreationDate = charge.CreationDate ?? DateTime.Now;
+
+                        // Si fue exitoso y aún no se han sumado los créditos
+                        if (creditRecharge.Estatus == "Exitoso")
+                        {
+                            var room = ctx.Rooms.Where(x => x.id == creditRecharge.idRoom).FirstOrDefault();
+
+                            if (room != null)
+                            {
+                                if (creditRecharge.Chanel.ToLower() == "short_sms")
+                                {
+                                    room.short_sms += creditRecharge.quantityCredits;
+                                    room.credits += creditRecharge.quantityCredits;
+                                }
+                                else
+                                {
+                                    room.long_sms += creditRecharge.quantityCredits;
+                                    room.credits += creditRecharge.quantityCredits;
+                                }
+                            }
+                        }
 
                         ctx.SaveChanges();
-                        log.Info($"Actualizado el estatus de recarga {idRecharge} a '{charge.Status}' correctamente.");
+                        log.Info($"Actualizado el estatus de recarga {idRecharge} a '{creditRecharge.Estatus}' correctamente.");
                         return true;
                     }
                     else
@@ -996,6 +982,7 @@ namespace Business
                 return false;
             }
         }
+
 
 
         public List<CreditHystoric> GetHistoricByUser(Datepickers credit)

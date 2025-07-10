@@ -600,7 +600,7 @@ const Clients: React.FC = () => {
             setMessageSnack('Cliente Eliminado correctamente');
         } catch (error) {
             console.error('Error al eliminar cliente:', error);
-            setTitleModalError('Error al capturar la recarga');
+            setTitleModalError('Error al eliminar el cliente');
             setMessageModal('Intentelo màs tarde');
             setShowModalError(true);
         }
@@ -686,7 +686,7 @@ const Clients: React.FC = () => {
                 billingDate: rechargeData.billingDate
             };
 
-            const url = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_DELETE_CLIENT}`;
+            const url = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_RECHARGE_CLIENT}`;
             const response = await axios.post(url, payload);
 
             if (response.status === 200) {
@@ -1316,6 +1316,7 @@ const Clients: React.FC = () => {
                 <MenuItem
                     disabled={!currentClient || !canDeleteClient(currentClient)}
                     onClick={() => {
+                        setSelectedClient(currentClient ?? null);
                         setModalAction(() => () => handleDeleteClient(menuRowId!));
                         setMainModalDelete(true);
                         handleMenuClose();
@@ -2011,7 +2012,7 @@ const Clients: React.FC = () => {
                 message='¿Está seguro de que desea eliminar al cliente seleccionado? Esta acción no podrá revertirse.'
                 primaryButtonText='Aceptar'
                 secondaryButtonText='Cancelar'
-                onPrimaryClick={modalAction}
+                onPrimaryClick={() => handleDeleteClient(selectedClient?.id ?? 0)}
                 onSecondaryClick={() => setMainModalDelete(false)}
             />
             <Modal open={rechargeModalOpen} onClose={() => setRechargeModalOpen(false)}>

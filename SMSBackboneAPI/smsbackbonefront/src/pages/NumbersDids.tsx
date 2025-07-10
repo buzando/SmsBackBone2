@@ -49,7 +49,8 @@ import LinearProgress from '@mui/material/LinearProgress';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import IconCheckBox2 from "../assets/IconCheckBox2.svg";
-
+import ModalMain from '../components/commons/MainModal'
+import SnackBar from "../components/commons/ChipBar";
 interface NumberData {
     Id: number;
     Number: string;
@@ -143,7 +144,10 @@ const NumbersDids: React.FC = () => {
     const [detailedView, setDetailedView] = useState(false);
     const [selectedFileName, setSelectedFileName] = useState<string>('');
     const [totalRecords, setTotalRecords] = useState<number>(0);
-
+    const [number, setNumber] = useState<NumberData | null>(null);
+    const [showModalNumber, setshowModalNumber] = useState(false);
+    const [selectedAction, setSelectedAction] = useState<'delete' | 'deactivate' | null>(null);
+      const [ShowSnackBar, setShowSnackBar] = useState(false);
     const [uploadSummary, setUploadSummary] = useState<{
         success: number;
         failed: number;
@@ -203,20 +207,6 @@ const NumbersDids: React.FC = () => {
             />
         </Box>
     );
-
-    const handleSelect = (id: number) => {
-        setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-        );
-    };
-
-    const handleSelectAll = () => {
-        if (selectedIds.length === numbersData.length) {
-            setSelectedIds([]);
-        } else {
-            setSelectedIds(numbersData.map((n) => n.Id));
-        }
-    };
 
 
     const GetNumbers = async () => {
@@ -300,9 +290,9 @@ const NumbersDids: React.FC = () => {
         setTotalPages(Math.ceil(numbersData.length / itemsPerPage));
     }, [numbersData, currentPage]);
 
-    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, rowId: number) => {
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, number: NumberData) => {
         setAnchorEl(event.currentTarget);
-        setMenuRowId(rowId);
+        setNumber(number);
     };
 
     const handleMenuClose = () => {
@@ -588,6 +578,34 @@ const NumbersDids: React.FC = () => {
             setErrorModal(true);
         }
     };
+
+    const handleNumberOperation = async (operation: 'delete' | 'deactivate', numberId: number) => {
+        const payload = {
+            "operation": operation,
+            "id": numberId, // suponiendo que mandas el ID o el número directamente como array
+        };
+
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MANAGEINDIVIDUAL_NUMBERS}`,
+                payload
+            );
+
+            if (response.status === 200) {
+                const data = response.data;
+                setshowModalNumber(false);
+                setShowSnackBar(true);
+                GetNumbers();
+            } else {
+                setshowModalNumber(false);
+                setErrorModal(true);
+            }
+        } catch (error) {
+            setshowModalNumber(false);
+            setErrorModal(true);
+        }
+    };
+
 
     const readyToUpload =
         (
@@ -959,7 +977,7 @@ const NumbersDids: React.FC = () => {
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
 
                                         }}>
-                                            <IconButton onClick={(event) => handleMenuOpen(event, number.Id)}>
+                                            <IconButton onClick={(event) => handleMenuOpen(event, number)}>
                                                 <MoreVertIcon />
                                             </IconButton>
                                         </td>
@@ -984,18 +1002,36 @@ const NumbersDids: React.FC = () => {
                     horizontal: 'right',
                 }}
             >
-                <MenuItem onClick={() => { console.log('Reemplazo', menuRowId); handleMenuClose(); }}>
-                    <ListItemIcon><SwapHorizIcon fontSize="small" /></ListItemIcon>
-                    <ListItemText>Reemplazo</ListItemText>
+                <MenuItem
+                    onClick={() => {
+                        setSelectedAction('delete');
+                        setshowModalNumber(true);
+                        setAnchorEl(null);
+                    }}
+                >
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <img src={Thrashicon} alt="Eliminar" style={{ width: 24, height: 24 }} />
+                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F" }}>
+                            Eliminar
+                        </Typography>
+                    </Box>
                 </MenuItem>
-                <MenuItem onClick={() => { console.log('Dar de baja', menuRowId); handleMenuClose(); }}>
-                    <ListItemIcon><DownloadForOfflineIcon fontSize="small" /></ListItemIcon>
-                    <ListItemText>Dar de baja</ListItemText>
+
+                <MenuItem
+                    onClick={() => {
+                        setSelectedAction('deactivate');
+                        setshowModalNumber(true);
+                        setAnchorEl(null);
+                    }}
+                >
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <img src={Thrashicon} alt="Dar de baja" style={{ width: 24, height: 24 }} />
+                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F" }}>
+                            Dar de baja
+                        </Typography>
+                    </Box>
                 </MenuItem>
-                <MenuItem onClick={() => { console.log('Eliminar', menuRowId); handleMenuClose(); }}>
-                    <ListItemIcon><DeleteIcon fontSize="small" /></ListItemIcon>
-                    <ListItemText>Eliminar</ListItemText>
-                </MenuItem>
+
             </Menu>
             <Menu
                 anchorEl={serviceAnchorEl}
@@ -3049,6 +3085,36 @@ const NumbersDids: React.FC = () => {
                 buttonText="Cerrar"
                 onClose={() => setErrorModal(false)}
             />
+            <ModalMain
+                isOpen={showModalNumber}
+                Title={selectedAction === 'delete' ? 'Eliminar Número' : 'Dar de baja Número'}
+                message={
+                    selectedAction === 'delete'
+                        ? `¿Estás seguro de eliminar el número ${number?.Number}?`
+                        : `¿Estás seguro de dar de baja el número ${number?.Number}?`
+                }
+                primaryButtonText={selectedAction === 'delete' ? 'Eliminar' : 'Dar de baja'}
+                secondaryButtonText="Cancelar"
+                onPrimaryClick={() => {
+                    if (!number || !selectedAction) return;
+                    handleNumberOperation(selectedAction, number?.Id);
+                }}
+                onSecondaryClick={() => {
+                    setshowModalNumber(false);
+                    setSelectedAction(null);
+                }}
+            />
+            {ShowSnackBar && (
+                <SnackBar
+                    message={
+                        selectedAction === 'delete'
+                            ? `Numero Eliminado Correctamente`
+                            : `Numero dado de baja correctamente`
+                    }
+                    buttonText="Cerrar"
+                    onClose={() => setShowSnackBar(false)}
+                />
+            )}
         </Box>
     );
 };

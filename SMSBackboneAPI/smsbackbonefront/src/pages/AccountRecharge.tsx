@@ -21,6 +21,19 @@ import ModalError from "../components/commons/ModalError"
 import { useLocation } from 'react-router-dom';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import { useNavigate } from "react-router-dom";
+import Errormodal from '../components/commons/ModalError'
+export interface Clients {
+    id: number;
+    nombreCliente: string;
+    creationDate: string;
+    rateForShort: number;
+    rateForLong: number;
+    shortRateType: number;
+    longRateType: number;
+    shortRateQty: string;
+    longRateQty: string;
+    estatus: number;
+}
 
 interface CreditCard {
     id: number;
@@ -103,6 +116,9 @@ const AccountRecharge: React.FC = () => {
     const [showChipBarAdd, setshowChipBarAdd] = useState(false);
     const [showChipBarCard, setshowChipBarCard] = useState(false);
     const [showChipBarDelete, setshowChipBarDelete] = useState(false);
+    const [Clients, setClients] = useState<Clients | null>(null);
+    const [isErrorModalOpen, setisErrorModalOpen] = useState(false);
+    const IVA_RATE = 0.16;
     const navigate = useNavigate();
 
     const useQuery = () => {
@@ -111,24 +127,13 @@ const AccountRecharge: React.FC = () => {
 
     const checkRechargeStatus = async (id: string) => {
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_VERIFY_RECHARGE}${id}`; // Ajusta el endpoint real aquí
+            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_VERIFY_RECHARGE}${id}`;
             const response = await axios.get(requestUrl);
 
             if (response.status === 200 && response.data) {
-                if (response.data.success) {
+                if (response.data) {
                     setshowChipBarAdd(true);
                     setTimeout(() => setshowChipBarAdd(false), 10000);
-                    const storedRoom = localStorage.getItem('selectedRoom');
-                    const request = localStorage.getItem('request');
-                    if (storedRoom) {
-                        const room = JSON.parse(storedRoom);
-                        const amountParsed = JSON.parse(request);
-                        if (amountParsed.Chanel === 'long_sms') {
-                            room.long_sms = (parseFloat(room.long_sms) || 0) + amountParsed.QuantityCredits;
-                        } else {
-                            room.short_sms = (parseFloat(room.short_sms) || 0) + amountParsed.QuantityCredits;
-                        }
-                    }
                 } else {
                     setTitleErrorModa("Error en recarga");
                     setMessageErrorModa(response.data.message || "Hubo un problema al validar la recarga.");
@@ -168,6 +173,23 @@ const AccountRecharge: React.FC = () => {
         }
     }, [id]);
 
+    useEffect(() => {
+        const userData = localStorage.getItem("userData");
+        const userObj = userData ? JSON.parse(userData) : null;
+
+        if (userObj?.idCliente) {
+            const url = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GETRATE_CLIENT}${userObj.idCliente}`;
+            axios.get(url)
+                .then(res => {
+                    if (res.status === 200 && res.data) {
+                        setClients(res.data);
+                    }
+                })
+                .catch(() => {
+                    setisErrorModalOpen(true);
+                });
+        }
+    }, []);
 
     const handleGenerateInvoiceCheck = () => {
         if (generateInvoice) {
@@ -209,15 +231,34 @@ const AccountRecharge: React.FC = () => {
         setSelectedChannel(event.target.value);
     };
 
-    const calculateCredits = (value: string) => {
-        const credits = parseFloat(value);
-        if (!isNaN(credits)) {
-            const calculatedAmount = credits * 0.65;  // 🔥 Ajusta el valor por crédito si es diferente
-            setRechargeAmount(calculatedAmount.toFixed(2));  // 🔥 Guarda el monto calculado con 2 decimales
-        } else {
-            setRechargeAmount('0.00');  // 🔥 Si no es un número válido, pone 0.00
+    useEffect(() => {
+        if (creditAmount) {
+            calculateCredits(creditAmount);
         }
-    };
+    }, [selectedChannel]);
+
+   const calculateCredits = (value: string) => {
+    const credits = parseFloat(value);
+    if (!isNaN(credits) && Clients) {
+        let rate = 0;
+        if (selectedChannel === 'short_sms') {
+            rate = parseFloat(Clients.rateForShort.toString());
+        } else if (selectedChannel === 'long_sms') {
+            rate = parseFloat(Clients.rateForLong.toString());
+        }
+
+        const baseAmount = credits * rate;
+        const ivaAmount = baseAmount * IVA_RATE;
+        const total = baseAmount + ivaAmount;
+
+        setRechargeAmount(total.toFixed(2));
+    } else {
+        setRechargeAmount('0.00');
+    }
+};
+
+
+
 
     const handleRechargeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRechargeAmount(event.target.value);
@@ -857,7 +898,7 @@ const AccountRecharge: React.FC = () => {
                                 display: 'block',
                                 marginBottom: '5px',
                                 color: '#330F1B',
-                            }}>Monto a recargar</Typography>
+                            }}>Monto a recargar + iva</Typography>
                             <TextField
                                 id="amount"
                                 type="text"
@@ -1708,6 +1749,13 @@ const AccountRecharge: React.FC = () => {
                     onClose={() => setshowChipBarAdd(false)}
                 />
             )}
+            <ModalError
+                isOpen={isErrorModalOpen}
+                title="Error al traer los creditos"
+                message="Intentenlo más tarde o refresque la pagina"
+                buttonText="Cerrar"
+                onClose={() => setisErrorModalOpen(false)}
+            />
         </Box>
     );
 };

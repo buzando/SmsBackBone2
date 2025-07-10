@@ -45,6 +45,8 @@ namespace Modal.Model.Model
         public string state { get; set; } // Estado
 
         public string postal_code { get; set; } // Código postal
+        public string token_id { get; set; }
+        public string token_id_customer { get; set; }
 
     }
 }

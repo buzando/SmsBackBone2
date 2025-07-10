@@ -199,6 +199,19 @@ namespace SMSBackboneAPI.Controllers
                 return StatusCode(500, new { message = "Error en el servidor", detail = ex.Message });
             }
         }
+        [HttpGet("GetClientRate")]
+        public IActionResult GetClientRate(int clientId)
+        {
+            var rate = new ClientManager().ObtenerClienteporID(clientId);
+            if (rate == null)
+            {
+                return BadRequest();
+            }
+            else
+            {
 
+                return Ok(rate);
+            }
+        }
     }
 }

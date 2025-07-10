@@ -14,5 +14,6 @@ namespace Contract.Response
         public double creditosGlobales { get; set; }
         public double creditosSmsCortos { get; set; }
         public double creditosSmsLargos { get; set; }
+        public bool CanBeDeleted { get; set; }
     }
 }

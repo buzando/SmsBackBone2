@@ -28,7 +28,10 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MainModal from '../components/commons/MainModal'
 import Thrashicon from '../assets/Icon-trash-Card.svg'
-
+import InfoIcon from '@mui/icons-material/InfoOutlined';
+import ModalError from "../components/commons/ModalError";
+import SnackBar from "../components/commons/ChipBar";
+import { tr } from 'date-fns/locale';
 interface Clients {
     id: number;
     nombrecliente: string;
@@ -42,6 +45,7 @@ export interface RoomAdminData {
     creditosGlobales: number;
     creditosSmsCortos: number;
     creditosSmsLargos: number;
+    CanBeDeleted: boolean;
 }
 
 const RoomsAdmin: React.FC = () => {
@@ -69,6 +73,10 @@ const RoomsAdmin: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<any>(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [rowToDelete, setRowToDelete] = useState<RoomAdminData | null>(null);
+    const [ShowModalError, setShowModalError] = useState(false);
+    const [TitleModalError, setTitleModalError] = useState("");
+    const [ShowSnackBar, setShowSnackBar] = useState(false);
+
     const open = Boolean(anchorEl);
 
     const navigate = useNavigate();
@@ -256,16 +264,21 @@ const RoomsAdmin: React.FC = () => {
 
     const handleDelete = async (id: number) => {
         try {
+
+            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_DELETE_CLIENT}${id}`;
+            await axios.get(requestUrl);
+
             setDeleteModalOpen(false);
             setRowToDelete(null);
 
-            // Actualizar UI tras eliminación (puedes hacer un nuevo fetch o filtrar)
             const updated = roomsData.filter(r => r.id !== id);
             setRoomsData(updated);
             setOriginalData(updated);
             setCurrentPageData(updated.slice(0, itemsPerPage));
+            setShowSnackBar(true);
         } catch (error) {
-            console.error("Error al eliminar sala:", error);
+            setShowModalError(true);
+            setTitleModalError('Error al eliminar la campaña');
         }
     };
 
@@ -818,31 +831,58 @@ const RoomsAdmin: React.FC = () => {
                     horizontal: 'right',
                 }}
             >
-                <MenuItem
-                    onClick={() => {
-                        setRowToDelete(selectedRow);
-                        setDeleteModalOpen(true);
-                        setAnchorEl(null);
-                    }}
-                    sx={{
-                        fontFamily: 'Poppins',
-                        fontSize: '14px',
-                        '&:hover': {
-                            backgroundColor: '#F2EBED'
-                        }
-                    }}
-                >
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <img
-                            src={Thrashicon}
-                            alt="Eliminar"
-                            style={{ width: 24, height: 24, color: '#5F5064' }}
-                        />
-                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F" }}>
-                            Eliminar
-                        </Typography>
-                    </Box>
-                </MenuItem>
+                <Tooltip title={selectedRow?.canBeDeleted ? '' : 'La sala tiene campañas activas'}>
+                    <span>
+                        <MenuItem
+                            onClick={() => {
+                                if (selectedRow?.canBeDeleted) {
+                                    setRowToDelete(selectedRow);
+                                    setDeleteModalOpen(true);
+                                }
+                                setAnchorEl(null);
+                            }}
+                            disabled={!selectedRow?.canBeDeleted}
+                            sx={{
+                                fontFamily: 'Poppins',
+                                fontSize: '14px',
+                                opacity: selectedRow?.canBeDeleted ? 1 : 0.5,
+                                cursor: selectedRow?.canBeDeleted ? 'pointer' : 'not-allowed',
+                                '&:hover': {
+                                    backgroundColor: selectedRow?.canBeDeleted ? '#F2EBED' : 'transparent'
+                                }
+                            }}
+                        >
+                            <Box display="flex" alignItems="center" gap={1}>
+                                <img
+                                    src={Thrashicon}
+                                    alt="Eliminar"
+                                    style={{
+                                        width: 24,
+                                        height: 24,
+                                        filter: selectedRow?.canBeDeleted ? 'none' : 'grayscale(1)',
+                                    }}
+                                />
+                                <Typography sx={{
+                                    fontFamily: 'Poppins',
+                                    fontSize: '14px',
+                                    color: selectedRow?.canBeDeleted ? "#574B4F" : "#AFA1A5"
+                                }}>
+                                    Eliminar
+                                </Typography>
+                                {!selectedRow?.canBeDeleted && (
+                                    <img
+                                        src={InfoIcon}
+                                        alt="No se puede eliminar"
+                                        title="Esta sala tiene campañas activas"
+                                        style={{ width: 16, height: 16 }}
+                                    />
+                                )}
+                            </Box>
+                        </MenuItem>
+
+                    </span>
+                </Tooltip>
+
             </Menu>
             <MainModal
                 isOpen={deleteModalOpen}
@@ -855,6 +895,20 @@ const RoomsAdmin: React.FC = () => {
                 primaryButtonText="Aceptar"
                 secondaryButtonText="Cancelar"
             />
+            <ModalError
+                isOpen={ShowModalError}
+                title={TitleModalError}
+                message='Intentelo más tarde'
+                buttonText="Cerrar"
+                onClose={() => setShowModalError(false)}
+            />
+            {ShowSnackBar && (
+                <SnackBar
+                    message='Sala Eliminada con exito'
+                    buttonText="Cerrar"
+                    onClose={() => setShowSnackBar(false)}
+                />
+            )}
         </Box>
     );
 };

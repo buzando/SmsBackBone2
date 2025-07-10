@@ -3,11 +3,14 @@ using Contract.Request;
 using Contract.Response;
 using Modal;
 using Modal.Model.Model;
+using Openpay.Entities;
+using Openpay;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contract;
 
 namespace Business
 {
@@ -30,13 +33,88 @@ namespace Business
 
         }
 
+        public string CreateOpenPayCustomerAndCard(CreditCardRequest creditCard, Users usuario)
+        {
+            try
+            {
+                var apiKey = Common.ConfigurationManagerJson("APIKEY");
+                var merchantId = Common.ConfigurationManagerJson("MERCHANTID");
+                var openpay = new OpenpayAPI(apiKey, merchantId);
+                openpay.Production = bool.Parse(Common.ConfigurationManagerJson("OPENPAYPRODUCTION"));
+
+                var newCustomer = new Openpay.Entities.Customer
+                {
+                    Name = usuario.firstName,
+                    LastName = usuario.lastName,
+                    Email = usuario.email,
+                    PhoneNumber = usuario.phonenumber,
+                    Address = new Openpay.Entities.Address
+                    {
+                        Line1 = $"{creditCard.street} {creditCard.interior_number} {creditCard.exterior_number}",
+                        PostalCode = creditCard.postal_code,
+                        State = creditCard.state,
+                        City = creditCard.city,
+                        CountryCode = "MX",
+                    }
+                };
+
+                var customer = openpay.CustomerService.Create(newCustomer);
+
+                var cardRequest = new Openpay.Entities.Card
+                {
+                    CardNumber = creditCard.card_number,
+                    HolderName = creditCard.card_name,
+                    ExpirationMonth = creditCard.expiration_month.ToString(),
+                    ExpirationYear = creditCard.expiration_year.ToString().Substring(2),
+                    Cvv2 = creditCard.CVV,
+                    DeviceSessionId = "kR1v4EXgk0kpbv2e4HkQWg9oBytTR84f"
+                };
+
+                var card = openpay.CardService.Create(customer.Id, cardRequest);
+
+                return $"{customer.Id}|{card.Id}";
+            }
+            catch (OpenpayException ex)
+            {
+                return $"OpenPay error: {ex.Description}";
+            }
+            catch (Exception ex)
+            {
+                return $"Error general: {ex.Message}";
+            }
+        }
+
+
+
         public string AddCreditCard(CreditCardRequest creditCard)
         {
             try
             {
+                var usuario = new Users();
                 using (var ctx = new Entities())
                 {
-                    var creditscard = ctx.creditcards.Where(x => x.card_number == creditCard.card_number && x.user_id == creditCard.user_id).FirstOrDefault();
+                    usuario = ctx.Users.Where(x => x.Id == creditCard.user_id).FirstOrDefault();
+                }
+                if (usuario == null)
+                {
+                    return "Error";
+                }
+
+                var token = CreateOpenPayCustomerAndCard(creditCard, usuario);
+                if (token.ToLower().Contains("error"))
+                {
+                    return "Error";
+                }
+                string lastFour = "0000";
+                if (!string.IsNullOrEmpty(creditCard.card_number) && creditCard.card_number.Length >= 4)
+                    lastFour = creditCard.card_number[^4..];
+                using (var ctx = new Entities())
+                {
+                    var tokencard = token.Split("|")[1];
+                    var tokencustomer = token.Split("|")[0];
+                    var creditscard = ctx.creditcards
+                        .Where(x => x.token_id == tokencard && x.user_id == creditCard.user_id)
+                        .FirstOrDefault(); 
                     if (creditscard != null)
                     {
                         return "Existe";
@@ -48,19 +126,21 @@ namespace Business
                             created_at = DateTime.Now,
                             user_id = creditCard.user_id,
                             card_name = creditCard.card_name,
-                            card_number = creditCard.card_number,
-                            CVV = creditCard.CVV,
+                            card_number = "000000000000" + lastFour,
+                            CVV = "000",
                             expiration_month = creditCard.expiration_month,
                             expiration_year = creditCard.expiration_year,
                             is_default = creditCard.is_default,
                             Type = creditCard.Type,
-                             city = creditCard.city,
-                             exterior_number = creditCard.exterior_number,
-                             interior_number = creditCard.interior_number,
-                             neighborhood = creditCard.neighborhood,
-                             postal_code = creditCard.postal_code,
-                             state = creditCard.state,
-                             street = creditCard.street,
+                            city = "ciudad",
+                            exterior_number = "0",
+                            interior_number = "0",
+                            neighborhood = "",
+                            postal_code = "",
+                            state = "",
+                            street = "",
+                            token_id = tokencard,
+                            token_id_customer = tokencustomer,
                         };
                         creditcarddb.created_at = DateTime.Now;
                         ctx.creditcards.Add(creditcarddb);

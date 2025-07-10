@@ -27,6 +27,13 @@ namespace Business
 
             try
             {
+                cliente.CreationDate = DateTime.Now;
+                cliente.RateForShort = 0.3m;
+                cliente.RateForLong = 0.15m;
+                cliente.ShortRateQty = "1";
+                cliente.LongRateQty = "1";
+                cliente.ShortRateType = 0;
+                cliente.LongRateType = 0;
                 var config = new MapperConfiguration(cfg =>
 
   cfg.CreateMap<clientDTO, clients>()
@@ -468,7 +475,9 @@ namespace Business
                                     nombreSala = r.name,
                                     creditosGlobales = r.credits,
                                     creditosSmsCortos = r.short_sms,
-                                    creditosSmsLargos = r.long_sms
+                                    creditosSmsLargos = r.long_sms,
+
+                                    CanBeDeleted = !ctx.Campaigns.Any(cam => cam.RoomId == r.id)
                                 };
 
                     return query.ToList();

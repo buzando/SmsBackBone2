@@ -58,5 +58,32 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
+
+        [HttpPost("ManagerNumbersIndividual")]
+        public async Task<IActionResult> ManagerNumbersIndividual(RequestManageNumbersIndividual Numbers)
+        {
+            GeneralErrorResponseDto[] errorResponse = new GeneralErrorResponseDto[1];
+            //var login = await ServiceRequest.GetRequest<LoginDto>(Request.Body);
+            //if (login == null)
+            //{
+            //    return BadRequest("Sin request valido.");
+            //}
+            var UserManager = new Business.MyNumbersManager();
+            var responseDto = UserManager.ProcesarNumerosDidsIndividual(Numbers);
+            if (responseDto != null)
+            {
+
+
+                var response = Ok(responseDto);
+                return response;
+
+            }
+            else
+            {
+                return BadRequest(new GeneralErrorResponseDto() { code = "Repedito", description = "responseDto" });
+
+            }
+
+        }
     }
 }

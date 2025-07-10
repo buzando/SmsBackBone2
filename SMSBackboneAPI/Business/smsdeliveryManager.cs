@@ -4,9 +4,11 @@ using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contract;
 using Contract.Other;
 using Contract.Response;
 using DocumentFormat.OpenXml.Spreadsheet;
+using log4net;
 using Microsoft.EntityFrameworkCore;
 using Modal;
 using Modal.Model.Model;
@@ -18,11 +20,12 @@ namespace Business
     {
         private static readonly TimeSpan HorarioInicio = new TimeSpan(7, 0, 0);  // 07:00
         private static readonly TimeSpan HorarioFin = new TimeSpan(21, 0, 0);    // 21:00
+        private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public List<FullCampaignSpResult> FullResponseCampaignstarted()
         {
             var result = new List<FullCampaignSpResult>();
-            Console.WriteLine($"Inicia Ejecutando SP");
+            _logger.Info($"Inicia Ejecutando SP");
             try
             {
                 using (var ctx = new Entities())
@@ -30,12 +33,12 @@ namespace Business
                     var connection = ctx.Database.GetDbConnection();
                     if (connection.State != System.Data.ConnectionState.Open)
                         connection.Open();
-
+                   
                     using (var cmd = connection.CreateCommand())
                     {
                         cmd.CommandText = "sp_getCampaignsToAutoStart";
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
-
+                        cmd.CommandTimeout = 0;
                         using (var reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -51,7 +54,7 @@ namespace Business
                                     FlashMessage = reader.GetBoolean(reader.GetOrdinal("FlashMessage")),
                                     CustomANI = reader.GetBoolean(reader.GetOrdinal("CustomANI")),
                                     RecycleRecords = reader.GetBoolean(reader.GetOrdinal("RecycleRecords")),
-NumberType = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("NumberType"))),
+                                    NumberType = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("NumberType"))),
                                     CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate")),
                                     Username = reader.GetString(reader.GetOrdinal("Username")),
                                     Password = reader.GetString(reader.GetOrdinal("Password")),
@@ -93,7 +96,7 @@ NumberType = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("NumberType"))),
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error ejecutando SP: {ex.Message}");
+                _logger.Error($"Error ejecutando SP: {ex.Message}");
             }
 
             return result;
@@ -122,25 +125,32 @@ NumberType = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("NumberType"))),
                     await throttler.WaitAsync();
                     try
                     {
-                        var loginResult = await new ApiBackBoneManager().LoginResponse(campaign.Username, campaign.Password);
-                        if (loginResult == null)
+                        var test = bool.TryParse(Common.ConfigurationManagerJson("QA"), out bool d) ? d : false;
+
+                        string token = null;
+                        if (!test)
                         {
-                            Console.WriteLine($"❌ Login fallido para la campaña {campaign.Name}");
-                            return;
-                        }
-                        var creditResponse = await new ApiBackBoneManager().GetOwnCredit(loginResult.token);
-                        if (decimal.TryParse(creditResponse, out var apiCredit))
-                        {
-                            if (apiCredit <= 0)
+                            var loginResult = await new ApiBackBoneManager().LoginResponse(campaign.Username, campaign.Password);
+                            if (loginResult == null)
                             {
-                                Console.WriteLine($"⚠️ Crédito insuficiente en API para la campaña {campaign.Name}: {apiCredit} créditos.");
+                                _logger.Error($"❌ Login fallido para la campaña {campaign.Name}");
                                 return;
                             }
-                        }
-                        else
-                        {
-                            Console.WriteLine($"❌ Error al interpretar el crédito del API para la campaña {campaign.Name}: '{creditResponse}'");
-                            return;
+                            var creditResponse = await new ApiBackBoneManager().GetOwnCredit(loginResult.token);
+                            if (decimal.TryParse(creditResponse, out var apiCredit))
+                            {
+                                if (apiCredit <= 0)
+                                {
+                                    _logger.Info($"⚠️ Crédito insuficiente en API para la campaña {campaign.Name}: {apiCredit} créditos.");
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                _logger.Error($"❌ Error al interpretar el crédito del API para la campaña {campaign.Name}: '{creditResponse}'");
+                                return;
+                            }
+                            token = loginResult.token;
                         }
                         using (var ctx = new Entities())
                         {
@@ -167,13 +177,14 @@ NumberType = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("NumberType"))),
                                     return;
                                 }
                             }
-                            var chunks = campaign.Contacts.Chunk(25);
+                            var chuncks = int.TryParse(Common.ConfigurationManagerJson("CantidadDeChunks"), out int c) ? c : 50;
+                            var chunks = campaign.Contacts.Chunk(chuncks);
 
                             foreach (var chunk in chunks)
                             {
                                 if (!IsWithinSchedule(campaign.StartDateTime, campaign.EndDateTime))
                                 {
-                                    Console.WriteLine($"⏰ Fuera del horario para enviar mensajes de la campaña {campaign.Name}");
+                                    _logger.Error($"⏰ Fuera del horario para enviar mensajes de la campaña {campaign.Name}");
                                     break;
                                 }
                                 var messagesToSend = new List<MessageToSend>();
@@ -245,28 +256,33 @@ NumberType = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("NumberType"))),
                                         text = FormatMessage,
                                         registryClient = contact.Id.ToString()
                                     });
+                                    _logger.Info($"📝 [Preparado] Campaña: {campaign.CampaignId} | ContactoId: {contact.Id} | Tel: {contact.PhoneNumber} | Mensaje: {FormatMessage}");
+
                                 }
 
                                 List<ApiResponse> sendResult;
+                                if (!test)
+                                {
+                                    sendResult = await new ApiBackBoneManager().SendMessagesAsync(messagesToSend, token);
+                                    _logger.Info($"✅ [Producción] Se enviaron {sendResult.Count} mensajes reales para la campaña {campaign.Name}:\n" +
+                                                 string.Join("\n", sendResult.Select(r =>
+                                                     $"📤 ContactoId: {r.registryClient} | Tel: {r.phoneNumber} | Status: {r.status}")));
+                                }
+                                else
+                                {
+                                    var rand = new Random();
+                                    sendResult = messagesToSend.Select(msg => new ApiResponse
+                                    {
+                                        phoneNumber = msg.phoneNumber,
+                                        status = rand.Next(0, 6), // Simulación: status del 0 al 5
+                                        registryClient = msg.registryClient
+                                    }).ToList();
 
-#if DEBUG
-                                var rand = new Random();
-                                sendResult = messagesToSend.Select(msg => new ApiResponse
-                                {
-                                    phoneNumber = msg.phoneNumber,
-                                    status = rand.Next(0, 6), // valores del 0 al 5 según la tabla que mostraste
-                                    registryClient = msg.registryClient
-                                }).ToList();
-#else
-//sendResult = await new ApiBackBoneManager().SendMessagesAsync(messagesToSend, loginResult.token);
-     var rand = new Random();
-                                sendResult = messagesToSend.Select(msg => new ApiResponse
-                                {
-                                    phoneNumber = msg.phoneNumber,
-                                    status = rand.Next(0, 6),
-                                    registryClient = msg.registryClient
-                                }).ToList();
-#endif
+                                    _logger.Info($"🧪 [Test] Se simularon {sendResult.Count} mensajes para la campaña {campaign.Name}:\n" +
+              string.Join("\n", sendResult.Select(r =>
+                  $"🧪 ContactoId: {r.registryClient} | Tel: {r.phoneNumber} | Status: {r.status}")));
+
+                                }
                                 double creditosConsumidos = 0;
                                 foreach (var message in sendResult)
                                 {
@@ -308,7 +324,7 @@ NumberType = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("NumberType"))),
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error en campaña ID {campaign.CampaignId}: {ex.Message}");
+                        _logger.Error($"Error en campaña ID {campaign.CampaignId}: {ex.Message}");
                     }
                     finally
                     {

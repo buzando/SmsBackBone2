@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using Contract.Request;
 using Contract.Response;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Vml;
 using Modal;
 using Modal.Model.Model;
@@ -232,6 +233,39 @@ namespace Business
             {
                 // Aquí puedes agregar logger si tienes
                 return null;
+            }
+        }
+
+        public bool ProcesarNumerosDidsIndividual(RequestManageNumbersIndividual number)
+        {
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    if (number.operation == "delete")
+                    {
+                        var numero = ctx.MyNumbers.Where(x => x.Id == number.id).FirstOrDefault();
+                        if (numero != null)
+                        {
+                            ctx.MyNumbers.Remove(numero);
+                        }
+                    }
+                    if (number.operation == "deactivate")
+                    {
+                        var numero = ctx.MyNumbers.Where(x => x.Id == number.id).FirstOrDefault();
+                        if (numero != null)
+                        {
+                            numero.Estatus = "baja";
+                            ctx.SaveChanges();
+                        }
+                    }
+                }
+                return true;
+
+            }
+            catch (Exception e)
+            {
+                return false;
             }
         }
 
