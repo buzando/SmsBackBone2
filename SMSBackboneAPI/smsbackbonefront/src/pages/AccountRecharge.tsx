@@ -22,6 +22,7 @@ import { useLocation } from 'react-router-dom';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import { useNavigate } from "react-router-dom";
 import Errormodal from '../components/commons/ModalError'
+import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 export interface Clients {
     id: number;
     nombreCliente: string;
@@ -237,25 +238,25 @@ const AccountRecharge: React.FC = () => {
         }
     }, [selectedChannel]);
 
-   const calculateCredits = (value: string) => {
-    const credits = parseFloat(value);
-    if (!isNaN(credits) && Clients) {
-        let rate = 0;
-        if (selectedChannel === 'short_sms') {
-            rate = parseFloat(Clients.rateForShort.toString());
-        } else if (selectedChannel === 'long_sms') {
-            rate = parseFloat(Clients.rateForLong.toString());
+    const calculateCredits = (value: string) => {
+        const credits = parseFloat(value);
+        if (!isNaN(credits) && Clients) {
+            let rate = 0;
+            if (selectedChannel === 'short_sms') {
+                rate = parseFloat(Clients.rateForShort.toString());
+            } else if (selectedChannel === 'long_sms') {
+                rate = parseFloat(Clients.rateForLong.toString());
+            }
+
+            const baseAmount = credits * rate;
+            const ivaAmount = baseAmount * IVA_RATE;
+            const total = baseAmount + ivaAmount;
+
+            setRechargeAmount(total.toFixed(2));
+        } else {
+            setRechargeAmount('0.00');
         }
-
-        const baseAmount = credits * rate;
-        const ivaAmount = baseAmount * IVA_RATE;
-        const total = baseAmount + ivaAmount;
-
-        setRechargeAmount(total.toFixed(2));
-    } else {
-        setRechargeAmount('0.00');
-    }
-};
+    };
 
 
 
@@ -1123,7 +1124,23 @@ const AccountRecharge: React.FC = () => {
                                     <Checkbox
                                         checked={generateInvoice}
                                         onChange={(e) => setGenerateInvoice(e.target.checked)}
-                                        sx={{ color: '#8F4D63' }}
+                                        checkedIcon={
+                                            <Box
+                                                sx={{
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    position: 'relative',
+                                                    marginTop: '0px',
+                                                    marginLeft: '0px',
+                                                }}
+                                            >
+                                                <img
+                                                    src={IconCheckBox1}
+                                                    alt="Seleccionado"
+                                                    style={{ width: '24px', height: '24px' }}
+                                                />
+                                            </Box>
+                                        }
                                     />
                                 }
                                 label={
@@ -1653,15 +1670,25 @@ const AccountRecharge: React.FC = () => {
                                     checked={cardDetails.isDefault}
                                     onChange={handleChange}
                                     sx={{
-                                        '&.Mui-checked': {
-                                            color: '#ffffff', // 🔥 Color del check (blanco)
-                                        },
-                                        '&.Mui-checked .MuiSvgIcon-root': {
-                                            backgroundColor: '#8F4D63', // 🔥 Cambia el color de adentro cuando está seleccionado
-                                            borderRadius: '4px',
-                                            color: '#ffffff', // 🔥 Cambia el color de la flecha (check) a blanco
-                                        }
+
                                     }}
+                                    checkedIcon={
+                                        <Box
+                                            sx={{
+                                                width: '24px',
+                                                height: '24px',
+                                                position: 'relative',
+                                                marginTop: '0px',
+                                                marginLeft: '0px',
+                                            }}
+                                        >
+                                            <img
+                                                src={IconCheckBox1}
+                                                alt="Seleccionado"
+                                                style={{ width: '24px', height: '24px' }}
+                                            />
+                                        </Box>
+                                    }
                                 />
                                 <span style={{
                                     textAlign: "left",

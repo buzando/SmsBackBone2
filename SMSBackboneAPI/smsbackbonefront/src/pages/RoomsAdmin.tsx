@@ -706,7 +706,12 @@ const RoomsAdmin: React.FC = () => {
                                             , borderRight: '1px solid #E0E0E0',
                                         }}>{room.creditosSmsLargos}</td>
                                         <td style={{
-                                            padding: '6px', width: '40px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            position: 'sticky',
+                                            right: 0,
+                                            background: '#fff', borderLeft: '1px solid #E0E0E0',
+                                            boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
+                                            zIndex: 2,
+                                            padding: '6px', width: '20px', whiteSpace: 'nowrap', overflow: 'hidden',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>
                                             <IconButton

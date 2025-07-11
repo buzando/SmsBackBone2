@@ -352,7 +352,6 @@ const Register: React.FC = () => {
                                         InputProps={{
                                             endAdornment: (
                                                 <InputAdornment position="end">
-
                                                     <Tooltip
                                                         title={
                                                             <Box
