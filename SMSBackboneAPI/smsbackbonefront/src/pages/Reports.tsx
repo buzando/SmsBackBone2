@@ -134,6 +134,9 @@ const Reports: React.FC = () => {
     const [reportDatasms, setReportDatasms] = useState<ReporteSMS[] | undefined | null>(undefined);
     const [users, setUsers] = useState<User[]>([]);
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalCount, settotalCount] = useState(0);
+    const [totalXPage, settotalXPage] = useState(0);
     const navigate = useNavigate();
 
 
@@ -324,6 +327,12 @@ const Reports: React.FC = () => {
             ':' + date.getSeconds().toString().padStart(2, '0');
     };
 
+    useEffect(() => {
+        handleReport();
+    }, [currentPage]);
+
+
+
     const handleReport = async (dates?: DateRangeType) => {
         const selectedRoom = localStorage.getItem("selectedRoom");
         if (!selectedRoom) {
@@ -342,18 +351,21 @@ const Reports: React.FC = () => {
                 StartDate: formatDateToLocalString(dates!.start),
                 EndDate: formatDateToLocalString(dates!.end),
                 CampaignIds: selectedCampaigns.length ? selectedCampaigns : null,
-                UserIds: selectedUsers.length ? selectedUsers : null
+                UserIds: selectedUsers.length ? selectedUsers : null,
+                Page: currentPage + 1
             };
 
             const response = await axios.post(
                 `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_REPORT}`,
                 payload
             );
-            if (response.data.length > 0) {
+            if (response.data) {
+                settotalCount(response.data.totalCount);
+                settotalXPage(response.data.totalXPage);
                 if (selectedSmsOption === "Global") {
-                    setReportData(transformPascalCase(response.data || [])); // para reporte Global
+                    setReportData(transformPascalCase(response.data.reportGlobalResponseLists || [])); // para reporte Global
                 } else {
-                    setReportDatasms(response.data || []);
+                    setReportDatasms(response.data.reportDeliveryList || []);
                 }
             }
             else {
@@ -366,6 +378,12 @@ const Reports: React.FC = () => {
         }
     };
 
+    const totalPages = Math.ceil(totalCount / totalXPage);
+
+    const handleFirstPage = () => setCurrentPage(0);
+    const handlePreviousPage = () => setCurrentPage((prev) => Math.max(prev - 1, 0));
+    const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+    const handleLastPage = () => setCurrentPage(totalPages - 1);
     const transformPascalCase = (data: any[]) => {
         return data.map(item => ({
             Campaign: item.campaign,
@@ -708,6 +726,7 @@ const Reports: React.FC = () => {
     };
 
 
+
     useEffect(() => {
 
         setSelectedCampaigns([]);
@@ -729,6 +748,7 @@ const Reports: React.FC = () => {
             default: return "Desconocido";
         }
     };
+
 
     return (
         <Box p={4} sx={{ padding: '10px', marginLeft: "35px", marginTop: '-60px', }}>
@@ -1174,7 +1194,7 @@ const Reports: React.FC = () => {
                         marginLeft: "5px", position: "absolute"
 
                     }}>
-                        1-1 de {getCurrentDataLength()}
+                        {currentPage + 1}-{totalPages} de {totalCount}
                     </Typography>
 
                     <Box display="flex" gap={1} ml={10}>
@@ -1187,12 +1207,12 @@ const Reports: React.FC = () => {
                         </IconButton>
 
                         {/* Página anterior (flecha izquierda) */}
-                        <IconButton sx={{ p: 0 }} disabled>
+                        <IconButton sx={{ p: 0 }} onClick={handleFirstPage} disabled={currentPage === 0}>
                             <img src={backarrow} alt="<" style={{ opacity: 0.4 }} />
                         </IconButton>
 
                         {/* Página siguiente (flecha derecha volteada) */}
-                        <IconButton sx={{ p: 0 }} disabled>
+                        <IconButton sx={{ p: 0 }} onClick={handlePreviousPage} disabled={currentPage === 0}>
                             <img
                                 src={backarrow}
                                 alt=">"
@@ -1201,21 +1221,25 @@ const Reports: React.FC = () => {
                         </IconButton>
 
                         {/* Última página (doble flecha derecha) */}
-                        <IconButton sx={{ p: 0 }} disabled>
-                            <Box display="flex" alignItems="center">
+                        <Box display="flex" alignItems="center">
+                            <IconButton sx={{ p: 0 }} onClick={handleNextPage} disabled={currentPage >= totalPages - 1}>
+
                                 <img
                                     src={backarrow}
                                     alt=">>"
                                     style={{ transform: 'scaleX(-1)', marginRight: '-4px', opacity: 0.4 }}
                                 />
+                            </IconButton>
+                            <IconButton sx={{ p: 0 }} onClick={handleLastPage} disabled={currentPage >= totalPages - 1}>
                                 <img
                                     src={backarrow}
                                     alt=">>"
                                     style={{ transform: 'scaleX(-1)', marginLeft: '-12px', opacity: 0.4 }}
-                                />
-                            </Box>
-                        </IconButton>
 
+                                />
+
+                            </IconButton>
+                        </Box>
                         {/* Botones de CSV / Excel y PDF */}
                         <Box sx={{ display: "flex", justifyContent: "flex-end", flex: 1, marginLeft: "810px", gap: 2 }}>
                             <IconButton sx={{ p: 0, opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}

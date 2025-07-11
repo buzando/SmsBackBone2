@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 
 namespace Contract.Response
 {
+
     public class ReportDeliveryResponse
+    {
+        public List<ReportDeliveryList> ReportDeliveryList { get; set; }
+        public int TotalCount { get; set; }
+        public int TotalXPage { get; set; }
+
+    }
+    public class ReportDeliveryList
     {
         public int MessageId { get; set; }
         public string Message { get; set; }
         public string CampaignName { get; set; }
-        public int CampaignId { get; set; }   
+        public int CampaignId { get; set; }
         public int UserId { get; set; }
         public string UserName { get; set; }
         public string RoomName { get; set; }

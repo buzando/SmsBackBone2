@@ -15,5 +15,6 @@ namespace Contract.Request
         public string EndDate { get; set; }
         public List<int>? CampaignIds { get; set; }
         public List<int>? UserIds { get; set; }
+        public int Page { get; set; }
     }
 }

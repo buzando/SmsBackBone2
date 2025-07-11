@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ using Contract.Other;
 using Contract.Response;
 using DocumentFormat.OpenXml.Spreadsheet;
 using log4net;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Modal;
 using Modal.Model.Model;
@@ -25,6 +27,8 @@ namespace Business
         public List<FullCampaignSpResult> FullResponseCampaignstarted()
         {
             var result = new List<FullCampaignSpResult>();
+            var topcampaigns = Common.ConfigurationManagerJson("TopCampaigns");
+            var topcontacts = Common.ConfigurationManagerJson("TopContacts");
             _logger.Info($"Inicia Ejecutando SP");
             try
             {
@@ -33,11 +37,22 @@ namespace Business
                     var connection = ctx.Database.GetDbConnection();
                     if (connection.State != System.Data.ConnectionState.Open)
                         connection.Open();
-                   
+
                     using (var cmd = connection.CreateCommand())
                     {
+                        var topcontactsValue = string.IsNullOrWhiteSpace(topcontacts) ? "NULL" : topcontacts;
+                        cmd.CommandType = CommandType.StoredProcedure;
                         cmd.CommandText = "sp_getCampaignsToAutoStart";
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                        var paramCampaigns = cmd.CreateParameter();
+                        paramCampaigns.ParameterName = "@TopCampaigns";
+                        paramCampaigns.Value = int.Parse(topcampaigns);
+                        cmd.Parameters.Add(paramCampaigns);
+
+                        var paramContacts = cmd.CreateParameter();
+                        paramContacts.ParameterName = "@TopContacts";
+                        paramContacts.Value = string.IsNullOrWhiteSpace(topcontacts) ? (object)DBNull.Value : int.Parse(topcontacts);
+                        cmd.Parameters.Add(paramContacts);
                         cmd.CommandTimeout = 0;
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -87,7 +102,7 @@ namespace Business
                                 campaign.RecycleSetting = !string.IsNullOrEmpty(campaign.RecycleSettingJson)
                                     ? JsonConvert.DeserializeObject<CampaignRecycleSettings>(campaign.RecycleSettingJson)
                                     : null;
-
+                                _logger.Info($"🔍 Se encontraron {result.Count()} campañas");
                                 result.Add(campaign);
                             }
                         }
@@ -374,6 +389,89 @@ namespace Business
 
             return message;
         }
+
+        public bool HayContactosPendientes()
+        {
+            try
+            {
+                var campaignsToCheck = new List<(int ScheduleId, int CampaignId)>();
+
+                using (var ctx = new Entities())
+                {
+                    var connection = (SqlConnection)ctx.Database.GetDbConnection();
+                    connection.Open(); // Asegúrate de abrir
+
+                    using (var getCampaignsCmd = connection.CreateCommand())
+                    {
+                        getCampaignsCmd.CommandText = @"
+                    SELECT s.Id AS ScheduleId, s.CampaignId
+                    FROM CampaignSchedules s
+                    JOIN Campaigns c ON s.CampaignId = c.Id
+                    WHERE 
+                        c.AutoStart = 1
+                        AND GETDATE() BETWEEN s.StartDateTime AND s.EndDateTime";
+
+                        using (var reader = getCampaignsCmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                campaignsToCheck.Add((
+                                    reader.GetInt32(0),
+                                    reader.GetInt32(1)
+                                ));
+                            }
+                        }
+                    }
+
+                    // Cerramos conexión anterior antes de reutilizar en segundo paso
+                    connection.Close();
+                }
+
+                // Recorremos schedules
+                foreach (var (scheduleId, campaignId) in campaignsToCheck)
+                {
+                    using (var ctx = new Entities())
+                    {
+                        var connection = (SqlConnection)ctx.Database.GetDbConnection();
+                        connection.Open(); // Necesario
+
+                        using (var cmd = connection.CreateCommand())
+                        {
+                            cmd.CommandText = @"
+                        SELECT COUNT(*)
+                        FROM CampaignContacts cc
+                        LEFT JOIN CampaignContactScheduleSend scss 
+                            ON cc.Id = scss.ContactId AND scss.ScheduleId = @ScheduleId
+                        WHERE cc.CampaignId = @CampaignId
+                        AND scss.Id IS NULL";
+
+                            cmd.Parameters.Add(new SqlParameter("@ScheduleId", scheduleId));
+                            cmd.Parameters.Add(new SqlParameter("@CampaignId", campaignId));
+
+                            var count = (int)(cmd.ExecuteScalar() ?? 0);
+                            if (count > 0)
+                            {
+                                _logger.Info($"📌 Campaña {campaignId} tiene {count} contactos no enviados para ScheduleId {scheduleId}.");
+                                return true;
+                            }
+                        }
+
+                        connection.Close();
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("❌ Error en HayContactosPendientes: " + ex.Message);
+                return false;
+            }
+        }
+
+
+
+
 
     }
 }
