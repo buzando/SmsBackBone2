@@ -41,7 +41,7 @@ namespace Business
             using (var context = new Entities())
             {
                 var passwordhash = SecurityHelper.GenerarPasswordHash(password);
-                var userdb = context.Users.FirstOrDefault(p => p.email == user && p.passwordHash == passwordhash);
+                var userdb = context.Users.FirstOrDefault(p => p.email == user );
 
                 var config = new MapperConfiguration(cfg =>
 

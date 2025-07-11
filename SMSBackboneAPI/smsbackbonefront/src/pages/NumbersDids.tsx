@@ -147,7 +147,7 @@ const NumbersDids: React.FC = () => {
     const [number, setNumber] = useState<NumberData | null>(null);
     const [showModalNumber, setshowModalNumber] = useState(false);
     const [selectedAction, setSelectedAction] = useState<'delete' | 'deactivate' | null>(null);
-      const [ShowSnackBar, setShowSnackBar] = useState(false);
+    const [ShowSnackBar, setShowSnackBar] = useState(false);
     const [uploadSummary, setUploadSummary] = useState<{
         success: number;
         failed: number;
@@ -308,8 +308,7 @@ const NumbersDids: React.FC = () => {
             item.Type.toLowerCase().includes(term) ||
             item.Service.toLowerCase().includes(term) || // Aquí se filtran los servicios
             item.State.toLowerCase().includes(term) ||
-            item.Municipality.toLowerCase().includes(term) ||
-            item.Estatus.toLowerCase().includes(term)
+            item.Municipality.toLowerCase().includes(term)
         );
     });
 
@@ -336,8 +335,7 @@ const NumbersDids: React.FC = () => {
                 item.Type.toLowerCase().includes(lowerSearch) ||
                 item.Service.toLowerCase().includes(lowerSearch) ||
                 item.State.toLowerCase().includes(lowerSearch) ||
-                item.Municipality.toLowerCase().includes(lowerSearch) ||
-                item.Estatus.toLowerCase().includes(lowerSearch);
+                item.Municipality.toLowerCase().includes(lowerSearch)
 
             return matchType && matchSearch;
         });
@@ -726,6 +724,7 @@ const NumbersDids: React.FC = () => {
                                         alt="Limpiar búsqueda"
                                         onClick={() => {
                                             setSearchTerm('');
+                                            GetNumbers();
                                             // Aplica búsqueda vacía que muestre solo SMS cortos o largos
                                             const filtered = numbersData.filter(
                                                 (item) =>
@@ -734,7 +733,7 @@ const NumbersDids: React.FC = () => {
                                             );
                                             setNumbersData(filtered);
                                         }}
-                                        style={{ marginLeft: 8, width: 20, height: 20, cursor: 'pointer' }}
+                                        style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
                                     />
 
                                 )}
@@ -967,7 +966,7 @@ const NumbersDids: React.FC = () => {
                         justifyContent="center"
                         sx={{
                             width: '100%',
-                            minHeight: '300px',
+                            minHeight: '410px',
                             backgroundColor: '#F9F9F9',
                             padding: 4,
                             borderRadius: '12px',
@@ -975,7 +974,7 @@ const NumbersDids: React.FC = () => {
                             mt: 2,
                         }}
                     >
-                        <img src={NoResult} alt="No resultados" style={{ width: '120px', marginBottom: '16px' }} />
+                        <img src={NoResult} alt="No resultados" style={{ width: '240px', marginBottom: '16px' }} />
                         <Typography
                             sx={{
                                 fontFamily: 'Poppins',
@@ -994,11 +993,11 @@ const NumbersDids: React.FC = () => {
                             borderRadius: '8px',
                             padding: '8px 2px',
                             boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                            overflowX: 'auto',
-                            maxHeight: "400px"
+                            overflowX: 'hidden',
+                            height: "410px"
                         }}
                     >
-                        <table style={{ minWidth: '1140px', borderCollapse: 'collapse', }}>
+                        <table style={{ minWidth: '1180px', borderCollapse: 'collapse', }}>
                             <thead>
                                 <tr style={{
                                     textAlign: 'left', fontFamily: 'Poppins', fontSize: '13px',
@@ -1058,12 +1057,17 @@ const NumbersDids: React.FC = () => {
 
                                         }}>{number.Service}</td>
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            padding: '6px', width: '150px', whiteSpace: 'nowrap', overflow: 'hidden',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                             , borderRight: '1px solid #E0E0E0',
 
                                         }}>{number.Estatus}</td>
                                         <td style={{
+                                            position: 'sticky',
+                                            right: -30,
+                                            background: '#fff', borderLeft: '1px solid #E0E0E0',
+                                            boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
+                                            zIndex: 2,
                                             padding: '6px', width: '35px', whiteSpace: 'nowrap', overflow: 'hidden',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
 
@@ -1448,11 +1452,9 @@ const NumbersDids: React.FC = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     fontFamily: 'Poppins',
-                    overflow: 'hidden', // 🔥 evita doble scroll
+                    overflow: 'hidden',
                     boxShadow: 24,
                 }}>
-
-
                     <Box sx={{ px: 4, pt: 4 }}>
                         <Typography fontWeight="600" fontSize="20px" fontFamily='Poppins' marginTop={'-10px'} marginLeft={'-5px'}>
                             Gestionar Números DIDS
@@ -1510,17 +1512,19 @@ const NumbersDids: React.FC = () => {
                             marginTop: "0px",
                             marginBottom: "0px"
                         }} />
+                    </Box>
+
+                    <Box sx={{ overflowY: "auto", overflowX: "hidden" }}>
                         <Typography
                             mt={3}
                             fontWeight="500"
                             fontSize="18px"
                             fontFamily="Poppins"
                             textAlign="center"
-                            sx={{ width: '100%' }}
+                            sx={{ width: '100%', marginTop: "15px" }}
                         >
                             Seleccionar operación
                         </Typography>
-
 
                         <ToggleButtonGroup
                             exclusive
@@ -1761,1135 +1765,1225 @@ const NumbersDids: React.FC = () => {
                             </Tooltip>
                         </ToggleButtonGroup>
 
-                    </Box>
-                    <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 6 }} />
 
-                    <Grid container spacing={2} sx={{ mb: 2 }}>
-                        {tab === 1 && (
-                            <Grid item xs={6}>
-                                <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', fontWeight: 500, color: '#330F1B', mb: 1 }}>
-                                    Cliente
+                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 6 }} />
+
+                        <Grid container spacing={2} sx={{ mb: 2 }}>
+                            {tab === 1 && (
+                                <Grid item xs={0} marginLeft={"50px"}>
+                                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '18px', fontWeight: 500, color: '#330F1B', mb: 1 }}>
+                                        Cliente
+                                    </Typography>
+
+                                    {/* TextField que abre el Popper */}
+                                    <TextField
+                                        placeholder="Seleccionar cliente"
+                                        value={selectedClient?.nombrecliente || ''}
+                                        onClick={(e) => setClientAnchorEl2(e.currentTarget)}
+                                        fullWidth
+                                        size="small"
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <ArrowDropDownIcon />
+                                                </InputAdornment>
+                                            ),
+                                            readOnly: true,
+                                            sx: {
+                                                fontFamily: 'Poppins',
+                                                backgroundColor: '#FFFFFF',
+                                                borderRadius: '8px',
+                                                width: '208px',
+                                                '& input::placeholder': {
+                                                    color: '#786E71',
+                                                    fontSize: '12px',
+                                                    opacity: 0.6,
+                                                    fontFamily: 'Poppins',
+                                                },
+                                            },
+                                        }}
+                                    />
+
+
+                                    {/* Aquí mismo va el Popper, dentro del mismo Grid */}
+                                    <Popper
+                                        open={openClientPopper2}
+                                        anchorEl={clientAnchorEl2}
+                                        placement="bottom-start"
+                                        style={{ zIndex: 1300 }}
+                                    >
+                                        <ClickAwayListener onClickAway={() => setClientAnchorEl2(null)}>
+                                            <Paper sx={{ width: clientAnchorEl2?.clientWidth, borderRadius: '8px', mt: 1 }}>
+                                                <TextField
+                                                    autoFocus
+                                                    placeholder="Buscar"
+                                                    value={clientSearch2}
+                                                    onChange={(e) => setClientSearch2(e.target.value)}
+                                                    InputProps={{
+                                                        startAdornment: (
+                                                            <InputAdornment position="start">
+                                                                <img
+                                                                    src={seachicon}
+                                                                    alt="Buscar"
+                                                                    style={{
+                                                                        width: 24,
+                                                                        filter: clientSearch2 ? 'invert(14%) sepia(58%) saturate(1253%) hue-rotate(316deg) brightness(90%) contrast(95%)' : 'none'
+                                                                    }}
+                                                                />
+                                                            </InputAdornment>
+                                                        ),
+                                                        endAdornment: clientSearch2 && (
+                                                            <IconButton onClick={() => setClientSearch2('')}>
+                                                                <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
+                                                            </IconButton>
+                                                        ),
+                                                        sx: {
+                                                            fontFamily: 'Poppins',
+                                                            color: clientSearch2 ? '#7B354D' : '#000',
+                                                        }
+                                                    }}
+                                                    inputProps={{
+                                                        style: {
+                                                            fontFamily: 'Poppins',
+                                                            color: clientSearch2 ? '#7B354D' : '#000',
+                                                        }
+                                                    }}
+                                                    sx={{
+                                                        width: '208px',
+                                                        height: '40px',
+                                                        mb: 1,
+                                                        '& .MuiOutlinedInput-root': {
+                                                            height: '40px',
+                                                            border: '1px solid #9B9295',
+                                                            '& fieldset': {
+                                                                borderColor: clientSearch2 ? '#7B354D' : '#9B9295',
+                                                            },
+                                                            '&:hover fieldset': {
+                                                                borderColor: clientSearch2 ? '#7B354D' : '#9B9295',
+                                                            },
+                                                            '&.Mui-focused fieldset': {
+                                                                borderColor: clientSearch2 ? '#7B354D' : '#9B9295',
+                                                            },
+                                                        },
+                                                    }}
+                                                    fullWidth
+                                                    size="small"
+                                                />
+
+                                                <List>
+                                                    {filteredClients.map((client) => (
+                                                        <ListItemButton
+                                                            key={client.id}
+                                                            onClick={() => {
+                                                                setSelectedClient(client);
+                                                                setClientAnchorEl2(null);
+                                                                setClientSearch2('');
+                                                            }}
+                                                            sx={{ fontFamily: 'Poppins', fontSize: '12px', color: "#786E71" }}
+                                                        >
+                                                            {client.nombrecliente}
+                                                        </ListItemButton>
+                                                    ))}
+                                                </List>
+                                            </Paper>
+                                        </ClickAwayListener>
+                                    </Popper>
+                                </Grid>
+
+                            )}
+                            <Grid item xs={tab === 1 ? 6 : 12}>
+                                <Typography sx={{ fontFamily: 'Poppins', fontSize: '18px', fontWeight: 500, color: '#330F1B', mb: 1, marginLeft: "50px" }}>
+                                    Canal
                                 </Typography>
-
-                                {/* TextField que abre el Popper */}
-                                <TextField
-                                    placeholder="Seleccionar cliente"
-                                    value={selectedClient?.nombrecliente || ''}
-                                    onClick={(e) => setClientAnchorEl2(e.currentTarget)}
-                                    fullWidth
+                                <FormControl
                                     size="small"
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <ArrowDropDownIcon />
-                                            </InputAdornment>
-                                        ),
-                                        readOnly: true,
-                                        sx: {
+                                    sx={{
+                                        width: '208px',
+                                        fontFamily: 'Poppins',
+                                        marginLeft: "45px",
+                                    }}
+                                >
+                                    <Select
+                                        value={selectedChannel}
+                                        onChange={(e) => setSelectedChannel(e.target.value)}
+                                        displayEmpty
+                                        renderValue={(selected) => {
+                                            if (!selected) {
+                                                return <span style={{ color: '#A9A9A9' }}>Seleccionar canal</span>;
+                                            }
+                                            return selected;
+                                        }}
+                                        sx={{
                                             fontFamily: 'Poppins',
                                             backgroundColor: '#FFFFFF',
-                                            borderRadius: '8px'
-                                        }
-                                    }}
-                                />
+                                            borderRadius: '8px',
+                                            height: '40px',
+                                            fontSize: '12px',
+                                            color: '#000000'
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    fontFamily: 'Poppins',
+                                                },
+                                            },
+                                        }}
+                                    >
+                                        <MenuItem value="Corto" sx={{ fontSize: '12px', color: '#786E71', fontFamily: 'Poppins', '&:hover': { backgroundColor: '#F2EBED' } }}>
+                                            SMS, números cortos
+                                        </MenuItem>
+                                        <MenuItem value="Largo" sx={{ fontSize: '12px', color: '#786E71', fontFamily: 'Poppins', '&:hover': { backgroundColor: '#F2EBED' } }}>
+                                            SMS, números largos
+                                        </MenuItem>
+                                        <MenuItem value="Llamada" sx={{ fontSize: '12px', color: '#786E71', fontFamily: 'Poppins', '&:hover': { backgroundColor: '#F2EBED' } }}>
+                                            Llamada
+                                        </MenuItem>
+                                    </Select>
 
-                                {/* Aquí mismo va el Popper, dentro del mismo Grid */}
-                                <Popper
-                                    open={openClientPopper2}
-                                    anchorEl={clientAnchorEl2}
-                                    placement="bottom-start"
-                                    style={{ zIndex: 1300 }}
-                                >
-                                    <ClickAwayListener onClickAway={() => setClientAnchorEl2(null)}>
-                                        <Paper sx={{ width: clientAnchorEl2?.clientWidth, borderRadius: '8px', mt: 1 }}>
-                                            <TextField
-                                                autoFocus
-                                                placeholder="Buscar cliente"
-                                                value={clientSearch2}
-                                                onChange={(e) => setClientSearch2(e.target.value)}
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <InputAdornment position="start">
-                                                            <img src={seachicon} alt="Buscar" style={{ width: 16 }} />
-                                                        </InputAdornment>
-                                                    ),
-                                                    sx: { fontFamily: 'Poppins', px: 1.5 }
-                                                }}
-                                                fullWidth
-                                                size="small"
-                                            />
-                                            <List>
-                                                {filteredClients.map((client) => (
-                                                    <ListItemButton
-                                                        key={client.id}
-                                                        onClick={() => {
-                                                            setSelectedClient(client);
-                                                            setClientAnchorEl2(null);
-                                                            setClientSearch2('');
-                                                        }}
-                                                        sx={{ fontFamily: 'Poppins', fontSize: '14px' }}
-                                                    >
-                                                        {client.nombrecliente}
-                                                    </ListItemButton>
-                                                ))}
-                                            </List>
-                                        </Paper>
-                                    </ClickAwayListener>
-                                </Popper>
+
+                                </FormControl>
+
                             </Grid>
-
-                        )}
-                        <Grid item xs={tab === 1 ? 6 : 12}>
-                            <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', fontWeight: 500, color: '#330F1B', mb: 1 }}>
-                                Canal
-                            </Typography>
-                            <FormControl fullWidth size="small">
-                                <InputLabel id="channel-select-label" sx={{ fontFamily: 'Poppins' }}>Seleccionar canal</InputLabel>
-                                <Select
-                                    labelId="channel-select-label"
-                                    value={selectedChannel}
-                                    onChange={(e) => setSelectedChannel(e.target.value)}
-                                    label="Seleccionar canal"
-                                    sx={{ fontFamily: 'Poppins', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
-                                >
-                                    <MenuItem value="Corto">SMS, números cortos</MenuItem>
-                                    <MenuItem value="Largo">SMS, números largos</MenuItem>
-                                    <MenuItem value="Llamada">Llamada</MenuItem>
-                                </Select>
-                            </FormControl>
                         </Grid>
-                    </Grid>
 
-                    <Box
-                        sx={{
-                            flex: 1,
-                            overflowY: 'auto',
-                            px: 3,
-                            py: 0,
-                            mt: -3,
-                            maxHeight: 'calc(85vh - 200px)',
-                        }}
-                    >
                         <Box
                             sx={{
                                 flex: 1,
-                                px: 4,
-                                py: 3,
-                                maxHeight: 'calc(90vh - 180px)', // o lo que uses
-                                overflowX: 'hidden', // 🔥 Esto evita scroll lateral
+                                overflowY: 'auto',
+                                px: 3,
+                                py: 0,
+                                mt: -3,
+                                maxHeight: 'calc(85vh - 200px)',
                             }}
                         >
-                            <Typography fontWeight="500" fontSize="18px" mb={1} fontFamily={"Poppins"}
-                                marginLeft={'-30px'} marginTop={'-10px'}>Seleccionar fuente de registros</Typography>
-
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    mb: 2,
-                                    ml: '-30px',
-                                    border: '1px solid #E6E4E4',
-                                    borderRadius: '6px',
-                                    width: '530px',
-                                    height: '57px',
-                                    opacity: manageByIndividual ? 0.4 : 1,
-                                    pointerEvents: manageByIndividual ? 'none' : 'auto'
-                                }}
-                            >
-                                <Typography fontSize="18px" fontFamily={"Poppins"} marginLeft={'16px'}>Por archivo</Typography>
-                                <Switch
-                                    checked={manageByList}
-                                    onChange={() => {
-                                        const newValue = !manageByList;
-                                        setManageByList(newValue);
-                                        if (newValue) {
-                                            setManageByIndividual(false);
-                                        }
-                                    }}
-                                />
-                            </Box>
-                        </Box>
-
-                        <Box mt={-2}>
-                            {manageByList && (
-                                <>
-                                    {manageOperation === 'agregar' && (
-                                        <Box display="flex" alignItems="flex-start" gap={3} mt={2} flexWrap="wrap">
-                                            <Box
-                                                marginBottom={'25px'}
-                                                onClick={() => !hasPhoneInput && fileInputRef.current?.click()}
-                                                onDragOver={(e) => e.preventDefault()}
-                                                onDrop={(e) => {
-                                                    e.preventDefault();
-                                                    if (hasPhoneInput) return; // prevenir carga
-                                                    const file = e.dataTransfer.files?.[0];
-                                                    if (file) handleFile(file);
-                                                }}
-                                                sx={{
-                                                    border: fileError
-                                                        ? '2px solid #EF5466'
-                                                        : fileSuccess
-                                                            ? '2px solid #8F4E63CC' // ✅ borde éxito
-                                                            : '2px dashed #D9B4C3',
-                                                    backgroundColor: fileError
-                                                        ? '#FFF4F5'
-                                                        : fileSuccess
-                                                            ? '#E5CBD333'           // ✅ fondo éxito
-                                                            : 'transparent',
-                                                    borderRadius: '8px',
-                                                    width: '160px',
-                                                    height: '160px',
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                    textAlign: 'center',
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: '13px',
-                                                    color: '#330F1B',
-                                                    position: 'relative',
-                                                    cursor: hasPhoneInput ? 'not-allowed' : 'pointer',
-                                                    px: 1,
-                                                    opacity: hasPhoneInput ? 0.5 : 1,
-                                                    pointerEvents: hasPhoneInput ? 'none' : 'auto',
-                                                }}
-
-                                            >
-
-                                                {/*Tooltip */}
-                                                <Box
-                                                    sx={{
-                                                        position: 'absolute',
-                                                        marginTop: "-115px",
-                                                        marginRight: '-115px',
-                                                        width: 24,
-                                                        height: 24,
-
-                                                    }}
-                                                >
-                                                    <Tooltip
-                                                        placement="right"
-                                                        title={
-                                                            fileError ? (
-                                                                <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#EF5466', opacity: 0.7 }}>
-                                                                    Solo se permiten archivos .xlsx
-                                                                </Box>
-                                                            ) : fileSuccess ? (
-                                                                <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#28A745', opacity: 0.7 }}>
-                                                                    Archivo cargado {selectedFile?.name}
-                                                                </Box>
-                                                            ) : (
-                                                                <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#000000', opacity: 0.7 }}>
-                                                                    El archivo debe ser Excel<br />(.xls/.xlsx)
-                                                                </Box>
-                                                            )
-                                                        }
-                                                        componentsProps={{
-                                                            tooltip: {
-                                                                sx: {
-                                                                    backgroundColor: "#FFFFFF",
-                                                                    borderRadius: "8px",
-                                                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                    padding: "8px 12px",
-                                                                    fontSize: "14px",
-                                                                    fontFamily: "Poppins",
-                                                                    color: "#000000",
-                                                                    whiteSpace: "pre-line",
-                                                                    transform: "translate(-5px, -5px)",
-                                                                    borderColor: "#00131F3D",
-                                                                    borderStyle: "solid",
-                                                                    borderWidth: "1px"
-                                                                }
-                                                            }
-                                                        }}
-                                                        PopperProps={{
-                                                            modifiers: [
-                                                                {
-                                                                    name: 'offset',
-                                                                    options: {
-                                                                        offset: [35, -180] // 👉 [horizontal, vertical]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }}
-                                                    >
-                                                        <Box>
-                                                            {!fileSuccess && (
-                                                                <img
-                                                                    src={fileError ? infoiconerror : infoicon}
-                                                                    alt="estado"
-                                                                    style={{ width: '24px', height: '24px', pointerEvents: 'auto', cursor: 'default' }}
-                                                                />
-                                                            )}
-                                                        </Box>
-                                                    </Tooltip>
-                                                    {fileSuccess && (
-                                                        <Tooltip title="Eliminar" arrow placement="top"
-                                                            componentsProps={{
-                                                                tooltip: {
-                                                                    sx: {
-                                                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                                                        color: "#CCC3C3",
-                                                                        fontFamily: "Poppins, sans-serif",
-                                                                        fontSize: "12px",
-                                                                        padding: "6px 8px",
-                                                                        borderRadius: "8px",
-                                                                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                                                                    }
-                                                                },
-                                                                arrow: {
-                                                                    sx: {
-                                                                        color: "rgba(0, 0, 0, 0.8)"
-                                                                    }
-                                                                }
-                                                            }}
-                                                            PopperProps={{
-                                                                modifiers: [
-                                                                    {
-                                                                        name: 'offset',
-                                                                        options: {
-                                                                            offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
-                                                                        }
-                                                                    }
-                                                                ]
-                                                            }}
-                                                        >
-                                                            <IconButton
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation(); // ❌ evita que el click se propague al Box que abre el file picker
-                                                                    setSelectedFile(null);
-                                                                    setUploadedFile(null);
-                                                                    setFileSuccess(false);
-                                                                    setFileError(false);
-                                                                    setBase64File('');
-                                                                    setUploadedFileBase64('');
-                                                                    setFormData(prev => ({ ...prev, File: '' }));
-                                                                    if (fileInputRef.current) {
-                                                                        fileInputRef.current.value = '';
-                                                                    }
-                                                                }}
-                                                                sx={{
-                                                                    position: 'absolute',
-                                                                    top: 0,
-                                                                    right: 0,
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    padding: 0,
-                                                                }}
-                                                            >
-                                                                <img src={Thrashicon} alt="Eliminar archivo" style={{ width: 24, height: 24 }} />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    )}
-
-                                                </Box>
-
-
-                                                {/*Imagen central del archivo a subir*/}
-                                                <Box
-                                                    sx={{
-                                                        width: "142px", height: "100px"
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={
-                                                            fileError
-                                                                ? IconCloudError
-                                                                : fileSuccess
-                                                                    ? CloudCheckedIcon
-                                                                    : UpCloudIcon
-                                                        }
-                                                        alt="estado archivo"
-                                                        style={{ marginBottom: '8px', width: "" }}
-                                                    />
-
-
-                                                    <Typography
-                                                        sx={{
-                                                            fontWeight: 600,
-                                                            fontFamily: "Poppins",
-                                                            color: "#330F1B",
-                                                            fontSize: '12px',
-                                                            opacity: !fileError && !fileSuccess ? 0.9 : 1
-                                                        }}
-                                                    >
-                                                        {fileError
-                                                            ? 'Archivo inválido'
-                                                            : fileSuccess
-                                                                ? 'Archivo cargado'
-                                                                : 'Subir archivo'}
-                                                    </Typography>
-
-                                                    <Typography
-                                                        sx={{
-                                                            fontFamily: 'Poppins',
-                                                            fontSize: '10px',
-                                                            color: '#574B4F',
-                                                            opacity: 1,
-                                                            textAlign: 'center',
-                                                            wordBreak: 'break-word',
-                                                            maxWidth: '142px',
-                                                            mt: '1px'
-                                                        }}
-                                                    >
-                                                        {fileSuccess && uploadedFile
-                                                            ? uploadedFile.name
-                                                            : 'Arrastre un archivo aquí, o selecciónelo.'}
-                                                    </Typography>
-                                                    {fileSuccess && (
-                                                        <Typography
-                                                            sx={{
-                                                                fontFamily: 'Poppins',
-                                                                fontSize: '10px',
-                                                                color: '#574B4F',
-                                                                opacity: 1,
-                                                                textAlign: 'center',
-                                                                mt: '1px'
-                                                            }}
-                                                        >
-                                                            Total de registros: {totalRecords}
-                                                        </Typography>
-                                                    )}
-
-                                                </Box>
-
-                                                <input
-                                                    type="file"
-                                                    hidden
-                                                    ref={fileInputRef}
-                                                    onChange={(e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (file) handleFile(file);
-                                                    }}
-
-                                                />
-
-
-
-                                            </Box>
-                                        </Box>
-
-                                    )}
-                                    {manageOperation === 'eliminar' && (
-                                        <Box sx={{ display: 'flex', gap: 2, mt: 2, alignItems: 'flex-start' }}>
-
-                                            <Box
-                                                marginBottom={'25px'}
-                                                onClick={() => !hasPhoneInput && fileInputRef.current?.click()}
-                                                onDragOver={(e) => e.preventDefault()}
-                                                onDrop={(e) => {
-                                                    e.preventDefault();
-                                                    if (hasPhoneInput) return; // prevenir carga
-                                                    const file = e.dataTransfer.files?.[0];
-                                                    if (file) handleFile(file);
-                                                }}
-                                                sx={{
-                                                    border: fileError
-                                                        ? '2px solid #EF5466'
-                                                        : fileSuccess
-                                                            ? '2px solid #8F4E63CC' // ✅ borde éxito
-                                                            : '2px dashed #D9B4C3',
-                                                    backgroundColor: fileError
-                                                        ? '#FFF4F5'
-                                                        : fileSuccess
-                                                            ? '#E5CBD333'           // ✅ fondo éxito
-                                                            : 'transparent',
-                                                    borderRadius: '8px',
-                                                    width: '160px',
-                                                    height: '160px',
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                    textAlign: 'center',
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: '13px',
-                                                    color: '#330F1B',
-                                                    position: 'relative',
-                                                    cursor: hasPhoneInput ? 'not-allowed' : 'pointer',
-                                                    px: 1,
-                                                    opacity: hasPhoneInput ? 0.5 : 1,
-                                                    pointerEvents: hasPhoneInput ? 'none' : 'auto',
-                                                }}
-
-                                            >
-
-                                                {/*Tooltip */}
-                                                <Box
-                                                    sx={{
-                                                        position: 'absolute',
-                                                        marginTop: "-115px",
-                                                        marginRight: '-115px',
-                                                        width: 24,
-                                                        height: 24,
-
-                                                    }}
-                                                >
-                                                    <Tooltip
-                                                        placement="right"
-                                                        title={
-                                                            fileError ? (
-                                                                <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#EF5466', opacity: 0.7 }}>
-                                                                    Solo se permiten archivos .xlsx
-                                                                </Box>
-                                                            ) : fileSuccess ? (
-                                                                <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#28A745', opacity: 0.7 }}>
-                                                                    Archivo cargado {selectedFile?.name}
-                                                                </Box>
-                                                            ) : (
-                                                                <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#000000', opacity: 0.7 }}>
-                                                                    El archivo debe ser Excel<br />(.xls/.xlsx)
-                                                                </Box>
-                                                            )
-                                                        }
-                                                        componentsProps={{
-                                                            tooltip: {
-                                                                sx: {
-                                                                    backgroundColor: "#FFFFFF",
-                                                                    borderRadius: "8px",
-                                                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                    padding: "8px 12px",
-                                                                    fontSize: "14px",
-                                                                    fontFamily: "Poppins",
-                                                                    color: "#000000",
-                                                                    whiteSpace: "pre-line",
-                                                                    transform: "translate(-5px, -5px)",
-                                                                    borderColor: "#00131F3D",
-                                                                    borderStyle: "solid",
-                                                                    borderWidth: "1px"
-                                                                }
-                                                            }
-                                                        }}
-                                                        PopperProps={{
-                                                            modifiers: [
-                                                                {
-                                                                    name: 'offset',
-                                                                    options: {
-                                                                        offset: [35, -180] // 👉 [horizontal, vertical]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }}
-                                                    >
-                                                        <Box>
-                                                            {!fileSuccess && (
-                                                                <img
-                                                                    src={fileError ? infoiconerror : infoicon}
-                                                                    alt="estado"
-                                                                    style={{ width: '24px', height: '24px', pointerEvents: 'auto', cursor: 'default' }}
-                                                                />
-                                                            )}
-                                                        </Box>
-                                                    </Tooltip>
-                                                    {fileSuccess && (
-                                                        <Tooltip title="Eliminar" arrow placement="top"
-                                                            componentsProps={{
-                                                                tooltip: {
-                                                                    sx: {
-                                                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                                                        color: "#CCC3C3",
-                                                                        fontFamily: "Poppins, sans-serif",
-                                                                        fontSize: "12px",
-                                                                        padding: "6px 8px",
-                                                                        borderRadius: "8px",
-                                                                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                                                                    }
-                                                                },
-                                                                arrow: {
-                                                                    sx: {
-                                                                        color: "rgba(0, 0, 0, 0.8)"
-                                                                    }
-                                                                }
-                                                            }}
-                                                            PopperProps={{
-                                                                modifiers: [
-                                                                    {
-                                                                        name: 'offset',
-                                                                        options: {
-                                                                            offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
-                                                                        }
-                                                                    }
-                                                                ]
-                                                            }}
-                                                        >
-                                                            <IconButton
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation(); // ❌ evita que el click se propague al Box que abre el file picker
-                                                                    setSelectedFile(null);
-                                                                    setUploadedFile(null);
-                                                                    setFileSuccess(false);
-                                                                    setFileError(false);
-                                                                    setBase64File('');
-                                                                    setUploadedFileBase64('');
-                                                                    setFormData(prev => ({ ...prev, File: '' }));
-                                                                    if (fileInputRef.current) {
-                                                                        fileInputRef.current.value = '';
-                                                                    }
-                                                                }}
-                                                                sx={{
-                                                                    position: 'absolute',
-                                                                    top: 0,
-                                                                    right: 0,
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    padding: 0,
-                                                                }}
-                                                            >
-                                                                <img src={Thrashicon} alt="Eliminar archivo" style={{ width: 24, height: 24 }} />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    )}
-
-                                                </Box>
-
-
-                                                {/*Imagen central del archivo a subir*/}
-                                                <Box
-                                                    sx={{
-                                                        width: "142px", height: "100px"
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={
-                                                            fileError
-                                                                ? IconCloudError
-                                                                : fileSuccess
-                                                                    ? CloudCheckedIcon
-                                                                    : UpCloudIcon
-                                                        }
-                                                        alt="estado archivo"
-                                                        style={{ marginBottom: '8px', width: "" }}
-                                                    />
-
-
-                                                    <Typography
-                                                        sx={{
-                                                            fontWeight: 600,
-                                                            fontFamily: "Poppins",
-                                                            color: "#330F1B",
-                                                            fontSize: '12px',
-                                                            opacity: !fileError && !fileSuccess ? 0.9 : 1
-                                                        }}
-                                                    >
-                                                        {fileError
-                                                            ? 'Archivo inválido'
-                                                            : fileSuccess
-                                                                ? 'Archivo cargado'
-                                                                : 'Subir archivo'}
-                                                    </Typography>
-
-                                                    <Typography
-                                                        sx={{
-                                                            fontFamily: 'Poppins',
-                                                            fontSize: '10px',
-                                                            color: '#574B4F',
-                                                            opacity: 1,
-                                                            textAlign: 'center',
-                                                            wordBreak: 'break-word',
-                                                            maxWidth: '142px',
-                                                            mt: '1px'
-                                                        }}
-                                                    >
-                                                        {fileSuccess && uploadedFile
-                                                            ? uploadedFile.name
-                                                            : 'Arrastre un archivo aquí, o selecciónelo.'}
-                                                    </Typography>
-                                                    {fileSuccess && (
-                                                        <Typography
-                                                            sx={{
-                                                                fontFamily: 'Poppins',
-                                                                fontSize: '10px',
-                                                                color: '#574B4F',
-                                                                opacity: 1,
-                                                                textAlign: 'center',
-                                                                mt: '1px'
-                                                            }}
-                                                        >
-                                                            Total de registros: {totalRecords}
-                                                        </Typography>
-                                                    )}
-
-                                                </Box>
-
-                                                <input
-                                                    type="file"
-                                                    hidden
-                                                    ref={fileInputRef}
-                                                    onChange={(e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (file) handleFile(file);
-                                                    }}
-
-                                                />
-
-
-
-                                            </Box>
-
-                                        </Box>
-
-                                    )}
-                                    {manageOperation === 'darDeBaja' && (
-                                        <Box display="flex" alignItems="flex-start" gap={3} mt={2} flexWrap="wrap">
-
-                                            <Box
-                                                marginBottom={'25px'}
-                                                onClick={() => !hasPhoneInput && fileInputRef.current?.click()}
-                                                onDragOver={(e) => e.preventDefault()}
-                                                onDrop={(e) => {
-                                                    e.preventDefault();
-                                                    if (hasPhoneInput) return; // prevenir carga
-                                                    const file = e.dataTransfer.files?.[0];
-                                                    if (file) handleFile(file);
-                                                }}
-                                                sx={{
-                                                    border: fileError
-                                                        ? '2px solid #EF5466'
-                                                        : fileSuccess
-                                                            ? '2px solid #8F4E63CC' // ✅ borde éxito
-                                                            : '2px dashed #D9B4C3',
-                                                    backgroundColor: fileError
-                                                        ? '#FFF4F5'
-                                                        : fileSuccess
-                                                            ? '#E5CBD333'           // ✅ fondo éxito
-                                                            : 'transparent',
-                                                    borderRadius: '8px',
-                                                    width: '160px',
-                                                    height: '160px',
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                    textAlign: 'center',
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: '13px',
-                                                    color: '#330F1B',
-                                                    position: 'relative',
-                                                    cursor: hasPhoneInput ? 'not-allowed' : 'pointer',
-                                                    px: 1,
-                                                    opacity: hasPhoneInput ? 0.5 : 1,
-                                                    pointerEvents: hasPhoneInput ? 'none' : 'auto',
-                                                }}
-
-                                            >
-
-                                                {/*Tooltip */}
-                                                <Box
-                                                    sx={{
-                                                        position: 'absolute',
-                                                        marginTop: "-115px",
-                                                        marginRight: '-115px',
-                                                        width: 24,
-                                                        height: 24,
-
-                                                    }}
-                                                >
-                                                    <Tooltip
-                                                        placement="right"
-                                                        title={
-                                                            fileError ? (
-                                                                <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#EF5466', opacity: 0.7 }}>
-                                                                    Solo se permiten archivos .xlsx
-                                                                </Box>
-                                                            ) : fileSuccess ? (
-                                                                <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#28A745', opacity: 0.7 }}>
-                                                                    Archivo cargado {selectedFile?.name}
-                                                                </Box>
-                                                            ) : (
-                                                                <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#000000', opacity: 0.7 }}>
-                                                                    El archivo debe ser Excel<br />(.xls/.xlsx)
-                                                                </Box>
-                                                            )
-                                                        }
-                                                        componentsProps={{
-                                                            tooltip: {
-                                                                sx: {
-                                                                    backgroundColor: "#FFFFFF",
-                                                                    borderRadius: "8px",
-                                                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                    padding: "8px 12px",
-                                                                    fontSize: "14px",
-                                                                    fontFamily: "Poppins",
-                                                                    color: "#000000",
-                                                                    whiteSpace: "pre-line",
-                                                                    transform: "translate(-5px, -5px)",
-                                                                    borderColor: "#00131F3D",
-                                                                    borderStyle: "solid",
-                                                                    borderWidth: "1px"
-                                                                }
-                                                            }
-                                                        }}
-                                                        PopperProps={{
-                                                            modifiers: [
-                                                                {
-                                                                    name: 'offset',
-                                                                    options: {
-                                                                        offset: [35, -180] // 👉 [horizontal, vertical]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }}
-                                                    >
-                                                        <Box>
-                                                            {!fileSuccess && (
-                                                                <img
-                                                                    src={fileError ? infoiconerror : infoicon}
-                                                                    alt="estado"
-                                                                    style={{ width: '24px', height: '24px', pointerEvents: 'auto', cursor: 'default' }}
-                                                                />
-                                                            )}
-                                                        </Box>
-                                                    </Tooltip>
-                                                    {fileSuccess && (
-                                                        <Tooltip title="Eliminar" arrow placement="top"
-                                                            componentsProps={{
-                                                                tooltip: {
-                                                                    sx: {
-                                                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                                                        color: "#CCC3C3",
-                                                                        fontFamily: "Poppins, sans-serif",
-                                                                        fontSize: "12px",
-                                                                        padding: "6px 8px",
-                                                                        borderRadius: "8px",
-                                                                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                                                                    }
-                                                                },
-                                                                arrow: {
-                                                                    sx: {
-                                                                        color: "rgba(0, 0, 0, 0.8)"
-                                                                    }
-                                                                }
-                                                            }}
-                                                            PopperProps={{
-                                                                modifiers: [
-                                                                    {
-                                                                        name: 'offset',
-                                                                        options: {
-                                                                            offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
-                                                                        }
-                                                                    }
-                                                                ]
-                                                            }}
-                                                        >
-                                                            <IconButton
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setSelectedFile(null);
-                                                                    setUploadedFile(null);
-                                                                    setFileSuccess(false);
-                                                                    setFileError(false);
-                                                                    setBase64File('');
-                                                                    setUploadedFileBase64('');
-                                                                    setFormData(prev => ({ ...prev, File: '' }));
-                                                                    if (fileInputRef.current) {
-                                                                        fileInputRef.current.value = '';
-                                                                    }
-                                                                }}
-                                                                sx={{
-                                                                    position: 'absolute',
-                                                                    top: 0,
-                                                                    right: 0,
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    padding: 0,
-                                                                }}
-                                                            >
-                                                                <img src={Thrashicon} alt="Eliminar archivo" style={{ width: 24, height: 24 }} />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    )}
-
-                                                </Box>
-
-
-                                                {/*Imagen central del archivo a subir*/}
-                                                <Box
-                                                    sx={{
-                                                        width: "142px", height: "100px"
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={
-                                                            fileError
-                                                                ? IconCloudError
-                                                                : fileSuccess
-                                                                    ? CloudCheckedIcon
-                                                                    : UpCloudIcon
-                                                        }
-                                                        alt="estado archivo"
-                                                        style={{ marginBottom: '8px', width: "" }}
-                                                    />
-
-
-                                                    <Typography
-                                                        sx={{
-                                                            fontWeight: 600,
-                                                            fontFamily: "Poppins",
-                                                            color: "#330F1B",
-                                                            fontSize: '12px',
-                                                            opacity: !fileError && !fileSuccess ? 0.9 : 1
-                                                        }}
-                                                    >
-                                                        {fileError
-                                                            ? 'Archivo inválido'
-                                                            : fileSuccess
-                                                                ? 'Archivo cargado'
-                                                                : 'Subir archivo'}
-                                                    </Typography>
-
-                                                    <Typography
-                                                        sx={{
-                                                            fontFamily: 'Poppins',
-                                                            fontSize: '10px',
-                                                            color: '#574B4F',
-                                                            opacity: 1,
-                                                            textAlign: 'center',
-                                                            wordBreak: 'break-word',
-                                                            maxWidth: '142px',
-                                                            mt: '1px'
-                                                        }}
-                                                    >
-                                                        {fileSuccess && uploadedFile
-                                                            ? uploadedFile.name
-                                                            : 'Arrastre un archivo aquí, o selecciónelo.'}
-                                                    </Typography>
-                                                    {fileSuccess && (
-                                                        <Typography
-                                                            sx={{
-                                                                fontFamily: 'Poppins',
-                                                                fontSize: '10px',
-                                                                color: '#574B4F',
-                                                                opacity: 1,
-                                                                textAlign: 'center',
-                                                                mt: '1px'
-                                                            }}
-                                                        >
-                                                            Total de registros: {totalRecords}
-                                                        </Typography>
-                                                    )}
-
-                                                </Box>
-
-                                                <input
-                                                    type="file"
-                                                    hidden
-                                                    ref={fileInputRef}
-                                                    onChange={(e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (file) handleFile(file);
-                                                    }}
-
-                                                />
-
-
-
-                                            </Box>
-
-                                        </Box>
-                                    )}
-                                </>
-                            )}
-
                             <Box
                                 sx={{
                                     flex: 1,
                                     px: 4,
-                                    mt: 2,
-                                    mb: 1,
+                                    py: 3,
                                     maxHeight: 'calc(90vh - 180px)', // o lo que uses
                                     overflowX: 'hidden', // 🔥 Esto evita scroll lateral
                                 }}
                             >
+                                <Typography fontWeight="500" fontSize="18px" mb={1} fontFamily={"Poppins"}
+                                    marginLeft={'-10px'} marginTop={'-10px'}>Seleccionar fuente de registros</Typography>
+
                                 <Box
                                     sx={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         alignItems: 'center',
                                         mb: 2,
-                                        ml: '-30px',
-                                        opacity: manageByList ? 0.4 : 1,
+                                        ml: '-10px',
                                         border: '1px solid #E6E4E4',
                                         borderRadius: '6px',
-                                        width: '530px',
+                                        width: '500px',
                                         height: '57px',
-                                        pointerEvents: manageByList ? 'none' : 'auto',
+                                        opacity: manageByIndividual ? 0.4 : 1,
+                                        pointerEvents: manageByIndividual ? 'none' : 'auto'
                                     }}
                                 >
-                                    <Typography fontSize="18px" fontFamily={"Poppins"} marginLeft={'16px'}>Por registro individual</Typography>
+                                    <Typography fontSize="18px" fontFamily={"Poppins"} marginLeft={'16px'}>Por archivo</Typography>
                                     <Switch
-                                        checked={manageByIndividual}
+                                        checked={manageByList}
                                         onChange={() => {
-                                            const newValue = !manageByIndividual;
-                                            setManageByIndividual(newValue);
+                                            const newValue = !manageByList;
+                                            setManageByList(newValue);
                                             if (newValue) {
-                                                setManageByList(false);
+                                                setManageByIndividual(false);
                                             }
                                         }}
                                     />
                                 </Box>
                             </Box>
 
-                            {manageByIndividual && (
-                                <Box mt={-2} ml={2.5}>
-                                    <Typography sx={{
-                                        fontFamily: 'Poppins', fontSize: '16px',
-                                        fontWeight: 500, mb: 1, color: '#574B4F'
-                                    }}>
-                                        Teléfono(s)
-                                    </Typography>
-
-                                    <Box
-                                        sx={{
-                                            maxHeight: '160px',
-                                            overflowY: 'auto',
-                                            pr: 1,
-                                            display: 'flex',
-                                            flexDirection: 'column',
-
-                                            gap: 1
-                                        }}
-                                    >
-                                        {individualPhones.map((phone, index) => (
-                                            <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <TextField
-                                                    value={phone}
-                                                    onChange={(e) => {
-                                                        const numericValue = e.target.value.replace(/\D/g, '');
-                                                        handleIndividualPhoneChange(index, numericValue);
+                            <Box mt={-2} sx={{}}>
+                                {manageByList && (
+                                    <>
+                                        {manageOperation === 'agregar' && (
+                                            <Box
+                                                display="flex"
+                                                justifyContent="center"
+                                                alignItems="flex-start" // si no necesitas centrar verticalmente, mantenlo así
+                                                gap={3}
+                                                mt={2}
+                                                flexWrap="wrap"
+                                            >
+                                                <Box
+                                                    marginBottom={'25px'}
+                                                    onClick={() => !hasPhoneInput && fileInputRef.current?.click()}
+                                                    onDragOver={(e) => e.preventDefault()}
+                                                    onDrop={(e) => {
+                                                        e.preventDefault();
+                                                        if (hasPhoneInput) return; // prevenir carga
+                                                        const file = e.dataTransfer.files?.[0];
+                                                        if (file) handleFile(file);
                                                     }}
-                                                    placeholder="5255..."
                                                     sx={{
-                                                        width: '232px',
-                                                        height: '54px',
-                                                        '& .MuiInputBase-root': {
-                                                            height: '54px',
-                                                        },
-                                                        '& input': {
-                                                            height: '54px',
-                                                            boxSizing: 'border-box',
-                                                            fontFamily: 'Poppins',
-                                                            fontSize: '14px',
-                                                        }
+                                                        border: fileError
+                                                            ? '2px solid #EF5466'
+                                                            : fileSuccess
+                                                                ? '2px solid #8F4E63CC' // ✅ borde éxito
+                                                                : '2px dashed #D9B4C3',
+                                                        backgroundColor: fileError
+                                                            ? '#FFF4F5'
+                                                            : fileSuccess
+                                                                ? '#E5CBD333'           // ✅ fondo éxito
+                                                                : 'transparent',
+                                                        borderRadius: '8px',
+                                                        width: '160px',
+                                                        height: '160px',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                        textAlign: 'center',
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '13px',
+                                                        color: '#330F1B',
+                                                        position: 'relative',
+                                                        cursor: hasPhoneInput ? 'not-allowed' : 'pointer',
+                                                        px: 1,
+                                                        opacity: hasPhoneInput ? 0.5 : 1,
+                                                        pointerEvents: hasPhoneInput ? 'none' : 'auto',
                                                     }}
-                                                    InputProps={{
-                                                        endAdornment: (
-                                                            <InputAdornment position="end">
-                                                                <Tooltip
-                                                                    title={
-                                                                        <Box
-                                                                            sx={{
-                                                                                backgroundColor: "#FFFFFF",
-                                                                                borderRadius: "8px",
-                                                                                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                                padding: "8px 12px",
-                                                                                fontSize: "14px",
-                                                                                fontFamily: "Poppins",
-                                                                                color: "#000000",
-                                                                                whiteSpace: "pre-line",
-                                                                                transform: "translate(2px, -15px)",
-                                                                                borderColor: "#00131F3D",
-                                                                                borderStyle: "solid",
 
+                                                >
 
-                                                                            }}
-                                                                        >
-                                                                            <>
-                                                                                Teléfono válido de 10 dígitos
-                                                                            </>
-                                                                        </Box>
-                                                                    }
-                                                                    placement="bottom-end"
-                                                                    componentsProps={{
-                                                                        tooltip: {
-                                                                            sx: {
-                                                                                backgroundColor: "transparent",
-                                                                                padding: 0,
+                                                    {/*Tooltip */}
+                                                    <Box
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            marginTop: "-115px",
+                                                            marginRight: '-115px',
+                                                            width: 24,
+                                                            height: 24,
 
-                                                                            },
-                                                                        },
-                                                                    }}
-                                                                >
-                                                                    <img src={infoicon} alt="info" style={{ width: 24, height: 24 }} />
-                                                                </Tooltip>
-                                                            </InputAdornment>
-                                                        )
-                                                    }}
-                                                />
-
-                                                {index === individualPhones.length - 1 && individualPhones.length < 5 && (
-                                                    <Tooltip title="Agregar número" arrow placement="top"
-                                                        componentsProps={{
-                                                            tooltip: {
-                                                                sx: {
-                                                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                                                    color: "#CCC3C3",
-                                                                    fontFamily: "Poppins, sans-serif",
-                                                                    fontSize: "12px",
-                                                                    padding: "6px 8px",
-                                                                    borderRadius: "8px",
-                                                                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                                                                }
-                                                            },
-                                                            arrow: {
-                                                                sx: {
-                                                                    color: "rgba(0, 0, 0, 0.8)"
-                                                                }
-                                                            }
-                                                        }}
-                                                        PopperProps={{
-                                                            modifiers: [
-                                                                {
-                                                                    name: 'offset',
-                                                                    options: {
-                                                                        offset: [-20, -7] // [horizontal, vertical] — aquí movemos 3px hacia abajo
-                                                                    }
-                                                                }
-                                                            ]
                                                         }}
                                                     >
-                                                        <Box
-                                                            sx={{
-                                                                width: 21,
-                                                                height: 21,
-                                                                backgroundColor: "#6F565E",
-                                                                borderRadius: "50%", // 🔥 clave para hacerlo circular
-                                                                display: "flex",
-                                                                alignItems: "center",
-                                                                justifyContent: "center"
+                                                        <Tooltip
+                                                            placement="right"
+                                                            title={
+                                                                fileError ? (
+                                                                    <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#EF5466', opacity: 0.7 }}>
+                                                                        Solo se permiten archivos .xlsx
+                                                                    </Box>
+                                                                ) : fileSuccess ? (
+                                                                    <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#28A745', opacity: 0.7 }}>
+                                                                        Archivo cargado {selectedFile?.name}
+                                                                    </Box>
+                                                                ) : (
+                                                                    <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#000000', opacity: 0.7 }}>
+                                                                        El archivo debe ser Excel<br />(.xls/.xlsx)
+                                                                    </Box>
+                                                                )
+                                                            }
+                                                            componentsProps={{
+                                                                tooltip: {
+                                                                    sx: {
+                                                                        backgroundColor: "#FFFFFF",
+                                                                        borderRadius: "8px",
+                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                        padding: "8px 12px",
+                                                                        fontSize: "14px",
+                                                                        fontFamily: "Poppins",
+                                                                        color: "#000000",
+                                                                        whiteSpace: "pre-line",
+                                                                        transform: "translate(-5px, -5px)",
+                                                                        borderColor: "#00131F3D",
+                                                                        borderStyle: "solid",
+                                                                        borderWidth: "1px"
+                                                                    }
+                                                                }
+                                                            }}
+                                                            PopperProps={{
+                                                                modifiers: [
+                                                                    {
+                                                                        name: 'offset',
+                                                                        options: {
+                                                                            offset: [35, -180] // 👉 [horizontal, vertical]
+                                                                        }
+                                                                    }
+                                                                ]
                                                             }}
                                                         >
-                                                            <IconButton onClick={handleAddIndividualPhone}>
-                                                                <img
-                                                                    src={IconPlus2}
-                                                                    alt="Agregar teléfono"
-                                                                    style={{ width: 21, height: 21, }}
-                                                                />
-                                                            </IconButton>
-                                                        </Box>
-                                                    </Tooltip>
+                                                            <Box>
+                                                                {!fileSuccess && (
+                                                                    <img
+                                                                        src={fileError ? infoiconerror : infoicon}
+                                                                        alt="estado"
+                                                                        style={{ width: '24px', height: '24px', pointerEvents: 'auto', cursor: 'default' }}
+                                                                    />
+                                                                )}
+                                                            </Box>
+                                                        </Tooltip>
+                                                        {fileSuccess && (
+                                                            <Tooltip title="Eliminar" arrow placement="top"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                            color: "#CCC3C3",
+                                                                            fontFamily: "Poppins, sans-serif",
+                                                                            fontSize: "12px",
+                                                                            padding: "6px 8px",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                                        }
+                                                                    },
+                                                                    arrow: {
+                                                                        sx: {
+                                                                            color: "rgba(0, 0, 0, 0.8)"
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                PopperProps={{
+                                                                    modifiers: [
+                                                                        {
+                                                                            name: 'offset',
+                                                                            options: {
+                                                                                offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }}
+                                                            >
+                                                                <IconButton
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation(); // ❌ evita que el click se propague al Box que abre el file picker
+                                                                        setSelectedFile(null);
+                                                                        setUploadedFile(null);
+                                                                        setFileSuccess(false);
+                                                                        setFileError(false);
+                                                                        setBase64File('');
+                                                                        setUploadedFileBase64('');
+                                                                        setFormData(prev => ({ ...prev, File: '' }));
+                                                                        if (fileInputRef.current) {
+                                                                            fileInputRef.current.value = '';
+                                                                        }
+                                                                    }}
+                                                                    sx={{
+                                                                        position: 'absolute',
+                                                                        top: 0,
+                                                                        right: 0,
+                                                                        width: 24,
+                                                                        height: 24,
+                                                                        padding: 0,
+                                                                    }}
+                                                                >
+                                                                    <img src={Thrashicon} alt="Eliminar archivo" style={{ width: 24, height: 24 }} />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        )}
 
-                                                )}
+                                                    </Box>
 
-                                                {index > 0 && (
-                                                    <Tooltip title="Eliminar teléfono">
-                                                        <IconButton onClick={() => handleRemoveIndividualPhone(index)}>
-                                                            <img src={Thrashicon} alt="Eliminar" style={{ width: 24, height: 24 }} />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                )}
+
+                                                    {/*Imagen central del archivo a subir*/}
+                                                    <Box
+                                                        sx={{
+                                                            width: "142px", height: "100px"
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={
+                                                                fileError
+                                                                    ? IconCloudError
+                                                                    : fileSuccess
+                                                                        ? CloudCheckedIcon
+                                                                        : UpCloudIcon
+                                                            }
+                                                            alt="estado archivo"
+                                                            style={{ marginBottom: '8px', width: "" }}
+                                                        />
+
+
+                                                        <Typography
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                fontFamily: "Poppins",
+                                                                color: "#330F1B",
+                                                                fontSize: '12px',
+                                                                opacity: !fileError && !fileSuccess ? 0.9 : 1
+                                                            }}
+                                                        >
+                                                            {fileError
+                                                                ? 'Archivo inválido'
+                                                                : fileSuccess
+                                                                    ? 'Archivo cargado'
+                                                                    : 'Subir archivo'}
+                                                        </Typography>
+
+                                                        <Typography
+                                                            sx={{
+                                                                fontFamily: 'Poppins',
+                                                                fontSize: '10px',
+                                                                color: '#574B4F',
+                                                                opacity: 1,
+                                                                textAlign: 'center',
+                                                                wordBreak: 'break-word',
+                                                                maxWidth: '142px',
+                                                                mt: '1px'
+                                                            }}
+                                                        >
+                                                            {fileSuccess && uploadedFile
+                                                                ? uploadedFile.name
+                                                                : 'Arrastre un archivo aquí, o selecciónelo.'}
+                                                        </Typography>
+                                                        {fileSuccess && (
+                                                            <Typography
+                                                                sx={{
+                                                                    fontFamily: 'Poppins',
+                                                                    fontSize: '10px',
+                                                                    color: '#574B4F',
+                                                                    opacity: 1,
+                                                                    textAlign: 'center',
+                                                                    mt: '1px'
+                                                                }}
+                                                            >
+                                                                Total de registros: {totalRecords}
+                                                            </Typography>
+                                                        )}
+
+                                                    </Box>
+
+                                                    <input
+                                                        type="file"
+                                                        hidden
+                                                        ref={fileInputRef}
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) handleFile(file);
+                                                        }}
+
+                                                    />
+
+
+
+                                                </Box>
                                             </Box>
-                                        ))}
+
+                                        )}
+                                        {manageOperation === 'eliminar' && (
+                                            <Box sx={{ display: 'flex', gap: 2, mt: 2, alignItems: 'flex-start' }}>
+
+                                                <Box
+                                                    marginBottom={'25px'}
+                                                    onClick={() => !hasPhoneInput && fileInputRef.current?.click()}
+                                                    onDragOver={(e) => e.preventDefault()}
+                                                    onDrop={(e) => {
+                                                        e.preventDefault();
+                                                        if (hasPhoneInput) return; // prevenir carga
+                                                        const file = e.dataTransfer.files?.[0];
+                                                        if (file) handleFile(file);
+                                                    }}
+                                                    sx={{
+                                                        border: fileError
+                                                            ? '2px solid #EF5466'
+                                                            : fileSuccess
+                                                                ? '2px solid #8F4E63CC' // ✅ borde éxito
+                                                                : '2px dashed #D9B4C3',
+                                                        backgroundColor: fileError
+                                                            ? '#FFF4F5'
+                                                            : fileSuccess
+                                                                ? '#E5CBD333'           // ✅ fondo éxito
+                                                                : 'transparent',
+                                                        borderRadius: '8px',
+                                                        width: '160px',
+                                                        height: '160px',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                        textAlign: 'center',
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '13px',
+                                                        color: '#330F1B',
+                                                        position: 'relative',
+                                                        cursor: hasPhoneInput ? 'not-allowed' : 'pointer',
+                                                        px: 1,
+                                                        opacity: hasPhoneInput ? 0.5 : 1,
+                                                        pointerEvents: hasPhoneInput ? 'none' : 'auto',
+                                                    }}
+
+                                                >
+
+                                                    {/*Tooltip */}
+                                                    <Box
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            marginTop: "-115px",
+                                                            marginRight: '-115px',
+                                                            width: 24,
+                                                            height: 24,
+
+                                                        }}
+                                                    >
+                                                        <Tooltip
+                                                            placement="right"
+                                                            title={
+                                                                fileError ? (
+                                                                    <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#EF5466', opacity: 0.7 }}>
+                                                                        Solo se permiten archivos .xlsx
+                                                                    </Box>
+                                                                ) : fileSuccess ? (
+                                                                    <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#28A745', opacity: 0.7 }}>
+                                                                        Archivo cargado {selectedFile?.name}
+                                                                    </Box>
+                                                                ) : (
+                                                                    <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#000000', opacity: 0.7 }}>
+                                                                        El archivo debe ser Excel<br />(.xls/.xlsx)
+                                                                    </Box>
+                                                                )
+                                                            }
+                                                            componentsProps={{
+                                                                tooltip: {
+                                                                    sx: {
+                                                                        backgroundColor: "#FFFFFF",
+                                                                        borderRadius: "8px",
+                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                        padding: "8px 12px",
+                                                                        fontSize: "14px",
+                                                                        fontFamily: "Poppins",
+                                                                        color: "#000000",
+                                                                        whiteSpace: "pre-line",
+                                                                        transform: "translate(-5px, -5px)",
+                                                                        borderColor: "#00131F3D",
+                                                                        borderStyle: "solid",
+                                                                        borderWidth: "1px"
+                                                                    }
+                                                                }
+                                                            }}
+                                                            PopperProps={{
+                                                                modifiers: [
+                                                                    {
+                                                                        name: 'offset',
+                                                                        options: {
+                                                                            offset: [35, -180] // 👉 [horizontal, vertical]
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }}
+                                                        >
+                                                            <Box>
+                                                                {!fileSuccess && (
+                                                                    <img
+                                                                        src={fileError ? infoiconerror : infoicon}
+                                                                        alt="estado"
+                                                                        style={{ width: '24px', height: '24px', pointerEvents: 'auto', cursor: 'default' }}
+                                                                    />
+                                                                )}
+                                                            </Box>
+                                                        </Tooltip>
+                                                        {fileSuccess && (
+                                                            <Tooltip title="Eliminar" arrow placement="top"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                            color: "#CCC3C3",
+                                                                            fontFamily: "Poppins, sans-serif",
+                                                                            fontSize: "12px",
+                                                                            padding: "6px 8px",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                                        }
+                                                                    },
+                                                                    arrow: {
+                                                                        sx: {
+                                                                            color: "rgba(0, 0, 0, 0.8)"
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                PopperProps={{
+                                                                    modifiers: [
+                                                                        {
+                                                                            name: 'offset',
+                                                                            options: {
+                                                                                offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }}
+                                                            >
+                                                                <IconButton
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation(); // ❌ evita que el click se propague al Box que abre el file picker
+                                                                        setSelectedFile(null);
+                                                                        setUploadedFile(null);
+                                                                        setFileSuccess(false);
+                                                                        setFileError(false);
+                                                                        setBase64File('');
+                                                                        setUploadedFileBase64('');
+                                                                        setFormData(prev => ({ ...prev, File: '' }));
+                                                                        if (fileInputRef.current) {
+                                                                            fileInputRef.current.value = '';
+                                                                        }
+                                                                    }}
+                                                                    sx={{
+                                                                        position: 'absolute',
+                                                                        top: 0,
+                                                                        right: 0,
+                                                                        width: 24,
+                                                                        height: 24,
+                                                                        padding: 0,
+                                                                    }}
+                                                                >
+                                                                    <img src={Thrashicon} alt="Eliminar archivo" style={{ width: 24, height: 24 }} />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        )}
+
+                                                    </Box>
+
+
+                                                    {/*Imagen central del archivo a subir*/}
+                                                    <Box
+                                                        sx={{
+                                                            width: "142px", height: "100px"
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={
+                                                                fileError
+                                                                    ? IconCloudError
+                                                                    : fileSuccess
+                                                                        ? CloudCheckedIcon
+                                                                        : UpCloudIcon
+                                                            }
+                                                            alt="estado archivo"
+                                                            style={{ marginBottom: '8px', width: "" }}
+                                                        />
+
+
+                                                        <Typography
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                fontFamily: "Poppins",
+                                                                color: "#330F1B",
+                                                                fontSize: '12px',
+                                                                opacity: !fileError && !fileSuccess ? 0.9 : 1
+                                                            }}
+                                                        >
+                                                            {fileError
+                                                                ? 'Archivo inválido'
+                                                                : fileSuccess
+                                                                    ? 'Archivo cargado'
+                                                                    : 'Subir archivo'}
+                                                        </Typography>
+
+                                                        <Typography
+                                                            sx={{
+                                                                fontFamily: 'Poppins',
+                                                                fontSize: '10px',
+                                                                color: '#574B4F',
+                                                                opacity: 1,
+                                                                textAlign: 'center',
+                                                                wordBreak: 'break-word',
+                                                                maxWidth: '142px',
+                                                                mt: '1px'
+                                                            }}
+                                                        >
+                                                            {fileSuccess && uploadedFile
+                                                                ? uploadedFile.name
+                                                                : 'Arrastre un archivo aquí, o selecciónelo.'}
+                                                        </Typography>
+                                                        {fileSuccess && (
+                                                            <Typography
+                                                                sx={{
+                                                                    fontFamily: 'Poppins',
+                                                                    fontSize: '10px',
+                                                                    color: '#574B4F',
+                                                                    opacity: 1,
+                                                                    textAlign: 'center',
+                                                                    mt: '1px'
+                                                                }}
+                                                            >
+                                                                Total de registros: {totalRecords}
+                                                            </Typography>
+                                                        )}
+
+                                                    </Box>
+
+                                                    <input
+                                                        type="file"
+                                                        hidden
+                                                        ref={fileInputRef}
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) handleFile(file);
+                                                        }}
+
+                                                    />
+
+
+
+                                                </Box>
+
+                                            </Box>
+
+                                        )}
+                                        {manageOperation === 'darDeBaja' && (
+                                            <Box display="flex" alignItems="flex-start" gap={3} mt={2} flexWrap="wrap">
+
+                                                <Box
+                                                    marginBottom={'25px'}
+                                                    onClick={() => !hasPhoneInput && fileInputRef.current?.click()}
+                                                    onDragOver={(e) => e.preventDefault()}
+                                                    onDrop={(e) => {
+                                                        e.preventDefault();
+                                                        if (hasPhoneInput) return; // prevenir carga
+                                                        const file = e.dataTransfer.files?.[0];
+                                                        if (file) handleFile(file);
+                                                    }}
+                                                    sx={{
+                                                        border: fileError
+                                                            ? '2px solid #EF5466'
+                                                            : fileSuccess
+                                                                ? '2px solid #8F4E63CC' // ✅ borde éxito
+                                                                : '2px dashed #D9B4C3',
+                                                        backgroundColor: fileError
+                                                            ? '#FFF4F5'
+                                                            : fileSuccess
+                                                                ? '#E5CBD333'           // ✅ fondo éxito
+                                                                : 'transparent',
+                                                        borderRadius: '8px',
+                                                        width: '160px',
+                                                        height: '160px',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                        textAlign: 'center',
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '13px',
+                                                        color: '#330F1B',
+                                                        position: 'relative',
+                                                        cursor: hasPhoneInput ? 'not-allowed' : 'pointer',
+                                                        px: 1,
+                                                        opacity: hasPhoneInput ? 0.5 : 1,
+                                                        pointerEvents: hasPhoneInput ? 'none' : 'auto',
+                                                    }}
+
+                                                >
+
+                                                    {/*Tooltip */}
+                                                    <Box
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            marginTop: "-115px",
+                                                            marginRight: '-115px',
+                                                            width: 24,
+                                                            height: 24,
+
+                                                        }}
+                                                    >
+                                                        <Tooltip
+                                                            placement="right"
+                                                            title={
+                                                                fileError ? (
+                                                                    <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#EF5466', opacity: 0.7 }}>
+                                                                        Solo se permiten archivos .xlsx
+                                                                    </Box>
+                                                                ) : fileSuccess ? (
+                                                                    <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#28A745', opacity: 0.7 }}>
+                                                                        Archivo cargado {selectedFile?.name}
+                                                                    </Box>
+                                                                ) : (
+                                                                    <Box sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#000000', opacity: 0.7 }}>
+                                                                        El archivo debe ser Excel<br />(.xls/.xlsx)
+                                                                    </Box>
+                                                                )
+                                                            }
+                                                            componentsProps={{
+                                                                tooltip: {
+                                                                    sx: {
+                                                                        backgroundColor: "#FFFFFF",
+                                                                        borderRadius: "8px",
+                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                        padding: "8px 12px",
+                                                                        fontSize: "14px",
+                                                                        fontFamily: "Poppins",
+                                                                        color: "#000000",
+                                                                        whiteSpace: "pre-line",
+                                                                        transform: "translate(-5px, -5px)",
+                                                                        borderColor: "#00131F3D",
+                                                                        borderStyle: "solid",
+                                                                        borderWidth: "1px"
+                                                                    }
+                                                                }
+                                                            }}
+                                                            PopperProps={{
+                                                                modifiers: [
+                                                                    {
+                                                                        name: 'offset',
+                                                                        options: {
+                                                                            offset: [35, -180] // 👉 [horizontal, vertical]
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }}
+                                                        >
+                                                            <Box>
+                                                                {!fileSuccess && (
+                                                                    <img
+                                                                        src={fileError ? infoiconerror : infoicon}
+                                                                        alt="estado"
+                                                                        style={{ width: '24px', height: '24px', pointerEvents: 'auto', cursor: 'default' }}
+                                                                    />
+                                                                )}
+                                                            </Box>
+                                                        </Tooltip>
+                                                        {fileSuccess && (
+                                                            <Tooltip title="Eliminar" arrow placement="top"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                            color: "#CCC3C3",
+                                                                            fontFamily: "Poppins, sans-serif",
+                                                                            fontSize: "12px",
+                                                                            padding: "6px 8px",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                                        }
+                                                                    },
+                                                                    arrow: {
+                                                                        sx: {
+                                                                            color: "rgba(0, 0, 0, 0.8)"
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                PopperProps={{
+                                                                    modifiers: [
+                                                                        {
+                                                                            name: 'offset',
+                                                                            options: {
+                                                                                offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }}
+                                                            >
+                                                                <IconButton
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setSelectedFile(null);
+                                                                        setUploadedFile(null);
+                                                                        setFileSuccess(false);
+                                                                        setFileError(false);
+                                                                        setBase64File('');
+                                                                        setUploadedFileBase64('');
+                                                                        setFormData(prev => ({ ...prev, File: '' }));
+                                                                        if (fileInputRef.current) {
+                                                                            fileInputRef.current.value = '';
+                                                                        }
+                                                                    }}
+                                                                    sx={{
+                                                                        position: 'absolute',
+                                                                        top: 0,
+                                                                        right: 0,
+                                                                        width: 24,
+                                                                        height: 24,
+                                                                        padding: 0,
+                                                                    }}
+                                                                >
+                                                                    <img src={Thrashicon} alt="Eliminar archivo" style={{ width: 24, height: 24 }} />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        )}
+
+                                                    </Box>
+
+
+                                                    {/*Imagen central del archivo a subir*/}
+                                                    <Box
+                                                        sx={{
+                                                            width: "142px", height: "100px"
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={
+                                                                fileError
+                                                                    ? IconCloudError
+                                                                    : fileSuccess
+                                                                        ? CloudCheckedIcon
+                                                                        : UpCloudIcon
+                                                            }
+                                                            alt="estado archivo"
+                                                            style={{ marginBottom: '8px', width: "" }}
+                                                        />
+
+
+                                                        <Typography
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                fontFamily: "Poppins",
+                                                                color: "#330F1B",
+                                                                fontSize: '12px',
+                                                                opacity: !fileError && !fileSuccess ? 0.9 : 1
+                                                            }}
+                                                        >
+                                                            {fileError
+                                                                ? 'Archivo inválido'
+                                                                : fileSuccess
+                                                                    ? 'Archivo cargado'
+                                                                    : 'Subir archivo'}
+                                                        </Typography>
+
+                                                        <Typography
+                                                            sx={{
+                                                                fontFamily: 'Poppins',
+                                                                fontSize: '10px',
+                                                                color: '#574B4F',
+                                                                opacity: 1,
+                                                                textAlign: 'center',
+                                                                wordBreak: 'break-word',
+                                                                maxWidth: '142px',
+                                                                mt: '1px'
+                                                            }}
+                                                        >
+                                                            {fileSuccess && uploadedFile
+                                                                ? uploadedFile.name
+                                                                : 'Arrastre un archivo aquí, o selecciónelo.'}
+                                                        </Typography>
+                                                        {fileSuccess && (
+                                                            <Typography
+                                                                sx={{
+                                                                    fontFamily: 'Poppins',
+                                                                    fontSize: '10px',
+                                                                    color: '#574B4F',
+                                                                    opacity: 1,
+                                                                    textAlign: 'center',
+                                                                    mt: '1px'
+                                                                }}
+                                                            >
+                                                                Total de registros: {totalRecords}
+                                                            </Typography>
+                                                        )}
+
+                                                    </Box>
+
+                                                    <input
+                                                        type="file"
+                                                        hidden
+                                                        ref={fileInputRef}
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) handleFile(file);
+                                                        }}
+
+                                                    />
+
+
+
+                                                </Box>
+
+                                            </Box>
+                                        )}
+                                    </>
+                                )}
+
+                                <Box
+                                    sx={{
+                                        flex: 1,
+                                        px: 4,
+                                        mt: 2,
+                                        mb: 1,
+                                        maxHeight: 'calc(90vh - 180px)', // o lo que uses
+                                        overflowX: 'hidden', // 🔥 Esto evita scroll lateral
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            mb: 2,
+                                            ml: '-10px',
+                                            opacity: manageByList ? 0.4 : 1,
+                                            border: '1px solid #E6E4E4',
+                                            borderRadius: '6px',
+                                            width: '500px',
+                                            height: '57px',
+                                            pointerEvents: manageByList ? 'none' : 'auto',
+                                        }}
+                                    >
+                                        <Typography fontSize="18px" fontFamily={"Poppins"} marginLeft={'16px'}>Por registro individual</Typography>
+                                        <Switch
+                                            checked={manageByIndividual}
+                                            onChange={() => {
+                                                const newValue = !manageByIndividual;
+                                                setManageByIndividual(newValue);
+                                                if (newValue) {
+                                                    setManageByList(false);
+                                                }
+                                            }}
+                                        />
                                     </Box>
                                 </Box>
-                            )}
+
+                                {manageByIndividual && (
+                                    <Box mt={-2} ml={4}>
+                                        <Typography sx={{
+                                            fontFamily: 'Poppins', fontSize: '16px',
+                                            fontWeight: 500, mb: 1, color: '#574B4F'
+                                        }}>
+                                            Teléfono(s)
+                                        </Typography>
+
+                                        <Box
+                                            sx={{
+                                                maxHeight: '160px',
+                                                overflowY: 'auto',
+                                                pr: 1,
+                                                display: 'flex',
+                                                flexDirection: 'column',
+
+                                                gap: 1
+                                            }}
+                                        >
+                                            {individualPhones.map((phone, index) => (
+                                                <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <TextField
+                                                        value={phone}
+                                                        onChange={(e) => {
+                                                            const numericValue = e.target.value.replace(/\D/g, '');
+                                                            handleIndividualPhoneChange(index, numericValue);
+                                                        }}
+                                                        placeholder="5255..."
+                                                        sx={{
+                                                            width: '232px',
+                                                            height: '54px',
+                                                            '& .MuiInputBase-root': {
+                                                                height: '54px',
+                                                            },
+                                                            '& input': {
+                                                                height: '54px',
+                                                                boxSizing: 'border-box',
+                                                                fontFamily: 'Poppins',
+                                                                fontSize: '14px',
+                                                            }
+                                                        }}
+                                                        InputProps={{
+                                                            endAdornment: (
+                                                                <InputAdornment position="end">
+                                                                    <Tooltip
+                                                                        title={
+                                                                            <Box
+                                                                                sx={{
+                                                                                    backgroundColor: "#FFFFFF",
+                                                                                    borderRadius: "8px",
+                                                                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                                    padding: "8px 12px",
+                                                                                    fontSize: "14px",
+                                                                                    fontFamily: "Poppins",
+                                                                                    color: "#000000",
+                                                                                    whiteSpace: "pre-line",
+                                                                                    transform: "translate(2px, -15px)",
+                                                                                    borderColor: "#00131F3D",
+                                                                                    borderStyle: "solid",
+
+
+                                                                                }}
+                                                                            >
+                                                                                <>
+                                                                                    Teléfono válido de 10 dígitos
+                                                                                </>
+                                                                            </Box>
+                                                                        }
+                                                                        placement="bottom-end"
+                                                                        componentsProps={{
+                                                                            tooltip: {
+                                                                                sx: {
+                                                                                    backgroundColor: "transparent",
+                                                                                    padding: 0,
+
+                                                                                },
+                                                                            },
+                                                                        }}
+                                                                    >
+                                                                        <img src={infoicon} alt="info" style={{ width: 24, height: 24 }} />
+                                                                    </Tooltip>
+                                                                </InputAdornment>
+                                                            )
+                                                        }}
+                                                    />
+
+                                                    {index === individualPhones.length - 1 && individualPhones.length < 5 && (
+                                                        <Tooltip title="Agregar número" arrow placement="top"
+                                                            componentsProps={{
+                                                                tooltip: {
+                                                                    sx: {
+                                                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                        color: "#CCC3C3",
+                                                                        fontFamily: "Poppins, sans-serif",
+                                                                        fontSize: "12px",
+                                                                        padding: "6px 8px",
+                                                                        borderRadius: "8px",
+                                                                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                                    }
+                                                                },
+                                                                arrow: {
+                                                                    sx: {
+                                                                        color: "rgba(0, 0, 0, 0.8)"
+                                                                    }
+                                                                }
+                                                            }}
+                                                            PopperProps={{
+                                                                modifiers: [
+                                                                    {
+                                                                        name: 'offset',
+                                                                        options: {
+                                                                            offset: [-20, -7] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }}
+                                                        >
+                                                            <Box
+                                                                sx={{
+                                                                    width: 21,
+                                                                    height: 21,
+                                                                    backgroundColor: "#6F565E",
+                                                                    borderRadius: "50%", // 🔥 clave para hacerlo circular
+                                                                    display: "flex",
+                                                                    alignItems: "center",
+                                                                    justifyContent: "center"
+                                                                }}
+                                                            >
+                                                                <IconButton onClick={handleAddIndividualPhone}>
+                                                                    <img
+                                                                        src={IconPlus2}
+                                                                        alt="Agregar teléfono"
+                                                                        style={{ width: 21, height: 21, }}
+                                                                    />
+                                                                </IconButton>
+                                                            </Box>
+                                                        </Tooltip>
+
+                                                    )}
+
+                                                    {index > 0 && (
+                                                        <Tooltip title="Eliminar teléfono">
+                                                            <IconButton onClick={() => handleRemoveIndividualPhone(index)}>
+                                                                <img src={Thrashicon} alt="Eliminar" style={{ width: 24, height: 24 }} />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    )}
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    </Box>
+                                )}
 
 
 
+                            </Box>
                         </Box>
-                    </Box>
 
-                    <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mt: 2, mb: 1 }} />
+                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mt: 2, mb: 1 }} />
+                    </Box>
 
                     <Box sx={{
                         px: 2.5,
