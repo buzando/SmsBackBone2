@@ -9,7 +9,7 @@ namespace Contract.Request
     public class ReportRequest
     {
         public string ReportType { get; set; } 
-        public string? SubType { get; set; } // Opcional para "Llamada" o "SMS", si aplica
+        public string? SubType { get; set; } 
         public int RoomId { get; set; }
         public string StartDate { get; set; }
         public string EndDate { get; set; }

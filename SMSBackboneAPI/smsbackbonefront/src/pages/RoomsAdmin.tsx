@@ -78,8 +78,11 @@ const RoomsAdmin: React.FC = () => {
     const [ShowModalError, setShowModalError] = useState(false);
     const [TitleModalError, setTitleModalError] = useState("");
     const [ShowSnackBar, setShowSnackBar] = useState(false);
-
+    const isClientActive = activeFilter === 'cliente';
+    const hasClientSelected = selectedClients.length > 0;
+    const showClientHighlight = isClientActive || hasClientSelected;
     const open = Boolean(anchorEl);
+    const [filteredRooms, setFilteredRooms] = useState<RoomAdminData[]>([]);
 
     const navigate = useNavigate();
 
@@ -123,6 +126,13 @@ const RoomsAdmin: React.FC = () => {
         </Box>
     );
 
+    useEffect(() => {
+        const term = searchTerm.toLowerCase();
+        const filtered = roomsData.filter((room) =>
+            room.nombreSala.toLowerCase().includes(term)
+        );
+        setFilteredRooms(filtered);
+    }, [searchTerm, roomsData]);
 
     const getRooms = async () => {
         setLoading(true);
@@ -311,36 +321,44 @@ const RoomsAdmin: React.FC = () => {
                     <Box sx={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                         {['CLIENTE'].map((label) => {
                             const isClient = label === 'CLIENTE';
-
-
                             const count = selectedClients.length;
-
-
                             const labelDisplay = count > 0 ? `${count} ${label}` : label;
+
+                            const isActive = activeFilter === label.toLowerCase();
+                            const isSelected = isClient && count > 0;
 
                             return (
                                 <Box
                                     key={label}
                                     onClick={(e) => {
-                                        if (label === 'CLIENTE') {
+                                        if (isClient) {
                                             setClientAnchorEl(e.currentTarget);
                                             setClientMenuOpen(true);
                                         }
                                         setActiveFilter(label.toLowerCase() as any);
                                     }}
                                     sx={{
-                                        px: '16px', py: '6px', border: '1px solid', borderColor: activeFilter === label.toLowerCase() ? '#7B354D' : '#CFCFCF',
-                                        borderRadius: '50px', cursor: 'pointer', fontFamily: 'Poppins', fontWeight: 600,
-                                        fontSize: '13px', backgroundColor: activeFilter === label.toLowerCase() ? '#F6EEF1' : '#FFFFFF',
-                                        color: activeFilter === label.toLowerCase() ? '#7B354D' : '#9B9295', transition: 'all 0.2s ease-in-out', userSelect: 'none',
+                                        px: '16px',
+                                        py: '6px',
+                                        border: '1px solid',
+                                        borderColor: showClientHighlight ? '#7B354D' : '#CFCFCF',
+                                        borderRadius: '50px',
+                                        cursor: 'pointer',
+                                        fontFamily: 'Poppins',
+                                        fontWeight: 600,
+                                        fontSize: '13px',
+                                        backgroundColor: showClientHighlight ? '#F6EEF1' : '#FFFFFF',
+                                        color: showClientHighlight ? '#7B354D' : '#9B9295',
+                                        transition: 'all 0.2s ease-in-out',
+                                        userSelect: 'none',
                                     }}
                                 >
                                     {labelDisplay}
                                 </Box>
                             );
                         })}
-
                     </Box>
+
 
                     {/* Botón y buscador */}
                     <Box sx={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
@@ -678,7 +696,7 @@ const RoomsAdmin: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {roomsData.map((room) => (
+                                {filteredRooms.map((room) => (
                                     <tr key={room.id} style={{ borderBottom: '1px solid #E0E0E0' }}>
                                         <td style={{
                                             padding: '5px', width: '180px', whiteSpace: 'nowrap', overflow: 'hidden',
@@ -734,7 +752,12 @@ const RoomsAdmin: React.FC = () => {
             <Menu
                 anchorEl={clientAnchorEl}
                 open={clientMenuOpen}
-                onClose={() => setClientMenuOpen(false)}
+                onClose={() => {
+                    setClientMenuOpen(false);
+                    if (selectedClients.length === 0) {
+                        setActiveFilter('');
+                    }
+                }}
                 PaperProps={{
                     sx: {
                         padding: 1,
@@ -868,6 +891,7 @@ const RoomsAdmin: React.FC = () => {
                             setClientMenuOpen(false);
                             setRoomsData(originalData.slice(0, 50));
                             setCurrentPage(1);
+                            setActiveFilter('');
                         }}
                         text="LIMPIAR"
                     />

@@ -24,86 +24,80 @@ namespace Business
         private static readonly TimeSpan HorarioFin = new TimeSpan(21, 0, 0);    // 21:00
         private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public List<FullCampaignSpResult> FullResponseCampaignstarted()
+        public List<LightCampaignResult> GetLightCampaigns(List<int> campaigns)
         {
-            var result = new List<FullCampaignSpResult>();
-            var topcampaigns = Common.ConfigurationManagerJson("TopCampaigns");
+            var result = new List<LightCampaignResult>();
             var topcontacts = Common.ConfigurationManagerJson("TopContacts");
-            _logger.Info($"Inicia Ejecutando SP");
+
+            var campaignIdsTable = new DataTable();
+            campaignIdsTable.Columns.Add("Value", typeof(int));
+            foreach (var id in  campaigns)
+                campaignIdsTable.Rows.Add(id);
+
             try
             {
                 using (var ctx = new Entities())
                 {
-                    var connection = ctx.Database.GetDbConnection();
-                    if (connection.State != System.Data.ConnectionState.Open)
-                        connection.Open();
+                    var connection = (SqlConnection)ctx.Database.GetDbConnection();
+                    connection.Open();
 
-                    using (var cmd = connection.CreateCommand())
+                    using (var cmd = new SqlCommand("sp_getPendingContacts", connection))
                     {
-                        var topcontactsValue = string.IsNullOrWhiteSpace(topcontacts) ? "NULL" : topcontacts;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "sp_getCampaignsToAutoStart";
 
-                        var paramCampaigns = cmd.CreateParameter();
-                        paramCampaigns.ParameterName = "@TopCampaigns";
-                        paramCampaigns.Value = int.Parse(topcampaigns);
-                        cmd.Parameters.Add(paramCampaigns);
+                        var param = cmd.Parameters.AddWithValue("@CampaignIds", campaignIdsTable);
+                        param.SqlDbType = SqlDbType.Structured;
+                        param.TypeName = "dbo.IntList"; // asegúrate que este tipo existe
 
-                        var paramContacts = cmd.CreateParameter();
-                        paramContacts.ParameterName = "@TopContacts";
-                        paramContacts.Value = string.IsNullOrWhiteSpace(topcontacts) ? (object)DBNull.Value : int.Parse(topcontacts);
-                        cmd.Parameters.Add(paramContacts);
-                        cmd.CommandTimeout = 0;
+                        cmd.Parameters.AddWithValue("@TopContacts",
+                            string.IsNullOrWhiteSpace(topcontacts) ? (object)DBNull.Value : int.Parse(topcontacts));
+
                         using (var reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                var campaign = new FullCampaignSpResult
+                                var campaignId = reader.GetInt32(reader.GetOrdinal("CampaignId"));
+                                var campaign = result.FirstOrDefault(c => c.CampaignId == campaignId);
+
+                                if (campaign == null)
                                 {
-                                    CampaignId = reader.GetInt32(reader.GetOrdinal("CampaignId")),
-                                    Name = reader.GetString(reader.GetOrdinal("Name")),
-                                    Message = reader.GetString(reader.GetOrdinal("Message")),
-                                    UseTemplate = reader.GetBoolean(reader.GetOrdinal("UseTemplate")),
-                                    TemplateId = reader.IsDBNull(reader.GetOrdinal("TemplateId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("TemplateId")),
-                                    AutoStart = reader.GetBoolean(reader.GetOrdinal("AutoStart")),
-                                    FlashMessage = reader.GetBoolean(reader.GetOrdinal("FlashMessage")),
-                                    CustomANI = reader.GetBoolean(reader.GetOrdinal("CustomANI")),
-                                    RecycleRecords = reader.GetBoolean(reader.GetOrdinal("RecycleRecords")),
-                                    NumberType = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("NumberType"))),
-                                    CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate")),
-                                    Username = reader.GetString(reader.GetOrdinal("Username")),
-                                    Password = reader.GetString(reader.GetOrdinal("Password")),
-                                    RoomId = reader.GetInt32(reader.GetOrdinal("RoomId")),
-                                    RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
-                                    RateForShort = Convert.ToDecimal(reader.GetValue(reader.GetOrdinal("RateForShort"))),
-                                    RateForLong = Convert.ToDecimal(reader.GetValue(reader.GetOrdinal("RateForLong"))),
-                                    ScheduleId = reader.GetInt32(reader.GetOrdinal("ScheduleId")),
-                                    StartDateTime = reader.GetDateTime(reader.GetOrdinal("StartDateTime")),
-                                    EndDateTime = reader.GetDateTime(reader.GetOrdinal("EndDateTime")),
-                                    RoomDescription = reader.GetString(reader.GetOrdinal("RoomDescription")),
-                                    Credits = Convert.ToDecimal(reader.GetValue(reader.GetOrdinal("Credits"))),
-                                    LongSms = Convert.ToDecimal(reader.GetValue(reader.GetOrdinal("Long_Sms"))),
-                                    ShortSms = Convert.ToDecimal(reader.GetValue(reader.GetOrdinal("Short_Sms"))),
-                                    ContactsJson = reader.GetString(reader.GetOrdinal("ContactsJson")),
-                                    SchedulesJson = reader.GetString(reader.GetOrdinal("SchedulesJson")),
-                                    RecycleSettingJson = reader.IsDBNull(reader.GetOrdinal("RecycleSettingJson"))
-                                        ? null
-                                        : reader.GetString(reader.GetOrdinal("RecycleSettingJson")),
-                                    BlackListIds = reader.IsDBNull(reader.GetOrdinal("BlackListIds"))
-    ? new List<int>()
-    : reader.GetString(reader.GetOrdinal("BlackListIds"))
-        .Split(',', StringSplitOptions.RemoveEmptyEntries)
-        .Select(id => int.Parse(id))
-        .ToList(),
+                                    campaign = new LightCampaignResult
+                                    {
+                                        CampaignId = campaignId,
+                                        Name = reader.GetString(reader.GetOrdinal("Name")),
+                                        Message = reader.GetString(reader.GetOrdinal("Message")),
+                                        UseTemplate = reader.GetBoolean(reader.GetOrdinal("UseTemplate")),
+                                        TemplateId = reader.IsDBNull(reader.GetOrdinal("TemplateId")) ? null : reader.GetInt32(reader.GetOrdinal("TemplateId")),
+                                        FlashMessage = reader.GetBoolean(reader.GetOrdinal("FlashMessage")),
+                                        CustomANI = reader.GetBoolean(reader.GetOrdinal("CustomANI")),
+                                        NumberType = reader.GetInt32(reader.GetOrdinal("NumberType")),
+                                        RoomId = reader.GetInt32(reader.GetOrdinal("RoomId")),
+                                        RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
+                                        Credits = reader.GetDouble(reader.GetOrdinal("Credits")),
+                                        ShortSms = reader.GetDouble(reader.GetOrdinal("short_sms")),
+                                        LongSms = reader.GetDouble(reader.GetOrdinal("long_sms")),
+                                        ScheduleId = reader.GetInt32(reader.GetOrdinal("ScheduleId")),
+                                        StartDateTime = reader.GetDateTime(reader.GetOrdinal("StartDateTime")),
+                                        EndDateTime = reader.GetDateTime(reader.GetOrdinal("EndDateTime")),
+                                        ClientId = reader.GetInt32(reader.GetOrdinal("ClientId")),
+                                        Contacts = JsonConvert.DeserializeObject<List<CampaignContact>>(reader["ContactsJson"].ToString())
+                                    };
+
+                                    result.Add(campaign);
+                                }
+
+                                var contact = new CampaignContact
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("ContactId")),
+                                    CampaignId = campaignId,
+                                    PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                    Dato = reader.IsDBNull(reader.GetOrdinal("Dato")) ? null : reader.GetString(reader.GetOrdinal("Dato")),
+                                    DatoId = reader.IsDBNull(reader.GetOrdinal("DatoId")) ? null : reader.GetString(reader.GetOrdinal("DatoId")),
+                                    Misc01 = reader.IsDBNull(reader.GetOrdinal("Misc01")) ? null : reader.GetString(reader.GetOrdinal("Misc01")),
+                                    Misc02 = reader.IsDBNull(reader.GetOrdinal("Misc02")) ? null : reader.GetString(reader.GetOrdinal("Misc02"))
                                 };
 
-                                campaign.Contacts = JsonConvert.DeserializeObject<List<CampaignContacts>>(campaign.ContactsJson);
-                                campaign.Schedules = JsonConvert.DeserializeObject<List<CampaignSchedules>>(campaign.SchedulesJson);
-                                campaign.RecycleSetting = !string.IsNullOrEmpty(campaign.RecycleSettingJson)
-                                    ? JsonConvert.DeserializeObject<CampaignRecycleSettings>(campaign.RecycleSettingJson)
-                                    : null;
-                                _logger.Info($"🔍 Se encontraron {result.Count()} campañas");
-                                result.Add(campaign);
+                                campaign.Contacts.Add(contact);
                             }
                         }
                     }
@@ -111,18 +105,22 @@ namespace Business
             }
             catch (Exception ex)
             {
-                _logger.Error($"Error ejecutando SP: {ex.Message}");
+                _logger.Error($"❌ Error en GetLightCampaigns: {ex.Message}");
             }
 
             return result;
         }
 
 
-        public async Task<bool> SimulateSmsDispatch()
+
+
+
+        public async Task<bool> SimulateSmsDispatch(List<int> Campaigns)
         {
+            var clientacces = new ClientAccess();
             try
             {
-                var campaigns = FullResponseCampaignstarted();
+                var campaigns = GetLightCampaigns(Campaigns);
                 var rnd = new Random();
 
                 var validCampaigns = campaigns.Where(c => c.ScheduleId != 0).ToList();
@@ -145,7 +143,16 @@ namespace Business
                         string token = null;
                         if (!test)
                         {
-                            var loginResult = await new ApiBackBoneManager().LoginResponse(campaign.Username, campaign.Password);
+                            using (var ctx = new Entities())
+                            {
+                                clientacces = ctx.ClientAccess.Where(x => x.ClientId == campaign.ClientId).FirstOrDefault();
+                            }
+                            if (clientacces == null)
+                            {
+                                _logger.Error($"❌ No se encontró acceso para el cliente con ID {campaign.ClientId} en campaña {campaign.CampaignId}.");
+                                return;
+                            }
+                            var loginResult = await new ApiBackBoneManager().LoginResponse(clientacces.Username, clientacces.Password);
                             if (loginResult == null)
                             {
                                 _logger.Error($"❌ Login fallido para la campaña {campaign.Name}");
@@ -208,10 +215,16 @@ namespace Business
                                     var lada = "";
                                     var ladaRecord = new IFTLadas();
                                     string estado = "";
-                                    if (campaign.BlackListIds != null && campaign.BlackListIds.Count > 0)
+
+                                        var blacklistids = ctx.blacklistcampains
+                                            .Where(x => x.idcampains == campaign.CampaignId)
+                                            .Select(x => x.idblacklist)
+                                            .ToList();
+                                    
+                                    if (blacklistids != null && blacklistids.Count > 0)
                                     {
                                         bool isBlacklisted = ctx.BlackList
-                                            .Any(bl => bl.phone == contact.PhoneNumber && campaign.BlackListIds.Contains(bl.Id));
+                                            .Any(bl => bl.phone == contact.PhoneNumber && blacklistids.Contains(bl.Id));
 
                                         if (isBlacklisted)
                                         {
@@ -259,7 +272,7 @@ namespace Business
                                             var hora = horaLocal.Value.TimeOfDay;
                                             if (hora < HorarioInicio || hora > HorarioFin)
                                             {
-                                                Console.WriteLine($"⛔ {contact.PhoneNumber} fuera de horario (local {hora}, estado {estado})");
+                                                _logger.Info($"⛔ {contact.PhoneNumber} fuera de horario (local {hora}, estado {estado})");
                                                 continue;
                                             }
                                         }
@@ -331,6 +344,29 @@ namespace Business
                                             room.short_sms = Math.Max(0, room.short_sms - creditosConsumidos); // no bajar de 0
                                         else if (campaign.NumberType == 2)
                                             room.long_sms = Math.Max(0, room.long_sms - creditosConsumidos);
+
+                                        if (notif != null)
+                                        {
+                                            bool isShort = campaign.NumberType == 1;
+                                            decimal newBalance = isShort ? Convert.ToDecimal(room.short_sms) : Convert.ToDecimal(room.long_sms);
+
+                                            if (newBalance <= notif.AmountValue)
+                                            {
+                                                string tipoSms = isShort ? "SMS cortos" : "SMS largos";
+                                                string mensaje = $"⚠️ La sala {campaign.RoomName} (ID: {campaign.RoomId}) tiene saldo bajo de {tipoSms}: {newBalance} créditos.";
+
+                                                var usersToNotify = (from anu in ctx.AmountNotificationUser
+                                                                     join user in ctx.Users on anu.UserId equals user.Id
+                                                                     where anu.NotificationId == notif.id
+                                                                     select user.email).ToList();
+
+                                                foreach (var email in usersToNotify)
+                                                {
+                                                    MailManager.SendEmail(email, $"⚠️ Alerta de saldo bajo en sala {campaign.RoomName}", mensaje);
+                                                }
+                                            }
+                                        }
+
                                     }
                                 }
                                 ctx.SaveChanges();
@@ -364,7 +400,7 @@ namespace Business
             return now >= startDateTime && now <= endDateTime;
         }
 
-        public static string PersonalizeMessage(string message, CampaignContacts contact)
+        public static string PersonalizeMessage(string message, Contract.Other.CampaignContact contact)
         {
             if (string.IsNullOrWhiteSpace(message)) return string.Empty;
 
@@ -390,84 +426,44 @@ namespace Business
             return message;
         }
 
-        public bool HayContactosPendientes()
+        public List<int> GetCampaignsReadyToSend(string top = "10")
         {
+            var campaigns = new List<int>();
+
             try
             {
-                var campaignsToCheck = new List<(int ScheduleId, int CampaignId)>();
-
                 using (var ctx = new Entities())
                 {
                     var connection = (SqlConnection)ctx.Database.GetDbConnection();
-                    connection.Open(); // Asegúrate de abrir
+                    connection.Open();
 
-                    using (var getCampaignsCmd = connection.CreateCommand())
+                    using (var cmd = connection.CreateCommand())
                     {
-                        getCampaignsCmd.CommandText = @"
-                    SELECT s.Id AS ScheduleId, s.CampaignId
-                    FROM CampaignSchedules s
-                    JOIN Campaigns c ON s.CampaignId = c.Id
-                    WHERE 
-                        c.AutoStart = 1
-                        AND GETDATE() BETWEEN s.StartDateTime AND s.EndDateTime";
+                        cmd.CommandText = "sp_getCampaignsReadyToSend";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@top", top);
 
-                        using (var reader = getCampaignsCmd.ExecuteReader())
+                        using (var reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                campaignsToCheck.Add((
-                                    reader.GetInt32(0),
-                                    reader.GetInt32(1)
-                                ));
+                                campaigns.Add(reader.GetInt32(0));
                             }
                         }
                     }
 
-                    // Cerramos conexión anterior antes de reutilizar en segundo paso
                     connection.Close();
                 }
 
-                // Recorremos schedules
-                foreach (var (scheduleId, campaignId) in campaignsToCheck)
-                {
-                    using (var ctx = new Entities())
-                    {
-                        var connection = (SqlConnection)ctx.Database.GetDbConnection();
-                        connection.Open(); // Necesario
-
-                        using (var cmd = connection.CreateCommand())
-                        {
-                            cmd.CommandText = @"
-                        SELECT COUNT(*)
-                        FROM CampaignContacts cc
-                        LEFT JOIN CampaignContactScheduleSend scss 
-                            ON cc.Id = scss.ContactId AND scss.ScheduleId = @ScheduleId
-                        WHERE cc.CampaignId = @CampaignId
-                        AND scss.Id IS NULL";
-
-                            cmd.Parameters.Add(new SqlParameter("@ScheduleId", scheduleId));
-                            cmd.Parameters.Add(new SqlParameter("@CampaignId", campaignId));
-
-                            var count = (int)(cmd.ExecuteScalar() ?? 0);
-                            if (count > 0)
-                            {
-                                _logger.Info($"📌 Campaña {campaignId} tiene {count} contactos no enviados para ScheduleId {scheduleId}.");
-                                return true;
-                            }
-                        }
-
-                        connection.Close();
-                    }
-                }
-
-                return false;
+                return campaigns;
             }
             catch (Exception ex)
             {
-                _logger.Error("❌ Error en HayContactosPendientes: " + ex.Message);
-                return false;
+                _logger.Error("❌ Error en GetCampaignsReadyToSend: " + ex.Message);
+                return new List<int>();
             }
         }
+
 
 
 

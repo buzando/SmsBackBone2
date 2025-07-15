@@ -45,15 +45,22 @@ namespace SmsDeliveryWorker
                 try
                 {
                     var manager = new smsdeliveryManager();
-                    if (manager.HayContactosPendientes())
+                    var topcampaigns = Common.ConfigurationManagerJson("TopCampaigns");
+                    var campaignsReady = manager.GetCampaignsReadyToSend(topcampaigns); 
+
+                    if (campaignsReady.Any())
                     {
-                        _logger.Info("📡 Campañas enviables detectadas. Ejecutando envío...");
-                        await manager.SimulateSmsDispatch();
+                        _logger.Info($"📡 Se encontraron {campaignsReady.Count} campañas listas para enviar.");
+
+                            _logger.Info($"🚀 Procesando campañas...");
+                            await manager.SimulateSmsDispatch(campaignsReady); 
+                        
                     }
                     else
                     {
                         _logger.Info("⏳ No hay campañas realmente listas para enviar.");
                     }
+
                 }
                 catch (Exception ex)
                 {

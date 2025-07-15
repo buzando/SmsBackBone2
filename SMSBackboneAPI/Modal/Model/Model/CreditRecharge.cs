@@ -32,5 +32,8 @@ namespace Modal.Model.Model
         public string? EstatusError { get; set; }
         public string? Invoice { get; set; }
         public int idRoom { get; set; }
+        public string? FacturaXML { get; set; }
+        public string? FacturaPDF { get; set; }
+        public DateTime? FechaFacturacion { get; set; }
     }
 }

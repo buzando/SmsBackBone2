@@ -294,21 +294,22 @@ const BillingInformation: React.FC = () => {
                             style={{ width: '400px', height: '54px' }}
                             select
                         >
-                            <MenuItem value="general">General de Ley Personas Morales</MenuItem>
-                            <MenuItem value="fines_no_lucrativos">Personas Morales con Fines no Lucrativos</MenuItem>
-                            <MenuItem value="sueldos_salarios">Sueldos y Salarios e Ingresos Asimilados a Salarios</MenuItem>
-                            <MenuItem value="arrendamiento">Arrendamiento</MenuItem>
-                            <MenuItem value="enajenacion_bienes">Régimen de Enajenación o Adquisición de Bienes</MenuItem>
-                            <MenuItem value="demas_ingresos">Demás Ingresos</MenuItem>
-                            <MenuItem value="incorporacion_fiscal">Régimen de Incorporación Fiscal</MenuItem>
-                            <MenuItem value="actividades_empresariales">Actividades Empresariales y Profesionales</MenuItem>
-                            <MenuItem value="agricolas_ganaderas">Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras</MenuItem>
-                            <MenuItem value="grupos_sociedades">Opcional para Grupos de Sociedades</MenuItem>
-                            <MenuItem value="coordinados">Coordinados</MenuItem>
-                            <MenuItem value="hidrocarburos">Hidrocarburos</MenuItem>
-                            <MenuItem value="plataformas_tecnologicas">Actividades Empresariales con Ingresos a través de Plataformas Tecnológicas</MenuItem>
-                            <MenuItem value="simplificado_confianza">Régimen Simplificado de Confianza</MenuItem>
+                            <MenuItem value="601">General de Ley Personas Morales</MenuItem>
+                            <MenuItem value="603">Personas Morales con Fines no Lucrativos</MenuItem>
+                            <MenuItem value="605">Sueldos y Salarios e Ingresos Asimilados a Salarios</MenuItem>
+                            <MenuItem value="606">Arrendamiento</MenuItem>
+                            <MenuItem value="607">Régimen de Enajenación o Adquisición de Bienes</MenuItem>
+                            <MenuItem value="608">Demás Ingresos</MenuItem>
+                            <MenuItem value="621">Régimen de Incorporación Fiscal</MenuItem>
+                            <MenuItem value="612">Actividades Empresariales y Profesionales</MenuItem>
+                            <MenuItem value="622">Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras</MenuItem>
+                            <MenuItem value="620">Opcional para Grupos de Sociedades</MenuItem>
+                            <MenuItem value="623">Coordinados</MenuItem>
+                            <MenuItem value="624">Hidrocarburos</MenuItem>
+                            <MenuItem value="625">Actividades Empresariales con Ingresos a través de Plataformas Tecnológicas</MenuItem>
+                            <MenuItem value="626">Régimen Simplificado de Confianza</MenuItem>
                         </TextField>
+
 
                     </div>
 

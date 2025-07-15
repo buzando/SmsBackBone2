@@ -448,17 +448,20 @@ const Reports: React.FC = () => {
 
 
     {/*Spinner*/ }
-    const handleExportClick = (
+    const handleExportClick = async (
         format: 'csv' | 'xlsx' | 'pdf',
         setThisLoading: React.Dispatch<React.SetStateAction<boolean>>
     ) => {
         setThisLoading(true);
-
-        setTimeout(() => {
-            exportReport(format, () => {
-                setThisLoading(false);
+        try {
+            await new Promise<void>((resolve) => {
+                exportReport2(format, () => {
+                    resolve();
+                });
             });
-        }, 1000); // Tiempo del spinner
+        } finally {
+            setThisLoading(false);
+        }
     };
 
     const DualSpinner = () => (
@@ -520,6 +523,57 @@ const Reports: React.FC = () => {
     const [isExportingXLSX, setIsExportingXLSX] = useState(false);
     const [isExportingPDF, setIsExportingPDF] = useState(false);
     const anyExporting = isExportingCSV || isExportingXLSX || isExportingPDF;
+
+
+    const exportReport2 = async (
+        format: 'pdf' | 'xlsx' | 'csv',
+        callback: () => void
+    ) => {
+        try {
+            const selectedRoom = localStorage.getItem("selectedRoom");
+            if (!selectedRoom) {
+                return;
+            }
+
+            const roomId = JSON.parse(selectedRoom).id;
+            const payload = {
+                ReportType: selectedSmsOption,
+                Format: format,
+                RoomId: roomId,
+                StartDate: formatDateToLocalString(selectedDates.start),
+                EndDate: formatDateToLocalString(selectedDates.end),
+                CampaignIds: selectedCampaigns.length ? selectedCampaigns : null,
+                UserIds: selectedUsers.length ? selectedUsers : null,
+                PageOrigin: "Reportes"
+            };
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GETREPORTS_ALL}`,
+                payload
+            );
+
+            if (response.data?.success && response.data?.downloadUrl) {
+                const fileUrl = `${import.meta.env.VITE_SMS_API_URL}${response.data.downloadUrl}`;
+
+                // Paso 2: Descargar el archivo ya generado (GET)
+                const fileResponse = await axios.get(fileUrl, { responseType: 'blob' });
+
+                const blob = new Blob([fileResponse.data]);
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = response.data.fileName;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } else {
+                console.error("Error: No se generó el archivo.");
+            }
+        } catch (error) {
+            console.error(`Error al exportar reporte a ${format}:`, error);
+        } finally {
+            callback();
+        }
+    };
 
 
 
@@ -711,20 +765,6 @@ const Reports: React.FC = () => {
         }
 
     };
-
-
-
-
-    const getCurrentDataLength = () => {
-        if (selectedSmsOption === "Global") {
-            if (filteredReports?.length != 0) return filteredReports?.length ?? 0;
-            return reportData?.length ?? 0;
-        } else {
-            if (filteredReportsSms) return filteredReportsSms.length;
-            return reportDatasms?.length ?? 0;
-        }
-    };
-
 
 
     useEffect(() => {

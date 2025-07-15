@@ -22,11 +22,30 @@ namespace SMSBackboneAPI.Controllers
 
     public class ReportsController : ControllerBase
     {
-        [AllowAnonymous]
-        [HttpPost("DownloadReports")]
-        public async Task<IActionResult> DownloadReports(GetReport Reporte)
+        [HttpPost("GetReports")]
+        public async Task<IActionResult> GetReports(ReportExportRequest report)
         {
-            return Ok();
+            GeneralErrorResponseDto[] errorResponse = new GeneralErrorResponseDto[1];
+            try
+            {
+                var reportManager = new ReportManager();
+                string fileName;
+                var fileBytes = reportManager.ExportReportToFile(report, report.Format, out fileName);
+
+                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "reports");
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                var filePath = Path.Combine(folderPath, fileName);
+                System.IO.File.WriteAllBytes(filePath, fileBytes);
+
+                var url = $"/reports/{fileName}";
+                return Ok(new { success = true, downloadUrl = url, fileName });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
         }
     }
 }

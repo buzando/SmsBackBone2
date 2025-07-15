@@ -1273,7 +1273,7 @@ namespace SMSBackboneAPI.Controllers
             if (string.IsNullOrWhiteSpace(request.ReportType))
                 return BadRequest("El tipo de reporte es obligatorio.");
 
-            var manager = new UserManager();
+            var manager = new ReportManager();
 
             switch (request.ReportType.ToLower())
             {

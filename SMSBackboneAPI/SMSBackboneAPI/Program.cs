@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Configurar servicios
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHostedService<ReportCleanupService>();
 
 // Add services to the container.
 
@@ -54,6 +55,8 @@ app.UseCors(x => x
                     .AllowCredentials()); // allow credentials
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

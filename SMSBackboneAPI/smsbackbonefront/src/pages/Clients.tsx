@@ -136,8 +136,8 @@ const Clients: React.FC = () => {
     const [selectedClient, setSelectedClient] = useState<Clients | null>(null);
     const [rechargeRooms, setRechargeRooms] = useState<string[]>([]);
     const [step, setStep] = useState(0);
-    const [newRooms, setNewRooms] = useState<string[]>([]);
-    const [roomCount, setRoomCount] = useState<number>(0);
+    const [newRooms, setNewRooms] = useState<string[]>(['Default']);
+    const [roomCount, setRoomCount] = useState<number>(1);
     const [shortRateType, setShortRateType] = useState<'estandar' | 'personalizada'>('estandar');
     const [longRateType, setLongRateType] = useState<'estandar' | 'personalizada'>('estandar');
     const [shortStandardQty, setShortStandardQty] = useState('');
@@ -177,7 +177,10 @@ const Clients: React.FC = () => {
     };
     const [rechargeData, setRechargeData] = useState(initialRechargeState);
     const [appliedClientIds, setAppliedClientIds] = useState<number[]>([]);
-
+    const isClientActive = activeFilter === 'cliente';
+    const hasClientSelected = selectedClients.length > 0;
+    const showClientHighlight = isClientActive || hasClientSelected;
+    const [isSavingClient, setIsSavingClient] = useState(false);
     const DualSpinner = () => (
         <Box
             sx={{
@@ -416,6 +419,7 @@ const Clients: React.FC = () => {
     const paginatedData = visibleData.slice(startIndex, endIndex);
 
     const handleAddClient = () => {
+
         setIsEditClient(false);
         setSelectedClient(null);
         setStep(0);
@@ -468,6 +472,7 @@ const Clients: React.FC = () => {
             : selectedClient?.rateForLong;
 
     const handleSubmit = async () => {
+        setIsSavingClient(true);
         if (!selectedClient) return;
 
         const payload = {
@@ -512,6 +517,7 @@ const Clients: React.FC = () => {
         }
         finally {
             setOpenClientModal(false);
+            setIsSavingClient(false);
         }
     };
 
@@ -784,12 +790,22 @@ const Clients: React.FC = () => {
                                         setActiveFilter(label.toLowerCase() as any);
                                     }}
                                     sx={{
-                                        px: '16px', py: '6px', border: '1px solid', borderColor: activeFilter === label.toLowerCase() ? '#7B354D' : '#CFCFCF',
-                                        borderRadius: '50px', cursor: 'pointer', fontFamily: 'Poppins', fontWeight: 600,
-                                        fontSize: '13px', backgroundColor: activeFilter === label.toLowerCase() ? '#F6EEF1' : '#FFFFFF',
-                                        color: activeFilter === label.toLowerCase() ? '#7B354D' : '#9B9295', transition: 'all 0.2s ease-in-out', userSelect: 'none',
+                                        px: '16px',
+                                        py: '6px',
+                                        border: '1px solid',
+                                        borderColor: showClientHighlight ? '#7B354D' : '#CFCFCF',
+                                        borderRadius: '50px',
+                                        cursor: 'pointer',
+                                        fontFamily: 'Poppins',
+                                        fontWeight: 600,
+                                        fontSize: '13px',
+                                        backgroundColor: showClientHighlight ? '#F6EEF1' : '#FFFFFF',
+                                        color: showClientHighlight ? '#7B354D' : '#9B9295',
+                                        transition: 'all 0.2s ease-in-out',
+                                        userSelect: 'none',
                                     }}
                                 >
+
                                     {labelDisplay}
                                 </Box>
                             );
@@ -1368,7 +1384,12 @@ const Clients: React.FC = () => {
             <Menu
                 anchorEl={clientAnchorEl}
                 open={clientMenuOpen}
-                onClose={() => setClientMenuOpen(false)}
+                onClose={() => {
+                    setClientMenuOpen(false);
+                    if (selectedClients.length === 0) {
+                        setActiveFilter('');
+                    }
+                }}
                 PaperProps={{
                     sx: {
                         padding: 1,
@@ -1505,6 +1526,7 @@ const Clients: React.FC = () => {
                             setClientMenuOpen(false);
                             setClientsList(originalData.slice(0, 50));
                             setCurrentPage(1);
+                            setActiveFilter('');
                         }}
                         text="LIMPIAR"
                     />
@@ -1522,7 +1544,7 @@ const Clients: React.FC = () => {
                     fontFamily: 'Poppins', fontSize: '20px', fontWeight: 600,
                     color: '#574B4F', textTransform: 'none'
                 }}>
-                    {selectedClient ? 'Editar cliente' : 'Añadir cliente'}
+                    {isEditClient ? 'Editar cliente' : 'Añadir cliente'}
                 </DialogTitle>
                 <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: -2 }} />
                 <DialogContent>
@@ -2397,7 +2419,7 @@ const Clients: React.FC = () => {
                                 <Box display="flex" alignItems="center" gap={2}>
                                     <IconButton
                                         onClick={() => {
-                                            if (ronomCount > 0) {
+                                            if (roomCount > 0) {
                                                 const updatedRooms = [...newRooms];
                                                 updatedRooms.pop();
                                                 setNewRooms(updatedRooms);
@@ -2471,7 +2493,14 @@ const Clients: React.FC = () => {
 
                     <Box display="flex" justifyContent="space-between" mt={4} px={3} pb={2}>
                         <SecondaryButton text="Cancelar" onClick={() => setOpenClientModal(false)} />
+                        {step > 0 && (
+                            <SecondaryButton
+                                onClick={() => setStep((prev) => prev - 1)}
+                                text="REGRESAR"
+                            />
+                        )}
                         <MainButton
+                            disabled={newRooms.some((name) => name.trim() === '')}
                             text={
                                 step === 2 || (step === 1 && isEditClient)
                                     ? isEditClient ? 'Guardar cambios' : 'Guardar'
@@ -2667,7 +2696,7 @@ const Clients: React.FC = () => {
                     </Box>
                     <Box mt={3} display="flex" justifyContent="flex-end">
                         <SecondaryButton text='Cancelar' onClick={() => setRechargeModalOpen(false)} />
-                        <MainButton text='Recargar' onClick={handleSaveRecharge} />
+                        <MainButton text='Recargar' onClick={handleSaveRecharge} isLoading={isSavingClient}/>
                     </Box>
                 </Box>
             </Modal>

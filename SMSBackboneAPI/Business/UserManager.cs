@@ -997,7 +997,7 @@ namespace Business
                                 join u in ctx.Users on cr.idUser equals u.Id
                                 join c in ctx.clients on u.IdCliente equals c.id
                                 join cc in ctx.creditcards on cr.idCreditCard equals cc.Id
-                                where cr.RechargeDate >= credit.FechaInicio && cr.RechargeDate <= credit.FechaFin && credit.IdUser == credit.IdUser // 🔥 Filtro agregado
+                                where cr.RechargeDate >= credit.FechaInicio && cr.RechargeDate <= credit.FechaFin && credit.IdUser == credit.IdUser 
                                 select new CreditHystoric
                                 {
                                     id = cr.Id,
@@ -1389,137 +1389,7 @@ namespace Business
                         }).ToList();
             }
         }
-        public ReportGlobalResponse GetSmsReport(ReportRequest request)
-        {
-            var results = new ReportGlobalResponse();
 
-            using (var ctx = new Entities())
-            {
-                var dbConnection = ctx.Database.GetDbConnection();
-                using (var connection = new SqlConnection(dbConnection.ConnectionString))
-                {
-                    using (var command = new SqlCommand("sp_getGlobalReport", connection))
-                    {
-                        var total = Common.ConfigurationManagerJson("TotalPaginas");
-                        command.CommandType = CommandType.StoredProcedure;
-
-                        command.Parameters.AddWithValue("@RoomId", request.RoomId);
-                        command.Parameters.AddWithValue("@StartDate", request.StartDate ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@EndDate", request.EndDate ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@PageNumber", request.Page > 0 ? request.Page : 1);
-                        command.Parameters.AddWithValue("@PageSize", total);
-
-                        connection.Open();
-
-                        using (var reader = command.ExecuteReader())
-                        {
-                            int totalCount = 0;
-                            if (reader.Read())
-                            {
-                                results.TotalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
-                            }
-                            results.TotalXPage = int.Parse(total);
-                            results.reportGlobalResponseLists = new List<ReportGlobalResponseList>();
-                            while (reader.Read())
-                            {
-                                results.reportGlobalResponseLists.Add(new ReportGlobalResponseList
-                                {
-                                    Date = reader.GetDateTime(reader.GetOrdinal("Date")),
-                                    Phone = reader.GetString(reader.GetOrdinal("Phone")),
-                                    Room = reader.GetString(reader.GetOrdinal("Room")),
-                                    Campaign = reader.GetString(reader.GetOrdinal("Campaign")),
-                                    CampaignId = reader.GetInt32(reader.GetOrdinal("CampaignId")),
-                                    User = reader.GetString(reader.GetOrdinal("User")), 
-                                    MessageId = reader.GetInt32(reader.GetOrdinal("MessageId")),
-                                    Message = reader.GetString(reader.GetOrdinal("Message")),
-                                    Status = reader.GetString(reader.GetOrdinal("Status")),
-                                    ReceivedAt = reader.GetDateTime(reader.GetOrdinal("ReceivedAt")), 
-                                    Cost = reader.GetString(reader.GetOrdinal("Cost")), 
-                                    Type = reader.GetString(reader.GetOrdinal("Type")),
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-            return results;
-        }
-
-        public ReportDeliveryResponse GetSmsReportSend(ReportRequest request)
-        {
-            var results = new ReportDeliveryResponse();
-
-            using (var ctx = new Entities())
-            {
-                var connection = (SqlConnection)ctx.Database.GetDbConnection();
-
-                // Normalizar tipo
-                switch (request.ReportType)
-                {
-                    case "Mensajes entrantes": request.ReportType = "entrantes"; break;
-                    case "Mensajes enviados": request.ReportType = "enviados"; break;
-                    case "Mensajes no enviados": request.ReportType = "noenviados"; break;
-                    case "Mensajes rechazados": request.ReportType = "rechazados"; break;
-                }
-
-                var total = Common.ConfigurationManagerJson("TotalPaginas");
-
-                using (var command = new SqlCommand("sp_getSmsDeliveryReport", connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    command.Parameters.AddWithValue("@StartDate", request.StartDate ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@EndDate", request.EndDate ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@RoomId", request.RoomId);
-                    command.Parameters.AddWithValue("@ReportType", request.ReportType ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@UserIds",
-                        (request.UserIds == null || request.UserIds.Count == 0) ? (object)DBNull.Value : string.Join(",", request.UserIds));
-                    command.Parameters.AddWithValue("@CampaignIds",
-                        (request.CampaignIds == null || request.CampaignIds.Count == 0) ? (object)DBNull.Value : string.Join(",", request.CampaignIds));
-                    command.Parameters.AddWithValue("@PageNumber", request.Page > 0 ? request.Page : 1);
-                    command.Parameters.AddWithValue("@PageSize", total);
-
-                    if (connection.State != ConnectionState.Open)
-                        connection.Open();
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        // 1. Leer TotalCount
-                        if (reader.Read())
-                        {
-                            results.TotalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
-                            results.TotalXPage = int.Parse(total);
-                        }
-
-                        // 2. Avanzar al segundo result set
-                        if (reader.NextResult())
-                        {
-                            results.ReportDeliveryList = new List<ReportDeliveryList>();
-
-                            while (reader.Read())
-                            {
-                                results.ReportDeliveryList.Add(new ReportDeliveryList
-                                {
-                                    MessageId = reader.GetInt32(reader.GetOrdinal("MessageId")),
-                                    Message = reader.GetString(reader.GetOrdinal("Message")),
-                                    CampaignName = reader.GetString(reader.GetOrdinal("CampaignName")),
-                                    CampaignId = reader.GetInt32(reader.GetOrdinal("CampaignId")),
-                                    UserName = reader.GetString(reader.GetOrdinal("UserName")),
-                                    RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
-                                    PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
-                                    Status = reader.GetString(reader.GetOrdinal("Status")),
-                                    ResponseMessage = reader.IsDBNull(reader.GetOrdinal("ResponseMessage")) ? null : reader.GetString(reader.GetOrdinal("ResponseMessage")),
-                                    SentAt = reader.IsDBNull(reader.GetOrdinal("SentAt")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("SentAt")),
-                                    UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-
-            return results;
-        }
 
 
 
