@@ -1,0 +1,8 @@
+<svg id="Icon-trash" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <rect id="Rectángulo_11002" data-name="Rectángulo 11002" width="24" height="24" fill="none"/>
+  <rect id="Rectángulo_11002-2" data-name="Rectángulo 11002" width="24" height="24" fill="none"/>
+  <g id="cancel-photo-svgrepo-com" transform="translate(-1 24) rotate(-90)">
+    <path id="Trazado_9971" data-name="Trazado 9971" d="M4,5A1,1,0,1,0,2,5V16.6A6.4,6.4,0,0,0,8.4,23H20a1,1,0,0,0,0-2H8.4A4.4,4.4,0,0,1,4,16.6Z" fill="rgba(87,75,79,0.9)"/>
+    <path id="check-square-svgrepo-com" d="M3.547,1A2.547,2.547,0,0,0,1,3.547V14.3a2.547,2.547,0,0,0,2.547,2.547H14.3A2.547,2.547,0,0,0,16.846,14.3V3.547A2.547,2.547,0,0,0,14.3,1ZM12,5.776a.849.849,0,1,1,1.2,1.2L8.108,12.069a.849.849,0,0,1-1.2,0L4.645,9.806a.849.849,0,0,1,1.2-1.2L7.508,10.27,12,5.776Z" transform="translate(23 2.203) rotate(90)" fill="#675c60" fill-rule="evenodd"/>
+  </g>
+</svg>
