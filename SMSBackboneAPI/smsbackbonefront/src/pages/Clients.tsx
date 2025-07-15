@@ -34,6 +34,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import CloseIcon from '@mui/icons-material/Close';
 import ListItemText from '@mui/material/ListItemText';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
@@ -55,6 +56,11 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CustomDateTimePicker from '../components/commons/DatePickerOneDate';
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import IconCheckBox2 from "../assets/IconCheckBox2.svg";
+import IconSuS from "../assets/IconSuS.svg";
+import IconSDown from "../assets/IconSDown.svg";
+import IconSChecked from "../assets/IconSChecked.svg";
+import IconPlus4 from "../assets/IconPlus4.svg";
+import IconMinus4 from "../assets/IconMinus4.svg";
 import EditIcon from '@mui/icons-material/Edit';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import Thrashicon from '../assets/Icon-trash-Card.svg'
@@ -800,7 +806,7 @@ const Clients: React.FC = () => {
                     {/* Botón y buscador */}
                     <Box sx={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
                         <SecondaryButton text="SALAS" onClick={() => navigate('/RoomsAdmin')} />
-                        <MainIcon text="Añadir cliente" width="218px" onClick={handleAddClient} />
+                        <MainIcon text="Añadir cliente" width="186px" onClick={handleAddClient} />
                         <Box sx={{ position: 'relative', width: '220px' }}>
                             <Box
                                 display="flex"
@@ -1165,6 +1171,7 @@ const Clients: React.FC = () => {
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Créditos SMS # Largos</th>
                                 </tr>
+
                             </thead>
                             <tbody>
                                 {paginatedData.map((Client) => (
@@ -1292,7 +1299,11 @@ const Clients: React.FC = () => {
                         }
                     }}
                 >
-                    <AutorenewIcon fontSize="small" sx={{ mr: 1, color: '#5F5064', width: 24, height: 24 }} />
+                    <img
+                        src={IconSuS}
+                        alt="Recarga"
+                        style={{ width: '24px', height: '24px', marginRight: "9px", color: "#574B4FE6" }}
+                    />
                     <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#583B43" }}>
                         Recargar
                     </Typography>
@@ -1302,20 +1313,42 @@ const Clients: React.FC = () => {
                     <MenuItem onClick={() => {
                         handleActivateClient();
                         handleMenuClose();
-                    }}>
-                        <ListItemIcon>
-                            <CheckBoxIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText primary="Dar de alta" />
+                    }}
+                        sx={{
+                            fontFamily: 'Poppins',
+                            fontSize: '14px',
+                            '&:hover': {
+                                backgroundColor: '#F2EBED'
+                            }
+                        }}
+                    >
+                        <img
+                            src={IconSChecked}
+                            alt="Recarga"
+                            style={{ width: '24px', height: '24px', marginRight: "9px" }}
+                        />
+                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#583B43" }}>
+                            Dar de alta
+                        </Typography>
                     </MenuItem>
                 ) : (
                     <MenuItem onClick={() => {
                         handleOpenDeactivateModal();
                         handleMenuClose();
-                    }}>
-                        <ListItemIcon>
-                            <BlockIcon fontSize="small" sx={{ mr: 1, color: '#5F5064', width: 22, height: 22 }} />
-                        </ListItemIcon>
+                    }}
+                        sx={{
+                            fontFamily: 'Poppins',
+                            fontSize: '14px',
+                            '&:hover': {
+                                backgroundColor: '#F2EBED'
+                            }
+                        }}
+                    >
+                        <img
+                            src={IconSDown}
+                            alt="Recarga"
+                            style={{ width: '24px', height: '24px', marginRight: "10px" }}
+                        />
                         <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#583B43" }}>
                             Dar de baja
                         </Typography>
@@ -1349,17 +1382,63 @@ const Clients: React.FC = () => {
                         <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F" }}>
                             Eliminar
                         </Typography>
-                    </Box>
 
+                    </Box>
                     <Tooltip
-                        title="El cliente no puede ser eliminado debido a que no ha cumplido 6 meses sin inactividad."
-                        placement="left"
-                        arrow
+                        title={
+                            <Box
+                                sx={{
+                                    backgroundColor: "#FFFFFF",
+                                    borderRadius: "8px",
+                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                    padding: "8px 12px",
+                                    fontSize: "14px",
+                                    fontFamily: "Poppins",
+                                    color: "#574B4F",
+                                    whiteSpace: "pre-line",
+                                    transform: "translate(-10px, -22px)",
+                                    borderColor: "#00131F3D",
+                                    borderStyle: "solid",
+                                    borderWidth: "1px"
+                                }}
+                            >
+                                <>
+                                    El cliente no puede ser<br />
+                                    eliminado debido a que<br />
+                                    no ha cumplido 6 meses<br />
+                                    sin inactividad
+                                </>
+                            </Box>
+                        }
+                        placement="bottom-end"
+                        componentsProps={{
+                            tooltip: {
+                                sx: {
+                                    backgroundColor: "transparent",
+                                    padding: 0,
+
+                                },
+                            },
+                        }}
                     >
-                        <InputAdornment position="end" sx={{ ml: 1, cursor: 'pointer' }}>
-                            <InfoOutlinedIcon sx={{ fontSize: 18, color: '#645E60' }} />
-                        </InputAdornment>
+                        <IconButton
+                            disableRipple
+                            sx={{
+                                backgroundColor: "transparent !important",
+                                pointerEvents: "auto",
+                                "&:hover": {
+                                    backgroundColor: "transparent !important",
+                                },
+                            }}
+                        >
+                            <img
+                                src={infoicon}
+                                alt="info-icon"
+                                style={{ width: 24, height: 24, marginLeft: "10px" }}
+                            />
+                        </IconButton>
                     </Tooltip>
+
                 </MenuItem>
 
             </Menu>
@@ -1517,45 +1596,59 @@ const Clients: React.FC = () => {
             </Menu>
 
             {/* Modal para añadir o editar cliente */}
-            <Dialog open={openClientModal} onClose={() => setOpenClientModal(false)} maxWidth="md" fullWidth>
+            <Dialog open={openClientModal} onClose={() => setOpenClientModal(false)} maxWidth="md" fullWidth sx={{ overflowX: "hidden" }}>
                 <DialogTitle sx={{
                     fontFamily: 'Poppins', fontSize: '20px', fontWeight: 600,
-                    color: '#574B4F', textTransform: 'none'
+                    color: '#574B4F', textTransform: 'none', mt: 1, mb: 1, marginLeft: "10px"
                 }}>
                     {selectedClient ? 'Editar cliente' : 'Añadir cliente'}
                 </DialogTitle>
-                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: -2 }} />
-                <DialogContent>
-                    <Box px={3} pt={1}>
-                        <Box display="flex" justifyContent="space-around" mb={2}>
-                            {['Información', 'Tarifas', 'Salas'].map((label, index) => (
-                                <Box key={label} textAlign="center">
-                                    <Box
-                                        sx={{
-                                            width: 24,
-                                            height: 24,
-                                            border: '2px solid',
-                                            borderColor: index <= step ? '#7B3F61' : '#DDD',
-                                            borderRadius: '50%',
-                                            mx: 'auto',
-                                            backgroundColor: index < step ? '#7B3F61' : 'transparent',
-                                        }}
-                                    />
-                                    <Typography
-                                        fontSize="12px"
-                                        mt={1}
-                                        color={index === step ? '#7B3F61' : '#B7AEB0'}
-                                        fontFamily={"Poppins"}
-                                    >
-                                        {label} {index > 0 && <span style={{ fontSize: '10px' }}>(Opcional)</span>}
-                                    </Typography>
-                                </Box>
-                            ))}
+                <IconButton
+                    onClick={() => setOpenClientModal(false)}
+                    sx={{
+                        position: 'absolute',
+                        marginTop: '10px',
+                        marginLeft: '854px',
+                        zIndex: 10
+                    }}
+                >
+                    <CloseIcon sx={{ color: '#A6A6A6' }} />
+                </IconButton>
+                <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: -1.5 }} />
+
+                <Box display="flex" justifyContent="space-around" mb={1.5} mt={3}>
+                    {['Información', 'Tarifas', 'Salas'].map((label, index) => (
+                        <Box key={label} textAlign="center">
+                            <Box
+                                sx={{
+                                    width: 24,
+                                    height: 24,
+                                    border: '2px solid',
+                                    borderColor: index <= step ? '#7B3F61' : '#DDD',
+                                    borderRadius: '50%',
+                                    mx: 'auto',
+                                    backgroundColor: index < step ? '#7B3F61' : 'transparent',
+                                }}
+                            />
+                            <Typography
+                                fontSize="12px"
+                                mt={1}
+                                color={index === step ? '#7B3F61' : '#B7AEB0'}
+                                fontFamily={"Poppins"}
+                            >
+                                {label} {index > 0 && <span style={{ fontSize: '10px' }}>(Opcional)</span>}
+                            </Typography>
                         </Box>
-                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mt: -1 }} />
+                    ))}
+                </Box>
+
+                <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: 0 }} />
+
+                <DialogContent>
+                    <Box px={3} pt={1} sx={{ overflowX: "hidden" }}>
                         {step === 0 && (
-                            <Box display="flex" flexDirection="column" gap={2}>
-                                <Grid item xs={12} md={6} marginLeft={"20px"} mt={1}>
+                            <Box display="flex" flexDirection="column" gap={2} sx={{ overflowX: "hidden" }}>
+                                <Grid item xs={12} md={6} marginLeft={"10px"} mt={1} mb={1}>
                                     <Typography
                                         sx={{
                                             textAlign: "left",
@@ -1573,6 +1666,22 @@ const Clients: React.FC = () => {
                                     <TextField
                                         value={selectedClient?.nombreCliente || ''}
                                         onChange={(e) => setSelectedClient({ ...selectedClient, nombreCliente: e.target.value })}
+                                        error={
+                                            !!(selectedClient?.nombreCliente && (selectedClient?.nombreCliente.length > 40 || !/^[a-zA-Z0-9 ]+$/.test(selectedClient?.nombreCliente)))
+                                        }
+                                        helperText={
+                                            selectedClient?.nombreCliente && selectedClient?.nombreCliente.length > 40
+                                                ? "Máximo 40 caracteres"
+                                                : selectedClient?.nombreCliente && !/^[a-zA-Z0-9 ]+$/.test(selectedClient?.nombreCliente)
+                                                    ? "Solo se permiten caracteres alfabéticos"
+                                                    : ""
+
+                                        }
+                                        FormHelperTextProps={{
+                                            sx: {
+                                                fontFamily: 'Poppins', position: "absolute", marginTop: "58px"
+                                            }
+                                        }}
                                         sx={{
                                             fontFamily: "Poppins",
                                             "& .MuiInputBase-input": {
@@ -1628,7 +1737,12 @@ const Clients: React.FC = () => {
                                                             }}
                                                         >
                                                             <img
-                                                                src={infoicon}
+                                                                src={
+                                                                    selectedClient?.nombreCliente &&
+                                                                        (selectedClient?.nombreCliente.length > 40 || !/^[a-zA-Z0-9 ]+$/.test(selectedClient?.nombreCliente))
+                                                                        ? infoiconerror
+                                                                        : infoicon
+                                                                }
                                                                 alt="info-icon"
                                                                 style={{ width: 24, height: 24 }}
                                                             />
@@ -1640,15 +1754,15 @@ const Clients: React.FC = () => {
                                         }}
                                     />
                                 </Grid>
-                                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mt: 0.5 }} />
+                                <Divider sx={{ width: 'calc(100% - 10px)', marginLeft: '8px', mt: 0.5 }} />
                                 <Typography sx={{
                                     color: "#330F1B", fontFamily: "Poppins", fontSize: "18px", fontWeight: 500,
-                                    marginLeft: "22px"
+                                    marginLeft: "10px"
                                 }}
                                 >Información de contacto</Typography>
 
                                 <Box display="flex" gap={2}>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"}>
+                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"}>
                                         <Typography
                                             sx={{
                                                 textAlign: "left",
@@ -1821,7 +1935,7 @@ const Clients: React.FC = () => {
                                     </Box>
                                 </Box>
                                 <Box display="flex" gap={2}>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"}>
+                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"}>
                                         <Typography
                                             sx={{
                                                 textAlign: "left",
@@ -1919,7 +2033,7 @@ const Clients: React.FC = () => {
                                             }}
                                         >
                                             Extensión
-                                            <span style={{ color: "#D01247" }}>*</span>
+
                                         </Typography>
                                         <TextField
                                             value={selectedClient?.extension || ''}
@@ -1993,7 +2107,7 @@ const Clients: React.FC = () => {
                                     </Box>
                                 </Box>
                                 <Box display="flex" gap={2}>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"}>
+                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"}>
                                         <Typography
                                             sx={{
                                                 textAlign: "left",
@@ -2083,7 +2197,7 @@ const Clients: React.FC = () => {
                                             }}
                                         />
                                     </Box>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"}>
+                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"}>
                                         <Typography
                                             sx={{
                                                 textAlign: "left",
@@ -2179,7 +2293,7 @@ const Clients: React.FC = () => {
 
                         {step === 1 && (
                             <Box display="flex" flexDirection="column" gap={4}>
-                                <Typography fontWeight={600} sx={{ fontSize: '16px', color: '#330F1B' }}>
+                                <Typography fontWeight={500} sx={{ fontSize: '18px', color: '#330F1B', fontFamily: "Poppins" }}>
                                     Tarifas
                                 </Typography>
 
@@ -2190,7 +2304,7 @@ const Clients: React.FC = () => {
                                         padding: '16px',
                                     }}
                                 >
-                                    <Typography fontWeight={600} sx={{ color: '#330F1B', mb: 1 }}>
+                                    <Typography fontWeight={500} sx={{ color: '#330F1B', fontWeight: "18px", mb: 1, fontFamily: "Poppins" }}>
                                         SMS # cortos
                                     </Typography>
 
@@ -2202,11 +2316,37 @@ const Clients: React.FC = () => {
                                                     <Radio
                                                         checked={shortRateType === 'estandar'}
                                                         onChange={() => setShortRateType('estandar')}
+                                                        sx={{
+                                                            color: shortRateType === 'estandar' ? '#8F4D63' : '#574B4F',
+                                                            '&.Mui-checked': {
+                                                                color: '#8F4D63',
+                                                            },
+                                                        }}
                                                     />
                                                 }
-                                                label="Tarifa estándar"
+                                                label={
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '16px',
+                                                            color: shortRateType === 'estandar' ? '#8F4D63' : '#574B4F',
+                                                        }}
+                                                    >
+                                                        Tarifa estándar
+                                                    </Typography>
+                                                }
                                             />
 
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '16px',
+                                                    color: shortRateType === 'estandar' ? '#330F1B' : '#D0CDCD',
+                                                    mt: 1, ml: 0.5
+                                                }}
+                                            >
+                                                Cantidad de mensajes
+                                            </Typography>
                                             <Select
                                                 fullWidth
                                                 displayEmpty
@@ -2216,23 +2356,95 @@ const Clients: React.FC = () => {
                                                     setShortStandardQty(selected);
                                                     setShortStandardPrice(String(standardShortRates[selected] ?? ''));
                                                 }}
-
                                                 disabled={shortRateType !== 'estandar'}
-                                                sx={{ mt: 1 }}
+                                                renderValue={(selected) =>
+                                                    selected ? selected : (
+                                                        <span style={{ color: '#645E60', fontSize: '12px', fontFamily: 'Poppins' }}>
+                                                            Seleccionar cantidad de mensajes
+                                                        </span>
+                                                    )
+                                                }
+                                                sx={{
+                                                    mt: 1,
+                                                    width: '325px',
+                                                    height: '40px',
+                                                    background: '#FFFFFF',
+                                                    border: '1px solid #9B9295',
+                                                    borderRadius: '8px',
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '14px',
+                                                    padding: '0 10px',
+                                                    '& .MuiSelect-select': {
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        height: '40px',
+                                                    },
+                                                    '& fieldset': {
+                                                        border: 'none',
+                                                    },
+                                                }}
                                             >
-                                                <MenuItem disabled value="">
-                                                    Seleccionar cantidad de mensajes
+                                                <MenuItem value="1–999" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    1–999
                                                 </MenuItem>
-                                                <MenuItem value="1–999">1–999</MenuItem>
-                                                <MenuItem value="1,000">1,000</MenuItem>
-                                                <MenuItem value="2,000">2,000</MenuItem>
-                                                <MenuItem value="3,000">3,000</MenuItem>
-                                                <MenuItem value="4,000">4,000</MenuItem>
-                                                <MenuItem value="6,000">6,000</MenuItem>
+                                                <MenuItem value="1,000" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    1,000
+                                                </MenuItem>
+                                                <MenuItem value="2,000" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    2,000
+                                                </MenuItem>
+                                                <MenuItem value="3,000" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    3,000
+                                                </MenuItem>
+                                                <MenuItem value="4,000" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    4,000
+                                                </MenuItem>
+                                                <MenuItem value="6,000" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    6,000
+                                                </MenuItem>
                                             </Select>
 
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '16px',
+                                                    color: shortRateType === 'estandar' ? '#330F1B' : '#D0CDCD',
+                                                    mt: 3.5, ml: 0.5, mb: -1
+                                                }}
+                                            >
+                                                Tarifa por mensaje
+                                            </Typography>
                                             <TextField
-                                                label="Tarifa por mensaje"
                                                 value={shortStandardPrice}
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -2240,8 +2452,34 @@ const Clients: React.FC = () => {
                                                 }}
                                                 disabled={shortRateType !== 'estandar'}
                                                 fullWidth
-                                                sx={{ mt: 2 }}
+                                                sx={{
+                                                    mt: 2,
+                                                    width: '324px',
+                                                    height: '54px',
+                                                    background: '#E5E4E4',
+                                                    border: '1px solid #9B9295',
+                                                    borderRadius: '8px',
+                                                    '& .MuiOutlinedInput-root': {
+                                                        background: '#E5E4E4',
+                                                        height: '54px',
+                                                        borderRadius: '8px',
+                                                        '& fieldset': {
+                                                            borderColor: '#9B9295',
+                                                        },
+                                                    },
+                                                    '& .MuiInputAdornment-root': {
+                                                        color: '#645E60',
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '14px'
+                                                    },
+                                                    '& input': {
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '16px',
+                                                        color: '#574B4F',
+                                                    },
+                                                }}
                                             />
+
 
                                         </Box>
 
@@ -2252,34 +2490,123 @@ const Clients: React.FC = () => {
                                                     <Radio
                                                         checked={shortRateType === 'personalizada'}
                                                         onChange={() => setShortRateType('personalizada')}
+                                                        sx={{
+                                                            color: shortRateType === 'personalizada' ? '#8F4D63' : '#C4B2B9',
+                                                            '&.Mui-checked': {
+                                                                color: '#8F4D63',
+                                                            },
+                                                        }}
                                                     />
                                                 }
-                                                label="Tarifa personalizada"
+                                                label={
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '16px',
+                                                            color: shortRateType === 'personalizada' ? '#8F4D63' : '#574B4F',
+                                                        }}
+                                                    >
+                                                        Tarifa personalizada
+                                                    </Typography>
+                                                }
                                             />
 
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '16px',
+                                                    color: shortRateType === 'personalizada' ? '#330F1B' : '#D0CDCD',
+                                                    mt: 1, ml: 0.5
+                                                }}
+                                            >
+                                                Cantidad de mensajes
+                                            </Typography>
                                             <TextField
-                                                label="Cantidad de mensajes"
                                                 value={shortCustomQty}
                                                 onChange={(e) => setShortCustomQty(e.target.value)}
                                                 disabled={shortRateType !== 'personalizada'}
                                                 fullWidth
-                                                sx={{ mt: 1 }}
+                                                sx={{
+                                                    mt: 1,
+                                                    width: '324px',
+                                                    height: '54px',
+                                                    background: '#FFFFFF',
+                                                    border: '1px solid #9B9295',
+                                                    borderRadius: '8px',
+                                                    '& .MuiOutlinedInput-root': {
+                                                        background: '#FFFFFF',
+                                                        height: '54px',
+                                                        borderRadius: '8px',
+                                                        '& fieldset': {
+                                                            borderColor: '#9B9295',
+                                                        },
+                                                    },
+                                                    '& input': {
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '16px',
+                                                        color: '#330F1B',
+                                                    },
+                                                }}
                                             />
 
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '16px',
+                                                    color: shortRateType === 'personalizada' ? '#330F1B' : '#D0CDCD',
+                                                    mt: 1.5, ml: 0.5, mb: -1
+                                                }}
+                                            >
+                                                Tarifa por mensaje
+                                            </Typography>
                                             <TextField
-                                                label="Tarifa por mensaje"
                                                 type="number"
                                                 value={selectedClient?.rateForShort || ''}
                                                 onChange={(e) =>
-                                                    setSelectedClient({ ...selectedClient, rateForShort: parseFloat(e.target.value) })
+                                                    setSelectedClient({
+                                                        ...selectedClient,
+                                                        rateForShort: parseFloat(e.target.value)
+                                                    })
                                                 }
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                                    inputProps: {
+                                                        style: {
+                                                            appearance: 'textfield',
+                                                            MozAppearance: 'textfield',
+                                                            WebkitAppearance: 'none',
+                                                        },
+                                                    },
                                                 }}
                                                 disabled={shortRateType !== 'personalizada'}
                                                 fullWidth
-                                                sx={{ mt: 2 }}
+                                                sx={{
+                                                    mt: 2,
+                                                    width: '324px',
+                                                    height: '54px',
+                                                    border: '1px solid #9B9295',
+                                                    borderRadius: '8px',
+                                                    '& .MuiOutlinedInput-root': {
+                                                        height: '54px',
+                                                        borderRadius: '8px',
+                                                        '& fieldset': {
+                                                            borderColor: '#9B9295',
+                                                        },
+                                                    },
+                                                    '& input': {
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '16px',
+                                                        color: '#330F1B',
+                                                    },
+                                                    '& .MuiInputAdornment-root': {
+                                                        color: '#645E60',
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '14px'
+                                                    },
+                                                }}
                                             />
+
+
                                         </Box>
                                     </Box>
                                 </Box>
@@ -2293,7 +2620,7 @@ const Clients: React.FC = () => {
                                         padding: '16px',
                                     }}
                                 >
-                                    <Typography fontWeight={600} sx={{ color: '#330F1B', mb: 1 }}>
+                                    <Typography fontWeight={500} sx={{ color: '#330F1B', fontWeight: "18px", mb: 1, fontFamily: "Poppins" }}>
                                         SMS # largos
                                     </Typography>
 
@@ -2305,11 +2632,36 @@ const Clients: React.FC = () => {
                                                     <Radio
                                                         checked={longRateType === 'estandar'}
                                                         onChange={() => setLongRateType('estandar')}
+                                                        sx={{
+                                                            color: longRateType === 'estandar' ? '#8F4D63' : '#574B4F',
+                                                            '&.Mui-checked': {
+                                                                color: '#8F4D63',
+                                                            },
+                                                        }}
                                                     />
                                                 }
-                                                label="Tarifa estándar"
+                                                label={
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '16px',
+                                                            color: longRateType === 'estandar' ? '#8F4D63' : '#574B4F',
+                                                        }}
+                                                    >
+                                                        Tarifa estándar
+                                                    </Typography>
+                                                }
                                             />
-
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '16px',
+                                                    color: longRateType === 'estandar' ? '#330F1B' : '#D0CDCD',
+                                                    mt: 1, ml: 0.5
+                                                }}
+                                            >
+                                                Cantidad de mensajes
+                                            </Typography>
                                             <Select
                                                 fullWidth
                                                 displayEmpty
@@ -2320,21 +2672,87 @@ const Clients: React.FC = () => {
                                                     setLongStandardPrice(String(standardLongRates[selected] ?? ''));
                                                 }}
                                                 disabled={longRateType !== 'estandar'}
-                                                sx={{ mt: 1 }}
+                                                renderValue={(selected) =>
+                                                    selected ? selected : (
+                                                        <span style={{ color: '#645E60', fontSize: '12px', fontFamily: 'Poppins' }}>
+                                                            Seleccionar cantidad de mensajes
+                                                        </span>
+                                                    )
+                                                }
+                                                sx={{
+                                                    mt: 1,
+                                                    width: '325px',
+                                                    height: '40px',
+                                                    background: '#FFFFFF',
+                                                    border: '1px solid #9B9295',
+                                                    borderRadius: '8px',
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '14px',
+                                                    padding: '0 10px',
+                                                    '& .MuiSelect-select': {
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        height: '40px',
+                                                    },
+                                                    '& fieldset': {
+                                                        border: 'none',
+                                                    }
+                                                }}
                                             >
-                                                <MenuItem disabled value="">
-                                                    Seleccionar cantidad de mensajes
-                                                </MenuItem>
-                                                <MenuItem value="1">1</MenuItem>
-                                                <MenuItem value="1,000">1,000</MenuItem>
-                                                <MenuItem value="2,000">2,000</MenuItem>
-                                                <MenuItem value="4,000">4,000</MenuItem>
-                                                <MenuItem value="5,000">5,000</MenuItem>
-                                                <MenuItem value="8,000">8,000</MenuItem>
+                                                <MenuItem value="1" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    1</MenuItem>
+                                                <MenuItem value="1,000" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    1,000</MenuItem>
+                                                <MenuItem value="2,000" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    2,000</MenuItem>
+                                                <MenuItem value="4,000" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    4,000</MenuItem>
+                                                <MenuItem value="5,000" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    5,000</MenuItem>
+                                                <MenuItem value="8,000" sx={{
+                                                    fontFamily: 'Poppins', fontSize: '12px',
+                                                    color: '#645E60', '&:hover': {
+                                                        backgroundColor: '#F2EBED'
+                                                    }
+                                                }}>
+                                                    8,000</MenuItem>
                                             </Select>
-
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '16px',
+                                                    color: longRateType === 'estandar' ? '#330F1B' : '#D0CDCD',
+                                                    mt: 3.5, ml: 0.5, mb: -1
+                                                }}
+                                            >
+                                                Tarifa por mensaje
+                                            </Typography>
                                             <TextField
-                                                label="Tarifa por mensaje"
                                                 value={longStandardPrice}
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -2342,7 +2760,32 @@ const Clients: React.FC = () => {
                                                 }}
                                                 disabled={longRateType !== 'estandar'}
                                                 fullWidth
-                                                sx={{ mt: 2 }}
+                                                sx={{
+                                                    mt: 2,
+                                                    width: '324px',
+                                                    height: '54px',
+                                                    background: '#E5E4E4',
+                                                    border: '1px solid #9B9295',
+                                                    borderRadius: '8px',
+                                                    '& .MuiOutlinedInput-root': {
+                                                        background: '#E5E4E4',
+                                                        height: '54px',
+                                                        borderRadius: '8px',
+                                                        '& fieldset': {
+                                                            borderColor: '#9B9295',
+                                                        },
+                                                    },
+                                                    '& .MuiInputAdornment-root': {
+                                                        color: '#645E60',
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '14px'
+                                                    },
+                                                    '& input': {
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '16px',
+                                                        color: '#574B4F',
+                                                    },
+                                                }}
                                             />
 
                                         </Box>
@@ -2354,22 +2797,76 @@ const Clients: React.FC = () => {
                                                     <Radio
                                                         checked={longRateType === 'personalizada'}
                                                         onChange={() => setLongRateType('personalizada')}
+                                                        sx={{
+                                                            color: longRateType === 'personalizada' ? '#8F4D63' : '#C4B2B9',
+                                                            '&.Mui-checked': {
+                                                                color: '#8F4D63',
+                                                            },
+                                                        }}
                                                     />
                                                 }
-                                                label="Tarifa personalizada"
+                                                label={
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '16px',
+                                                            color: longRateType === 'personalizada' ? '#8F4D63' : '#574B4F',
+                                                        }}
+                                                    >
+                                                        Tarifa personalizada
+                                                    </Typography>
+                                                }
                                             />
 
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '16px',
+                                                    color: longRateType === 'personalizada' ? '#330F1B' : '#D0CDCD',
+                                                    mt: 1, ml: 0.5
+                                                }}
+                                            >
+                                                Cantidad de mensajes
+                                            </Typography>
                                             <TextField
-                                                label="Cantidad de mensajes"
                                                 value={longCustomQty}
                                                 onChange={(e) => setLongCustomQty(e.target.value)}
                                                 disabled={longRateType !== 'personalizada'}
                                                 fullWidth
-                                                sx={{ mt: 1 }}
+                                                sx={{
+                                                    mt: 1,
+                                                    width: '324px',
+                                                    height: '54px',
+                                                    background: '#FFFFFF',
+                                                    border: '1px solid #9B9295',
+                                                    borderRadius: '8px',
+                                                    '& .MuiOutlinedInput-root': {
+                                                        background: '#FFFFFF',
+                                                        height: '54px',
+                                                        borderRadius: '8px',
+                                                        '& fieldset': {
+                                                            borderColor: '#9B9295',
+                                                        },
+                                                    },
+                                                    '& input': {
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '16px',
+                                                        color: '#330F1B',
+                                                    },
+                                                }}
                                             />
 
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '16px',
+                                                    color: longRateType === 'personalizada' ? '#330F1B' : '#D0CDCD',
+                                                    mt: 1.5, ml: 0.5, mb: -1
+                                                }}
+                                            >
+                                                Tarifa por mensaje
+                                            </Typography>
                                             <TextField
-                                                label="Tarifa por mensaje"
                                                 type='number'
                                                 value={selectedClient?.rateForLong || ''}
                                                 onChange={(e) =>
@@ -2380,7 +2877,30 @@ const Clients: React.FC = () => {
                                                 }}
                                                 disabled={longRateType !== 'personalizada'}
                                                 fullWidth
-                                                sx={{ mt: 2 }}
+                                                sx={{
+                                                    mt: 2,
+                                                    width: '324px',
+                                                    height: '54px',
+                                                    border: '1px solid #9B9295',
+                                                    borderRadius: '8px',
+                                                    '& .MuiOutlinedInput-root': {
+                                                        height: '54px',
+                                                        borderRadius: '8px',
+                                                        '& fieldset': {
+                                                            borderColor: '#9B9295',
+                                                        },
+                                                    },
+                                                    '& input': {
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '16px',
+                                                        color: '#330F1B',
+                                                    },
+                                                    '& .MuiInputAdornment-root': {
+                                                        color: '#645E60',
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '14px'
+                                                    },
+                                                }}
                                             />
                                         </Box>
                                     </Box>
@@ -2390,14 +2910,14 @@ const Clients: React.FC = () => {
                         )}
                         {step === 2 && (
                             <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
-                                <Typography fontWeight={600} sx={{ fontSize: '16px', color: '#330F1B' }}>
+                                <Typography fontWeight={500} sx={{ fontSize: '18px', color: '#330F1B', fontFamily: "Poppins" }}>
                                     Elegir cantidad de salas
                                 </Typography>
 
                                 <Box display="flex" alignItems="center" gap={2}>
                                     <IconButton
                                         onClick={() => {
-                                            if (ronomCount > 0) {
+                                            if (roomCount > 0) {
                                                 const updatedRooms = [...newRooms];
                                                 updatedRooms.pop();
                                                 setNewRooms(updatedRooms);
@@ -2413,13 +2933,41 @@ const Clients: React.FC = () => {
                                             color: '#7B354D',
                                         }}
                                     >
-                                        −
+                                        <img
+                                            src={IconMinus4}
+                                            alt="Seleccionado"
+                                            style={{ width: '24px', height: '24px' }}
+                                        />
                                     </IconButton>
 
                                     <TextField
                                         value={roomCount}
-                                        inputProps={{ readOnly: true, style: { textAlign: 'center' } }}
-                                        sx={{ width: 48 }}
+                                        inputProps={{
+                                            readOnly: true,
+                                            style: {
+                                                textAlign: 'center',
+                                                fontFamily: 'Poppins',
+                                                fontSize: '16px',
+                                                fontWeight: 600,
+                                                color: '#796E71',
+                                            }
+                                        }}
+                                        sx={{
+                                            width: '56px',
+                                            height: '56px',
+                                            border: '1px solid #9B9295',
+                                            borderRadius: '8px',
+                                            '& .MuiOutlinedInput-root': {
+                                                height: '56px',
+                                                borderRadius: '8px',
+                                                '& fieldset': {
+                                                    borderColor: '#9B9295',
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#9B9295',
+                                                },
+                                            },
+                                        }}
                                     />
 
                                     <IconButton
@@ -2438,73 +2986,165 @@ const Clients: React.FC = () => {
                                             color: '#7B354D',
                                         }}
                                     >
-                                        +
+                                        <img
+                                            src={IconPlus4}
+                                            alt="Seleccionado"
+                                            style={{ width: '24px', height: '24px' }}
+                                        />
                                     </IconButton>
                                 </Box>
 
                                 {newRooms.map((value, index) => (
-                                    <TextField
-                                        key={index}
-                                        fullWidth
-                                        label={`Nombre de sala ${index + 1}`}
-                                        value={value}
-                                        onChange={(e) => {
-                                            const updated = [...newRooms];
-                                            updated[index] = e.target.value;
-                                            setNewRooms(updated);
-                                        }}
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <Tooltip title="Nombre para identificar la sala">
-                                                        <InfoOutlined fontSize="small" />
-                                                    </Tooltip>
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                    />
+                                    <Box key={index} sx={{ mb: 2 }}>
+                                        <Typography
+                                            sx={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '16px',
+                                                color: '#330F1B',
+                                            }}
+                                        >
+                                            Nombre de sala {index + 1}
+                                        </Typography>
+
+                                        <TextField
+                                            fullWidth
+                                            value={value}
+                                            onChange={(e) => {
+                                                const updated = [...newRooms];
+                                                updated[index] = e.target.value;
+                                                setNewRooms(updated);
+                                            }}
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <Tooltip
+                                                            title={
+                                                                <Box
+                                                                    sx={{
+                                                                        backgroundColor: "#FFFFFF",
+                                                                        borderRadius: "8px",
+                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                        padding: "8px 12px",
+                                                                        fontSize: "14px",
+                                                                        fontFamily: "Poppins",
+                                                                        color: "#574B4F",
+                                                                        whiteSpace: "pre-line",
+                                                                        transform: "translate(-10px, -22px)",
+                                                                        borderColor: "#00131F3D",
+                                                                        borderStyle: "solid",
+                                                                        borderWidth: "1px"
+                                                                    }}
+                                                                >
+                                                                    <>
+                                                                        • Solo caracteres alfabéticos<br />
+                                                                        • Longitud máxima de 40<br />
+                                                                        caracteres
+                                                                    </>
+                                                                </Box>
+                                                            }
+                                                            placement="bottom-end"
+                                                            componentsProps={{
+                                                                tooltip: {
+                                                                    sx: {
+                                                                        backgroundColor: "transparent",
+                                                                        padding: 0,
+
+                                                                    },
+                                                                },
+                                                            }}
+                                                        >
+                                                            <IconButton
+                                                                disableRipple
+                                                                sx={{
+                                                                    paddingTop: '28px',
+                                                                    backgroundColor: "transparent !important",
+                                                                    "&:hover": {
+                                                                        backgroundColor: "transparent !important",
+                                                                    },
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={infoicon}
+                                                                    alt="info-icon"
+                                                                    style={{ width: 24, height: 24 }}
+                                                                />
+                                                            </IconButton>
+                                                        </Tooltip>
+
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                            sx={{
+                                                width: '340px',
+                                                height: '54px',
+                                                borderColor: "#9B9295",
+                                                '& .MuiOutlinedInput-root': {
+                                                    height: '54px',
+                                                    alignItems: 'start',
+                                                    '& input': {
+                                                        color: '#574B4F',
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '16px',
+                                                        letterSpacing: '0.03px',
+                                                        paddingTop: '15px'
+                                                    },
+
+                                                },
+                                            }}
+                                        />
+                                    </Box>
                                 ))}
+
+
                             </Box>
                         )}
 
                     </Box>
+                </DialogContent>
+                <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: -2 }} />
 
-                    <Box display="flex" justifyContent="space-between" mt={4} px={3} pb={2}>
-                        <SecondaryButton text="Cancelar" onClick={() => setOpenClientModal(false)} />
-                        <MainButton
-                            text={
-                                step === 2 || (step === 1 && isEditClient)
-                                    ? isEditClient ? 'Guardar cambios' : 'Guardar'
-                                    : 'Siguiente'
+                <Box display="flex" justifyContent="space-between" mt={4} px={3} pb={2}
+                    sx={{
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 10
+                    }}
+                >
+                    <SecondaryButton text="Cancelar" onClick={() => setOpenClientModal(false)} />
+                    <MainButton
+                        text={
+                            step === 2 || (step === 1 && isEditClient)
+                                ? isEditClient ? 'Guardar cambios' : 'Guardar'
+                                : 'Siguiente'
+                        }
+
+                        onClick={() => {
+                            if (step === 0) {
+                                const isEmailValid = validateEmailFormat(email);
+                                const isMatch = email === confirmEmail;
+
+                                setEmailError(!isEmailValid);
+                                setConfirmEmailError(!isMatch);
+
+                                if (!isEmailValid || !isMatch) return;
                             }
 
-                            onClick={() => {
-                                if (step === 0) {
-                                    const isEmailValid = validateEmailFormat(email);
-                                    const isMatch = email === confirmEmail;
+                            if (step === 1 && isEditClient) {
+                                handleSubmit();
+                                return;
+                            }
 
-                                    setEmailError(!isEmailValid);
-                                    setConfirmEmailError(!isMatch);
-
-                                    if (!isEmailValid || !isMatch) return;
-                                }
-
-                                if (step === 1 && isEditClient) {
-                                    handleSubmit();
-                                    return;
-                                }
-
-                                if (step === 2) {
-                                    handleSubmit();
-                                } else {
-                                    setStep(step + 1);
-                                }
-                            }}
+                            if (step === 2) {
+                                handleSubmit();
+                            } else {
+                                setStep(step + 1);
+                            }
+                        }}
 
 
-                        />
-                    </Box>
-                </DialogContent>
+                    />
+                </Box>
+
             </Dialog>
 
 
@@ -2527,150 +3167,373 @@ const Clients: React.FC = () => {
                 onSecondaryClick={() => setMainModalDelete(false)}
             />
             <Modal open={rechargeModalOpen} onClose={() => setRechargeModalOpen(false)}>
-                <Box sx={{ background: '#fff', padding: 4, width: 500, margin: '100px auto', borderRadius: 2 }}>
-                    <Typography variant="h6" mb={2} fontFamily="Poppins">Recargar Saldo para {selectedClient?.nombreCliente}</Typography>
-
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                        <InputLabel>Tipo de SMS</InputLabel>
-                        <Select
-                            value={rechargeData.smsType}
-                            onChange={(e) => {
-                                const tipo = e.target.value as 'short' | 'long';
-                                setRechargeData(prev => ({
-                                    ...prev,
-                                    smsType: tipo,
-                                    ratePerMessage:
-                                        tipo === 'short'
-                                            ? selectedClient?.rateForShort ?? 0
-                                            : selectedClient?.rateForLong ?? 0
-                                }));
-                            }}
-                            displayEmpty
-                        >
-                            <MenuItem value="">
-                                <em>Seleccionar servicio</em>
-                            </MenuItem>
-                            <MenuItem value="short">SMS Cortos</MenuItem>
-                            <MenuItem value="long">SMS Largos</MenuItem>
-                        </Select>
-                    </FormControl>
-
-                    <Typography fontWeight="bold" fontFamily="Poppins">Salas:</Typography>
-                    <FormGroup sx={{ mb: 2 }}>
-                        {getRoomsList().map((room, idx) => (
-                            <FormControlLabel
-                                key={idx}
-                                control={
-                                    <Checkbox
-                                        checked={rechargeData.roomsSelected.includes(room)}
-                                        onChange={() => handleToggleRoom(room)}
-                                        checkedIcon={
-                                            <Box
-                                                sx={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    position: 'relative',
-                                                    marginTop: '0px',
-                                                    marginLeft: '0px',
-                                                }}
-                                            >
-                                                <img
-                                                    src={IconCheckBox1}
-                                                    alt="Seleccionado"
-                                                    style={{ width: '24px', height: '24px' }}
-                                                />
-                                            </Box>
-                                        }
-                                    />
-                                }
-                                label={room}
-                                sx={{
-                                    '& .MuiFormControlLabel-label': {
-                                        fontFamily: 'Poppins',
-                                        fontSize: '14px',
-                                        color: '#574B4F',
-                                    }
-                                }}
-                            />
-                        ))}
-                    </FormGroup>
-                    <TextField
-                        label="Tarifa por mensaje"
-                        value={rechargeData.ratePerMessage.toFixed(2)}
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                            readOnly: true
+                <Box sx={{
+                    background: '#fff', padding: 4, width: "556px", height: "656px", margin: '100px auto',
+                    borderRadius: 2, overflowX: "hidden", overflowY: "hidden"
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, marginLeft: "-5px", marginTop: "-12px" }}>
+                        <Typography variant="h6" mb={2} fontFamily="Poppins"
+                            sx={{ color: "#574B4F", fontWeight: 600, fontSize: "20px" }}>
+                            Recargar Saldo para:
+                        </Typography>
+                        <Typography variant="h6" mb={2} fontFamily="Poppins"
+                            sx={{ color: "#843C55", fontWeight: 600, fontSize: "20px" }}>
+                            {selectedClient?.nombreCliente}
+                        </Typography>
+                    </Box>
+                    <IconButton
+                        onClick={() => setRechargeModalOpen(false)}
+                        sx={{
+                            position: 'absolute',
+                            marginTop: '-64px',
+                            marginLeft: '478px',
+                            zIndex: 10
                         }}
-                        fullWidth
-                        margin="normal"
-                    />
-                    <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                            <TextField
-                                label="Monto"
-                                type="number"
-                                fullWidth
-                                value={rechargeData.amount}
-                                onChange={(e) =>
-                                    setRechargeData((prev) => ({
-                                        ...prev,
-                                        amount: parseFloat(e.target.value) || 0,
-                                    }))
-                                }
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                label="Total (con IVA 16%)"
-                                value={`$${((rechargeData.amount || 0) * 1.16).toFixed(2)}`}
-                                fullWidth
-                                InputProps={{ readOnly: true }}
-                            />
-                        </Grid>
-                    </Grid>
-                    <FormControl component="fieldset" sx={{ mt: 3 }}>
-                        <FormLabel component="legend" sx={{ fontWeight: 'bold', fontFamily: 'Poppins' }}>
-                            Tipo de pago
-                        </FormLabel>
-                        <RadioGroup
-                            value={rechargeData.paymentType}
-                            onChange={(e) =>
-                                setRechargeData((prev) => ({
-                                    ...prev,
-                                    paymentType: e.target.value,
-                                }))
-                            }
+                    >
+                        <CloseIcon sx={{ color: '#A6A6A6' }} />
+                    </IconButton>
+
+                    <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: 1, mt: 0.5 }} />
+
+                    <Box sx={{ overflowY: "auto", height: "490px", overflowX: "hidden", width: "515px" }}>
+                        <Typography
+                            sx={{ color: "#330F1B", fontFamily: "Poppins", fontSize: "16px", marginLeft: "15px" }}
                         >
-                            <FormControlLabel value="demo" control={<Radio />} label="Demo" />
-                            <FormControlLabel value="transferencia" control={<Radio />} label="Transferencia bancaria" />
-                            <FormControlLabel value="deposito" control={<Radio />} label="Depósito en efectivo" />
-                        </RadioGroup>
-                    </FormControl>
-                    <Box mt={2}>
-                        <Typography sx={{ fontWeight: 600, fontFamily: 'Poppins', mb: 1 }}>
-                            Fecha de facturación
+                            Servicio
+                        </Typography>
+
+                        <FormControl fullWidth sx={{ mb: 2, marginLeft: "10px" }}>
+
+                            <Select
+                                value={rechargeData.smsType}
+                                onChange={(e) => {
+                                    const tipo = e.target.value as 'short' | 'long';
+                                    setRechargeData(prev => ({
+                                        ...prev,
+                                        smsType: tipo,
+                                        ratePerMessage:
+                                            tipo === 'short'
+                                                ? selectedClient?.rateForShort ?? 0
+                                                : selectedClient?.rateForLong ?? 0
+                                    }));
+                                }}
+                                displayEmpty
+                                renderValue={(selected) =>
+                                    selected ? selected : (
+                                        <span style={{ color: '#786E71', fontSize: '12px', fontFamily: 'Poppins' }}>
+                                            SMS # cortos
+                                        </span>
+                                    )
+                                }
+                                sx={{
+                                    mt: 1,
+                                    width: '215px',
+                                    height: '40px',
+                                    background: '#FFFFFF',
+                                    border: '1px solid #9B9295',
+                                    borderRadius: '8px',
+                                    fontFamily: 'Poppins',
+                                    fontSize: '14px',
+                                    padding: '0 10px',
+                                    '& .MuiSelect-select': {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        height: '40px',
+                                    },
+                                    '& fieldset': {
+                                        border: 'none',
+                                    },
+                                }}
+                            >
+                                <MenuItem value="Corto"
+                                    sx={{
+                                        fontFamily: 'Poppins', fontSize: '12px',
+                                        color: '#645E60', '&:hover': {
+                                            backgroundColor: '#F2EBED'
+                                        }
+                                    }}>
+                                    SMS Cortos</MenuItem>
+                                <MenuItem value="Largo"
+                                    sx={{
+                                        fontFamily: 'Poppins', fontSize: '12px',
+                                        color: '#645E60', '&:hover': {
+                                            backgroundColor: '#F2EBED'
+                                        }
+                                    }}>
+                                    SMS Largos</MenuItem>
+                            </Select>
+                        </FormControl>
+
+
+                        <Typography
+                            sx={{ color: "#330F1B", fontFamily: "Poppins", fontSize: "16px", marginLeft: "10px" }}
+                        >
+                            Seleccionar sala(s)
+                        </Typography>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 2,
+                                height: '140px',
+                                overflowY: 'auto',
+                                width: '480px', marginLeft: "15px"
+                            }}
+                        >
+                            {getRoomsList().map((room, idx) => (
+                                <Box key={idx} sx={{ width: '45%', height: "17px" }}>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={rechargeData.roomsSelected.includes(room)}
+                                                onChange={() => handleToggleRoom(room)}
+                                                checkedIcon={
+                                                    <Box
+                                                        sx={{
+                                                            width: '24px',
+                                                            height: '24px',
+                                                            position: 'relative',
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={IconCheckBox1}
+                                                            alt="Seleccionado"
+                                                            style={{ width: '24px', height: '24px' }}
+                                                        />
+                                                    </Box>
+                                                }
+                                            />
+                                        }
+                                        label={room}
+                                        sx={{
+                                            '& .MuiFormControlLabel-label': {
+                                                fontFamily: 'Poppins',
+                                                fontSize: '14px',
+                                                color: '#574B4F',
+                                            },
+                                        }}
+                                    />
+                                </Box>
+                            ))}
+                        </Box>
+                        <Divider sx={{ width: 'calc(100% - 40px)', marginLeft: '5px', mb: 2, mt: 1 }} />
+
+
+                        <Typography
+                            sx={{
+                                fontFamily: 'Poppins',
+                                fontSize: '16px',
+                                color: shortRateType === 'estandar' ? '#330F1B' : '#D0CDCD',
+                                mt: 3.5, ml: 0.5, mb: -1
+                            }}
+                        >
+                            Tarifa por mensaje
                         </Typography>
                         <TextField
-                            value={selectedDate ? selectedDate.toLocaleDateString('es-MX') : ''}
-                            onClick={handleOpenDatePicker}
-                            placeholder="Seleccionar fecha"
-                            fullWidth
+                            value={rechargeData.ratePerMessage.toFixed(2)}
                             InputProps={{
-                                readOnly: true,
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <img src="/icons/calendar.svg" alt="Calendario" style={{ width: 18 }} />
-                                    </InputAdornment>
-                                ),
+                                startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                readOnly: true
+                            }}
+                            fullWidth
+                            margin="normal"
+                            sx={{
+                                mt: 2, mb: 2,
+                                width: '216px',
+                                height: '54px',
+                                background: '#E5E4E4',
+                                border: '1px solid #9B9295',
+                                borderRadius: '8px',
+                                '& .MuiOutlinedInput-root': {
+                                    background: '#E5E4E4',
+                                    height: '54px',
+                                    borderRadius: '8px',
+                                    '& fieldset': {
+                                        borderColor: '#9B9295',
+                                    },
+                                },
+                                '& .MuiInputAdornment-root': {
+                                    color: '#645E60',
+                                    fontFamily: 'Poppins',
+                                    fontSize: '14px'
+                                },
+                                '& input': {
+                                    fontFamily: 'Poppins',
+                                    fontSize: '16px',
+                                    color: '#574B4F',
+                                },
                             }}
                         />
+
+                        <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                                <Typography
+                                    sx={{
+                                        fontFamily: 'Poppins',
+                                        fontSize: '16px',
+                                        color: shortRateType === 'estandar' ? '#330F1B' : '#D0CDCD',
+                                        mt: 1.5, ml: 0.5, mb: 1
+                                    }}
+                                >
+                                    Monto por servicio
+                                </Typography>
+                                <TextField
+                                    type="number"
+                                    fullWidth
+                                    sx={{
+                                        mt: 1,
+                                        width: '216px',
+                                        height: '54px',
+                                        background: '#FFFFFF',
+                                        border: '1px solid #9B9295',
+                                        borderRadius: '8px',
+                                        '& .MuiOutlinedInput-root': {
+                                            background: '#FFFFFF',
+                                            height: '54px',
+                                            borderRadius: '8px',
+                                            '& fieldset': {
+                                                borderColor: '#9B9295',
+                                            },
+                                        },
+                                        '& input': {
+                                            fontFamily: 'Poppins',
+                                            fontSize: '16px',
+                                            color: '#330F1B',
+                                        },
+                                    }}
+                                    value={rechargeData.amount}
+                                    onChange={(e) =>
+                                        setRechargeData((prev) => ({
+                                            ...prev,
+                                            amount: parseFloat(e.target.value) || 0,
+                                        }))
+                                    }
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography
+                                    sx={{
+                                        fontFamily: 'Poppins',
+                                        fontSize: '16px',
+                                        color: '#330F1B',
+                                        mt: 1.5, ml: 0.5, mb: 1
+                                    }}
+                                >
+                                    Total (monto+IVA)
+                                </Typography>
+                                <TextField
+                                    value={`$${((rechargeData.amount || 0) * 1.16).toFixed(2)}`}
+                                    fullWidth
+                                    InputProps={{ readOnly: true }}
+                                    sx={{
+                                        mt: 1,
+                                        width: '216px',
+                                        height: '54px',
+                                        background: '#FFFFFF',
+                                        border: '1px solid #9B9295',
+                                        borderRadius: '8px',
+                                        '& .MuiOutlinedInput-root': {
+                                            background: '#FFFFFF',
+                                            height: '54px',
+                                            borderRadius: '8px',
+                                            '& fieldset': {
+                                                borderColor: '#9B9295',
+                                            },
+                                        },
+                                        '& input': {
+                                            fontFamily: 'Poppins',
+                                            fontSize: '16px',
+                                            color: '#330F1B',
+                                        },
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
+
+                        <FormControl component="fieldset" sx={{ mt: 3 }}>
+                            <FormLabel component="legend" sx={{
+                                fontWeight: 500, fontFamily: 'Poppins',
+                                color: "#330F1B", fontSize: "18px", marginLeft: "12px", mb: 0.5
+                            }}>
+                                Tipo de pago
+                            </FormLabel>
+                            <FormControl>
+                                <RadioGroup
+                                    value={rechargeData.paymentType}
+                                    onChange={(e) =>
+                                        setRechargeData((prev) => ({
+                                            ...prev,
+                                            paymentType: e.target.value,
+                                        }))
+                                    }
+                                >
+                                    {[
+                                        { value: 'demo', label: 'Demo' },
+                                        { value: 'transferencia', label: 'Transferencia bancaria' },
+                                        { value: 'deposito', label: 'Depósito en efectivo' },
+                                    ].map((option) => (
+                                        <FormControlLabel
+                                            key={option.value}
+                                            value={option.value}
+                                            control={
+                                                <Radio
+                                                    sx={{
+                                                        marginLeft: "15px", mb: -0.5,
+                                                        color: '#786F71',
+                                                        '&.Mui-checked': {
+                                                            color: '#8F4D63',
+                                                        },
+                                                    }}
+                                                />
+                                            }
+                                            label={option.label}
+                                            sx={{
+                                                '& .MuiFormControlLabel-label': {
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: '16px',
+                                                    color: rechargeData.paymentType === option.value ? '#8F4D63' : '#786F71',
+                                                },
+                                            }}
+                                        />
+                                    ))}
+                                </RadioGroup>
+
+                            </FormControl>
+
+                        </FormControl>
+                        <Box mt={2}>
+                            <Typography sx={{
+                                fontWeight: 500, fontFamily: 'Poppins', mb: 1,
+                                color: "#330F1B", marginLeft: "10px", fontSize: "16px"
+                            }}>
+                                Fecha de facturación
+                            </Typography>
+                            <TextField
+                                value={selectedDate ? selectedDate.toLocaleDateString('es-MX') : ''}
+                                onClick={handleOpenDatePicker}
+                                placeholder="Seleccionar fecha"
+                                fullWidth
+                                InputProps={{
+                                    readOnly: true,
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <img src="/icons/calendar.svg" alt="Calendario" style={{ width: 18 }} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+
+                        </Box>
                     </Box>
+
+                    <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: 1, mt: 0.5 }} />
+
                     <Box mt={3} display="flex" justifyContent="flex-end">
                         <SecondaryButton text='Cancelar' onClick={() => setRechargeModalOpen(false)} />
                         <MainButton text='Recargar' onClick={handleSaveRecharge} />
                     </Box>
                 </Box>
-            </Modal>
+            </Modal >
             <CustomDateTimePicker
                 open={datePickerOpen}
                 anchorEl={anchorEl2}
@@ -2687,13 +3550,15 @@ const Clients: React.FC = () => {
                 onClose={() => setDatePickerOpen(false)}
             />
 
-            {ShowSnackBar && (
-                <SnackBar
-                    message={MessageSnack}
-                    buttonText="Cerrar"
-                    onClose={() => setShowSnackBar(false)}
-                />
-            )}
+            {
+                ShowSnackBar && (
+                    <SnackBar
+                        message={MessageSnack}
+                        buttonText="Cerrar"
+                        onClose={() => setShowSnackBar(false)}
+                    />
+                )
+            }
 
             <ModalError
                 isOpen={ShowModalError}
@@ -2702,7 +3567,7 @@ const Clients: React.FC = () => {
                 buttonText="Cerrar"
                 onClose={() => setShowModalError(false)}
             />
-        </Box>
+        </Box >
     );
 };
 

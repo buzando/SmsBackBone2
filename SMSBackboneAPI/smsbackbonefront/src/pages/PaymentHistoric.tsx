@@ -131,7 +131,7 @@ const PaymentHistoric: React.FC = () => {
     };
 
     return (
-        <div style={{ padding: '20px', maxWidth: '1140px', marginTop: '-70px', marginLeft: "40px" }}>
+        <div style={{ padding: '20px', maxWidth: '1140px', marginTop: '-70px', marginLeft: "40px", marginBottom: "40px" }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
 
                 <IconButton
