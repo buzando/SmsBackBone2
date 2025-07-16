@@ -46,6 +46,7 @@ const Autentification: React.FC = () => {
             const obj = JSON.parse(usuario);
             if (obj.rol === 'Root' || obj.rol === 'Telco') {
                 navigate('/');
+                return;
             }
             if (obj.twoFactorAuthentication) {
                   navigate('/chooseroom');

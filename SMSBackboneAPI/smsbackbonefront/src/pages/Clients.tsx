@@ -686,7 +686,8 @@ const Clients: React.FC = () => {
             console.error("No se encontró el ID del usuario.");
             return;
         }
-
+        const selectedRoom = JSON.parse(localStorage.getItem('selectedRoom') || '{}');
+        const roomId = selectedRoom?.id;
         try {
             const payload = {
                 IdUser: parsedUser.id,
@@ -697,7 +698,8 @@ const Clients: React.FC = () => {
                 amount: rechargeData.amount,
                 total: rechargeData.totalWithTax,
                 paymentType: rechargeData.paymentType,
-                billingDate: rechargeData.billingDate
+                billingDate: rechargeData.billingDate,
+                IdRoom: roomId
             };
 
             const url = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_RECHARGE_CLIENT}`;
@@ -3558,7 +3560,7 @@ const Clients: React.FC = () => {
 
                     <Box mt={3} display="flex" justifyContent="flex-end">
                         <SecondaryButton text='Cancelar' onClick={() => setRechargeModalOpen(false)} />
-                        <MainButton text='Recargar' onClick={handleSaveRecharge} isLoading={isSavingClient}/>
+                        <MainButton text='Recargar' onClick={handleSaveRecharge} isLoading={isSavingClient} />
                     </Box>
                 </Box>
             </Modal >

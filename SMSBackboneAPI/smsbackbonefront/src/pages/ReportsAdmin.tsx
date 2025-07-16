@@ -373,7 +373,7 @@ const ReportsAdmin = () => {
 
                     {/* Flechas + Exportaciones */}
                     <Box display="flex" alignItems="center" gap={1} height={"25px"} marginBottom={"-5px"} marginTop={"-5px"}>
-                        <Box sx={{ marginRight: "800px" }}>
+                        <Box sx={{ marginRight: "790px" }}>
                             <Tooltip title="Primera página">
                                 <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
                                     <Box
