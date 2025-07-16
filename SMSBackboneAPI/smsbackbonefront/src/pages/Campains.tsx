@@ -2995,13 +2995,15 @@ const Campains: React.FC = () => {
             }}
           >
             Crear campaña SMS
-            <IconButton onClick={handleCloseModalCampaña}>
-              <CloseIcon sx={{
+            <IconButton onClick={handleCloseModalCampaña}
+              sx={{
                 fontSize: "22px", color: "#574B4F",
-                marginLeft: "65px",
-                marginTop: "-20px",
+                marginLeft: "744px",
+                marginTop: "-28px",
                 position: "absolute"
-              }} />
+              }}
+            >
+              <CloseIcon />
             </IconButton>
           </DialogTitle>
 
@@ -3415,7 +3417,7 @@ const Campains: React.FC = () => {
                                 {
                                   name: 'offset',
                                   options: {
-                                    offset: [-0, -10] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                    offset: [-0, -10] // [h,v]
                                   }
                                 }
                               ]
@@ -4882,7 +4884,7 @@ const Campains: React.FC = () => {
                       <Divider
                         sx={{
                           position: "absolute",
-                          width: 'calc(80% + 60px)', // compensa 15px de padding a cada lado
+                          width: 'calc(80% + 60px)',
                           marginTop: '230px',
                         }}
                       />

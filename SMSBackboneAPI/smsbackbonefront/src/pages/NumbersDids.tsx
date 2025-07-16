@@ -16,6 +16,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import IconSDown from "../assets/IconSDown.svg";
+import IconSEye from "../assets/IconSEye.svg";
 import ListItemText from '@mui/material/ListItemText';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
@@ -1004,7 +1006,7 @@ const NumbersDids: React.FC = () => {
                                     color: '#330F1B', fontWeight: 500, borderBottom: '1px solid #E0E0E0'
                                 }}>
                                     <th style={{
-                                        padding: '10px', textAlign: 'left',
+                                        padding: '8px', textAlign: 'left',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Número DID</th>
                                     <th style={{
@@ -1027,6 +1029,18 @@ const NumbersDids: React.FC = () => {
                                         padding: '6px', textAlign: 'left',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Estatus</th>
+                                    <td style={{
+                                        position: 'sticky',
+                                        right: -30,
+                                        background: '#fff', borderLeft: '1px solid #E0E0E0',
+                                        boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
+                                        zIndex: 2,
+                                        padding: '6px', width: '35px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                        textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+
+                                    }}>
+
+                                    </td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1103,6 +1117,13 @@ const NumbersDids: React.FC = () => {
                         setshowModalNumber(true);
                         setAnchorEl(null);
                     }}
+                    sx={{
+                        fontFamily: 'Poppins',
+                        fontSize: '14px',
+                        '&:hover': {
+                            backgroundColor: '#F2EBED'
+                        }
+                    }}
                 >
                     <Box display="flex" alignItems="center" gap={1}>
                         <img src={Thrashicon} alt="Eliminar" style={{ width: 24, height: 24 }} />
@@ -1118,10 +1139,21 @@ const NumbersDids: React.FC = () => {
                         setshowModalNumber(true);
                         setAnchorEl(null);
                     }}
+                    sx={{
+                        fontFamily: 'Poppins',
+                        fontSize: '14px',
+                        '&:hover': {
+                            backgroundColor: '#F2EBED'
+                        }
+                    }}
                 >
                     <Box display="flex" alignItems="center" gap={1}>
-                        <img src={Thrashicon} alt="Dar de baja" style={{ width: 24, height: 24 }} />
-                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F" }}>
+                        <img
+                            src={IconSDown}
+                            alt="Recarga"
+                            style={{ width: '24px', height: '24px', marginRight: "10px" }}
+                        />
+                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F", marginLeft: "-10px" }}>
                             Dar de baja
                         </Typography>
                     </Box>
@@ -2004,7 +2036,7 @@ const NumbersDids: React.FC = () => {
                                             <Box
                                                 display="flex"
                                                 justifyContent="center"
-                                                alignItems="flex-start" // si no necesitas centrar verticalmente, mantenlo así
+                                                alignItems="flex-start"
                                                 gap={3}
                                                 mt={2}
                                                 flexWrap="wrap"
@@ -2023,12 +2055,12 @@ const NumbersDids: React.FC = () => {
                                                         border: fileError
                                                             ? '2px solid #EF5466'
                                                             : fileSuccess
-                                                                ? '2px solid #8F4E63CC' // ✅ borde éxito
+                                                                ? '2px solid #8F4E63CC'
                                                                 : '2px dashed #D9B4C3',
                                                         backgroundColor: fileError
                                                             ? '#FFF4F5'
                                                             : fileSuccess
-                                                                ? '#E5CBD333'           // ✅ fondo éxito
+                                                                ? '#E5CBD333'
                                                                 : 'transparent',
                                                         borderRadius: '8px',
                                                         width: '160px',
@@ -2101,7 +2133,7 @@ const NumbersDids: React.FC = () => {
                                                                     {
                                                                         name: 'offset',
                                                                         options: {
-                                                                            offset: [35, -180] // 👉 [horizontal, vertical]
+                                                                            offset: [35, -180]
                                                                         }
                                                                     }
                                                                 ]
@@ -2223,7 +2255,10 @@ const NumbersDids: React.FC = () => {
                                                                 textAlign: 'center',
                                                                 wordBreak: 'break-word',
                                                                 maxWidth: '142px',
-                                                                mt: '1px'
+                                                                mt: '1px',
+                                                                whiteSpace: 'nowrap',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
                                                             }}
                                                         >
                                                             {fileSuccess && uploadedFile
@@ -2265,8 +2300,14 @@ const NumbersDids: React.FC = () => {
 
                                         )}
                                         {manageOperation === 'eliminar' && (
-                                            <Box sx={{ display: 'flex', gap: 2, mt: 2, alignItems: 'flex-start' }}>
-
+                                            <Box
+                                                display="flex"
+                                                justifyContent="center"
+                                                alignItems="flex-start"
+                                                gap={3}
+                                                mt={2}
+                                                flexWrap="wrap"
+                                            >
                                                 <Box
                                                     marginBottom={'25px'}
                                                     onClick={() => !hasPhoneInput && fileInputRef.current?.click()}
@@ -2524,8 +2565,14 @@ const NumbersDids: React.FC = () => {
 
                                         )}
                                         {manageOperation === 'darDeBaja' && (
-                                            <Box display="flex" alignItems="flex-start" gap={3} mt={2} flexWrap="wrap">
-
+                                            <Box
+                                                display="flex"
+                                                justifyContent="center"
+                                                alignItems="flex-start"
+                                                gap={3}
+                                                mt={2}
+                                                flexWrap="wrap"
+                                            >
                                                 <Box
                                                     marginBottom={'25px'}
                                                     onClick={() => !hasPhoneInput && fileInputRef.current?.click()}
@@ -2965,7 +3012,36 @@ const NumbersDids: React.FC = () => {
                                                     )}
 
                                                     {index > 0 && (
-                                                        <Tooltip title="Eliminar teléfono">
+                                                        <Tooltip title="Eliminar teléfono" arrow placement="top"
+                                                            componentsProps={{
+                                                                tooltip: {
+                                                                    sx: {
+                                                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                        color: "#CCC3C3",
+                                                                        fontFamily: "Poppins, sans-serif",
+                                                                        fontSize: "12px",
+                                                                        padding: "6px 8px",
+                                                                        borderRadius: "8px",
+                                                                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                                    }
+                                                                },
+                                                                arrow: {
+                                                                    sx: {
+                                                                        color: "rgba(0, 0, 0, 0.8)"
+                                                                    }
+                                                                }
+                                                            }}
+                                                            PopperProps={{
+                                                                modifiers: [
+                                                                    {
+                                                                        name: 'offset',
+                                                                        options: {
+                                                                            offset: [-0, -10] // [h,v]
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }}
+                                                        >
                                                             <IconButton onClick={() => handleRemoveIndividualPhone(index)}>
                                                                 <img src={Thrashicon} alt="Eliminar" style={{ width: 24, height: 24 }} />
                                                             </IconButton>
@@ -3022,32 +3098,86 @@ const NumbersDids: React.FC = () => {
                     {detailedView && (
                         <IconButton
                             onClick={() => setDetailedView(false)}
-                            sx={{ position: 'absolute', top: 16, left: 16 }}
+                            sx={{ position: 'absolute', marginTop: "46px", marginLeft: "-14px" }}
                         >
-                            <Tooltip title="Regresar" arrow>
-                                <img src={ArrowBackIosNewIcon} style={{ width: 16, transform: 'rotate(90deg)' }} />
+                            <Tooltip
+                                title="Regresar" arrow placement="top"
+                                componentsProps={{
+                                    tooltip: {
+                                        sx: {
+                                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                            color: "#CCC3C3",
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "12px",
+                                            padding: "6px 8px",
+                                            borderRadius: "8px",
+                                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                        }
+                                    },
+                                    arrow: {
+                                        sx: {
+                                            color: "rgba(0, 0, 0, 0.8)"
+                                        }
+                                    }
+                                }}
+                                PopperProps={{
+                                    modifiers: [
+                                        {
+                                            name: 'offset',
+                                            options: {
+                                                offset: [-0, -10] // [h,v]
+                                            }
+                                        }
+                                    ]
+                                }}
+                            >
+                                <img src={ArrowBackIosNewIcon} style={{ width: 24, transform: 'rotate(-90deg)' }} />
                             </Tooltip>
                         </IconButton>
                     )}
 
                     {/* Título */}
-                    <Typography fontWeight="600" fontSize="20px" mb={1} textAlign="center">
+                    <Typography fontWeight="600" fontSize="20px" mb={1} textAlign="left"
+                        sx={{ fontFamily: "Poppins", mt: -1 }}
+                    >
                         Gestionar números DIDS
                     </Typography>
+                    <IconButton
+                        onClick={() => setShowUploadStatusModal(false)}
+                        sx={{
+                            color: "#574B4F",
+                            marginLeft: "502px",
+                            marginTop: "-56px",
+                            position: "absolute"
+                        }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
 
-                    <Divider sx={{ mb: 3 }} />
+                    <Divider sx={{ width: 'calc(100% + 64px)', mb: 2, mt: 2, marginLeft: "-32px" }} />
+
 
                     {uploadSummary && !detailedView && manageOperation == 'agregar' && (
                         <>
-                            <Typography fontWeight="600" fontSize="16px" mb={2}>Estado de carga</Typography>
-                            <Box display="flex" gap={3}>
+                            <Typography fontWeight="500" fontSize="16px" mb={1.5}
+                                sx={{ fontFamily: "Poppins", color: "#330F1B" }}
+                            >
+                                Estado de Carga
+                            </Typography>
+
+                            <Box display="flex" gap={3}
+                                sx={{
+                                    width: "533px", height: "192px",
+                                    borderRadius: "12px", border: "1px solid #E6E4E4",
+                                    padding: "16px", marginLeft: "-10px"
+                                }}>
                                 {manageByList && (
                                     <Box
                                         sx={{
                                             border: '2px solid #D9B4C3',
                                             borderRadius: '12px',
                                             padding: '16px',
-                                            width: '170px',
+                                            width: '160px', height: "160px",
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
@@ -3056,23 +3186,93 @@ const NumbersDids: React.FC = () => {
                                             position: 'relative'
                                         }}
                                     >
-                                        <Tooltip title="Este resumen corresponde al archivo recién cargado">
-                                            <img src={infoicon} alt="info" style={{ position: 'absolute', top: 12, right: 12, width: 20 }} />
+                                        <Tooltip
+                                            title={
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        Este resumen corresponde<br />
+                                                        al archivo recién cargado<br />
+                                                    </>
+                                                </Box>
+                                            }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <img src={infoicon} alt="info" style={{ position: 'absolute', top: 12, right: 12, width: 24 }} />
                                         </Tooltip>
-                                        <img src={CloudCheckedIcon} alt="éxito" style={{ width: 48, marginBottom: 8 }} />
-                                        <Typography fontWeight="600" fontSize="14px" color="#8F4D63">Archivo cargado</Typography>
-                                        <Typography fontSize="12px" color="#574B4F" sx={{ mt: 0.5 }}>{uploadSummary.fileName}</Typography>
-                                        <Typography fontSize="12px" color="#574B4F" sx={{ opacity: 0.7 }}>Total de registros: {uploadSummary.total}</Typography>
+                                        <img src={CloudCheckedIcon} alt="éxito" style={{ width: 48, marginBottom: 10, marginTop: 5 }} />
+                                        <Typography
+                                            sx={{
+                                                fontWeight: 600,
+                                                fontFamily: "Poppins",
+                                                color: "#330F1B",
+                                                fontSize: '12px',
+                                            }}
+                                        >
+                                            Archivo cargado
+                                        </Typography>
+                                        <Typography fontSize="12px" color="#574B4F"
+                                            sx={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '10px',
+                                                color: '#574B4F',
+                                                opacity: 1,
+                                                textAlign: 'center',
+                                                wordBreak: 'break-word',
+                                                maxWidth: '142px',
+                                                mt: '3px',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                            {uploadSummary.fileName}
+                                        </Typography>
+                                        <Typography
+                                            sx={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '10px',
+                                                color: '#574B4F',
+                                                opacity: 1,
+                                                textAlign: 'center',
+                                                mt: '1px'
+                                            }}>
+                                            Total de registros: {uploadSummary.total}
+                                        </Typography>
                                     </Box>
                                 )}
 
 
                                 {/* Tabla porcentajes */}
                                 <Box flex={1}>
-                                    <Box display="flex" fontWeight="600" fontSize="14px" mb={1}>
-                                        <Box width="33%">Estado</Box>
-                                        <Box width="33%">Números</Box>
-                                        <Box width="34%">Porcentaje</Box>
+                                    <Box display="flex" fontWeight="500" fontSize="14px" mb={1}
+                                        sx={{ fontFamily: "Poppins", color: "#574B4F", }}
+                                    >
+                                        <Box width="95px">Estado</Box>
+                                        <Box width="80px">Números</Box>
+                                        <Box width="140px">Porcentaje</Box>
                                     </Box>
                                     {[
                                         { label: 'Cargados', value: uploadSummary.success },
@@ -3080,76 +3280,145 @@ const NumbersDids: React.FC = () => {
                                     ].map(({ label, value }) => {
                                         const pct = Math.round((value / uploadSummary.total) * 100);
                                         return (
-                                            <Box key={label} display="flex" alignItems="center" mb={1}>
-                                                <Box width="33%">{label}</Box>
-                                                <Box width="33%">{value}</Box>
-                                                <Box width="34%" display="flex" alignItems="center" gap={1}>
-                                                    <Box flex={1} height="8px" borderRadius="4px" sx={{ backgroundColor: '#E0D1D6' }}>
-                                                        <Box width={`${pct}%`} height="100%" borderRadius="4px" sx={{ backgroundColor: '#8F4D63' }} />
+                                            <Box key={label} display="flex" alignItems="center" mb={-1}>
+                                                <Box width="95px">
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '12px',
+                                                            color: '#574B4F',
+                                                        }}
+                                                    >
+                                                        {label}
+                                                    </Typography>
+                                                </Box>
+                                                <Box width="80px">
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '12px',
+                                                            color: '#574B4F',
+                                                        }}
+                                                    >
+                                                        {value}
+                                                    </Typography>
+                                                </Box>
+                                                <Box width="150px" display="flex" alignItems="center" gap={1}>
+                                                    <Box
+                                                        flex={1}
+                                                        height="8px"
+                                                        borderRadius="4px"
+                                                        sx={{ backgroundColor: '#E0D1D6' }}
+                                                    >
+                                                        <Box
+                                                            width={`${pct}%`}
+                                                            height="100%"
+                                                            borderRadius="4px"
+                                                            sx={{ backgroundColor: '#8F4D63' }}
+                                                        />
                                                     </Box>
-                                                    <Typography fontSize="13px">{pct}%</Typography>
-                                                    <IconButton onClick={() => setDetailedView(true)}><img src={seachicon} style={{ width: 16 }} /></IconButton>
+                                                    <Typography
+                                                        fontSize="13px"
+                                                        sx={{ fontFamily: 'Poppins', color: '#574B4F' }}
+                                                    >
+                                                        {pct}%
+                                                    </Typography>
+                                                    <IconButton onClick={() => setDetailedView(true)}>
+                                                        <img src={IconSEye} style={{ width: 24 }} />
+                                                    </IconButton>
                                                 </Box>
                                             </Box>
                                         );
                                     })}
                                 </Box>
+
                             </Box>
                         </>
                     )}
 
                     {uploadSummary && detailedView && manageOperation == "agregar" && (
                         <>
-                            <Typography fontWeight="600" fontSize="16px" mb={2}>Detalle de carga</Typography>
-                            <Typography fontWeight={500} fontSize="15px" mb={2}>Teléfonos</Typography>
-                            <Box display="flex" justifyContent="space-between" mt={2}>
-                                {[
-                                    { label: 'Cargados', color: '#A178E7', value: uploadSummary.success },
-                                    { label: 'No cargados:\nCaracteres mínimos no cumplidos.', color: '#F1B13F', value: uploadSummary.errors?.minLength || 0 },
-                                    { label: 'No cargados:\nContiene caracteres especiales.', color: '#3DB4E7', value: uploadSummary.errors?.specialChars || 0 },
-                                    { label: 'No cargados:\nContiene caracteres alfanuméricos.', color: '#F280B9', value: uploadSummary.errors?.alphanumeric || 0 },
-                                    { label: 'No cargados:\nContiene repetidos.', color: '#B3B3FF', value: uploadSummary.errors?.duplicated || 0 },
-                                ]
-                                    .map(({ label, color, value }, i, arr) => {
-                                        const visibleItems = 5;
-                                        return (
-                                            <Box key={i} textAlign="center" width={`${100 / visibleItems}%`}>
-                                                <Typography fontSize="10px" color={color} whiteSpace="pre-line">{label}</Typography>
-                                                <Typography fontSize="20px" fontWeight="bold" color={color}>{value}</Typography>
-                                                <Typography fontSize="12px" color={color}>
-                                                    {uploadSummary.total ? Math.round((value / uploadSummary.total) * 100) : 0}%
-                                                </Typography>
-                                                <Box
-                                                    sx={{
-                                                        width: '100%',
-                                                        height: '8px',
-                                                        borderRadius: '4px',
-                                                        mt: 1,
-                                                        backgroundColor: value > 0 ? color : '#F5F5F5', // 🔥 solo pinta si hay valor
-                                                        opacity: value > 0 ? 0.8 : 0.3,
-                                                    }}
-                                                />
-                                            </Box>
-                                        );
-                                    })}
+                            <Typography fontWeight="500" fontSize="16px" mb={2} mt={-0.2}
+                                sx={{ fontFamily: "Poppins", color: "#330F1B", marginLeft: "25px" }}
+                            >
+                                Detalle de carga
+                            </Typography>
 
+                            <Box sx={{
+                                width: "533px", height: "187px",
+                                borderRadius: "12px", border: "1px solid #E6E4E4",
+                                padding: "10px", marginLeft: "-10px"
+                            }}>
+                                <Typography fontWeight={500} fontSize="16px" mb={2}
+                                    sx={{ fontFamily: "Poppins", color: "#574B4F", marginLeft: "15px" }}
+                                >
+                                    Teléfonos
+                                </Typography>
+                                <Box display="flex" justifyContent="space-between" mt={2} marginLeft={"-20px"}>
+                                    {[
+                                        { label: 'Cargados', color: '#A178E7', value: uploadSummary.success },
+                                        { label: 'No cargados:\nCaracteres mínimos no cumplidos.', color: '#F1B13F', value: uploadSummary.errors?.minLength || 0 },
+                                        { label: 'No cargados:\nContiene caracteres especiales.', color: '#3DB4E7', value: uploadSummary.errors?.specialChars || 0 },
+                                        { label: 'No cargados:\nContiene caracteres alfanuméricos.', color: '#F280B9', value: uploadSummary.errors?.alphanumeric || 0 },
+                                        { label: 'No cargados:\nContiene repetidos.', color: '#B3B3FF', value: uploadSummary.errors?.duplicated || 0 },
+                                    ]
+                                        .map(({ label, color, value }, i, arr) => {
+                                            const visibleItems = 5;
+                                            return (
+                                                <Box key={i} textAlign="center" width={`${98 / visibleItems}%`}>
+                                                    <Box
+                                                        sx={{
+                                                            width: '106%',
+                                                            height: '12px',
+                                                            borderRadius: '0px 8px 8px 0px',
+                                                            mt: 1,
+                                                            backgroundColor: value > 0 ? color : '#F5F5F5', //  solo pinta si hay valor
+                                                            opacity: value > 0 ? 0.8 : 0.3,
+                                                        }}
+                                                    />
+                                                    <Typography fontSize="10px" color={"#574B4F"} fontFamily={"Poppins"} whiteSpace="pre-line"
+                                                        sx={{ opacity: 0.8 }}
+                                                    >
+                                                        {label}
+                                                    </Typography>
+                                                    <Typography fontSize="20px" fontWeight="bold" color={color} fontFamily={"Poppins"}>
+                                                        {value}
+                                                    </Typography>
+                                                    <Typography fontSize="12px" color={color} fontFamily={"Poppins"}
+                                                        marginTop={"5px"} marginLeft={"8px"}>
+                                                        {uploadSummary.total ? Math.round((value / uploadSummary.total) * 100) : 0}%
+                                                    </Typography>
+
+                                                </Box>
+                                            );
+                                        })}
+
+                                </Box>
                             </Box>
-
-                            <Divider sx={{ my: 2, borderColor: '#E0E0E0' }} />
                         </>
                     )}
 
                     {manageOperation === 'darDeBaja' && uploadSummary && !detailedView && (
                         <>
-                            <Typography fontWeight="600" fontSize="16px" mb={2}>Estado de carga</Typography>
-                            <Box display="flex" gap={3}>
+
+                            <Typography fontWeight="500" fontSize="16px" mb={1.5}
+                                sx={{ fontFamily: "Poppins", color: "#330F1B" }}
+                            >
+                                Estado de Carga
+                            </Typography>
+                            <Box display="flex" gap={3}
+                                sx={{
+                                    width: "533px", height: "192px",
+                                    borderRadius: "12px", border: "1px solid #E6E4E4",
+                                    padding: "16px", marginLeft: "-10px"
+                                }}>
                                 {manageByList && (
                                     <Box
                                         sx={{
                                             border: '2px solid #D9B4C3',
                                             borderRadius: '12px',
                                             padding: '16px',
-                                            width: '170px',
+                                            width: '160px', height: "160px",
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
@@ -3158,23 +3427,92 @@ const NumbersDids: React.FC = () => {
                                             position: 'relative'
                                         }}
                                     >
-                                        <Tooltip title="Este resumen corresponde al archivo recién cargado">
+                                        <Tooltip
+                                            title={
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        Este resumen corresponde<br />
+                                                        al archivo recién cargado<br />
+                                                    </>
+                                                </Box>
+                                            }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
                                             <img src={infoicon} alt="info" style={{ position: 'absolute', top: 12, right: 12, width: 20 }} />
                                         </Tooltip>
                                         <img src={CloudCheckedIcon} alt="éxito" style={{ width: 48, marginBottom: 8 }} />
-                                        <Typography fontWeight="600" fontSize="14px" color="#8F4D63">Archivo cargado</Typography>
-                                        <Typography fontSize="12px" color="#574B4F" sx={{ mt: 0.5 }}>{uploadSummary.fileName}</Typography>
-                                        <Typography fontSize="12px" color="#574B4F" sx={{ opacity: 0.7 }}>Total de registros: {uploadSummary.total}</Typography>
+                                        <Typography fontWeight="600" fontSize="14px" color="#8F4D63"
+                                            sx={{
+                                                fontWeight: 600,
+                                                fontFamily: "Poppins",
+                                                color: "#330F1B",
+                                                fontSize: '12px',
+                                            }}>
+                                            Archivo cargado
+                                        </Typography>
+                                        <Typography fontSize="12px" color="#574B4F"
+                                            sx={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '10px',
+                                                color: '#574B4F',
+                                                opacity: 1,
+                                                textAlign: 'center',
+                                                wordBreak: 'break-word',
+                                                maxWidth: '142px',
+                                                mt: '3px',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                            {uploadSummary.fileName}
+                                        </Typography>
+                                        <Typography fontSize="12px" color="#574B4F"
+                                            sx={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '10px',
+                                                color: '#574B4F',
+                                                opacity: 1,
+                                                textAlign: 'center',
+                                                mt: '1px'
+                                            }}>
+                                            Total de registros: {uploadSummary.total}
+                                        </Typography>
                                     </Box>
                                 )}
 
 
                                 {/* Tabla porcentajes */}
                                 <Box flex={1}>
-                                    <Box display="flex" fontWeight="600" fontSize="14px" mb={1}>
-                                        <Box width="33%">Estado</Box>
-                                        <Box width="33%">Números</Box>
-                                        <Box width="34%">Porcentaje</Box>
+                                    <Box display="flex" fontWeight="500" fontSize="14px" mb={1}
+                                        sx={{ fontFamily: "Poppins", color: "#574B4F", }}
+                                    >
+                                        <Box width="95px">Estado</Box>
+                                        <Box width="80px">Números</Box>
+                                        <Box width="140px">Porcentaje</Box>
                                     </Box>
                                     {[
                                         { label: 'Baja', value: uploadSummary.success },
@@ -3183,14 +3521,50 @@ const NumbersDids: React.FC = () => {
                                         const pct = Math.round((value / uploadSummary.total) * 100);
                                         return (
                                             <Box key={label} display="flex" alignItems="center" mb={1}>
-                                                <Box width="33%">{label}</Box>
-                                                <Box width="33%">{value}</Box>
-                                                <Box width="34%" display="flex" alignItems="center" gap={1}>
-                                                    <Box flex={1} height="8px" borderRadius="4px" sx={{ backgroundColor: '#E0D1D6' }}>
-                                                        <Box width={`${pct}%`} height="100%" borderRadius="4px" sx={{ backgroundColor: '#8F4D63' }} />
+                                                <Box width="95px">
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '12px',
+                                                            color: '#574B4F',
+                                                        }}
+                                                    >
+                                                        {label}
+                                                    </Typography>
+                                                </Box>
+                                                <Box width="80px">
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '12px',
+                                                            color: '#574B4F',
+                                                        }}
+                                                    >
+                                                        {value}
+                                                    </Typography>
+                                                </Box>
+                                                <Box width="150px" display="flex" alignItems="center" gap={1}>
+                                                    <Box
+                                                        flex={1}
+                                                        height="8px"
+                                                        borderRadius="4px"
+                                                        sx={{ backgroundColor: '#E0D1D6' }}
+                                                    >
+                                                        <Box
+                                                            width={`${pct}%`}
+                                                            height="100%"
+                                                            borderRadius="4px"
+                                                            sx={{ backgroundColor: '#8F4D63' }}
+                                                        />
                                                     </Box>
-                                                    <Typography fontSize="13px">{pct}%</Typography>
-                                                    <IconButton onClick={() => setDetailedView(true)}><img src={seachicon} style={{ width: 16 }} /></IconButton>
+                                                    <Typography
+                                                        fontSize="13px"
+                                                        sx={{ fontFamily: 'Poppins', color: '#574B4F' }}
+                                                    >
+                                                        {pct}%
+                                                    </Typography>
+                                                    <IconButton onClick={() => setDetailedView(true)}>
+                                                        <img src={IconSEye} style={{ width: 24 }} />                                                        </IconButton>
                                                 </Box>
                                             </Box>
                                         );
@@ -3200,69 +3574,97 @@ const NumbersDids: React.FC = () => {
                         </>
                     )}
                     {uploadSummary && detailedView && manageOperation === 'darDeBaja' && (
-                        <Box
-                            sx={{
-                                border: '1px solid #E4D8D2',
-                                borderRadius: 2,
-                                p: 2,
-                                mt: 2,
-                                backgroundColor: '#FDF9F8',
-                            }}
-                        >
-                            <Typography fontWeight="bold" fontSize="16px" mb={1}>
-                                Teléfonos
+                        <>
+                            <Typography fontWeight="500" fontSize="16px" mb={2} mt={-0.2}
+                                sx={{ fontFamily: "Poppins", color: "#330F1B", marginLeft: "25px" }}
+                            >
+                                Detalle de carga
                             </Typography>
+                            <Box
+                                sx={{
+                                    width: "533px", height: "187px",
+                                    borderRadius: "12px", border: "1px solid #E6E4E4",
+                                    padding: "10px", marginLeft: "-10px"
+                                }}
+                            >
+                                <Typography fontWeight={500} fontSize="16px" mb={2}
+                                    sx={{ fontFamily: "Poppins", color: "#574B4F", marginLeft: "15px" }}
+                                >
+                                    Teléfonos
+                                </Typography>
 
-                            {/* Barra de progreso personalizada */}
-                            <Box display="flex" height="10px" borderRadius="8px" overflow="hidden" mb={2}>
-                                <Box
-                                    width={`${(uploadSummary.success / (uploadSummary.success + uploadSummary.failed)) * 100}%`}
-                                    bgcolor="#A178E7"
-                                />
-                                <Box
-                                    width={`${(uploadSummary.failed / (uploadSummary.success + uploadSummary.failed)) * 100}%`}
-                                    bgcolor="#F1B13F"
-                                />
-                            </Box>
-
-                            {/* Valores */}
-                            <Box display="flex" justifyContent="space-between">
-                                <Box textAlign="center" width="50%">
-                                    <Typography color="#A178E7" fontWeight="medium">Dados de baja:</Typography>
-                                    <Typography fontSize="22px" fontWeight="bold" color="#A178E7">
-                                        {uploadSummary.success}
-                                    </Typography>
-                                    <Typography color="#A178E7">
-                                        {((uploadSummary.success / (uploadSummary.success + uploadSummary.failed)) * 100).toFixed(2)}%
-                                    </Typography>
+                                {/* Barra de progreso personalizada */}
+                                <Box display="flex" height="10px" borderRadius="8px" overflow="hidden" mb={2}>
+                                    <Box
+                                        width={`${(uploadSummary.success / (uploadSummary.success + uploadSummary.failed)) * 100}%`}
+                                        bgcolor="#A178E7"
+                                    />
+                                    <Box
+                                        width={`${(uploadSummary.failed / (uploadSummary.success + uploadSummary.failed)) * 100}%`}
+                                        bgcolor="#F1B13F"
+                                    />
                                 </Box>
 
-                                <Box textAlign="center" width="50%">
-                                    <Typography color="#F1B13F" fontWeight="medium">
-                                        No dados de baja:
-                                    </Typography>
-                                    <Typography fontSize="22px" fontWeight="bold" color="#F1B13F">
-                                        {uploadSummary.failed}
-                                    </Typography>
-                                    <Typography color="#F1B13F">
-                                        {((uploadSummary.failed / (uploadSummary.success + uploadSummary.failed)) * 100).toFixed(2)}%
-                                    </Typography>
+                                {/* Valores */}
+                                <Box display="flex" justifyContent="space-between">
+                                    <Box textAlign="center" width="50%">
+                                        <Typography fontWeight="medium"
+                                            sx={{
+                                                fontFamily: "Poppins", color: "#574B4F", opacity: 0.8,
+                                                marginLeft: "15px", fontSize: "12px"
+                                            }}
+                                        >
+                                            Dados de baja:
+                                        </Typography>
+                                        <Typography fontSize="22px" fontWeight="bold" color="#A178E7" fontFamily={"Poppins"} mt={2}>
+                                            {uploadSummary.success}
+                                        </Typography>
+                                        <Typography color="#A178E7" fontFamily={"Poppins"}>
+                                            {((uploadSummary.success / (uploadSummary.success + uploadSummary.failed)) * 100).toFixed(2)}%
+                                        </Typography>
+                                    </Box>
+
+                                    <Box textAlign="center" width="50%">
+                                        <Typography color="#F1B13F" fontWeight="medium"
+                                            sx={{
+                                                fontFamily: "Poppins", color: "#574B4F", opacity: 0.8,
+                                                marginLeft: "15px", fontSize: "12px"
+                                            }}
+                                        >
+                                            No dados de baja:
+                                        </Typography>
+                                        <Typography fontSize="22px" fontWeight="bold" color="#F1B13F" fontFamily={"Poppins"} mt={2}>
+                                            {uploadSummary.failed}
+                                        </Typography>
+                                        <Typography color="#F1B13F" fontFamily={"Poppins"}>
+                                            {((uploadSummary.failed / (uploadSummary.success + uploadSummary.failed)) * 100).toFixed(2)}%
+                                        </Typography>
+                                    </Box>
                                 </Box>
                             </Box>
-                        </Box>
+                        </>
                     )}
 
                     {uploadSummary && !detailedView && manageOperation === 'eliminar' && (
                         <>
-                            <Typography fontWeight="600" fontSize="16px" mb={2}>Estado de carga</Typography>
-                            <Box display="flex" gap={3}>
+                            <Typography fontWeight="500" fontSize="16px" mb={1.5}
+                                sx={{ fontFamily: "Poppins", color: "#330F1B" }}
+                            >
+                                Estado de Carga
+                            </Typography>
+                            <Box display="flex" gap={3}
+                                sx={{
+                                    width: "533px", height: "192px",
+                                    borderRadius: "12px", border: "1px solid #E6E4E4",
+                                    padding: "16px", marginLeft: "-10px"
+                                }}>
                                 {manageByList && (
                                     <Box
                                         sx={{
                                             border: '2px solid #D9B4C3',
                                             borderRadius: '12px',
                                             padding: '16px',
-                                            width: '170px',
+                                            width: '160px', height: "160px",
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
@@ -3271,23 +3673,94 @@ const NumbersDids: React.FC = () => {
                                             position: 'relative'
                                         }}
                                     >
-                                        <Tooltip title="Este resumen corresponde al archivo recién cargado">
-                                            <img src={infoicon} alt="info" style={{ position: 'absolute', top: 12, right: 12, width: 20 }} />
+                                        <Tooltip
+                                            title={
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        Este resumen corresponde<br />
+                                                        al archivo recién cargado<br />
+                                                    </>
+                                                </Box>
+                                            }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+
+                                            <img src={infoicon} alt="info" style={{ position: 'absolute', top: 12, right: 12, width: 24 }} />
                                         </Tooltip>
-                                        <img src={CloudCheckedIcon} alt="éxito" style={{ width: 48, marginBottom: 8 }} />
-                                        <Typography fontWeight="600" fontSize="14px" color="#8F4D63">Archivo cargado</Typography>
-                                        <Typography fontSize="12px" color="#574B4F" sx={{ mt: 0.5 }}>{uploadSummary.fileName}</Typography>
-                                        <Typography fontSize="12px" color="#574B4F" sx={{ opacity: 0.7 }}>Total de registros: {uploadSummary.total}</Typography>
+                                        <img src={CloudCheckedIcon} alt="éxito" style={{ width: 48, marginBottom: 8, marginTop: 5 }} />
+                                        <Typography
+                                            sx={{
+                                                fontWeight: 600,
+                                                fontFamily: "Poppins",
+                                                color: "#330F1B",
+                                                fontSize: '12px',
+                                            }}
+                                        >
+                                            Archivo cargado
+                                        </Typography>
+                                        <Typography fontSize="12px" color="#574B4F"
+                                            sx={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '10px',
+                                                color: '#574B4F',
+                                                opacity: 1,
+                                                textAlign: 'center',
+                                                wordBreak: 'break-word',
+                                                maxWidth: '142px',
+                                                mt: '3px',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                            {uploadSummary.fileName}
+                                        </Typography>
+                                        <Typography
+                                            sx={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '10px',
+                                                color: '#574B4F',
+                                                opacity: 1,
+                                                textAlign: 'center',
+                                                mt: '1px'
+                                            }}>
+                                            Total de registros: {uploadSummary.total}
+                                        </Typography>
                                     </Box>
                                 )}
 
 
                                 {/* Tabla porcentajes */}
                                 <Box flex={1}>
-                                    <Box display="flex" fontWeight="600" fontSize="14px" mb={1}>
-                                        <Box width="33%">Estado</Box>
-                                        <Box width="33%">Números</Box>
-                                        <Box width="34%">Porcentaje</Box>
+                                    <Box display="flex" fontWeight="500" fontSize="14px" mb={1}
+                                        sx={{ fontFamily: "Poppins", color: "#574B4F", }}
+                                    >
+                                        <Box width="95px">Estado</Box>
+                                        <Box width="80px">Números</Box>
+                                        <Box width="140px">Porcentaje</Box>
                                     </Box>
                                     {[
                                         { label: 'Eliminados', value: uploadSummary.success },
@@ -3295,15 +3768,52 @@ const NumbersDids: React.FC = () => {
                                     ].map(({ label, value }) => {
                                         const pct = Math.round((value / uploadSummary.total) * 100);
                                         return (
-                                            <Box key={label} display="flex" alignItems="center" mb={1}>
-                                                <Box width="33%">{label}</Box>
-                                                <Box width="33%">{value}</Box>
-                                                <Box width="34%" display="flex" alignItems="center" gap={1}>
-                                                    <Box flex={1} height="8px" borderRadius="4px" sx={{ backgroundColor: '#E0D1D6' }}>
-                                                        <Box width={`${pct}%`} height="100%" borderRadius="4px" sx={{ backgroundColor: '#8F4D63' }} />
+                                            <Box key={label} display="flex" alignItems="center" mb={-1}>
+                                                <Box width="95px">
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '12px',
+                                                            color: '#574B4F',
+                                                        }}
+                                                    >
+                                                        {label}
+                                                    </Typography>
+                                                </Box>
+                                                <Box width="80px">
+                                                    <Typography
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '12px',
+                                                            color: '#574B4F',
+                                                        }}
+                                                    >
+                                                        {value}
+                                                    </Typography>
+                                                </Box>
+                                                <Box width="150px" display="flex" alignItems="center" gap={1}>
+                                                    <Box
+                                                        flex={1}
+                                                        height="8px"
+                                                        borderRadius="4px"
+                                                        sx={{ backgroundColor: '#E0D1D6' }}
+                                                    >
+                                                        <Box
+                                                            width={`${pct}%`}
+                                                            height="100%"
+                                                            borderRadius="4px"
+                                                            sx={{ backgroundColor: '#8F4D63' }}
+                                                        />
                                                     </Box>
-                                                    <Typography fontSize="13px">{pct}%</Typography>
-                                                    <IconButton onClick={() => setDetailedView(true)}><img src={seachicon} style={{ width: 16 }} /></IconButton>
+                                                    <Typography
+                                                        fontSize="13px"
+                                                        sx={{ fontFamily: 'Poppins', color: '#574B4F' }}
+                                                    >
+                                                        {pct}%
+                                                    </Typography>
+                                                    <IconButton onClick={() => setDetailedView(true)}>
+                                                        <img src={IconSEye} style={{ width: 24 }} />
+                                                    </IconButton>
                                                 </Box>
                                             </Box>
                                         );
@@ -3315,84 +3825,99 @@ const NumbersDids: React.FC = () => {
 
                     {uploadSummary && detailedView && manageOperation === 'eliminar' && (
                         <>
-                            <Typography fontWeight="600" fontSize="16px" mb={2}>Detalle de carga</Typography>
-                            <Typography fontWeight={500} fontSize="15px" mb={2}>Teléfonos</Typography>
+                            <Typography fontWeight="500" fontSize="16px" mb={2} mt={-0.2}
+                                sx={{ fontFamily: "Poppins", color: "#330F1B", marginLeft: "25px" }}
+                            >
+                                Detalle de carga
+                            </Typography>
+                            <Box sx={{
+                                width: "533px", height: "187px",
+                                borderRadius: "12px", border: "1px solid #E6E4E4",
+                                padding: "10px", marginLeft: "-10px"
+                            }}>
+                                <Typography fontWeight={500} fontSize="16px" mb={2}
+                                    sx={{ fontFamily: "Poppins", color: "#574B4F", marginLeft: "15px" }}
+                                >
+                                    Teléfonos
+                                </Typography>
+                                <Box display="flex" justifyContent="space-between" mt={0} marginLeft={"0px"}>
 
-                            <Box display="flex" justifyContent="space-between" alignItems="center" bgcolor="#FFF7F7" borderRadius="12px" px={3} py={2}>
-
-                                <Box flex={1}>
-                                    <Box height={10} display="flex" borderRadius="5px" overflow="hidden">
-                                        <Box
-                                            flex={uploadSummary.success}
-                                            bgcolor="#A178E7"
-                                            height="100%"
-                                            sx={{ transition: 'width 0.3s ease' }}
-                                        />
-                                        <Box
-                                            flex={uploadSummary.failed}
-                                            bgcolor="#F1B13F"
-                                            height="100%"
-                                            sx={{ transition: 'width 0.3s ease' }}
-                                        />
-                                    </Box>
-                                </Box>
-
-                                <Box display="flex" flexDirection="column" mt={2}>
-                                    {/* Barra de progreso */}
-                                    <Box height="10px" display="flex" borderRadius="5px" overflow="hidden">
-                                        <Box
-                                            width={`${(uploadSummary.success / uploadSummary.total) * 100 || 0}%`}
-                                            bgcolor="#A178E7"
-                                            height="100%"
-                                            sx={{
-                                                transition: 'width 0.3s ease',
-                                                minWidth: uploadSummary.success > 0 ? '2%' : 0,
-                                            }}
-                                        />
-                                        <Box
-                                            width={`${(uploadSummary.failed / uploadSummary.total) * 100 || 0}%`}
-                                            bgcolor="#F1B13F"
-                                            height="100%"
-                                            sx={{
-                                                transition: 'width 0.3s ease',
-                                                minWidth: uploadSummary.failed > 0 ? '2%' : 0,
-                                            }}
-                                        />
-                                    </Box>
-
-                                    {/* Texto inferior con detalles */}
-                                    <Box display="flex" justifyContent="space-between" width="100%" mt={2}>
-                                        <Box textAlign="center" flex={1}>
-                                            <Typography fontSize="13px" fontWeight="medium" color="#A178E7">
-                                                Eliminados:
-                                            </Typography>
-                                            <Typography fontSize="20px" fontWeight="bold" color="#A178E7">
-                                                {uploadSummary.success}
-                                            </Typography>
-                                            <Typography fontSize="12px" color="#A178E7">
-                                                {uploadSummary.total ? ((uploadSummary.success / uploadSummary.total) * 100).toFixed(2) : '0.00'}%
-                                            </Typography>
-                                        </Box>
-                                        <Box textAlign="center" flex={1}>
-                                            <Typography fontSize="13px" fontWeight="medium" color="#F1B13F">
-                                                No eliminados:
-                                            </Typography>
-                                            <Typography fontSize="20px" fontWeight="bold" color="#F1B13F">
-                                                {uploadSummary.failed}
-                                            </Typography>
-                                            <Typography fontSize="12px" color="#F1B13F">
-                                                {uploadSummary.total ? ((uploadSummary.failed / uploadSummary.total) * 100).toFixed(2) : '0.00'}%
-                                            </Typography>
+                                    <Box flex={1}>
+                                        <Box height={10} display="flex" borderRadius="5px" overflow="hidden" mt={2}>
+                                            <Box
+                                                flex={uploadSummary.success}
+                                                bgcolor="#A178E7"
+                                                height="100%"
+                                                sx={{ transition: 'width 0.3s ease' }}
+                                            />
+                                            <Box
+                                                flex={uploadSummary.failed}
+                                                bgcolor="#F1B13F"
+                                                height="100%"
+                                                sx={{ transition: 'width 0.3s ease' }}
+                                            />
                                         </Box>
                                     </Box>
-                                </Box>
 
+                                    <Box display="flex" flexDirection="column" mt={2}>
+                                        {/* Barra de progreso */}
+                                        <Box height="10px" display="flex" borderRadius="5px" overflow="hidden">
+                                            <Box
+                                                width={`${(uploadSummary.success / uploadSummary.total) * 100 || 0}%`}
+                                                bgcolor="#A178E7"
+                                                height="100%"
+                                                sx={{
+                                                    transition: 'width 0.3s ease',
+                                                    minWidth: uploadSummary.success > 0 ? '2%' : 0,
+                                                }}
+                                            />
+                                            <Box
+                                                width={`${(uploadSummary.failed / uploadSummary.total) * 100 || 0}%`}
+                                                bgcolor="#F1B13F"
+                                                height="100%"
+                                                sx={{
+                                                    transition: 'width 0.3s ease',
+                                                    minWidth: uploadSummary.failed > 0 ? '2%' : 0,
+                                                }}
+                                            />
+                                        </Box>
+
+                                        {/* Texto inferior con detalles */}
+                                        <Box display="flex" justifyContent="space-between" width="100%" mt={2}>
+                                            <Box textAlign="center" flex={1}>
+                                                <Typography fontSize="10px" color={"#574B4F"} fontFamily={"Poppins"} whiteSpace="pre-line"
+                                                    sx={{ opacity: 0.8 }}>
+                                                    Eliminados:
+                                                </Typography>
+                                                <Typography fontSize="20px" fontWeight="bold" color="#A178E7">
+                                                    {uploadSummary.success}
+                                                </Typography>
+                                                <Typography fontSize="12px" color="#A178E7">
+                                                    {uploadSummary.total ? ((uploadSummary.success / uploadSummary.total) * 100).toFixed(2) : '0.00'}%
+                                                </Typography>
+                                            </Box>
+                                            <Box textAlign="center" flex={1}>
+                                                <Typography fontSize="10px" color={"#574B4F"} fontFamily={"Poppins"} whiteSpace="pre-line"
+                                                    sx={{ opacity: 0.8 }}>
+                                                    No eliminados:
+                                                </Typography>
+                                                <Typography fontSize="20px" fontWeight="bold" color="#F1B13F">
+                                                    {uploadSummary.failed}
+                                                </Typography>
+                                                <Typography fontSize="12px" color="#F1B13F">
+                                                    {uploadSummary.total ? ((uploadSummary.failed / uploadSummary.total) * 100).toFixed(2) : '0.00'}%
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                    </Box>
+
+                                </Box>
                             </Box>
                         </>
                     )}
 
                 </Box>
-            </Modal>
+            </Modal >
 
 
             <ModalError
@@ -3421,18 +3946,20 @@ const NumbersDids: React.FC = () => {
                     setSelectedAction(null);
                 }}
             />
-            {ShowSnackBar && (
-                <SnackBar
-                    message={
-                        selectedAction === 'delete'
-                            ? `Numero Eliminado Correctamente`
-                            : `Numero dado de baja correctamente`
-                    }
-                    buttonText="Cerrar"
-                    onClose={() => setShowSnackBar(false)}
-                />
-            )}
-        </Box>
+            {
+                ShowSnackBar && (
+                    <SnackBar
+                        message={
+                            selectedAction === 'delete'
+                                ? `Numero Eliminado Correctamente`
+                                : `Numero dado de baja correctamente`
+                        }
+                        buttonText="Cerrar"
+                        onClose={() => setShowSnackBar(false)}
+                    />
+                )
+            }
+        </Box >
     );
 };
 

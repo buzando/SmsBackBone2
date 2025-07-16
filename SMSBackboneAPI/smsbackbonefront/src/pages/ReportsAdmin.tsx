@@ -543,7 +543,6 @@ const ReportsAdmin = () => {
                 </Box>
                 <Box mt={0}>
                     {!hasFiltered ? (
-                        // Caja cerrada al entrar a la vista
                         <Box
                             display="flex"
                             flexDirection="column"
@@ -569,7 +568,6 @@ const ReportsAdmin = () => {
                             </Typography>
                         </Box>
                     ) : originalData.length === 0 ? (
-                        // Caja abierta si no hay resultados después de aplicar filtro
                         <Box
                             display="flex"
                             flexDirection="column"
@@ -582,7 +580,7 @@ const ReportsAdmin = () => {
                                 border: "1px solid #E0E0E0"
                             }}
                         >
-                            <img src={NoResult} alt="Sin resultados" style={{ width: 120, marginBottom: 16 }} />
+                            <img src={NoResult} alt="Sin resultados" style={{ width: 240, marginBottom: 16 }} />
                             <Typography
                                 sx={{
                                     fontFamily: "Poppins",
@@ -607,7 +605,7 @@ const ReportsAdmin = () => {
                                                         {Object.keys(originalData[0]).map((key) => (
                                                             <TableCell
                                                                 key={key}
-                                                                sx={{ fontWeight: 'bold', fontFamily: 'Poppins', color: '#5A2836' }}
+                                                                sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#5A2836', fontSize: "13px" }}
                                                             >
                                                                 {key}
                                                             </TableCell>
@@ -618,7 +616,10 @@ const ReportsAdmin = () => {
                                                     {originalData.map((row: any, index: number) => (
                                                         <TableRow key={index}>
                                                             {Object.keys(row).map((key) => (
-                                                                <TableCell key={key}>
+                                                                <TableCell key={key}
+                                                                    sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#574B4F', fontSize: "13px" }}
+
+                                                                >
                                                                     {typeof row[key] === 'string' || typeof row[key] === 'number'
                                                                         ? row[key]
                                                                         : row[key] instanceof Date
@@ -669,7 +670,7 @@ const ReportsAdmin = () => {
                                                         {Object.keys(originalData[0]).map((key) => (
                                                             <TableCell
                                                                 key={key}
-                                                                sx={{ fontWeight: 'bold', fontFamily: 'Poppins', color: '#5A2836' }}
+                                                                sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#5A2836', fontSize: "13px" }}
                                                             >
                                                                 {key}
                                                             </TableCell>
@@ -680,7 +681,9 @@ const ReportsAdmin = () => {
                                                     {originalData.map((row: any, index: number) => (
                                                         <TableRow key={index}>
                                                             {Object.keys(row).map((key) => (
-                                                                <TableCell key={key}>
+                                                                <TableCell key={key}
+                                                                    sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#574B4F', fontSize: "13px" }}
+                                                                >
                                                                     {typeof row[key] === 'string' || typeof row[key] === 'number'
                                                                         ? row[key]
                                                                         : row[key] instanceof Date
@@ -730,7 +733,7 @@ const ReportsAdmin = () => {
                                                         {Object.keys(originalData[0]).map((key) => (
                                                             <TableCell
                                                                 key={key}
-                                                                sx={{ fontWeight: 'bold', fontFamily: 'Poppins', color: '#5A2836' }}
+                                                                sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#5A2836', fontSize: "13px" }}
                                                             >
                                                                 {key}
                                                             </TableCell>
@@ -741,7 +744,10 @@ const ReportsAdmin = () => {
                                                     {originalData.map((row: any, index: number) => (
                                                         <TableRow key={index}>
                                                             {Object.keys(row).map((key) => (
-                                                                <TableCell key={key}>
+                                                                <TableCell key={key}
+                                                                    sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#574B4F', fontSize: "13px" }}
+
+                                                                >
                                                                     {typeof row[key] === 'string' || typeof row[key] === 'number'
                                                                         ? row[key]
                                                                         : row[key] instanceof Date

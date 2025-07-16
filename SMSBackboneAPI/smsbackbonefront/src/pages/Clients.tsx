@@ -33,6 +33,7 @@ import backarrow from '../assets/MoveTable.svg';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ListItemIcon from '@mui/material/ListItemIcon';
 import CloseIcon from '@mui/icons-material/Close';
 import ListItemText from '@mui/material/ListItemText';
@@ -3136,10 +3137,12 @@ const Clients: React.FC = () => {
                 >
                     {step > 0 && (
                         <SecondaryButton
+
                             onClick={() => setStep((prev) => prev - 1)}
                             text="REGRESAR"
                         />
                     )}
+
                     <SecondaryButton text="Cancelar" onClick={() => setOpenClientModal(false)} />
                     <MainButton
                         text={
@@ -3170,9 +3173,8 @@ const Clients: React.FC = () => {
                                 setStep(step + 1);
                             }
                         }}
-
-
                     />
+
                 </Box>
 
             </Dialog>
@@ -3538,27 +3540,33 @@ const Clients: React.FC = () => {
                             }}>
                                 Fecha de facturación
                             </Typography>
-                            <TextField
-                                value={selectedDate ? selectedDate.toLocaleDateString('es-MX') : ''}
-                                onClick={handleOpenDatePicker}
-                                placeholder="Seleccionar fecha"
-                                fullWidth
-                                InputProps={{
-                                    readOnly: true,
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <img src="/icons/calendar.svg" alt="Calendario" style={{ width: 18 }} />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-
+                            <Box sx={{ mb: 2 }}>
+                                <TextField
+                                    value={selectedDate ? selectedDate.toLocaleDateString('es-MX') : ''}
+                                    onClick={handleOpenDatePicker}
+                                    placeholder="Seleccionar fecha"
+                                    fullWidth
+                                    sx={{
+                                        width: "262px", height: "56px", backgroundColor: "#FFFFFF", '& .MuiInputBase-input': {
+                                            fontFamily: 'Poppins', fontSize: '16px', color: "#574B4F",
+                                        },
+                                    }}
+                                    InputProps={{
+                                        readOnly: true,
+                                        endAdornment: (
+                                            <IconButton position="end">
+                                                <CalendarTodayIcon sx={{ width: "15px", height: "15px", color: "#8F4D63" }} />
+                                            </IconButton>
+                                        ),
+                                    }}
+                                />
+                            </Box>
                         </Box>
                     </Box>
 
                     <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: 1, mt: 0.5 }} />
 
-                    <Box mt={3} display="flex" justifyContent="flex-end">
+                    <Box mt={3} display="flex" gap={31.5}>
                         <SecondaryButton text='Cancelar' onClick={() => setRechargeModalOpen(false)} />
                         <MainButton text='Recargar' onClick={handleSaveRecharge} isLoading={isSavingClient} />
                     </Box>
