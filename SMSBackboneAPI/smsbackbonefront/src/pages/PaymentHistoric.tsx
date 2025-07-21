@@ -278,7 +278,8 @@ const PaymentHistoric: React.FC = () => {
                         background: '#FFFFFF',
                         border: '1px solid #E6E4E4',
                         borderRadius: '8px',
-                        width: '100%',
+                        maxWidth: "1140px",
+                        height: '468px',
                         padding: '20px',
                         marginTop: '20px',
                         overflowX: 'auto'

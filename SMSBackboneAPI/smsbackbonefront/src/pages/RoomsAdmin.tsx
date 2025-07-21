@@ -660,7 +660,7 @@ const RoomsAdmin: React.FC = () => {
                             padding: '8px 2px',
                             boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                             overflowX: 'auto',
-                            maxHeight: "400px"
+                            maxHeight: "465px"
                         }}
                     >
                         <table style={{ minWidth: '1140px', borderCollapse: 'collapse', }}>

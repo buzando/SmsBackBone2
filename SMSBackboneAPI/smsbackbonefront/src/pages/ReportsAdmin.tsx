@@ -574,10 +574,11 @@ const ReportsAdmin = () => {
                             alignItems="center"
                             justifyContent="center"
                             sx={{
-                                backgroundColor: "#FAFAFA",
+                                backgroundColor: "#FFFFFF",
                                 padding: "60px 0",
                                 borderRadius: "8px",
-                                border: "1px solid #E0E0E0"
+                                border: "1px solid #E0E0E0",
+                                height: "410px"
                             }}
                         >
                             <img src={NoResult} alt="Sin resultados" style={{ width: 240, marginBottom: 16 }} />
@@ -598,7 +599,10 @@ const ReportsAdmin = () => {
                             {activeTab === 0 && (
                                 <>
                                     {Array.isArray(originalData) && originalData.length > 0 ? (
-                                        <TableContainer component={Paper} sx={{ borderRadius: '12px', boxShadow: '0 0 10px rgba(0,0,0,0.05)' }}>
+                                        <TableContainer component={Paper} sx={{
+                                            borderRadius: '12px', boxShadow: '0 0 10px rgba(0,0,0,0.05)',
+                                            height: "410px", overflowY: "auto"
+                                        }}>
                                             <Table>
                                                 <TableHead>
                                                     <TableRow>
@@ -640,10 +644,10 @@ const ReportsAdmin = () => {
                                             justifyContent="center"
                                             alignItems="center"
                                             flexDirection="column"
-                                            height="400px"
+                                            height="410px"
                                             width="100%"
                                         >
-                                            <img src={NoResult} alt="No hay resultados" style={{ width: 140, height: 140, opacity: 0.7 }} />
+                                            <img src={NoResult} alt="No hay resultados" style={{ width: 0, height: 140, opacity: 0.7 }} />
                                             <Typography
                                                 sx={{
                                                     mt: 1,
