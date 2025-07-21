@@ -1171,7 +1171,7 @@ const NumbersDids: React.FC = () => {
                     sx: {
                         padding: 1,
                         width: "280px",
-                        maxHeight: "200px",
+                        height: "150px",
                         overflowY: "hidden",
                         borderRadius: '12px',
                         boxShadow: '0px 8px 16px #00131F29',
@@ -1190,7 +1190,7 @@ const NumbersDids: React.FC = () => {
                                     : [...prev, option]
                             )
                         }
-                        sx={{ height: "32px", marginLeft: "-12px" }}
+                        sx={{ height: "35px", marginLeft: "-12px" }}
                     >
                         <Checkbox checked={selectedServices.includes(option)}
                             checkedIcon={
@@ -3074,9 +3074,15 @@ const NumbersDids: React.FC = () => {
                         />
                         <MainButton
                             onClick={handleUploadSubmit}
-                            text='Guardar cambios'
+                            text={
+                                manageOperation === 'agregar' ? 'Cargar' :
+                                    manageOperation === 'darDeBaja' ? 'Dar de baja' :
+                                        manageOperation === 'eliminar' ? 'Eliminar' :
+                                            'Guardar cambios'
+                            }
                             disabled={!readyToUpload}
                         />
+
 
 
                     </Box>

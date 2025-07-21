@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import MainIcon from '../components/commons/MainButtonIcon';
 import seachicon from '../assets/icon-lupa.svg';
+import Iconseachred from "../assets/Iconseachred.svg";
 import iconclose from '../assets/icon-close.svg';
 import BoxEmpty from '../assets/Nousers.svg';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
@@ -134,6 +135,10 @@ const Clients: React.FC = () => {
     const [clientAnchorEl, setClientAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedClients, setSelectedClients] = useState<string[]>([]);
     const [clientSearch, setClientSearch] = useState('');
+
+    const [estadoAnchorEl, setEstadoAnchorEl] = useState<null | HTMLElement>(null);
+    const [estadoMenuOpen, setEstadoMenuOpen] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
 
     const [isExportingCSV, setIsExportingCSV] = useState(false);
     const [isExportingXLSX, setIsExportingXLSX] = useState(false);
@@ -834,7 +839,8 @@ const Clients: React.FC = () => {
                 >
                     {/* Chips redonditos */}
                     <Box sx={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                        {['CLIENTE'].map((label) => {
+                        {['CLIENTE', 'ESTADO'].map((label) => {
+
                             const isClient = label === 'CLIENTE';
 
 
@@ -850,6 +856,10 @@ const Clients: React.FC = () => {
                                         if (label === 'CLIENTE') {
                                             setClientAnchorEl(e.currentTarget);
                                             setClientMenuOpen(true);
+                                        }
+                                        if (label === 'ESTADO') {
+                                            setEstadoAnchorEl(e.currentTarget);
+                                            setEstadoMenuOpen(true);
                                         }
                                         setActiveFilter(label.toLowerCase() as any);
                                     }}
@@ -895,7 +905,11 @@ const Clients: React.FC = () => {
                                     height: "40px"
                                 }}
                             >
-                                <img src={seachicon} alt="Buscar" style={{ marginRight: 8, width: 24 }} />
+                                <img
+                                    src={searchTerm ? Iconseachred : seachicon}
+                                    alt="Buscar"
+                                    style={{ marginRight: 8, width: 24 }}
+                                />
                                 <input
                                     type="text"
                                     placeholder="Buscar"
@@ -1151,12 +1165,11 @@ const Clients: React.FC = () => {
                         justifyContent="center"
                         sx={{
                             width: '100%',
-                            minHeight: '400px',
-                            backgroundColor: '#F9F9F9',
+                            minHeight: '465px',
+                            backgroundColor: '#FFFFFF',
                             padding: 4,
                             borderRadius: '12px',
                             border: '1px solid #E0E0E0',
-                            mt: 2,
                         }}
                     >
                         <img src={NoResult} alt="No resultados" style={{ width: '220px', marginBottom: '16px' }} />
@@ -1179,142 +1192,165 @@ const Clients: React.FC = () => {
                             padding: '8px 2px',
                             boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                             overflowX: 'auto',
-                            maxHeight: "400px"
+                            maxHeight: "465px"
                         }}
                     >
-                        <table style={{ minWidth: '1140px', borderCollapse: 'collapse', }}>
+                        <table style={{ minWidth: '1180px', borderCollapse: 'collapse', }}>
                             <thead>
                                 <tr style={{
                                     textAlign: 'left', fontFamily: 'Poppins', fontSize: '13px',
-                                    color: '#330F1B', fontWeight: 500, borderBottom: '1px solid #E0E0E0'
-                                }}>
+                                    color: '#330F1B', fontWeight: 500, borderBottom: '1px solid #E0E0E0',
+                                    height: "45px",
+                                }}
+                                >
                                     <th style={{
-                                        padding: '6px', textAlign: 'left',
+                                        textAlign: 'left', padding: '0 15px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Fecha de alta</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left',
+                                        textAlign: 'left', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Cliente</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left',
+                                        textAlign: 'left', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Nombre</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left',
+                                        textAlign: 'left', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Apellidos</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left',
+                                        textAlign: 'left', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Teléfono</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left',
+                                        textAlign: 'left', padding: '0 0px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Extensión</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left',
+                                        textAlign: 'left', padding: '0 46px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Correo electrónico</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left', whiteSpace: 'nowrap',
+                                        textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Tarifa SMS # Cortos</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left', fontSize: "13px",
+                                        textAlign: 'left', fontSize: "13px", padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", whiteSpace: 'nowrap'
                                     }}>Tarifa SMS # Largos</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left',
+                                        textAlign: 'left', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Salas</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left',
+                                        textAlign: 'left', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Estatus</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left', whiteSpace: 'nowrap',
+                                        textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Créditos Globales</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left', whiteSpace: 'nowrap',
+                                        textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Créditos SMS # Cortos</th>
                                     <th style={{
-                                        padding: '6px', textAlign: 'left', whiteSpace: 'nowrap',
+                                        textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Créditos SMS # Largos</th>
+                                    <td style={{
+                                        position: 'sticky', textAlign: "center",
+                                        right: -2,
+                                        background: '#fff', borderLeft: '1px solid #E0E0E0',
+                                        boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
+                                        padding: '3.5px', width: '66px', height: "30px", whiteSpace: 'nowrap', overflow: 'hidden',
+                                        textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F",
+                                    }}>
+                                    </td>
                                 </tr>
-
                             </thead>
                             <tbody>
                                 {clientsList.map((Client) => (
                                     <tr key={Client.id} style={{ borderBottom: '1px solid #E0E0E0' }}>
                                         <td style={{
-                                            padding: '5px', width: '180px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 14px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.creationDate}</td>
+
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.nombreCliente}</td>
+
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.firstName}</td>
+
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.lastName}</td>
+
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.phoneNumber}</td>
+
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px', maxWidth: '100px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.extension}</td>
+
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 46px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.email}</td>
+
                                         <td style={{
-                                            //sdsd
-                                            padding: '6px', width: '200px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.rateForShort}</td>
+
                                         <td style={{
-                                            padding: '6px', maxWidth: '180px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.rateForLong}</td>
+
                                         <td style={{
-                                            padding: '6px', maxWidth: '160px', overflow: 'hidden',
-                                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px', maxWidth: '100px',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.roomName}</td>
+
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 28px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.estatus}</td>
+
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.totalCredits}</td>
+
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{Client.totalShortSmsCredits}</td>
+
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
-                                            ,
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F",
+                                            fontSize: "13px"
+
                                         }}>{Client.totalLongSmsCredits}</td>
+
                                         <td style={{
-                                            position: 'sticky',
-                                            right: 0,
+                                            position: 'sticky', textAlign: "center",
+                                            right: -2,
                                             background: '#fff', borderLeft: '1px solid #E0E0E0',
                                             boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
-                                            zIndex: 2,
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            padding: '3.5px', width: '66px', height: "51px", whiteSpace: 'nowrap', overflow: 'hidden',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>
                                             <IconButton onClick={(event) => handleMenuOpen(event, Client.id)}>
@@ -1346,13 +1382,15 @@ const Clients: React.FC = () => {
                     sx={{
                         fontFamily: 'Poppins',
                         fontSize: '14px',
+                        width: "198px",
+                        borderRadius: "8px",
                         '&:hover': {
                             backgroundColor: '#F2EBED'
                         }
                     }}
                 >
                     <EditIcon fontSize="small" sx={{ mr: 1, color: '#5F5064', width: 24, height: 24 }} />
-                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#583B43" }}>
+                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4FE6" }}>
                         Editar
                     </Typography>
                 </MenuItem>
@@ -1374,11 +1412,10 @@ const Clients: React.FC = () => {
                     }}
                 >
                     <img
-                        src={IconSuS}
-                        alt="Recarga"
+                        src={IconSuS} alt="Recarga"
                         style={{ width: '24px', height: '24px', marginRight: "9px", color: "#574B4FE6" }}
                     />
-                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#583B43" }}>
+                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4FE6" }}>
                         Recargar
                     </Typography>
                 </MenuItem>
@@ -1401,7 +1438,7 @@ const Clients: React.FC = () => {
                             alt="Recarga"
                             style={{ width: '24px', height: '24px', marginRight: "9px" }}
                         />
-                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#583B43" }}>
+                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4FE6" }}>
                             Dar de alta
                         </Typography>
                     </MenuItem>
@@ -1451,9 +1488,9 @@ const Clients: React.FC = () => {
                         <img
                             src={Thrashicon}
                             alt="Eliminar"
-                            style={{ width: 24, height: 24, color: '#5F5064' }}
+                            style={{ width: 24, height: 24, color: '#5F5064', marginLeft: "1px" }}
                         />
-                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F" }}>
+                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F", marginLeft: "2px" }}>
                             Eliminar
                         </Typography>
 
@@ -1674,6 +1711,96 @@ const Clients: React.FC = () => {
 
                 </Box>
             </Menu>
+
+            <Menu
+                anchorEl={estadoAnchorEl}
+                open={estadoMenuOpen}
+                onClose={() => setEstadoMenuOpen(false)}
+                PaperProps={{
+                    sx: {
+                        padding: 1,
+                        width: "280px",
+                        height: "150px",
+                        overflowY: "hidden",
+                        borderRadius: '12px',
+                        boxShadow: '0px 8px 16px #00131F29',
+                    },
+                }}
+            >
+                <Box sx={{ height: '65px', overflowY: 'hidden' }}>
+                    {['Habilitado', 'Inhabilitado'].map((status) => (
+                        <MenuItem
+                            key={status}
+                            onClick={() =>
+                                setSelectedStatus((prev) =>
+                                    prev.includes(status)
+                                        ? prev.filter((s) => s !== status)
+                                        : [...prev, status]
+                                )
+                            }
+                            sx={{ height: "32px", marginLeft: "-12px" }}
+
+                        >
+                            <Checkbox checked={selectedStatus.includes(status)}
+                                checkedIcon={
+                                    <Box
+                                        sx={{
+                                            width: '24px',
+                                            height: '24px',
+                                            position: 'relative',
+                                            marginTop: '0px',
+                                            marginLeft: '0px',
+                                        }}
+                                    >
+                                        <img
+                                            src={IconCheckBox1}
+                                            alt="Seleccionado"
+                                            style={{ width: '24px', height: '24px' }}
+                                        />
+                                    </Box>
+                                }
+                            />
+                            <ListItemText primary={status}
+                                primaryTypographyProps={{
+                                    fontFamily: 'Poppins',
+                                    fontSize: '16px',
+                                    fontWeight: 500,
+                                    color: selectedStatus.includes(status) ? '#8F4E63' : '#786E71',
+                                }}
+                            />
+                        </MenuItem>
+                    ))}
+                </Box>
+
+                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+
+                <Box display="flex" justifyContent="space-between" px={0} pb={0} gap={2.5}>
+                    <SecondaryButton
+                        onClick={() => {
+                            setSelectedStatus([]);
+                            setStatusMenuOpen(false);
+                            setNumbersData(originalData);
+                            setCurrentPage(1);
+                        }}
+                        text="LIMPIAR"
+                    />
+                    <MainButton
+                        onClick={() => {
+                            const filtered = originalData.filter((item) =>
+                                selectedStatus.length === 0 ||
+                                selectedStatus.includes(item.Estatus) // ajusta el campo si es necesario
+                            );
+                            setNumbersData(filtered);
+                            setStatusMenuOpen(false);
+                            setCurrentPage(1);
+                        }}
+                        text="APLICAR"
+                    />
+                </Box>
+
+
+            </Menu>
+
 
             {/* Modal para añadir o editar cliente */}
             <Dialog open={openClientModal} onClose={() => setOpenClientModal(false)} maxWidth="md" fullWidth sx={{ overflowX: "hidden" }}>
@@ -2277,7 +2404,7 @@ const Clients: React.FC = () => {
                                             }}
                                         />
                                     </Box>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"}>
+                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"}>
                                         <Typography
                                             sx={{
                                                 textAlign: "left",
@@ -3190,46 +3317,62 @@ const Clients: React.FC = () => {
                         zIndex: 10
                     }}
                 >
-                    {step > 0 && (
-                        <SecondaryButton
-
-                            onClick={() => setStep((prev) => prev - 1)}
-                            text="REGRESAR"
-                        />
-                    )}
 
                     <SecondaryButton text="Cancelar" onClick={() => setOpenClientModal(false)} />
-                    <MainButton
-                        text={
-                            step === 2 || (step === 1 && isEditClient)
-                                ? isEditClient ? 'Guardar cambios' : 'Guardar'
-                                : 'Siguiente'
-                        }
 
-                        onClick={() => {
-                            if (step === 0) {
-                                const isEmailValid = validateEmailFormat(email);
-                                const isMatch = email === confirmEmail;
 
-                                setEmailError(!isEmailValid);
-                                setConfirmEmailError(!isMatch);
+                    <Box sx={{ display: "flex", gap: 2 }}>
+                        <Box sx={{ mt: -0.2 }}>
+                            {step > 0 && (
+                                <SecondaryButton
 
-                                if (!isEmailValid || !isMatch) return;
-                            }
+                                    onClick={() => setStep((prev) => prev - 1)}
+                                    text="REGRESAR"
+                                />
+                            )}
+                        </Box>
+                        <Box sx={{ display: "flex", gap: 2 }}>
 
-                            if (step === 1 && isEditClient) {
-                                handleSubmit();
-                                return;
-                            }
 
-                            if (step === 2) {
-                                handleSubmit();
-                            } else {
-                                setStep(step + 1);
-                            }
-                        }}
-                    />
+                            <MainButton
+                                text={
+                                    step === 2 || (step === 1 && isEditClient)
+                                        ? isEditClient ? 'Guardar cambios' : 'Guardar'
+                                        : 'Siguiente'
+                                }
 
+                                onClick={() => {
+                                    if (step === 0) {
+                                        const isEmailValid = validateEmailFormat(email);
+                                        const isMatch = email === confirmEmail;
+
+                                        setEmailError(!isEmailValid);
+                                        setConfirmEmailError(!isMatch);
+
+                                        if (!isEmailValid || !isMatch) return;
+                                    }
+
+                                    if (step === 1 && isEditClient) {
+                                        handleSubmit();
+                                        return;
+                                    }
+
+                                    if (step === 2) {
+                                        handleSubmit();
+                                    } else {
+                                        setStep(step + 1);
+                                    }
+                                }}
+                            />
+                            <Box sx={{ mt: -0.2 }}>
+                                {isEditClient && step == 0 && (
+                                    <SecondaryButton text="Guardar"
+                                        onClick={() => handleSubmit()}
+                                    />
+                                )}
+                            </Box>
+                        </Box>
+                    </Box>
                 </Box>
 
             </Dialog>

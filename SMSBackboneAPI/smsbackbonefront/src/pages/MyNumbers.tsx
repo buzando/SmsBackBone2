@@ -2298,15 +2298,13 @@ const MyNumbers: React.FC = () => {
                 </Box>
             ) : (
                 <div style={{
-                    padding: '20px', marginTop: '-70px', marginLeft: '40px', maxWidth: '1140px'
+                    padding: '12px', marginTop: '-80px', marginLeft: '40px', maxWidth: '1180px', minHeight: 'calc(100vh - 64px)', overflowY: "hidden"
                 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: "-0.5" }}>
                         <IconButton
                             onClick={() => navigate('/')}
                             sx={{
-                                p: 0,
-                                mr: 1,
-                                ml: '-28px',
+                                ml: '-26px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -2340,7 +2338,7 @@ const MyNumbers: React.FC = () => {
                             Mis números
                         </Typography>
                     </Box>
-                    <Divider sx={{ marginBottom: '17px', marginTop: '10px' }} />
+                    <Divider sx={{ marginBottom: '17px', marginTop: '6px' }} />
 
                     {/* Filtros */}
                     <div style={{ marginBottom: '20px' }}>
@@ -3126,7 +3124,7 @@ const MyNumbers: React.FC = () => {
                         borderRadius: '8px',
                         overflowX: 'auto',
                         backgroundColor: '#FFFFFF',
-                        height: "360px",
+                        height: "428px", //maxHeight: "465px"
                     }}>
                         {currentItems.length === 0 ? (
                             <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={2}>
@@ -3149,7 +3147,7 @@ const MyNumbers: React.FC = () => {
                             <div style={{ maxHeight: '400px', overflowY: 'hidden', borderRadius: '5px' }}>
 
                                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1080px', overflowY: 'hidden' }}>
-                                    <thead style={{ backgroundColor: '#f9f9f9', color: '#6a6a6a' }}>
+                                    <thead style={{ backgroundColor: '#FFFFFF', color: '#6a6a6a' }}>
                                         {isAnyRowSelected ? (
                                             <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', borderBottom: '1px solid #dcdcdc', }}>
                                                 <th style={{ padding: '0px', }}>

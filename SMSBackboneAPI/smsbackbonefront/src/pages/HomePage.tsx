@@ -11,6 +11,7 @@ import { fontFamily, height, letterSpacing, styled, textTransform, width } from 
 import { ReactNode } from 'react';
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import BoxEmpty from '../assets/Nousers.svg';
+import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import smsico from '../assets/Icon-sms.svg'
 import welcome from '../assets/icon-welcome.svg'
 import fast from '../assets/icon-fastsend.svg'
@@ -68,6 +69,9 @@ const HomePage: React.FC = () => {
             [event.target.name]: event.target.checked,
         });
     };
+
+    const [openWelcomeModal, setOpenWelcomeModal] = useState(true); // se abre al cargar
+
 
     const handleApplyFilters = async () => {
         const selectedRoom = localStorage.getItem("selectedRoom");
@@ -268,6 +272,11 @@ const HomePage: React.FC = () => {
         },
     }));
 
+    {/* 
+    useEffect(() => {
+  setOpenWelcomeModal(true);
+}, []);
+*/}
 
     useEffect(() => {
         const userData = localStorage.getItem("userData");
@@ -878,6 +887,9 @@ const HomePage: React.FC = () => {
                 </Grid>
             )}
 
+
+
+
             <Modal open={open} onClose={handleClose} aria-labelledby="quick-send-title">
                 <Box sx={modalStyle}>
 
@@ -1231,6 +1243,310 @@ const HomePage: React.FC = () => {
                     </Box>
                 </Box>
             </Modal>
+
+            <Modal open={openWelcomeModal} onClose={() => setOpenWelcomeModal(false)}>
+                <Box
+                    sx={{
+                        width: '511px',
+                        height: '433px',
+                        backgroundColor: '#FFFFFF',
+                        border: '2px solid #E6E4E4CC',
+                        borderRadius: '8px',
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '22px',
+                    }}
+                >
+
+                    <Typography noWrap sx={{ fontSize: '16px', fontFamily: 'Poppins', color: '#330F1B', mb: 2, mt: -1 }}>
+                        Ingrese una contraseña nueva para configurar su cuenta.
+                    </Typography>
+
+                    <Box mt={2}>
+                        <Typography
+                            sx={{
+                                textAlign: 'left',
+                                fontFamily: 'Poppins',
+                                fontWeight: '500',
+                                fontSize: '16px',
+                                lineHeight: '20px',
+                                letterSpacing: '0px',
+                                color: "#330F1B",
+                                marginTop: "-8px",
+                                marginBottom: "-8px",
+                                opacity: 1,
+                            }}
+                        >
+                            Contraseña
+                        </Typography>
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            helperText={
+                                <span style={{
+                                    minHeight: "20px", display: "inline-block",
+                                    fontFamily: 'Poppins',
+                                    fontSize: "12px",
+                                    color: "#D01247"
+                                }}>
+                                </span>
+                            }
+                            InputProps={{
+                                sx: {
+                                    "& input": {
+                                        backgroundColor: "transparent !important",
+                                    },
+                                    "& input:focus": {
+                                        backgroundColor: "transparent !important",
+                                        boxShadow: "none !important",
+                                        outline: "none !important",
+                                    },
+                                    fontStyle: "normal",
+                                    fontVariant: "normal",
+                                    fontWeight: "500",
+                                    fontSize: "16px",
+                                    lineHeight: "54px",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0.3px",
+                                    color: "#574B4F",
+                                    opacity: 1,
+                                },
+                                endAdornment: (
+                                    <InputAdornment position="end">
+
+                                        <Tooltip title={
+                                            <Box
+                                                sx={{
+                                                    backgroundColor: "#FFFFFF",
+                                                    borderRadius: "8px",
+                                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                    padding: "8px 12px",
+                                                    fontSize: "14px",
+                                                    fontFamily: "Poppins",
+                                                    color: "#574B4F",
+                                                    transform: "translate(-10px, -22px)",
+                                                }}
+                                            >
+                                                <>
+                                                    · Solo caracteres tales <br />
+                                                    · Longitud máxima de 40 <br />
+                                                    caracteres
+                                                </>
+                                            </Box>
+                                        }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <IconButton
+                                                disableRipple
+                                                sx={{
+                                                    backgroundColor: "transparent !important",
+                                                    "&:hover": {
+                                                        backgroundColor: "transparent !important",
+                                                    },
+                                                }}
+                                            >
+                                                <img
+                                                    src={infoicon}
+                                                    alt="info-icon"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                            </IconButton>
+                                        </Tooltip>
+
+                                    </InputAdornment>
+                                ),
+                            }}
+                            required
+                        />
+
+                    </Box>
+
+                    <Box mt={0.5}>
+                        <Typography
+                            sx={{
+                                textAlign: 'left',
+                                fontFamily: 'Poppins',
+                                fontWeight: '500',
+                                fontSize: '16px',
+                                lineHeight: '20px',
+                                letterSpacing: '0px',
+                                color: "#330F1B",
+                                marginTop: "-8px",
+                                marginBottom: "-8px",
+                                opacity: 1,
+                            }}
+                        >
+                            Confirmar contraseña
+                        </Typography>
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            helperText={
+                                <span style={{
+                                    minHeight: "20px", display: "inline-block",
+                                    fontFamily: 'Poppins',
+                                    fontSize: "12px",
+                                    color: "#D01247"
+                                }}>
+                                </span>
+                            }
+                            InputProps={{
+                                sx: {
+                                    "& input": {
+                                        backgroundColor: "transparent !important",
+                                    },
+                                    "& input:focus": {
+                                        backgroundColor: "transparent !important",
+                                        boxShadow: "none !important",
+                                        outline: "none !important",
+                                    },
+                                    fontStyle: "normal",
+                                    fontVariant: "normal",
+                                    fontWeight: "500",
+                                    fontSize: "16px",
+                                    lineHeight: "54px",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0.3px",
+                                    color: "#574B4F",
+                                    opacity: 1,
+                                },
+                                endAdornment: (
+                                    <InputAdornment position="end">
+
+                                        <Tooltip title={
+                                            <Box
+                                                sx={{
+                                                    backgroundColor: "#FFFFFF",
+                                                    borderRadius: "8px",
+                                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                    padding: "8px 12px",
+                                                    fontSize: "14px",
+                                                    fontFamily: "Poppins",
+                                                    color: "#574B4F",
+                                                    transform: "translate(-10px, -22px)",
+                                                }}
+                                            >
+                                                <>
+                                                    · Solo caracteres tales <br />
+                                                    · Longitud máxima de 40 <br />
+                                                    caracteres
+                                                </>
+                                            </Box>
+                                        }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <IconButton
+                                                disableRipple
+                                                sx={{
+                                                    backgroundColor: "transparent !important",
+                                                    "&:hover": {
+                                                        backgroundColor: "transparent !important",
+                                                    },
+                                                }}
+                                            >
+                                                <img
+                                                    src={infoicon}
+                                                    alt="info-icon"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                            </IconButton>
+                                        </Tooltip>
+
+                                    </InputAdornment>
+                                ),
+                            }}
+                            required
+                        />
+
+                    </Box>
+
+                    <Box
+                        sx={{
+                            display: "flex",
+                            gap: "8px",
+                            justifyContent: "flex-start", ml: -14, mb: 0
+                        }}
+                    >
+                        <Checkbox
+                            checkedIcon={
+                                <Box
+                                    sx={{
+                                        width: '24px',
+                                        height: '24px',
+                                        position: 'relative',
+                                    }}
+                                >
+                                    <img
+                                        src={IconCheckBox1}
+                                        alt="Seleccionado"
+                                        style={{ width: '24px', height: '24px' }}
+                                    />
+                                </Box>
+                            }
+                            sx={{
+                                color: "#240F17",
+                                "&.Mui-checked": { color: "#8F4D63" },
+                                alignSelf: "flex-start",
+                                padding: 0,
+                            }}
+                        />
+                        <Typography
+                            sx={{
+                                fontFamily: "Poppins",
+                                fontSize: "14px",
+                                color: '#574B4FCC',
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            Habilitar verificación en dos pasos
+                        </Typography>
+                    </Box>
+
+                    <Divider sx={{ width: 'calc(100% + 50px)', mb: 2.5, mt: 3 }} />
+
+                    <Box display="flex" justifyContent="space-between"
+                        sx={{
+                            position: 'absolute',
+                            gap: 30, mt: "373px"
+
+                        }}
+                    >
+                        <SecondaryButton text="Cancelar" />
+
+                        <MainButton text='Guardar' />
+                    </Box>
+
+                </Box>
+
+            </Modal>
+
+
         </div>
     );
 };
@@ -1243,8 +1559,8 @@ const modalStyle = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '570px',  // Nuevo ancho
-    height: '579px', // Nuevo alto
+    width: '570px',
+    height: '579px',
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 3,
