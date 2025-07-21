@@ -16,7 +16,7 @@ namespace Contract.Request
         public int Amount { get; set; }
         public decimal Total { get; set; } 
         public string PaymentType { get; set; } 
-        public DateTime BillingDate { get; set; } 
+        public DateTime BillingDate { get; set; }
 
     }
 }

@@ -15,6 +15,9 @@ using Contract.Request;
 using Contract;
 using Contract.Other;
 using ClosedXML.Parser;
+using DocumentFormat.OpenXml.Drawing.Spreadsheet;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Business
 {
@@ -178,7 +181,7 @@ namespace Business
                         string rawPassword;
                         string hashedPassword = SecurityHelper.GenerarPasswordTemporal(out rawPassword);
                         // 2. Crear usuario
-                        var user = new Users
+                        var user = new Modal.Model.Model.Users
                         {
                             firstName = dto.FirstName,
                             lastName = dto.LastName,
@@ -409,20 +412,39 @@ namespace Business
             {
                 using (var ctx = new Entities())
                 {
-                    var recharge = new CreditRecharge
+                    if (credit.SmsType.ToLower() == "largo")
                     {
-                        Chanel = credit.SmsType,
-                        idCreditCard = null,
-                        quantityCredits = credit.Amount,
-                        quantityMoney = credit.Total,
-                        RechargeDate = credit.BillingDate,
-                        idUser = credit.IdUser,
-                        AutomaticInvoice = false,
-                        Estatus = credit.PaymentType,
-                    };
+                        credit.SmsType = "long_sms";
+                    }
+                    if (credit.SmsType.ToLower() == "corto")
+                    {
+                        credit.SmsType = "short_sms";
+                    }
+                    foreach (var item in credit.Rooms)
+                    {
+                        var roomId = (from c in ctx.clients
+                                      join u in ctx.Users on c.id equals u.IdCliente
+                                      join ru in ctx.roomsbyuser on u.Id equals ru.idUser
+                                      join r in ctx.Rooms on ru.idRoom equals r.id
+                                      where r.name == item && c.id == credit.ClientId
+                                      select r.id).FirstOrDefault();
 
-                    ctx.CreditRecharge.Add(recharge);
-                    ctx.SaveChanges();
+                        var recharge = new CreditRecharge
+                        {
+                            Chanel = credit.SmsType,
+                            idCreditCard = null,
+                            quantityCredits = credit.Amount,
+                            quantityMoney = credit.Total,
+                            RechargeDate = credit.BillingDate,
+                            idUser = credit.IdUser,
+                            AutomaticInvoice = false,
+                            Estatus = credit.PaymentType,
+                            idRoom = roomId
+                        };
+
+                        ctx.CreditRecharge.Add(recharge);
+                        ctx.SaveChanges();
+                    }
 
                     foreach (var roomName in credit.Rooms)
                     {
@@ -433,12 +455,12 @@ namespace Business
 
                         if (room != null)
                         {
-                            if (credit.SmsType?.ToLower() == "short")
+                            if (credit.SmsType?.ToLower() == "short_sms")
                             {
                                 room.short_sms += credit.Amount;
                                 room.credits += credit.Amount;
                             }
-                            else if (credit.SmsType?.ToLower() == "long")
+                            else if (credit.SmsType?.ToLower() == "long_sms")
                             {
                                 room.long_sms += credit.Amount;
                                 room.credits += credit.Amount;
@@ -577,10 +599,9 @@ namespace Business
                             } into g
                             select new ReporteConsumoSistemaDto
                             {
-                                Fecha = DateTime.Today, // Fijamos la fecha de hoy
+                                Fecha = DateTime.Today, 
                                 Cliente = g.Key.nombrecliente,
                                 MensajesEnviados = g.Count(),
-                                ConceptoEnvio = "$1,000.00" // Valor fijo temporal
                             };
 
                 return query.ToList();
