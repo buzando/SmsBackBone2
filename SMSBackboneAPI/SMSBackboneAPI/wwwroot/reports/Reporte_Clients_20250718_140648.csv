@@ -1,0 +1,6 @@
+﻿id,NombreCliente,CreationDate,RateForShort,RateForLong,ShortRateType,LongRateType,ShortRateQty,LongRateQty,Estatus,FirstName,LastName,PhoneNumber,Email,Extension,RoomName,TotalCredits,TotalLongSmsCredits,TotalShortSmsCredits,DeactivationDate
+"3","Hector","6/18/2025 2:58:48 PM","0.02","0.10","0","1","1000","1000","1","Hector","Trejo","5539006706","hec_tre_san@hotmail.com","","Default, Sala dos, tres, sala cuatro","7903","7363","535","7/8/2025 7:04:19 PM"
+"1002","Hector 2","6/18/2025 2:58:48 PM","0.01","0.50","1","0","1000","1000","0","Hector Jesus","Trejo","5539006706","hec.tre.san@gmail.com","","Default","0","0","0",""
+"2003","Cliente 1","7/6/2025 8:13:05 PM","0.26","0.10","0","0","2,000","2,000","0","Jesus","Trejo","5587554862","Correo1@correo.com","","Default","0","0","0","7/6/2025 8:18:24 PM"
+"3003","Cliente3","7/7/2025 4:23:12 PM","0.28","0.13","0","0","1–999","1,000","0","Jesus","Trejo","5587554862","Correo1@correo.com","","default","0","0","0","7/7/2025 4:24:18 PM"
+"4003","Cliente5","7/9/2025 2:01:59 PM","0.26","0.10","0","0","2,000","2,000","0","Cliente nombre 6","cliente apellido","5539006706","correo4@gmail.com","","Default","7","7","0",""

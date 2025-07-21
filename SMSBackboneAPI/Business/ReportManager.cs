@@ -222,38 +222,64 @@ namespace Business
                     var deliveryData = GetSmsReportSend(reportdata, true);
                     return GenerateFileFrom(deliveryData, format);
 
+                case "clients":
+                    var clientData = new ClientManager().GetClientsAdmin(0);
+                    return GenerateFileFrom(clientData.Items, format);
+
+                case "reportesadmin":
+                    var data = new ReportsAdminRequest { FechaFin = DateTime.Parse(request.EndDate), FechaInicio = DateTime.Parse(request.StartDate), Page = 0, TipoReporte = int.Parse(request.PageOrigin) };
+                    var ReportData = new ClientManager().GetReportsAdmin(data);
+                    return GenerateFileFrom(ReportData.Items, format);
+
                 default:
                     throw new Exception("Tipo de reporte no válido.");
             }
         }
-        private byte[] GenerateFileFrom(dynamic data, string format)
+        public byte[] GenerateFileFrom(object data, string format)
         {
-            IEnumerable<object> records = data switch
-            {
-                ReportGlobalResponse global => global.reportGlobalResponseLists,
-                ReportDeliveryResponse delivery => delivery.ReportDeliveryList,
-                _ => throw new Exception("Tipo de datos no reconocido.")
-            };
+            if (data is ReportGlobalResponse global)
+                data = global.reportGlobalResponseLists;
+            else if (data is ReportDeliveryResponse delivery)
+                data = delivery.ReportDeliveryList;
+            else if (data is ReportsAdminResponse admin)
+                data = admin.Items;
 
-            var listType = records.FirstOrDefault()?.GetType();
-            if (listType == null) throw new Exception("No hay datos para exportar.");
+            // Validación
+            var listObj = (data as IEnumerable<object>)?.ToList();
+            if (listObj == null || !listObj.Any())
+                throw new Exception("No hay datos para exportar.");
 
-            var method = typeof(ReportHelper)
-                .GetMethod("GenerateGenericCsv")
-                .MakeGenericMethod(listType);
+            var type = listObj.First().GetType();
 
+            // Convertir List<object> a List<T> dinámicamente
+            var castedList = typeof(Enumerable)
+                .GetMethod("Cast")!
+                .MakeGenericMethod(type)
+                .Invoke(null, new object[] { listObj });
+
+            var toList = typeof(Enumerable)
+                .GetMethod("ToList")!
+                .MakeGenericMethod(type)
+                .Invoke(null, new object[] { castedList });
+
+            // Ejecutar método correcto según formato
             return format switch
             {
-                "xlsx" => (byte[])typeof(ReportHelper).GetMethod("GenerateGenericExcel").MakeGenericMethod(listType).Invoke(null, new object[] { records }),
-                "csv" => (byte[])method.Invoke(null, new object[] { records }),
-                "pdf" => (byte[])typeof(ReportHelper).GetMethod("GeneratePdfWithMigraDoc").MakeGenericMethod(listType).Invoke(null, new object[] { records }),
+                "xlsx" => (byte[])typeof(ReportHelper)
+                            .GetMethod("GenerateGenericExcel")!
+                            .MakeGenericMethod(type)
+                            .Invoke(null, new[] { toList }),
+                "csv" => (byte[])typeof(ReportHelper)
+                            .GetMethod("GenerateGenericCsv")!
+                            .MakeGenericMethod(type)
+                            .Invoke(null, new[] { toList }),
+                "pdf" => (byte[])typeof(ReportHelper)
+                            .GetMethod("GeneratePdfWithMigraDoc")!
+                            .MakeGenericMethod(type)
+                            .Invoke(null, new[] { toList }),
                 _ => throw new Exception("Formato no soportado.")
             };
         }
-
-
-
-
 
     }
 }

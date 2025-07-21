@@ -70,6 +70,12 @@ namespace Business
                     msgBody = $"<h1>Register user</h1>" + $"Please click on the following link to finish your register:<p>" +
                        $"<a href=\"{link}\">Finish Register</a></p>";
                     break;
+                case "NewClient":
+                    var Login = Common.ConfigurationManagerJson("UrlSitio");
+                    link = Login;
+                    msgBody = $"<h1>Register user</h1>" + $"Porfavor ingrese al link con la siguiente contraseña: {token}<p>" +
+                       $"<a href=\"{link}\">Login</a></p>";
+                    break;
                 default:
                     msgBody = "";
                     break;

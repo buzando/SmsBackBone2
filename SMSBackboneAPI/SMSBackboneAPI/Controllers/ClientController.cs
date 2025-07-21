@@ -58,13 +58,13 @@ namespace SMSBackboneAPI.Controllers
 
         [AllowAnonymous]
         [HttpGet("GetClientsAdmin")]
-        public IActionResult GetClientsAdmin()
+        public IActionResult GetClientsAdmin(int page)
         {
             GeneralErrorResponseDto errorResponse = new GeneralErrorResponseDto();
 
 
             var userManager = new Business.ClientManager();
-            var user = userManager.GetClientsAdmin();
+            var user = userManager.GetClientsAdmin(page);
             if (user != null)
             {
                 var response = Ok(user);
@@ -88,7 +88,7 @@ namespace SMSBackboneAPI.Controllers
                 var clientManager = new ClientManager();
 
                 bool result;
-
+                string passwordtmp = string.Empty;
                 if (dto.Id.HasValue)
                 {
                     result = clientManager.UpdateClient(dto);

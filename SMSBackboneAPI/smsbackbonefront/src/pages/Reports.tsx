@@ -187,32 +187,6 @@ const Reports: React.FC = () => {
     };
 
 
-    const handleClearCampaignSelection = () => {
-        if (selectedSmsOption === "Global") {
-            setCampaignMenuOpen(false);
-            return;
-        }
-
-
-        setSelectedCampaigns([]);
-        setCampaignSearch('');
-
-        setFilteredReportsSms(null);
-
-        handleFilter();
-
-        setCampaignMenuOpen(false);
-    };
-
-    useEffect(() => {
-        if (selectedCampaigns.length === 0) {
-            setFilteredReportsSms(null);
-        }
-        if (selectedUsers.length === 0) {
-            setFilteredReportsSms(null);
-        }
-    }, [selectedCampaigns, selectedUsers]);
-
     // Abre o cierra el menú de usuarios
     const handleUserClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         if (userMenuOpen) {
@@ -235,23 +209,6 @@ const Reports: React.FC = () => {
         setSelectedUsers(
             selectedUsers.length === users.length ? [] : users
         );
-    };
-
-
-    const handleClearUserSelection = () => {
-        if (selectedSmsOption === "Global") {
-            setUserMenuOpen(false);
-            return;
-        }
-
-        setSelectedUsers([]);
-        setUserSearch('');
-
-        setFilteredReportsSms(null);
-
-        handleFilter();
-
-        setUserMenuOpen(false);
     };
 
 
@@ -328,7 +285,7 @@ const Reports: React.FC = () => {
     };
 
     useEffect(() => {
-        handleReport();
+        handleReport(selectedDates!);
     }, [currentPage]);
 
 
@@ -350,8 +307,8 @@ const Reports: React.FC = () => {
                 RoomId: roomId,
                 StartDate: formatDateToLocalString(dates!.start),
                 EndDate: formatDateToLocalString(dates!.end),
-                CampaignIds: selectedCampaigns.length ? selectedCampaigns : null,
-                UserIds: selectedUsers.length ? selectedUsers : null,
+                CampaignIds: selectedCampaigns.length ? selectedCampaigns.map(c => c.id) : null,
+                UserIds: selectedUsers.length ? selectedUsers.map(u => u.id) : null,
                 Page: currentPage + 1
             };
 
@@ -363,7 +320,7 @@ const Reports: React.FC = () => {
                 settotalCount(response.data.totalCount);
                 settotalXPage(response.data.totalXPage);
                 if (selectedSmsOption === "Global") {
-                    setReportData(transformPascalCase(response.data.reportGlobalResponseLists || [])); // para reporte Global
+                    setReportData(transformPascalCase(response.data.reportGlobalResponseLists || []));
                 } else {
                     setReportDatasms(response.data.reportDeliveryList || []);
                 }
@@ -382,7 +339,7 @@ const Reports: React.FC = () => {
 
     const handleFirstPage = () => setCurrentPage(0);
     const handlePreviousPage = () => setCurrentPage((prev) => Math.max(prev - 1, 0));
-    const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+    const handleNextPage = () => setCurrentPage(currentPage + 1);
     const handleLastPage = () => setCurrentPage(totalPages - 1);
     const transformPascalCase = (data: any[]) => {
         return data.map(item => ({
@@ -540,8 +497,8 @@ const Reports: React.FC = () => {
                 ReportType: selectedSmsOption,
                 Format: format,
                 RoomId: roomId,
-                StartDate: formatDateToLocalString(selectedDates.start),
-                EndDate: formatDateToLocalString(selectedDates.end),
+                StartDate: formatDateToLocalString(selectedDates!.start),
+                EndDate: formatDateToLocalString(selectedDates!.end),
                 CampaignIds: selectedCampaigns.length ? selectedCampaigns : null,
                 UserIds: selectedUsers.length ? selectedUsers : null,
                 PageOrigin: "Reportes"
@@ -576,195 +533,6 @@ const Reports: React.FC = () => {
     };
 
 
-
-    const exportReport = async (format: 'csv' | 'xlsx' | 'pdf',
-        onComplete?: () => void
-    ) => {
-        const MAX_RECORDS_LOCAL = 100000;
-        try {
-            const dataToExport = selectedSmsOption === "Global"
-                ? reportData
-                : (reportData!.length > 0 ? reportData : reportDatasms);
-
-            if ((dataToExport?.length ?? 0) <= MAX_RECORDS_LOCAL) {
-                // === LOCAL EXPORT ===
-
-                const cleanData = dataToExport!.map((item: ReporteGlobal | ReporteSMS) => {
-                    const isGlobal = 'Cost' in item;
-
-                    return isGlobal
-                        ? {
-                            Fecha: new Date((item as ReporteGlobal).Date).toLocaleString(),
-                            Telefono: (item as ReporteGlobal).Phone,
-                            Sala: (item as ReporteGlobal).Room,
-                            Campana: (item as ReporteGlobal).Campaign,
-                            Idcampana: (item as ReporteGlobal).CampaignId,
-                            Usuario: (item as ReporteGlobal).User,
-                            Idmensaje: (item as ReporteGlobal).MessageId,
-                            Mensaje: (item as ReporteGlobal).Message,
-                            Estado: (item as ReporteGlobal).Status,
-                            Fecharecepcion: new Date((item as ReporteGlobal).SentAt ?? '').toLocaleString(),
-                            Costo: (item as ReporteGlobal).Cost,
-                            Tipo: (item as ReporteGlobal).Type,
-                        }
-                        : {
-                            Fecha: new Date((item as ReporteSMS).sentAt ?? '').toLocaleString(),
-                            Telefono: (item as ReporteSMS).phoneNumber,
-                            Sala: (item as ReporteSMS).roomName,
-                            Campana: (item as ReporteSMS).campaignName,
-                            Idcampana: (item as ReporteSMS).campaignId,
-                            Usuario: (item as ReporteSMS).userName,
-                            Idmensaje: (item as ReporteSMS).messageId,
-                            Mensaje: (item as ReporteSMS).message,
-                            Estado: (item as ReporteSMS).status ?? '',
-                            Fecharecepcion: '', // o repetir SentAt si aplica
-                            Costo: '',
-                            Tipo: '',
-                        };
-                });
-                if (format === 'csv') {
-                    const csv = unparse(cleanData);
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                    saveAs(blob, 'Reporte.csv');
-                } else if (format === 'xlsx') {
-                    const worksheet = XLSX.utils.json_to_sheet(cleanData);
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte');
-                    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-                    const blob = new Blob([excelBuffer], {
-                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    });
-                    saveAs(blob, 'Reporte.xlsx');
-                }
-                else if (format === 'pdf') {
-                    const input = tableRef.current;
-                    if (!input) return;
-
-                    // 🔄 Crear un clon oculto para capturar sin afectar la vista
-                    const clone = input.cloneNode(true) as HTMLDivElement;
-                    clone.style.position = 'absolute';
-                    clone.style.top = '-9999px';
-                    clone.style.left = '-9999px';
-                    clone.style.overflow = 'visible';
-                    clone.style.width = 'fit-content';
-                    clone.style.maxWidth = 'none';
-
-                    document.body.appendChild(clone);
-
-                    const canvas = await html2canvas(clone, {
-                        scale: 2,
-                        useCORS: true
-                    });
-
-                    document.body.removeChild(clone); // 🧹 Limpieza
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const pdf = new jsPDF('l', 'mm', 'a4');
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = pdf.internal.pageSize.getHeight();
-
-                    const imgProps = pdf.getImageProperties(imgData);
-                    const imgWidth = pdfWidth;
-                    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-
-                    let position = 0;
-
-                    if (imgHeight < pdfHeight) {
-                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-                    } else {
-                        const canvasHeight = canvas.height;
-                        const pageHeightPx = (pdfHeight * canvas.height) / imgHeight;
-
-                        const pageCanvas = document.createElement('canvas');
-                        const pageCtx = pageCanvas.getContext('2d')!;
-                        pageCanvas.width = canvas.width;
-                        pageCanvas.height = pageHeightPx;
-
-                        let pageCount = 0;
-
-                        for (let offset = 0; offset < canvasHeight; offset += pageHeightPx) {
-                            pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
-                            pageCtx.drawImage(canvas, 0, -offset);
-                            const pageImg = pageCanvas.toDataURL('image/png');
-                            if (pageCount > 0) pdf.addPage();
-                            pdf.addImage(pageImg, 'PNG', 0, 0, imgWidth, pdfHeight);
-                            pageCount++;
-                        }
-                    }
-
-                    pdf.save('Reporte.pdf');
-                    return;
-                }
-
-
-            }
-            else {
-                const payload = {
-                    // Cambia esto según los filtros seleccionados
-                    FechaInicio: selectedDates?.start,
-                    FechaFin: selectedDates?.end,
-                    Campanas: selectedCampaigns,
-                    Usuarios: selectedUsers,
-                    Tipo: selectedTab,
-                    Formato: format
-                };
-
-                const headers = {
-                    'Content-Type': 'application/json',
-                    "Access-Control-Allow-Headers": "X-Requested-With",
-                    "Access-Control-Allow-Origin": "*"
-                };
-
-                const response = await axios.post(
-                    `${import.meta.env.VITE_SMS_API_URL}` + `${import.meta.env.VITE_API_GET_REPORTS}`,
-                    payload,
-                    { headers }
-                );
-
-                // Crea un enlace para descargar el archivo
-                const blob = new Blob([response.data], { type: 'application/octet-stream' });
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', `Reporte.${format === 'xlsx' ? 'xlsx' : format}`);
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-            }
-        } catch (error) {
-            console.error("Error exportando reporte:", error);
-        }
-        finally {
-            onComplete?.();
-        }
-    };
-
-    const handleFilter = () => {
-        if (selectedSmsOption === "Global") {
-            setFilteredReports((reportData ?? []) as ReporteGlobal[]);
-            return;
-        }
-
-        // Para reportes SMS
-        let resultado = [...(reportDatasms ?? [])];
-
-        if (selectedUsers.length > 0) {
-            const selectedUserIds = selectedUsers.map(u => u.id);
-            resultado = resultado.filter(r => selectedUserIds.includes(r.UserId));
-        }
-
-        if (selectedCampaigns.length > 0) {
-            const selectedCampaignIds = selectedCampaigns.map(c => c.id);
-            resultado = resultado.filter(r => selectedCampaignIds.includes(r.campaignId));
-        }
-        if (resultado.length > 0) {
-
-            setFilteredReportsSms(resultado as ReporteSMS[]);
-        } else {
-            setFilteredReportsSms(null);
-        }
-
-    };
 
 
     useEffect(() => {
@@ -1016,7 +784,14 @@ const Reports: React.FC = () => {
                     </div>
 
                     <Box display="flex" justifyContent="space-between" sx={{ mt: 4.5 }}>
-                        <Button variant="outlined" onClick={handleClearCampaignSelection}
+                        <Button variant="outlined" onClick={() => {
+                            setSelectedCampaigns([]);
+                            setCurrentPage(0);
+                            if (selectedDates) {
+                                handleReport(selectedDates);
+                            }
+                            setCampaignMenuOpen(false);
+                        }}
                             sx={{
                                 backgroundColor: '#FFFFFF',
                                 color: '#833A53',
@@ -1038,8 +813,11 @@ const Reports: React.FC = () => {
 
                         <Button variant="contained"
                             onClick={() => {
+                                setCurrentPage(0);
                                 setCampaignMenuOpen(false);
-                                handleFilter();
+                                if (selectedDates) {
+                                    handleReport(selectedDates);
+                                }
                             }}
                             sx={{
                                 backgroundColor: '#833A53',
@@ -1179,7 +957,15 @@ const Reports: React.FC = () => {
 
 
                     <Box display="flex" justifyContent="space-between" sx={{ mt: 4.5 }}>
-                        <Button variant="outlined" onClick={handleClearUserSelection}
+                        <Button variant="outlined" onClick={() => {
+                            setSelectedUsers([]);
+                            setCurrentPage(0);
+                            if (selectedDates) {
+                                handleReport(selectedDates);
+                            }
+                            setUserMenuOpen(false);
+                        }}
+
                             sx={{
                                 backgroundColor: '#FFFFFF',
                                 color: '#833A53',
@@ -1198,8 +984,12 @@ const Reports: React.FC = () => {
                         >LIMPIAR</Button>
                         <Button variant="contained"
                             onClick={() => {
+                                setCurrentPage(0);
                                 setUserMenuOpen(false);
-                                handleFilter();
+                                if (selectedDates) {
+                                    handleReport(selectedDates);
+                                }
+
                             }}
                             sx={{
                                 backgroundColor: '#833A53',
@@ -1239,42 +1029,43 @@ const Reports: React.FC = () => {
 
                     <Box display="flex" gap={1} ml={10}>
                         {/* Primera página (doble flecha izquierda) */}
-                        <IconButton sx={{ p: 0 }} disabled>
+                        <IconButton sx={{ p: 0 }} onClick={handleFirstPage} disabled={currentPage === 0}>
                             <Box display="flex" alignItems="center" >
-                                <img src={backarrow} alt="<<" style={{ marginRight: '-16px', opacity: 0.4 }} />
-                                <img src={backarrow} alt="<<" style={{ opacity: 0.4 }} />
+                                <img src={backarrow} alt="<<" style={{ marginRight: '-16px',opacity: currentPage === 0 ? 0.1 : 3  }} />
+                                <img src={backarrow} alt="<<" style={{ opacity: currentPage === 0 ? 0.1 : 3  }} />
                             </Box>
                         </IconButton>
 
                         {/* Página anterior (flecha izquierda) */}
-                        <IconButton sx={{ p: 0 }} onClick={handleFirstPage} disabled={currentPage === 0}>
-                            <img src={backarrow} alt="<" style={{ opacity: 0.4 }} />
+                        <IconButton sx={{ p: 0 }} onClick={handlePreviousPage}  disabled={currentPage === 0}>
+                            <img src={backarrow} alt="<" style={{  opacity: currentPage === 0 ? 0.1 : 3 }} />
                         </IconButton>
 
                         {/* Página siguiente (flecha derecha volteada) */}
-                        <IconButton sx={{ p: 0 }} onClick={handlePreviousPage} disabled={currentPage === 0}>
+                        <IconButton sx={{ p: 0 }} onClick={handleNextPage}  disabled={currentPage >= totalPages - 1}>
                             <img
                                 src={backarrow}
                                 alt=">"
-                                style={{ transform: 'scaleX(-1)', opacity: 0.4 }}
+                                style={{ transform: 'scaleX(-1)', opacity: currentPage >= totalPages - 1 ? 0.1 : 3 }}
                             />
                         </IconButton>
 
                         {/* Última página (doble flecha derecha) */}
                         <Box display="flex" alignItems="center">
-                            <IconButton sx={{ p: 0 }} onClick={handleNextPage} disabled={currentPage >= totalPages - 1}>
+                            <IconButton sx={{ p: 0 }} onClick={handleLastPage}  disabled={currentPage >= totalPages - 1}>
 
                                 <img
                                     src={backarrow}
                                     alt=">>"
-                                    style={{ transform: 'scaleX(-1)', marginRight: '-4px', opacity: 0.4 }}
+                                    style={{ transform: 'scaleX(-1)', marginRight: '-4px', opacity: currentPage >= totalPages - 1 ? 0.1 : 3 }}
                                 />
                             </IconButton>
                             <IconButton sx={{ p: 0 }} onClick={handleLastPage} disabled={currentPage >= totalPages - 1}>
                                 <img
                                     src={backarrow}
                                     alt=">>"
-                                    style={{ transform: 'scaleX(-1)', marginLeft: '-12px', opacity: 0.4 }}
+                                    style={{ transform: 'scaleX(-1)', marginLeft: '-12px',   opacity: currentPage >= totalPages - 1 ? 0.1 : 1}}
+                                  
 
                                 />
 

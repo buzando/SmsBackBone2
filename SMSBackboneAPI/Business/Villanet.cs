@@ -48,7 +48,7 @@ namespace Business
                 string xmlArticulos = $@"
 <articulos>
   <articulo>
-    <claveProducto>01010101</claveProducto>
+    <claveProducto>43223204</claveProducto>
     <descripcion>Servicio profesional</descripcion>
     <cantidad>1</cantidad>
     <unidad>E48</unidad>
@@ -127,7 +127,7 @@ namespace Business
             using (var ctx = new Entities())
             {
                 var recargas = ctx.CreditRecharge
-                    .Where(x => x.Estatus == "exitoso" && (x.FacturaXML == null || x.FacturaPDF == null))
+                    .Where(x => x.Estatus.ToLower() == "exitoso" && (x.FacturaXML == null || x.FacturaPDF == null))
                     .ToList();
 
                 foreach (var recarga in recargas)

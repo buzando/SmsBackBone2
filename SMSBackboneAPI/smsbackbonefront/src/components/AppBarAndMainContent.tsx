@@ -63,7 +63,7 @@ import PrivacityIcon from '../assets/Icon_privacidad.svg'
 import api from '../assets/api.svg'
 import apihover from '../assets/apihover.svg'
 import { useLocation } from 'react-router-dom';
-
+import axios from 'axios';
 const drawerWidth = 278;
 
 type Page = {
@@ -146,6 +146,19 @@ type Props = {
     children: React.ReactNode;
 }
 
+type Clients = {
+    id: number;
+    nombreCliente: string;
+    creationDate: string;
+    rateForShort: number;
+    rateForLong: number;
+    shortRateType: number;
+    longRateType: number;
+    shortRateQty: string;
+    longRateQty: string;
+    estatus: number;
+    tmpPassword: boolean;
+}
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
@@ -248,10 +261,33 @@ const NavBarAndDrawer: React.FC<Props> = props => {
     const [isHoveringApi, setIsHoveringApi] = useState(false);
     const location = useLocation();
     const [userMenu, setUserMenu] = useState(null);
+    const [client, setClient] = useState<Clients | null>(null);
+    const [OpenModal, SetOpenModal] = useState(true);
     const handleSelection = (link: string) => {
         setSelectedLink(link); // Cambia el enlace seleccionado
     };
 
+    const Handletmppwwd = async () => {
+        try {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userId = user?.id;
+            const response = await axios.get(`${import.meta.env.VITE_SMS_API_URL +
+                import.meta.env.VITE_API_Client_TMPPSSW}`, {
+                params: { userId }
+            });
+            setClient(response.data);
+            if (response.data.tmpPassword) {
+                SetOpenModal(true);
+            }
+        } catch (error) {
+            console.error("Error al obtener usuarios:", error);
+        }
+    };
+
+    useEffect(() => {
+        Handletmppwwd();
+
+    }, []);
 
     const closeHelpModal = () => setHelpModalIsOpen(false);
 

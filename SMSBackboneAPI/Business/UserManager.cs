@@ -41,16 +41,29 @@ namespace Business
             using (var context = new Entities())
             {
                 var passwordhash = SecurityHelper.GenerarPasswordHash(password);
-                var userdb = context.Users.FirstOrDefault(p => p.email == user /*&& p.passwordHash == passwordhash*/);
+                var userdb = context.Users.FirstOrDefault(p => p.email == user);
 
-                var config = new MapperConfiguration(cfg =>
+                var iguales = SecurityHelper.VerificarPassword(password,userdb.passwordHash);
+                if (iguales)
+                {
+                    var client = context.clients.Where(x => x.id == userdb.IdCliente).FirstOrDefault();
+                    if (client.Estatus != 0)
+                    {
+                        return null;
+                    }
+                    var config = new MapperConfiguration(cfg =>
 
-    cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
+cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
 ); var mapper = new Mapper(config);
 
-                userdto = mapper.Map<UserDto>(userdb);
-                userdto.rol = context.Roles.Where(x => x.id == userdb.idRole).Select(x => x.Role).FirstOrDefault();
+                    userdto = mapper.Map<UserDto>(userdb);
+                    userdto.rol = context.Roles.Where(x => x.id == userdb.idRole).Select(x => x.Role).FirstOrDefault();
+                }
+                else
+                {
+                    return null;
+                }
 
             }
 
@@ -359,7 +372,8 @@ namespace Business
                     var user = ctx.Users.Where(x => x.email == pass.Email).FirstOrDefault();
                     if (user != null)
                     {
-                        user.passwordHash = pass.NewPassword;
+                        var pww = SecurityHelper.GenerarPasswordHash(pass.NewPassword);
+                        user.passwordHash = pww;
                         user.TwoFactorAuthentication = pass.TwoFactorAuthentication;
                         ctx.SaveChanges();
                         return true;

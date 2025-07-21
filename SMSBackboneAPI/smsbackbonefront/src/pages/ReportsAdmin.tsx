@@ -40,7 +40,7 @@ const ReportsAdmin = () => {
     const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
     const [clientAnchorEl, setClientAnchorEl] = useState<null | HTMLElement>(null);
     const [clientMenuOpen, setClientMenuOpen] = useState(false);
-    const [selectedClients, setSelectedClients] = useState<string[]>([]);
+    const [selectedClients, setSelectedClients] = useState<Clients[]>([]);
     const [clientsList, setClientsList] = useState<Clients[]>([]);
     const [clientSearch, setClientSearch] = useState('');
     const [originalData, setOriginalData] = useState<any[]>([]);
@@ -56,6 +56,9 @@ const ReportsAdmin = () => {
     const [errorModal, setErrorModal] = useState(false);
     const anyExporting = isExportingCSV || isExportingXLSX || isExportingPDF;
     const [hasFiltered, setHasFiltered] = useState(false);
+    const [totalregisters, Settotalregisters] = useState(0);
+    const [pagination, SetPagination] = useState(0);
+    const [totaldivision, Settotaldivision] = useState(0);
     const DualSpinner = () => (
         <Box
             sx={{
@@ -118,6 +121,11 @@ const ReportsAdmin = () => {
             console.error("Error al obtener clientes:", err);
         }
     };
+
+    useEffect(() => {
+        handleReport(selectedStartDate, selectedEndDate, activeTab);
+    }, [currentPage]);
+
     const handleReport = async (start: Date | null, end: Date | null, tab: number) => {
         if (!start || !end) return;
 
@@ -125,12 +133,19 @@ const ReportsAdmin = () => {
             const response = await axios.post(`${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_REPORTSADMIN}`, {
                 fechaInicio: start.toISOString(),
                 fechaFin: end.toISOString(),
-                tipoReporte: tab
+                tipoReporte: tab,
+                Page: currentPage,
+                clientIds: selectedClients.map(c => c.id),
             });
-            const datos = response.data;
-            setHasFiltered(true);
-            setOriginalData(datos);
-            setFilteredData(datos.slice(0, rowsPerPage));
+            if (response.status == 200) {
+                const datos = response.data;
+                setHasFiltered(true);
+                setOriginalData(datos.items);
+                setFilteredData(datos.items);
+                Settotalregisters(datos.total);
+                SetPagination(datos.pagination);
+                Settotaldivision(Math.ceil(datos.total / datos.pagination));
+            }
         } catch (error) {
             console.error('Error al obtener el reporte:', error);
         }
@@ -146,7 +161,53 @@ const ReportsAdmin = () => {
         GetClients();
     }, []);
 
+    const exportReport2 = async (
+        format: 'pdf' | 'xlsx' | 'csv',
+        callback: () => void
+    ) => {
+        try {
+            const selectedRoom = localStorage.getItem("selectedRoom");
+            if (!selectedRoom) {
+                return;
+            }
 
+            const roomId = JSON.parse(selectedRoom).id;
+            const payload = {
+                ReportType: "ReportesAdmin",
+                Format: format,
+                RoomId: roomId,
+                PageOrigin: activeTab.toString(),
+                StartDate: selectedStartDate?.toISOString(),
+                EndDate: selectedEndDate?.toISOString(),
+            };
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GETREPORTS_ALL}`,
+                payload
+            );
+
+            if (response.data?.success && response.data?.downloadUrl) {
+                const fileUrl = `${import.meta.env.VITE_SMS_API_URL}${response.data.downloadUrl}`;
+
+                // Paso 2: Descargar el archivo ya generado (GET)
+                const fileResponse = await axios.get(fileUrl, { responseType: 'blob' });
+
+                const blob = new Blob([fileResponse.data]);
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = response.data.fileName;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } else {
+                console.error("Error: No se generó el archivo.");
+            }
+        } catch (error) {
+            console.error(`Error al exportar reporte a ${format}:`, error);
+        } finally {
+            callback();
+        }
+    };
 
     const handleExportClick = (
         format: 'csv' | 'xlsx' | 'pdf',
@@ -154,102 +215,20 @@ const ReportsAdmin = () => {
     ) => {
         setThisLoading(true);
         setTimeout(() => {
-            exportRooms(format, () => setThisLoading(false));
+            exportReport2(format, () => setThisLoading(false));
         }, 1000);
-    };
-
-    const exportRooms = async (
-        format: 'csv' | 'xlsx' | 'pdf',
-        onComplete?: () => void
-    ) => {
-        const MAX_RECORDS_LOCAL = 100000;
-        const data = originalData;
-        const cleanData = data.map((item) => {
-            const result: { [key: string]: any } = {};
-            Object.keys(item).forEach((key) => {
-                const value = item[key];
-                result[key] =
-                    typeof value === 'string' || typeof value === 'number'
-                        ? value
-                        : value instanceof Date
-                            ? dayjs(value).format('DD/MM/YYYY HH:mm')
-                            : value !== null && typeof value === 'object'
-                                ? JSON.stringify(value)
-                                : value;
-            });
-            return result;
-        });
-        try {
-            if (data.length <= MAX_RECORDS_LOCAL) {
-
-                if (format === 'csv') {
-                    const csv = unparse(cleanData);
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                    saveAs(blob, 'DescargaSalas.csv');
-                } else if (format === 'xlsx') {
-                    const worksheet = XLSX.utils.json_to_sheet(cleanData);
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, worksheet, 'NumerosDID');
-                    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-                    const blob = new Blob([excelBuffer], {
-                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    });
-                    saveAs(blob, 'DescargarReporte.xlsx');
-                } else if (format === 'pdf') {
-                    const input = document.querySelector('table');
-                    if (!input) return;
-
-                    const clone = input.cloneNode(true) as HTMLElement;
-                    clone.style.position = 'absolute';
-                    clone.style.top = '-9999px';
-                    document.body.appendChild(clone);
-
-                    const canvas = await html2canvas(clone, { scale: 2, useCORS: true });
-                    document.body.removeChild(clone);
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const pdf = new jsPDF('l', 'mm', 'a4');
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const imgProps = pdf.getImageProperties(imgData);
-                    const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
-                    pdf.save('DescargarReporte.pdf');
-                }
-            } else {
-                const payload = { Formato: format };
-                const response = await axios.post(
-                    '${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_EXPORT_NUMBERS}',
-                    payload,
-                    { headers: { 'Content-Type': 'application/json' }, responseType: 'blob' }
-                );
-
-                const blob = new Blob([response.data], { type: 'application/octet-stream' });
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', `DescargarReporte.${format}`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        } catch (error) {
-            setErrorModal(true);
-        } finally {
-            onComplete?.();
-        }
     };
 
     const goToFirstPage = () => setCurrentPage(1);
 
-    const goToLastPage = () => setCurrentPage(totalPages);
+    const goToLastPage = () => setCurrentPage(totaldivision);
 
     const handleNextPage = () => {
-        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+        if (currentPage < totaldivision) setCurrentPage(currentPage + 1);
     };
 
     const handlePrevPage = () => {
-        if (currentPage > 1) setCurrentPage(currentPage - 1);
+        if (currentPage > 0) setCurrentPage(currentPage - 1);
     };
 
 
@@ -367,7 +346,7 @@ const ReportsAdmin = () => {
                 >
                     {/* Rango de resultados */}
                     <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E" }}>
-                        {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, originalData.length)} de {originalData.length}
+                        {(currentPage)}–{totaldivision} de {totalregisters}
                     </Typography>
 
 
@@ -395,21 +374,21 @@ const ReportsAdmin = () => {
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Siguiente página">
-                                <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+                                <IconButton onClick={handleNextPage} disabled={currentPage === totaldivision}>
                                     <img src={backarrow} style={{
                                         width: 24, transform: 'rotate(180deg)', marginRight: "-28px", marginLeft: "-28px",
-                                        opacity: currentPage === totalPages ? 0.3 : 1
+                                        opacity: currentPage === totaldivision ? 0.3 : 1
                                     }} />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Ultima Página">
-                                <IconButton onClick={goToLastPage} disabled={currentPage === totalPages}>
+                                <IconButton onClick={goToLastPage} disabled={currentPage === Math.ceil(pagination / totalregisters)}>
                                     <Box
                                         display="flex"
                                         gap="0px"
                                         alignItems="center"
                                         sx={{
-                                            opacity: currentPage === 1 ? 0.3 : 1
+                                            opacity: currentPage === totaldivision ? 0.3 : 1
                                         }}
                                     >
                                         <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-6px" }} />
@@ -876,14 +855,14 @@ const ReportsAdmin = () => {
                                 key={client.id}
                                 onClick={() =>
                                     setSelectedClients((prev) =>
-                                        prev.includes(client.nombrecliente)
-                                            ? prev.filter((c) => c !== client.nombrecliente)
-                                            : [...prev, client.nombrecliente]
+                                        prev.includes(client)
+                                            ? prev.filter((c) => c !== client)
+                                            : [...prev, client]
                                     )
                                 }
                                 sx={{ height: "32px", marginLeft: "-12px" }}
                             >
-                                <Checkbox checked={selectedClients.includes(client.nombrecliente)}
+                                <Checkbox checked={selectedClients.includes(client)}
                                     checkedIcon={
                                         <Box
                                             sx={{
@@ -907,7 +886,7 @@ const ReportsAdmin = () => {
                                         fontFamily: 'Poppins',
                                         fontSize: '16px',
                                         fontWeight: 500,
-                                        color: selectedClients.includes(client.nombrecliente) ? '#8F4E63' : '#786E71',
+                                        color: selectedClients.includes(client) ? '#8F4E63' : '#786E71',
                                     }}
                                 />
                             </MenuItem>
@@ -929,14 +908,14 @@ const ReportsAdmin = () => {
                             setSelectedClients([]);
                             setClientSearch('');
                             setClientMenuOpen(false);
-                            // Aquí podrías resetear los datos si aplicas filtros
+                            handleReport(selectedStartDate, selectedEndDate, activeTab);
                         }}
                         text="LIMPIAR"
                     />
                     <MainButton
                         onClick={() => {
                             setClientMenuOpen(false);
-                            // Aquí puedes aplicar lógica si quieres filtrar por cliente
+                            handleReport(selectedStartDate, selectedEndDate, activeTab);
                         }}
                         text="APLICAR"
                     />

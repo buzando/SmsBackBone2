@@ -22,6 +22,7 @@ namespace Modal.Model
         public string? ShortRateQty { get; set; } 
         public string? LongRateQty { get; set; } 
         public DateTime? DeactivationDate { get; set; }
+        public bool TmpPassword { get; set; }
 
     }
 }

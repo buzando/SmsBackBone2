@@ -69,6 +69,11 @@ import SnackBar from "../components/commons/ChipBar";
 import infoicon from '../assets/Icon-info.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
 
+export interface PagedClientResponse {
+    items: Clients[];
+    total: number;
+}
+
 export interface Clients {
     id: number;
     nombreCliente: string;
@@ -110,8 +115,8 @@ const Clients: React.FC = () => {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(50);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(50);
     const [totalPages, setTotalPages] = useState(0);
     const [totalItems, setTotalItems] = useState(0);
     const [currentItems, setCurrentItems] = useState<any[]>([]);
@@ -188,6 +193,7 @@ const Clients: React.FC = () => {
     const hasClientSelected = selectedClients.length > 0;
     const showClientHighlight = isClientActive || hasClientSelected;
     const [isSavingClient, setIsSavingClient] = useState(false);
+
     const DualSpinner = () => (
         <Box
             sx={{
@@ -247,18 +253,19 @@ const Clients: React.FC = () => {
 
         try {
             const request = `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_GET_CLIENTSADMIN}`;
-            const response = await axios.get<Clients[]>(request);
+                import.meta.env.VITE_API_GET_CLIENTSADMIN}${currentPage + 1}`;
+            const response = await axios.get<PagedClientResponse>(request);
 
             if (response.status === 200) {
-                const fetchedClient = response.data;
+                const fetchedClient = response.data.items;
                 const uniqueClients: Clients[] = [
                     ...new Map(fetchedClient.map((item: Clients) => [item.nombreCliente, item])).values()
                 ];
-                setClientsList(uniqueClients);
+                setClientsList(uniqueClients); 
                 setOriginalData(uniqueClients);
-                setClientsList(uniqueClients.slice(0, 50));
-
+                setTotalPages(Math.ceil(response.data.total / itemsPerPage));
+                setItemsPerPage(response.data.total);
+                setTotalItems(response.data.total);
             }
         } catch {
 
@@ -271,6 +278,51 @@ const Clients: React.FC = () => {
         GetClientsAdmin();
     }, []);
 
+     const exportReport2 = async (
+            format: 'pdf' | 'xlsx' | 'csv',
+            callback: () => void
+        ) => {
+            try {
+                const selectedRoom = localStorage.getItem("selectedRoom");
+                if (!selectedRoom) {
+                    return;
+                }
+    
+                const roomId = JSON.parse(selectedRoom).id;
+                const payload = {
+                    ReportType: "Clients",
+                    Format: format,
+                    RoomId: roomId,
+                    PageOrigin: "Reportes"
+                };
+    
+                const response = await axios.post(
+                    `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GETREPORTS_ALL}`,
+                    payload
+                );
+    
+                if (response.data?.success && response.data?.downloadUrl) {
+                    const fileUrl = `${import.meta.env.VITE_SMS_API_URL}${response.data.downloadUrl}`;
+    
+                    // Paso 2: Descargar el archivo ya generado (GET)
+                    const fileResponse = await axios.get(fileUrl, { responseType: 'blob' });
+    
+                    const blob = new Blob([fileResponse.data]);
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = response.data.fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } else {
+                    console.error("Error: No se generó el archivo.");
+                }
+            } catch (error) {
+                console.error(`Error al exportar reporte a ${format}:`, error);
+            } finally {
+                callback();
+            }
+        };
 
     const handleExportClick = (
         format: 'csv' | 'xlsx' | 'pdf',
@@ -278,7 +330,7 @@ const Clients: React.FC = () => {
     ) => {
         setThisLoading(true);
         setTimeout(() => {
-            exportClients(format, () => setThisLoading(false));
+            exportReport2(format, () => setThisLoading(false));
         }, 1000);
     };
 
@@ -381,6 +433,9 @@ const Clients: React.FC = () => {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
 
+    useEffect(() => {
+    GetClientsAdmin();
+}, [currentPage]);
 
     useEffect(() => {
         const start = (currentPage - 1) * itemsPerPage;
@@ -883,21 +938,21 @@ const Clients: React.FC = () => {
 
                     {/* Rango de resultados */}
                     <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E" }}>
-                        {(currentPage - 1) * itemsPerPage + 1}–
-                        {Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems}
+                        {(currentPage + 1)}–
+                        {totalPages} de {totalItems}
                     </Typography>
 
                     {/* Flechas + Exportaciones */}
                     <Box display="flex" alignItems="center" gap={1} height={"25px"} marginBottom={"-5px"} marginTop={"-5px"}>
                         <Box sx={{ marginRight: "750px" }}>
                             <Tooltip title="Primera página">
-                                <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
+                                <IconButton onClick={goToFirstPage} disabled={currentPage === 0}>
                                     <Box
                                         display="flex"
                                         gap="0px"
                                         alignItems="center"
                                         sx={{
-                                            opacity: currentPage === 1 ? 0.3 : 1
+                                            opacity: currentPage === 0 ? 0.3 : 1
                                         }}
                                     >
                                         <img src={backarrow} style={{ width: 24, marginRight: "-16px" }} />
@@ -906,26 +961,26 @@ const Clients: React.FC = () => {
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Página Anterior">
-                                <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
-                                    <img src={backarrow} style={{ width: 24, opacity: currentPage === 1 ? 0.3 : 1, marginLeft: "-18px" }} />
+                                <IconButton onClick={handlePrevPage} disabled={currentPage === 0}>
+                                    <img src={backarrow} style={{ width: 24, opacity: currentPage === 0 ? 0.3 : 1, marginLeft: "-18px" }} />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Siguiente página">
-                                <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+                                <IconButton onClick={handleNextPage} disabled={currentPage + 1 === totalPages}>
                                     <img src={backarrow} style={{
                                         width: 24, transform: 'rotate(180deg)', marginRight: "-28px", marginLeft: "-28px",
-                                        opacity: currentPage === totalPages ? 0.3 : 1
+                                        opacity: currentPage + 1 === totalPages ? 0.3 : 1
                                     }} />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Ultima Página">
-                                <IconButton onClick={goToLastPage} disabled={currentPage === totalPages}>
+                                <IconButton onClick={goToLastPage} disabled={currentPage + 1 === totalPages}>
                                     <Box
                                         display="flex"
                                         gap="0px"
                                         alignItems="center"
                                         sx={{
-                                            opacity: currentPage === 1 ? 0.3 : 1
+                                            opacity: currentPage + 1 === totalPages ? 0.3 : 1
                                         }}
                                     >
                                         <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-6px" }} />
@@ -1087,7 +1142,7 @@ const Clients: React.FC = () => {
                             Da de alta un cliente para comenzar.
                         </Typography>
                     </Box>
-                ) : paginatedData.length === 0 ? (
+                ) : clientsList.length === 0 ? (
                     // Caja abierta - no hay coincidencias con los filtros
                     <Box
                         display="flex"
@@ -1193,7 +1248,7 @@ const Clients: React.FC = () => {
 
                             </thead>
                             <tbody>
-                                {paginatedData.map((Client) => (
+                                {clientsList.map((Client) => (
                                     <tr key={Client.id} style={{ borderBottom: '1px solid #E0E0E0' }}>
                                         <td style={{
                                             padding: '5px', width: '180px', whiteSpace: 'nowrap', overflow: 'hidden',

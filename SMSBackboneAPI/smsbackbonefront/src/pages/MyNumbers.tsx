@@ -1916,7 +1916,7 @@ const MyNumbers: React.FC = () => {
                 setFilteredData(fetchedNumbers);
             }
         } catch {
-            alert("Error");
+       
         } finally {
             setLoading(false);
         }

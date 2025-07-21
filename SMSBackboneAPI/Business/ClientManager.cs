@@ -18,6 +18,8 @@ using ClosedXML.Parser;
 using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Business
 {
@@ -37,6 +39,7 @@ namespace Business
                 cliente.LongRateQty = "1";
                 cliente.ShortRateType = 0;
                 cliente.LongRateType = 0;
+                cliente.TmpPassword = true;
                 var config = new MapperConfiguration(cfg =>
 
   cfg.CreateMap<clientDTO, clients>()
@@ -114,6 +117,7 @@ namespace Business
         {
             try
             {
+                var total = Common.ConfigurationManagerJson("TotalPaginas");
                 using (var ctx = new Entities())
                 {
                     var clientes = ctx.clients.ToList();
@@ -135,22 +139,80 @@ namespace Business
             }
         }
 
-        public List<Modal.Model.Model.ClientRoomSummaryDTO> GetClientsAdmin()
+        public PagedClientResponse GetClientsAdmin(int page)
         {
-            var lista = new List<Modal.Model.Model.ClientRoomSummaryDTO>();
             try
             {
-                using (var ctx = new Entities())
+
+                var result = new PagedClientResponse();
+                var connectionString = Common.ConfigurationManagerJson("ConnectionStrings:Conexion");
+                var pageSize = int.Parse(Common.ConfigurationManagerJson("TotalPaginas"));
+
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    lista = ctx.Set<Modal.Model.Model.ClientRoomSummaryDTO>().FromSqlRaw("EXEC GetClientRoomSummary").ToList();
+                    using (var command = new SqlCommand("GetClientRoomSummary", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Page", page);
+                        command.Parameters.AddWithValue("@PageSize", pageSize);
+
+                        connection.Open();
+                        using (var reader = command.ExecuteReader())
+                        {
+                            result.Items = new List<Modal.Model.Model.ClientRoomSummaryDTO>();
+
+                            while (reader.Read())
+                            {
+                                var dto = new Modal.Model.Model.ClientRoomSummaryDTO
+                                {
+                                    id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    NombreCliente = reader.GetString(reader.GetOrdinal("nombreCliente")),
+                                    CreationDate = reader.GetDateTime(reader.GetOrdinal("CreationDate")),
+                                    RateForShort = reader.GetDecimal(reader.GetOrdinal("RateForShort")),
+                                    RateForLong = reader.GetDecimal(reader.GetOrdinal("RateForLong")),
+                                    ShortRateType = reader.IsDBNull(reader.GetOrdinal("ShortRateType")) ? (byte?)null : reader.GetByte(reader.GetOrdinal("ShortRateType")),
+                                    LongRateType = reader.IsDBNull(reader.GetOrdinal("LongRateType")) ? (byte?)null : reader.GetByte(reader.GetOrdinal("LongRateType")),
+                                    ShortRateQty = reader.GetString(reader.GetOrdinal("ShortRateQty")),
+                                    LongRateQty = reader.GetString(reader.GetOrdinal("LongRateQty")),
+                                    Estatus = reader.IsDBNull(reader.GetOrdinal("Estatus")) ? (byte?)null : reader.GetByte(reader.GetOrdinal("Estatus")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("firstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("lastName")),
+                                    PhoneNumber = reader.GetString(reader.GetOrdinal("phoneNumber")),
+                                    Email = reader.GetString(reader.GetOrdinal("email")),
+                                    Extension = reader.IsDBNull(reader.GetOrdinal("extension"))
+    ? (int?)null
+    : reader.GetInt32(reader.GetOrdinal("extension")),
+                                    RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
+                                    TotalCredits = reader.GetDouble(reader.GetOrdinal("TotalCredits")),
+                                    TotalLongSmsCredits = reader.GetDouble(reader.GetOrdinal("TotalLongSmsCredits")),
+                                    TotalShortSmsCredits = reader.GetDouble(reader.GetOrdinal("TotalShortSmsCredits")),
+                                    DeactivationDate = reader.IsDBNull(reader.GetOrdinal("DeactivationDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DeactivationDate"))
+                                };
+
+                                result.Items.Add(dto);
+                            }
+
+                            if (reader.NextResult() && reader.Read())
+                            {
+                                result.Total = reader.GetInt32(0);
+                            }
+                        }
+                    }
                 }
-                return lista;
+
+                return result;
+
             }
             catch (Exception e)
             {
+
                 return null;
             }
         }
+
+
+
+
         public bool CreateClient(ClientRequestDto dto)
         {
             using (var ctx = new Entities())
@@ -170,7 +232,8 @@ namespace Business
                             LongRateType = dto.LongRateType,
                             ShortRateQty = dto.ShortRateQty,
                             LongRateQty = dto.LongRateQty,
-                            Estatus = 1
+                            Estatus = 1,
+                            TmpPassword = true
                         };
 
                         ctx.clients.Add(client);
@@ -178,8 +241,8 @@ namespace Business
 
                         int clientId = client.id;
 
-                        string rawPassword;
-                        string hashedPassword = SecurityHelper.GenerarPasswordTemporal(out rawPassword);
+                        string rawPassword = GenerarPasswordTemporal(8);;
+                        string hashedPassword = SecurityHelper.GenerarPasswordHash(rawPassword);
                         // 2. Crear usuario
                         var user = new Modal.Model.Model.Users
                         {
@@ -240,7 +303,7 @@ namespace Business
                         if (dto.Id == null)
                         {
                             string sitioFront = Common.ConfigurationManagerJson("UrlSitio");
-                            string mensaje = MailManager.GenerateMailMessage(dto.Email, rawPassword, sitioFront, "Register");
+                            string mensaje = MailManager.GenerateMailMessage(dto.Email, rawPassword, sitioFront, "NewClient");
 
                             MailManager.SendEmail(dto.Email, "Bienvenido a Red Quantum", mensaje);
                         }
@@ -254,6 +317,13 @@ namespace Business
                     }
                 }
             }
+        }
+        private string GenerarPasswordTemporal(int length = 8)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
         public bool UpdateClient(ClientRequestDto dto)
@@ -512,29 +582,50 @@ namespace Business
             }
         }
 
-        public List<object> GetReportsAdmin(ReportsAdminRequest request)
+        public ReportsAdminResponse GetReportsAdmin(ReportsAdminRequest request)
         {
-            // Aquí seleccionas según el tipo de reporte, por ejemplo:
+            var pageSize = int.Parse(Common.ConfigurationManagerJson("TotalPaginas"));
+
             if (request.TipoReporte == 0)
             {
-                return GetReporteFacturacion(request.FechaInicio, request.FechaFin)
-                         .Cast<object>().ToList();
+                var (items, total) = GetReporteFacturacion(request.FechaInicio, request.FechaFin,request.ClientIds ,request.Page, pageSize);
+                return new ReportsAdminResponse
+                {
+                    Items = items.Cast<object>().ToList(),
+                    Total = total,
+                    Pagination = pageSize
+                };
             }
             else if (request.TipoReporte == 1)
             {
-
-                return GetReporteConsumoCliente(request.FechaInicio, request.FechaFin)
-                         .Cast<object>().ToList();
+                var (items, total) = GetReporteConsumoCliente(request.FechaInicio, request.FechaFin,request.ClientIds, request.Page, pageSize);
+                return new ReportsAdminResponse
+                {
+                    Items = items.Cast<object>().ToList(),
+                    Total = total,
+                    Pagination = pageSize
+                };
             }
             else if (request.TipoReporte == 2)
             {
-                return GetReporteConsumoSistema(request.FechaInicio, request.FechaFin).Cast<object>().ToList();
+                var (items, total) = GetReporteConsumoSistema(request.FechaInicio, request.FechaFin, request.ClientIds,request.Page, pageSize);
+                return new ReportsAdminResponse
+                {
+                    Items = items.Cast<object>().ToList(),
+                    Total = total,
+                    Pagination = pageSize
+                };
             }
 
-            return new List<object>();
+            return new ReportsAdminResponse
+            {
+                Items = new List<object>(),
+                Total = 0
+            };
         }
 
-        public List<ReporteConsumoDTO> GetReporteConsumoCliente(DateTime fechaInicio, DateTime fechaFin)
+
+        public (List<ReporteConsumoDTO> Items, int Total) GetReporteConsumoCliente(DateTime fechaInicio, DateTime fechaFin, List<int> clientIds, int page, int pageSize)
         {
             using (var ctx = new Entities())
             {
@@ -542,6 +633,7 @@ namespace Business
                             join user in ctx.Users on recarga.idUser equals user.Id
                             join client in ctx.clients on user.IdCliente equals client.id
                             where recarga.RechargeDate >= fechaInicio && recarga.RechargeDate <= fechaFin
+                                  && (clientIds == null || clientIds.Contains(client.id))
                             select new ReporteConsumoDTO
                             {
                                 Fecha = recarga.RechargeDate,
@@ -552,11 +644,21 @@ namespace Business
                                 Saldo = Math.Round(recarga.quantityMoney * 0.75m, 2)
                             };
 
-                return query.ToList();
+                int total = query.Count();
+                var items = (page <= 0)
+                    ? query.OrderByDescending(x => x.Fecha).ToList()
+                    : query.OrderByDescending(x => x.Fecha)
+                           .Skip((page - 1) * pageSize)
+                           .Take(pageSize)
+                           .ToList();
+
+                return (items, total);
             }
         }
 
-        public List<ReporteFacturacionDTO> GetReporteFacturacion(DateTime fechaInicio, DateTime fechaFin)
+
+
+        public (List<ReporteFacturacionDTO> Items, int Total) GetReporteFacturacion(DateTime fechaInicio, DateTime fechaFin, List<int> clientIds, int page, int pageSize)
         {
             using (var ctx = new Entities())
             {
@@ -566,6 +668,7 @@ namespace Business
                             join billing in ctx.BillingInformation on user.Id equals billing.userId into billingGroup
                             from billing in billingGroup.DefaultIfEmpty()
                             where recarga.RechargeDate >= fechaInicio && recarga.RechargeDate <= fechaFin
+                                  && (clientIds == null || clientIds.Contains(cliente.id))
                             select new ReporteFacturacionDTO
                             {
                                 FechaFacturacion = DateTime.Now,
@@ -579,34 +682,51 @@ namespace Business
                                 Total = Math.Round(recarga.quantityMoney * 1.16m, 2)
                             };
 
-                return query.ToList();
+                int total = query.Count();
+                var items = (page <= 0)
+                    ? query.OrderByDescending(x => x.FechaRecarga).ToList()
+                    : query.OrderByDescending(x => x.FechaRecarga)
+                           .Skip((page - 1) * pageSize)
+                           .Take(pageSize)
+                           .ToList();
+
+                return (items, total);
             }
         }
 
-        public List<ReporteConsumoSistemaDto> GetReporteConsumoSistema(DateTime fechaInicio, DateTime fechaFin)
+
+        public (List<ReporteConsumoSistemaDto> Items, int Total) GetReporteConsumoSistema(DateTime fechaInicio, DateTime fechaFin, List<int> clientIds, int page, int pageSize)
         {
             using (var ctx = new Entities())
             {
-                var query = from send in ctx.CampaignContactScheduleSend
-                            join campaign in ctx.Campaigns on send.CampaignId equals campaign.Id
-                            join roomUser in ctx.roomsbyuser on campaign.RoomId equals roomUser.idRoom
-                            join user in ctx.Users on roomUser.idUser equals user.Id
-                            join client in ctx.clients on user.IdCliente equals client.id
-                            where send.SentAt >= fechaInicio && send.SentAt <= fechaFin
-                            group send by new
-                            {
-                                client.nombrecliente
-                            } into g
-                            select new ReporteConsumoSistemaDto
-                            {
-                                Fecha = DateTime.Today, 
-                                Cliente = g.Key.nombrecliente,
-                                MensajesEnviados = g.Count(),
-                            };
+                var grouped = from send in ctx.CampaignContactScheduleSend
+                              join campaign in ctx.Campaigns on send.CampaignId equals campaign.Id
+                              join roomUser in ctx.roomsbyuser on campaign.RoomId equals roomUser.idRoom
+                              join user in ctx.Users on roomUser.idUser equals user.Id
+                              join client in ctx.clients on user.IdCliente equals client.id
+                              where send.SentAt >= fechaInicio && send.SentAt <= fechaFin
+                                    && (clientIds == null || clientIds.Contains(client.id))
+                              group send by client.nombrecliente into g
+                              select new ReporteConsumoSistemaDto
+                              {
+                                  Fecha = DateTime.Today,
+                                  Cliente = g.Key,
+                                  MensajesEnviados = g.Count(),
+                              };
 
-                return query.ToList();
+                int total = grouped.Count();
+                var items = (page <= 0)
+                    ? grouped.OrderByDescending(x => x.MensajesEnviados).ToList()
+                    : grouped.OrderByDescending(x => x.MensajesEnviados)
+                             .Skip((page - 1) * pageSize)
+                             .Take(pageSize)
+                             .ToList();
+
+                return (items, total);
             }
         }
+
+
 
     }
 }

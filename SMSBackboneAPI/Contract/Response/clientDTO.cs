@@ -18,6 +18,7 @@ namespace Contract.Response
         public byte LongRateType { get; set; }
 
         public string? ShortRateQty { get; set; } 
-        public string? LongRateQty { get; set; }  
+        public string? LongRateQty { get; set; }
+        public bool TmpPassword { get; set; }
     }
 }
