@@ -1843,7 +1843,7 @@ const Clients: React.FC = () => {
                                 color={index === step ? '#7B3F61' : '#B7AEB0'}
                                 fontFamily={"Poppins"}
                             >
-                                {label} {index > 0 && <span style={{ fontSize: '10px' }}>(Opcional)</span>}
+                                {label}
                             </Typography>
                         </Box>
                     ))}

@@ -25,7 +25,19 @@ interface CampaignKPIResponse {
     creditConsumption: number;
 }
 
-
+type Clients = {
+    id: number;
+    nombreCliente: string;
+    creationDate: string;
+    rateForShort: number;
+    rateForLong: number;
+    shortRateType: number;
+    longRateType: number;
+    shortRateQty: string;
+    longRateQty: string;
+    estatus: number;
+    tmpPassword: boolean;
+}
 const HomePage: React.FC = () => {
     const [open, setOpen] = useState(false);
     const [message, setMessage] = useState('');
@@ -42,6 +54,7 @@ const HomePage: React.FC = () => {
     const [openControlModal, setOpenControlModal] = useState(false);
     const [enableButtons, setenableButtons] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [client, setClient] = useState<Clients | null>(null);
     const [settings, setSettings] = useState({
         campanasActivas: true,
         smsEnviados: true,
@@ -51,6 +64,8 @@ const HomePage: React.FC = () => {
         resultadosEnvio: true,
     });
     const [firstname, setFirstname] = useState<string>('');
+    const [pssw, setPssw] = useState('');
+    const [psswconfirm, setPsswconfirm] = useState('');
     const [kpi, setKpi] = useState<CampaignKPIResponse | null>(null);
     const [dataOptions, setDataOptions] = useState<
         { title: string; value: string }[]
@@ -70,8 +85,30 @@ const HomePage: React.FC = () => {
         });
     };
 
-    const [openWelcomeModal, setOpenWelcomeModal] = useState(true); // se abre al cargar
+    const [openWelcomeModal, setOpenWelcomeModal] = useState(false);
+    const [passwordError, setPasswordError] = useState(false);
+    const [loadingpssw, setLoadingpssw] = useState(true);
+    const Handletmppwwd = async () => {
+        try {
+            const user = JSON.parse(localStorage.getItem('userData') || '{}');
+            const userId = user?.id;
+            const response = await axios.get(`${import.meta.env.VITE_SMS_API_URL +
+                import.meta.env.VITE_API_Client_TMPPSSW}`, {
+                params: { userId }
+            });
+            setClient(response.data);
+            if (response.data.tmpPassword) {
+                setOpenWelcomeModal(true);
+            }
+        } catch (error) {
+            console.error("Error al obtener usuarios:", error);
+        }
+    };
 
+    useEffect(() => {
+        Handletmppwwd();
+
+    }, []);
 
     const handleApplyFilters = async () => {
         const selectedRoom = localStorage.getItem("selectedRoom");
@@ -272,11 +309,6 @@ const HomePage: React.FC = () => {
         },
     }));
 
-    {/* 
-    useEffect(() => {
-  setOpenWelcomeModal(true);
-}, []);
-*/}
 
     useEffect(() => {
         const userData = localStorage.getItem("userData");
@@ -288,6 +320,24 @@ const HomePage: React.FC = () => {
         const parsedUserData = JSON.parse(userData);
         setFirstname(parsedUserData.firstName);
     }, []);
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPssw(e.target.value);
+        if (psswconfirm && e.target.value !== psswconfirm) {
+            setPasswordError(true);
+        } else {
+            setPasswordError(false);
+        }
+    };
+
+    const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPsswconfirm(e.target.value);
+        if (pssw !== e.target.value) {
+            setPasswordError(true);
+        } else {
+            setPasswordError(false);
+        }
+    };
 
     return (
         <div style={{
@@ -1277,7 +1327,7 @@ const HomePage: React.FC = () => {
                                 fontSize: '16px',
                                 lineHeight: '20px',
                                 letterSpacing: '0px',
-                                color: "#330F1B",
+                                color: passwordError ? "red" : "#330F1B",
                                 marginTop: "-8px",
                                 marginBottom: "-8px",
                                 opacity: 1,
@@ -1288,16 +1338,23 @@ const HomePage: React.FC = () => {
                         <TextField
                             variant="outlined"
                             fullWidth
+                            name="password"
+                            type="password"
                             margin="normal"
-                            helperText={
+                            value={pssw}
+                            onChange={handlePasswordChange}
+                            helperText={passwordError ?
                                 <span style={{
                                     minHeight: "20px", display: "inline-block",
                                     fontFamily: 'Poppins',
                                     fontSize: "12px",
                                     color: "#D01247"
                                 }}>
+                                    Las contraseñas no coinciden
                                 </span>
+                                : ''
                             }
+                            error={passwordError}
                             InputProps={{
                                 sx: {
                                     "& input": {
@@ -1361,11 +1418,18 @@ const HomePage: React.FC = () => {
                                                     },
                                                 }}
                                             >
-                                                <img
-                                                    src={infoicon}
-                                                    alt="info-icon"
-                                                    style={{ width: 24, height: 24 }}
-                                                />
+                                                {
+                                                    passwordError ? <img
+                                                        src={infoiconerror}
+                                                        alt="info-icon"
+                                                        style={{ width: 24, height: 24 }}
+                                                    /> :
+                                                        <img
+                                                            src={infoicon}
+                                                            alt="info-icon"
+                                                            style={{ width: 24, height: 24 }}
+                                                        />
+                                                }
                                             </IconButton>
                                         </Tooltip>
 
@@ -1386,7 +1450,7 @@ const HomePage: React.FC = () => {
                                 fontSize: '16px',
                                 lineHeight: '20px',
                                 letterSpacing: '0px',
-                                color: "#330F1B",
+                                color: passwordError ? "red" : "#330F1B",
                                 marginTop: "-8px",
                                 marginBottom: "-8px",
                                 opacity: 1,
@@ -1397,15 +1461,22 @@ const HomePage: React.FC = () => {
                         <TextField
                             variant="outlined"
                             fullWidth
+                            value={psswconfirm}
+                            onChange={handleConfirmPasswordChange}
                             margin="normal"
-                            helperText={
+                            name="password"
+                            type="password"
+                            error={passwordError}
+                            helperText={passwordError ?
                                 <span style={{
                                     minHeight: "20px", display: "inline-block",
                                     fontFamily: 'Poppins',
                                     fontSize: "12px",
                                     color: "#D01247"
                                 }}>
+                                    Las contraseñas no coinciden
                                 </span>
+                                : ''
                             }
                             InputProps={{
                                 sx: {
@@ -1470,11 +1541,18 @@ const HomePage: React.FC = () => {
                                                     },
                                                 }}
                                             >
-                                                <img
-                                                    src={infoicon}
-                                                    alt="info-icon"
-                                                    style={{ width: 24, height: 24 }}
-                                                />
+                                                {
+                                                    passwordError ? <img
+                                                        src={infoiconerror}
+                                                        alt="info-icon"
+                                                        style={{ width: 24, height: 24 }}
+                                                    /> :
+                                                        <img
+                                                            src={infoicon}
+                                                            alt="info-icon"
+                                                            style={{ width: 24, height: 24 }}
+                                                        />
+                                                }
                                             </IconButton>
                                         </Tooltip>
 
@@ -1537,9 +1615,9 @@ const HomePage: React.FC = () => {
 
                         }}
                     >
-                        <SecondaryButton text="Cancelar" />
+                        <SecondaryButton text="Cancelar" onClick={() => setOpenWelcomeModal(false)} />
 
-                        <MainButton text='Guardar' />
+                        <MainButton text='Guardar' isLoading={loadingpssw} />
                     </Box>
 
                 </Box>

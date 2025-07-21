@@ -1292,9 +1292,9 @@ namespace SMSBackboneAPI.Controllers
         }
 
         [HttpGet("GetConfigurationPss")]
-        public IActionResult GetConfigurationPss(int ID)
+        public IActionResult GetConfigurationPss(int userId)
         {
-            var data = new ClientManager().ObtenerClienteporID(ID);
+            var data = new ClientManager().ObtenerClienteporID(userId);
             if (data != null)
             {
                 return Ok(data);
