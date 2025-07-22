@@ -113,6 +113,20 @@ namespace Business
                 return null;
             }
         }
+        public List<SmsRateOptionDto> GetSmsRateOptions()
+        {
+            using (var ctx = new Entities())
+            {
+                return ctx.SmsDisplayRate
+                    .Where(x => x.DisplayPrice != null)
+                    .Select(x => new SmsRateOptionDto
+                    {
+                        SmsType = x.SmsType,
+                        Quantity = x.Quantity,
+                        DisplayPrice = x.DisplayPrice
+                    }).ToList();
+            }
+        }
         public List<clientDTO> GetClientes()
         {
             try
@@ -139,7 +153,7 @@ namespace Business
             }
         }
 
-        public PagedClientResponse GetClientsAdmin(int page)
+        public PagedClientResponse GetClientsAdmin(ClientFilterRequest client)
         {
             try
             {
@@ -153,8 +167,11 @@ namespace Business
                     using (var command = new SqlCommand("GetClientRoomSummary", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@Page", page);
+                        command.Parameters.AddWithValue("@Page", client.Page);
                         command.Parameters.AddWithValue("@PageSize", pageSize);
+                        command.Parameters.AddWithValue("@SearchTerm", (object?)client.SearchTerm ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@ClienteIds", client.ClienteIds?.Any() == true ? string.Join(",", client.ClienteIds) : DBNull.Value);
+                        command.Parameters.AddWithValue("@Estatus", client.Estatus?.Any() == true ? string.Join(",", client.Estatus) : DBNull.Value);
 
                         connection.Open();
                         using (var reader = command.ExecuteReader())

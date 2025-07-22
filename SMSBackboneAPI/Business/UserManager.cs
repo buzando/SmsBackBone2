@@ -372,6 +372,11 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                     var user = ctx.Users.Where(x => x.email == pass.Email).FirstOrDefault();
                     if (user != null)
                     {
+                        var cliente = ctx.clients.Where(x => x.id == user.IdCliente).FirstOrDefault();
+                        if (cliente != null)
+                        {
+                            cliente.TmpPassword = false;
+                        }
                         var pww = SecurityHelper.GenerarPasswordHash(pass.NewPassword);
                         user.passwordHash = pww;
                         user.TwoFactorAuthentication = pass.TwoFactorAuthentication;

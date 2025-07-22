@@ -57,14 +57,14 @@ namespace SMSBackboneAPI.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("GetClientsAdmin")]
-        public IActionResult GetClientsAdmin(int page)
+        [HttpPost("GetClientsAdmin")]
+        public IActionResult GetClientsAdmin(ClientFilterRequest client)
         {
             GeneralErrorResponseDto errorResponse = new GeneralErrorResponseDto();
 
 
             var userManager = new Business.ClientManager();
-            var user = userManager.GetClientsAdmin(page);
+            var user = userManager.GetClientsAdmin(client);
             if (user != null)
             {
                 var response = Ok(user);
@@ -96,6 +96,10 @@ namespace SMSBackboneAPI.Controllers
                 else
                 {
                     result = clientManager.CreateClient(dto);
+                }
+                if (result)
+                {
+                    //var userbackbone = new ApiBackBoneManager().CreateUser();
                 }
 
                 if (result)
@@ -203,6 +207,20 @@ namespace SMSBackboneAPI.Controllers
         public IActionResult GetClientRate(int clientId)
         {
             var rate = new ClientManager().ObtenerClienteporID(clientId);
+            if (rate == null)
+            {
+                return BadRequest();
+            }
+            else
+            {
+
+                return Ok(rate);
+            }
+        }
+        [HttpGet("GetConfigurationCost")]
+        public IActionResult GetConfigurationCost()
+        {
+            var rate = new ClientManager().GetSmsRateOptions();
             if (rate == null)
             {
                 return BadRequest();

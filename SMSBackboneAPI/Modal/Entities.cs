@@ -45,6 +45,7 @@ namespace Modal
         public DbSet<tpm_CampaignContacts> tpm_CampaignContacts { get; set; }  
         public DbSet<CampaignContactScheduleSend> CampaignContactScheduleSend { get; set; }
         public DbSet<IFTLadas> IFTLadas { get; set; }
+        public DbSet<SmsDisplayRate> SmsDisplayRate { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

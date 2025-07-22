@@ -107,7 +107,12 @@ interface FormData {
     File: string;
 }
 
-
+interface SmsCost {
+    id: number;
+    SmsType: string;
+    Quantity: string;
+    DisplayPrice: number;
+}
 
 const Clients: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -133,7 +138,7 @@ const Clients: React.FC = () => {
     const [originalData, setOriginalData] = useState<Clients[]>([]);
     const [clientMenuOpen, setClientMenuOpen] = useState(false);
     const [clientAnchorEl, setClientAnchorEl] = useState<null | HTMLElement>(null);
-    const [selectedClients, setSelectedClients] = useState<string[]>([]);
+    const [selectedClients, setSelectedClients] = useState<number[]>([]);
     const [clientSearch, setClientSearch] = useState('');
 
     const [estadoAnchorEl, setEstadoAnchorEl] = useState<null | HTMLElement>(null);
@@ -198,7 +203,8 @@ const Clients: React.FC = () => {
     const hasClientSelected = selectedClients.length > 0;
     const showClientHighlight = isClientActive || hasClientSelected;
     const [isSavingClient, setIsSavingClient] = useState(false);
-
+    const [shortRates, setShortRates] = useState<SmsCost[]>([]);
+    const [longRates, setLongRates] = useState<SmsCost[]>([]);
     const DualSpinner = () => (
         <Box
             sx={{
@@ -259,14 +265,31 @@ const Clients: React.FC = () => {
         try {
             const request = `${import.meta.env.VITE_SMS_API_URL +
                 import.meta.env.VITE_API_GET_CLIENTSADMIN}${currentPage + 1}`;
-            const response = await axios.get<PagedClientResponse>(request);
+
+            const requestPayload = {
+                page: currentPage + 1,
+                ClienteIds: selectedClients.length > 0 ? selectedClients.join(",") : null,
+                Estatus: selectedStatus.length > 0
+                    ? selectedStatus
+                        .map((s) => (s === "Inhabilitado" ? 1 : s === "Habilitado" ? 0 : null))
+                        .filter((s) => s !== null)
+                        .join(",")
+                    : null,
+                SearchTerm: searchTerm || null,
+            };
+
+            const response = await axios.post<PagedClientResponse>(
+                request,
+                requestPayload
+            );
+
 
             if (response.status === 200) {
                 const fetchedClient = response.data.items;
                 const uniqueClients: Clients[] = [
                     ...new Map(fetchedClient.map((item: Clients) => [item.nombreCliente, item])).values()
                 ];
-                setClientsList(uniqueClients); 
+                setClientsList(uniqueClients);
                 setOriginalData(uniqueClients);
                 setTotalPages(Math.ceil(response.data.total / itemsPerPage));
                 setItemsPerPage(response.data.total);
@@ -279,55 +302,80 @@ const Clients: React.FC = () => {
         }
     }
 
+
+    const Getcost = async () => {
+
+        try {
+            const request = `${import.meta.env.VITE_SMS_API_URL +
+                import.meta.env.VITE_API_Client_COST}`;
+            const response = await axios.get(request);
+
+            if (response.status === 200) {
+                const data = response.data;
+                const shortOptions = data.filter((x) => x.smsType === 'short');
+                const longOptions = data.filter((x) => x.smsType === 'long');
+
+                setShortRates(shortOptions);
+                setLongRates(longOptions);
+            }
+        } catch {
+
+        } finally {
+            setLoading(false);
+        }
+    }
+
+
     useEffect(() => {
         GetClientsAdmin();
+        Getcost();
     }, []);
 
-     const exportReport2 = async (
-            format: 'pdf' | 'xlsx' | 'csv',
-            callback: () => void
-        ) => {
-            try {
-                const selectedRoom = localStorage.getItem("selectedRoom");
-                if (!selectedRoom) {
-                    return;
-                }
-    
-                const roomId = JSON.parse(selectedRoom).id;
-                const payload = {
-                    ReportType: "Clients",
-                    Format: format,
-                    RoomId: roomId,
-                    PageOrigin: "Reportes"
-                };
-    
-                const response = await axios.post(
-                    `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GETREPORTS_ALL}`,
-                    payload
-                );
-    
-                if (response.data?.success && response.data?.downloadUrl) {
-                    const fileUrl = `${import.meta.env.VITE_SMS_API_URL}${response.data.downloadUrl}`;
-    
-                    // Paso 2: Descargar el archivo ya generado (GET)
-                    const fileResponse = await axios.get(fileUrl, { responseType: 'blob' });
-    
-                    const blob = new Blob([fileResponse.data]);
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = response.data.fileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                } else {
-                    console.error("Error: No se generó el archivo.");
-                }
-            } catch (error) {
-                console.error(`Error al exportar reporte a ${format}:`, error);
-            } finally {
-                callback();
+    const exportReport2 = async (
+        format: 'pdf' | 'xlsx' | 'csv',
+        callback: () => void
+    ) => {
+        try {
+            const selectedRoom = localStorage.getItem("selectedRoom");
+            if (!selectedRoom) {
+                return;
             }
-        };
+
+            const roomId = JSON.parse(selectedRoom).id;
+            const payload = {
+                ReportType: "Clients",
+                Format: format,
+                RoomId: roomId,
+                PageOrigin: "Reportes"
+            };
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GETREPORTS_ALL}`,
+                payload
+            );
+
+            if (response.data?.success && response.data?.downloadUrl) {
+                const fileUrl = `${import.meta.env.VITE_SMS_API_URL}${response.data.downloadUrl}`;
+
+                // Paso 2: Descargar el archivo ya generado (GET)
+                const fileResponse = await axios.get(fileUrl, { responseType: 'blob' });
+
+                const blob = new Blob([fileResponse.data]);
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = response.data.fileName;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } else {
+                console.error("Error: No se generó el archivo.");
+            }
+        } catch (error) {
+            console.error(`Error al exportar reporte a ${format}:`, error);
+        } finally {
+            callback();
+        }
+    };
 
     const handleExportClick = (
         format: 'csv' | 'xlsx' | 'pdf',
@@ -426,7 +474,7 @@ const Clients: React.FC = () => {
         }
     };
 
-    const goToFirstPage = () => setCurrentPage(1);
+    const goToFirstPage = () => setCurrentPage(0);
 
     const goToLastPage = () => setCurrentPage(totalPages);
 
@@ -439,8 +487,8 @@ const Clients: React.FC = () => {
     };
 
     useEffect(() => {
-    GetClientsAdmin();
-}, [currentPage]);
+        GetClientsAdmin();
+    }, [currentPage]);
 
     useEffect(() => {
         const start = (currentPage - 1) * itemsPerPage;
@@ -803,16 +851,35 @@ const Clients: React.FC = () => {
 
     const handleFilterClients = () => {
         const selectedClientIds = clientsList
-            .filter(c => selectedClients.includes(c.nombreCliente))
+            .filter(c => selectedClients.includes(c.id))
             .map(c => c.id);
 
         setAppliedClientIds(selectedClientIds);
         setClientMenuOpen(false);
-        setCurrentPage(1);
+        setCurrentPage(0);
     };
 
+    useEffect(() => {
+        if (selectedStatus.length === 0) {
+            setCurrentPage(0);
+            GetClientsAdmin();
+        }
+    }, [selectedStatus]);
+
+    useEffect(() => {
+        if (selectedClients.length === 0) {
+            GetClientsAdmin();
+        }
+    }, [selectedClients]);
+
+    useEffect(() => {
+        if (searchTerm.length === 3 || searchTerm.length === 0) {
+            GetClientsAdmin();
+        }
+    }, [searchTerm]);
 
 
+    const showEstadoHighlight = selectedStatus.length > 0;
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             {/* Header con título y flecha */}
@@ -840,24 +907,20 @@ const Clients: React.FC = () => {
                     {/* Chips redonditos */}
                     <Box sx={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                         {['CLIENTE', 'ESTADO'].map((label) => {
-
                             const isClient = label === 'CLIENTE';
-
-
-                            const count = selectedClients.length;
-
-
+                            const count = isClient ? selectedClients.length : selectedStatus.length;
                             const labelDisplay = count > 0 ? `${count} ${label}` : label;
+
+                            const highlight = isClient ? showClientHighlight : showEstadoHighlight;
 
                             return (
                                 <Box
                                     key={label}
                                     onClick={(e) => {
-                                        if (label === 'CLIENTE') {
+                                        if (isClient) {
                                             setClientAnchorEl(e.currentTarget);
                                             setClientMenuOpen(true);
-                                        }
-                                        if (label === 'ESTADO') {
+                                        } else {
                                             setEstadoAnchorEl(e.currentTarget);
                                             setEstadoMenuOpen(true);
                                         }
@@ -867,24 +930,22 @@ const Clients: React.FC = () => {
                                         px: '16px',
                                         py: '6px',
                                         border: '1px solid',
-                                        borderColor: showClientHighlight ? '#7B354D' : '#CFCFCF',
+                                        borderColor: highlight ? '#7B354D' : '#CFCFCF',
                                         borderRadius: '50px',
                                         cursor: 'pointer',
                                         fontFamily: 'Poppins',
                                         fontWeight: 600,
                                         fontSize: '13px',
-                                        backgroundColor: showClientHighlight ? '#F6EEF1' : '#FFFFFF',
-                                        color: showClientHighlight ? '#7B354D' : '#9B9295',
+                                        backgroundColor: highlight ? '#F6EEF1' : '#FFFFFF',
+                                        color: highlight ? '#7B354D' : '#9B9295',
                                         transition: 'all 0.2s ease-in-out',
                                         userSelect: 'none',
                                     }}
                                 >
-
                                     {labelDisplay}
                                 </Box>
                             );
                         })}
-
                     </Box>
 
                     {/* Botón y buscador */}
@@ -1326,7 +1387,7 @@ const Clients: React.FC = () => {
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 28px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
-                                        }}>{Client.estatus}</td>
+                                        }}>{Client.estatus === 0 ? 'Habilitado' : 'Inhabilitado'}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
@@ -1644,14 +1705,14 @@ const Clients: React.FC = () => {
                                 key={client.id}
                                 onClick={() =>
                                     setSelectedClients((prev) =>
-                                        prev.includes(client.nombreCliente)
-                                            ? prev.filter((c) => c !== client.nombreCliente)
-                                            : [...prev, client.nombreCliente]
+                                        prev.includes(client.id)
+                                            ? prev.filter((c) => c !== client.id)
+                                            : [...prev, client.id]
                                     )
                                 }
                                 sx={{ height: "32px", marginLeft: "-12px" }}
                             >
-                                <Checkbox checked={selectedClients.includes(client.nombreCliente)}
+                                <Checkbox checked={selectedClients.includes(client.id)}
                                     checkedIcon={
                                         <Box
                                             sx={{
@@ -1676,7 +1737,7 @@ const Clients: React.FC = () => {
                                         fontFamily: 'Poppins',
                                         fontSize: '16px',
                                         fontWeight: 500,
-                                        color: selectedClients.includes(client.nombreCliente) ? '#8F4E63' : '#786E71',
+                                        color: selectedClients.includes(client.id) ? '#8F4E63' : '#786E71',
                                     }}
                                 />
                             </MenuItem>
@@ -1698,14 +1759,17 @@ const Clients: React.FC = () => {
                             setSelectedClients([]);
                             setClientSearch('');
                             setClientMenuOpen(false);
-                            setClientsList(originalData.slice(0, 50));
-                            setCurrentPage(1);
+                            setCurrentPage(0);
                             setActiveFilter('');
                         }}
                         text="LIMPIAR"
                     />
                     <MainButton
-                        onClick={handleFilterClients}
+                        onClick={() => {
+                            handleFilterClients();
+                            GetClientsAdmin();
+                            setClientMenuOpen(false);
+                        }}
                         text="APLICAR"
                     />
 
@@ -1778,21 +1842,15 @@ const Clients: React.FC = () => {
                     <SecondaryButton
                         onClick={() => {
                             setSelectedStatus([]);
-                            setStatusMenuOpen(false);
-                            setNumbersData(originalData);
-                            setCurrentPage(1);
+                            setEstadoMenuOpen(false);
+
                         }}
                         text="LIMPIAR"
                     />
                     <MainButton
                         onClick={() => {
-                            const filtered = originalData.filter((item) =>
-                                selectedStatus.length === 0 ||
-                                selectedStatus.includes(item.Estatus) // ajusta el campo si es necesario
-                            );
-                            setNumbersData(filtered);
-                            setStatusMenuOpen(false);
-                            setCurrentPage(1);
+                            setEstadoMenuOpen(false);
+                            GetClientsAdmin();
                         }}
                         text="APLICAR"
                     />

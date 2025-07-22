@@ -17,7 +17,8 @@ import welcome from '../assets/icon-welcome.svg'
 import fast from '../assets/icon-fastsend.svg'
 import Secondarybutton from '../components/commons/SecondaryButton'
 import axios from "axios";
-
+import ModalError from "../components/commons/ModalError";
+import SnackBar from "../components/commons/ChipBar";
 interface CampaignKPIResponse {
     activeCampaigns: number;
     sentToday: number;
@@ -87,11 +88,14 @@ const HomePage: React.FC = () => {
 
     const [openWelcomeModal, setOpenWelcomeModal] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
-    const [loadingpssw, setLoadingpssw] = useState(true);
+    const [loadingpssw, setLoadingpssw] = useState(false);
+    const [enableTwoFactor, setenableTwoFactor] = useState(true);
+    const [IsErrormodal, setIsErrormodal] = useState(false);
+    const [ShowSnackBar, setShowSnackBar] = useState(false);
     const Handletmppwwd = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('userData') || '{}');
-            const userId = user?.id;
+            const userId = user?.idCliente;
             const response = await axios.get(`${import.meta.env.VITE_SMS_API_URL +
                 import.meta.env.VITE_API_Client_TMPPSSW}`, {
                 params: { userId }
@@ -109,6 +113,43 @@ const HomePage: React.FC = () => {
         Handletmppwwd();
 
     }, []);
+
+
+    const handleSendNewPassword = async () => {
+        setLoadingpssw(true);
+        try {
+            const user = JSON.parse(localStorage.getItem('userData') || '{}');
+            const data = {
+                Email: user.email,
+                NewPassword: psswconfirm,
+                TwoFactorAuthentication: enableTwoFactor
+            };
+
+            const headers = {
+                'Content-Type': 'application/json',
+                "Access-Control-Allow-Headers": "X-Requested-With",
+                "Access-Control-Allow-Origin": "*"
+            };
+
+            const apiEndpoint = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_NEWPASSWORD_USER}`;
+            const response = await axios.post(apiEndpoint, data, {
+                headers
+            });
+            if (response.status === 200) {
+                const { user, token, expiration } = await response.data;
+                setLoadingpssw(false);
+                localStorage.setItem('token', token);
+                localStorage.setItem('expirationDate', expiration);
+                localStorage.setItem('userData', JSON.stringify(user));
+                setShowSnackBar(true);
+            }
+        } catch (error) {
+            setIsErrormodal(true);
+        }
+        finally {
+            setOpenWelcomeModal(false);
+        }
+    };
 
     const handleApplyFilters = async () => {
         const selectedRoom = localStorage.getItem("selectedRoom");
@@ -1572,6 +1613,7 @@ const HomePage: React.FC = () => {
                         }}
                     >
                         <Checkbox
+                            onChange={(e) => setenableTwoFactor(e.target.checked)}
                             checkedIcon={
                                 <Box
                                     sx={{
@@ -1617,14 +1659,31 @@ const HomePage: React.FC = () => {
                     >
                         <SecondaryButton text="Cancelar" onClick={() => setOpenWelcomeModal(false)} />
 
-                        <MainButton text='Guardar' isLoading={loadingpssw} />
+                        <MainButton text='Guardar' isLoading={loadingpssw} onClick={() => handleSendNewPassword()} />
                     </Box>
 
                 </Box>
 
             </Modal>
 
+            <ModalError
+                isOpen={IsErrormodal}
+                title="Error al cambiar la contraseña"
+                message='Intentelo mas tarde'
+                buttonText="Cerrar"
+                onClose={() => setIsErrormodal(false)}
+            />
 
+
+            {
+                ShowSnackBar && (
+                    <SnackBar
+                        message="Contraseña Actualizada con exito"
+                        buttonText="Cerrar"
+                        onClose={() => setShowSnackBar(false)}
+                    />
+                )
+            }
         </div>
     );
 };

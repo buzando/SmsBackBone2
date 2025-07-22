@@ -223,7 +223,8 @@ namespace Business
                     return GenerateFileFrom(deliveryData, format);
 
                 case "clients":
-                    var clientData = new ClientManager().GetClientsAdmin(0);
+                    var clientfilterrequest = new ClientFilterRequest {Page = 0};
+                    var clientData = new ClientManager().GetClientsAdmin(clientfilterrequest);
                     return GenerateFileFrom(clientData.Items, format);
 
                 case "reportesadmin":
