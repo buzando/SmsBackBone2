@@ -1351,15 +1351,14 @@ const HomePage: React.FC = () => {
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        padding: '22px',
                     }}
                 >
-
-                    <Typography noWrap sx={{ fontSize: '16px', fontFamily: 'Poppins', color: '#330F1B', mb: 2, mt: -1 }}>
-                        Ingrese una contraseña nueva para configurar su cuenta.
-                    </Typography>
-
-                    <Box mt={2}>
+                    <Box sx={{ marginTop: "-335px", position: "absolute" }}>
+                        <Typography noWrap sx={{ fontSize: '16px', fontFamily: 'Poppins', color: '#330F1B', mb: 2, mt: -1 }}>
+                            Ingrese una contraseña nueva para configurar su cuenta.
+                        </Typography>
+                    </Box>
+                    <Box position={"absolute"} mt={"-150px"}>
                         <Typography
                             sx={{
                                 textAlign: 'left',
@@ -1389,9 +1388,9 @@ const HomePage: React.FC = () => {
                                     minHeight: "20px", display: "inline-block",
                                     fontFamily: 'Poppins',
                                     fontSize: "12px",
-                                    color: "#D01247"
+                                    color: "#D01247", position: "absolute"
                                 }}>
-                                    Las contraseñas no coinciden
+                                    Ingresa la contraseña válida.
                                 </span>
                                 : ''
                             }
@@ -1482,7 +1481,7 @@ const HomePage: React.FC = () => {
 
                     </Box>
 
-                    <Box mt={0.5}>
+                    <Box position={"absolute"} mt={"100px"}>
                         <Typography
                             sx={{
                                 textAlign: 'left',
@@ -1513,9 +1512,9 @@ const HomePage: React.FC = () => {
                                     minHeight: "20px", display: "inline-block",
                                     fontFamily: 'Poppins',
                                     fontSize: "12px",
-                                    color: "#D01247"
+                                    color: "#D01247", position: "absolute"
                                 }}>
-                                    Las contraseñas no coinciden
+                                    Las contraseñas no coinciden.
                                 </span>
                                 : ''
                             }
@@ -1609,7 +1608,8 @@ const HomePage: React.FC = () => {
                         sx={{
                             display: "flex",
                             gap: "8px",
-                            justifyContent: "flex-start", ml: -14, mb: 0
+                            justifyContent: "flex-start", position: "absolute",
+                            ml: "-110px", mt: "240px"
                         }}
                     >
                         <Checkbox
@@ -1648,7 +1648,7 @@ const HomePage: React.FC = () => {
                         </Typography>
                     </Box>
 
-                    <Divider sx={{ width: 'calc(100% + 50px)', mb: 2.5, mt: 3 }} />
+                    <Divider sx={{ width: 'calc(100% + 0px)', position: "absolute", mt: "300px" }} />
 
                     <Box display="flex" justifyContent="space-between"
                         sx={{

@@ -63,6 +63,8 @@ import IconSDown from "../assets/IconSDown.svg";
 import IconSChecked from "../assets/IconSChecked.svg";
 import IconPlus4 from "../assets/IconPlus4.svg";
 import IconMinus4 from "../assets/IconMinus4.svg";
+import IconCheckedCircle1 from "../assets/IconCheckedCircle1.svg";
+import IconCheckedCircle2 from "../assets/IconCheckedCircle2.svg";
 import EditIcon from '@mui/icons-material/Edit';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import Thrashicon from '../assets/Icon-trash-Card.svg'
@@ -244,6 +246,14 @@ const Clients: React.FC = () => {
             />
         </Box>
     );
+
+    const getStepColor = (stepIndex: number) =>
+        stepIndex === step
+            ? '#8F4E63'
+            : stepIndex < step
+                ? '#BC94A1'
+                : '#574B4F66';
+
 
     const handleSelect = (id: number) => {
         setSelectedIds((prev) =>
@@ -1881,31 +1891,99 @@ const Clients: React.FC = () => {
                 </IconButton>
                 <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: -1.5 }} />
 
-                <Box display="flex" justifyContent="space-around" mb={1.5} mt={3}>
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    gap="140px"
+                    mb={1.5}
+                    mt={3}
+                >
                     {['Información', 'Tarifas', 'Salas'].map((label, index) => (
                         <Box key={label} textAlign="center">
                             <Box
                                 sx={{
-                                    width: 24,
-                                    height: 24,
-                                    border: '2px solid',
-                                    borderColor: index <= step ? '#7B3F61' : '#DDD',
+                                    width: 28,
+                                    height: 28,
+                                    border: index < step ? '4px solid' : '2px solid',
+                                    borderColor: index <= step ? '#8F4E63' : '#DDD',
                                     borderRadius: '50%',
                                     mx: 'auto',
-                                    backgroundColor: index < step ? '#7B3F61' : 'transparent',
+                                    backgroundColor: 'transparent',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
                                 }}
-                            />
+                            >
+                                {index < step && (
+                                    <img
+                                        src={index < step ? IconCheckedCircle2 : IconCheckedCircle1}
+                                        alt="Completado"
+                                        style={{
+                                            width: '28px',
+                                            height: '28px',
+                                        }}
+                                    />
+                                )}
+                            </Box>
+
                             <Typography
                                 fontSize="12px"
                                 mt={1}
-                                color={index === step ? '#7B3F61' : '#B7AEB0'}
-                                fontFamily={"Poppins"}
+                                color={
+                                    index === step
+                                        ? '#8F4E63'
+                                        : index < step
+                                            ? '#BC94A1'
+                                            : '#574B4F66'
+                                }
+                                fontFamily="Poppins"
                             >
                                 {label}
                             </Typography>
+
                         </Box>
                     ))}
+
                 </Box>
+                {/*Guiones fake*/}
+                <Box>
+                    <Divider
+                        sx={{
+                            width: '170px',
+                            position: "absolute",
+                            mt: "-53px",
+                            ml: "286px",
+                            border: '1.5px solid',
+                            borderColor: getStepColor(1),
+                        }}
+                    />
+                </Box>
+
+                <Box sx={{ position: "absolute", mt: "78px", ml: "545px" }}>
+                    <Typography
+                        fontSize="10px"
+                        mt={1}
+                        color={getStepColor(2)}
+                        fontFamily="Poppins"
+                    >
+                        Opcional
+                    </Typography>
+                </Box>
+
+                <Box>
+                    <Divider
+                        sx={{
+                            width: '150px',
+                            position: "absolute",
+                            mt: "-54px",
+                            ml: "484px",
+                            border: '2px dashed',
+                            borderColor: getStepColor(2),
+                        }}
+                    />
+                </Box>
+
+
 
                 <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: 0 }} />
 
