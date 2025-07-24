@@ -742,7 +742,7 @@ namespace SMSBackboneAPI.Controllers
             //}
             var UserManager = new Business.MyNumbersManager();
             var responseDto = UserManager.NumbersByUser(id);
-            if (responseDto.Count() == 0)
+            if (responseDto == null)
             {
 
 

@@ -1397,7 +1397,7 @@ const Clients: React.FC = () => {
                     </Typography>
                 </MenuItem>
 
-                {currentClient?.estatus === 0 ? (
+                {currentClient?.estatus === 1 ? (
                     <MenuItem onClick={() => {
                         handleActivateClient();
                         handleMenuClose();
@@ -3362,8 +3362,8 @@ const Clients: React.FC = () => {
                         <Box sx={{ mt: -0 }}>
                             {!isEditClient && step > 0 && step < 2 && (
                                 <MainButton
-                                    text="Guardars"
-                                    onClick={() => console.log("Guardars clicked")}
+                                    text="Guardar"
+                                    onClick={() => handleSubmit()}
                                 />
                             )}
                         </Box>

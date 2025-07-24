@@ -15,25 +15,25 @@ namespace SMSBackboneAPI.Controllers
             configuration = iConfig;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Send()
-        {
-            var autenticate = new AutenticationBearer(configuration).Validate(Request);
-            if (autenticate == null)
-            {
-                return BadRequest("Token inválido.");
-            }
+        //[HttpPost]
+        //public async Task<IActionResult> SendMessage(SendTestSmsRequest request)
+        //{
+        //    //var autenticate = new AutenticationBearer(configuration).Validate(Request);
+        //    //if (autenticate == null)
+        //    //{
+        //    //    return BadRequest("Token inválido.");
+        //    //}
 
-            var smsRequest = await ServiceRequest.GetRequest<SmsRequestDto>(Request.Body);
-            if (smsRequest == null)
-            {
-                return BadRequest("Sin request valido.");
-            }
+        //    var smsRequest = await ServiceRequest.GetRequest<SmsRequestDto>(Request.Body);
+        //    if (smsRequest == null)
+        //    {
+        //        return BadRequest("Sin request valido.");
+        //    }
 
-            var messageManager = new Business.MessageManager();
-            var result = messageManager.SendMessage(smsRequest);
-            return Ok(result);
-        }
+        //    var messageManager = new Business.MessageManager();
+        //    var result = messageManager.SendMessage(smsRequest);
+        //    return Ok(result);
+        //}
 
         [HttpPost("List")]
         public async Task<IActionResult> List()

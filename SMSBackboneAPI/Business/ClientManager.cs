@@ -20,6 +20,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using Newtonsoft.Json.Linq;
 
 namespace Business
 {
@@ -249,7 +250,7 @@ namespace Business
                             LongRateType = dto.LongRateType,
                             ShortRateQty = dto.ShortRateQty,
                             LongRateQty = dto.LongRateQty,
-                            Estatus = 1,
+                            Estatus = 0,
                             TmpPassword = true
                         };
 
@@ -291,6 +292,10 @@ namespace Business
 
                         int userId = user.Id;
 
+                        if (dto.RoomNames == null)
+                        {
+                            dto.RoomNames = new List<string> { "Default" };
+                        }
                         // 3. Crear rooms y asociarlas
                         foreach (var roomName in dto.RoomNames)
                         {
@@ -319,10 +324,7 @@ namespace Business
                         
                         if (dto.Id == null)
                         {
-                            string sitioFront = Common.ConfigurationManagerJson("UrlSitio");
-                            string mensaje = MailManager.GenerateMailMessage(dto.Email, rawPassword, sitioFront, "NewClient");
-
-                            MailManager.SendEmail(dto.Email, "Bienvenido a Red Quantum", mensaje);
+                           
 
                             var password = GenerarPasswordTemporalBackBone(16);
 
@@ -331,13 +333,20 @@ namespace Business
                                 .CreateUser(admintoken.Result.token, dto.NombreCliente, password, dto.Email, 3, "")
                                 .GetAwaiter()
                                 .GetResult();
-
+                            int id = JObject.Parse(userbackbone)["id"].Value<int>();
                             var passencrypt = ClientAccessManager.Encrypt(password);
 
-                            var clientacces = new ClientAccess { client_id = client.id, password = passencrypt, username = dto.NombreCliente, status = true, created_at = DateTime.Now };
+                            var clientacces = new ClientAccess { client_id = client.id, password = passencrypt, username = dto.NombreCliente, status = true,
+                                created_at = DateTime.Now, id_backbone = id
+                            };
                             ctx.Client_Access.Add(clientacces);
                             ctx.SaveChanges();
                             transaction.Commit();
+
+                            string sitioFront = Common.ConfigurationManagerJson("UrlSitio");
+                            string mensaje = MailManager.GenerateMailMessage(dto.Email, rawPassword, sitioFront, "NewClient");
+
+                            MailManager.SendEmail(dto.Email, "Bienvenido a Red Quantum", mensaje);
                         }
                         return true;
                     }

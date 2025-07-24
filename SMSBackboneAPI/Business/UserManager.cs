@@ -28,6 +28,7 @@ using BCrypt;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using Azure;
+using DocumentFormat.OpenXml.InkML;
 namespace Business
 {
     public class UserManager
@@ -982,6 +983,18 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                                     room.credits += creditRecharge.quantityCredits;
                                 }
                             }
+
+                            var acceso = (from rbu in ctx.roomsbyuser
+                                          join u in ctx.Users on rbu.idUser equals u.Id
+                                          join c in ctx.clients on u.IdCliente equals c.id
+                                          join ca in ctx.Client_Access on c.id equals ca.client_id
+                                          where rbu.idRoom == creditRecharge.idRoom
+                                          select ca).FirstOrDefault();
+
+
+                            var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
+                            var recarga = new ApiBackBoneManager().AddCredit(admintoken.Result.token,acceso.id_backbone, (int)(creditRecharge.quantityCredits));
+
                         }
 
                         ctx.SaveChanges();

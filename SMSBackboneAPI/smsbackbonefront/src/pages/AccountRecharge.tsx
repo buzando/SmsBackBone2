@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import ChipBar from "../components/commons/ChipBar";
 import { Box, Divider, Typography, Checkbox, Radio, Modal, Select, MenuItem, SelectChangeEvent, TextField, FormControlLabel } from '@mui/material';
@@ -125,6 +125,7 @@ const AccountRecharge: React.FC = () => {
     const useQuery = () => {
         return new URLSearchParams(useLocation().search);
     };
+    const hasRunRef = useRef(false);
 
     const checkRechargeStatus = async (id: string) => {
         try {
@@ -169,7 +170,8 @@ const AccountRecharge: React.FC = () => {
     const id = query.get('id');
 
     useEffect(() => {
-        if (id) {
+        if (id && !hasRunRef.current) {
+            hasRunRef.current = true;
             checkRechargeStatus(id);
         }
     }, [id]);

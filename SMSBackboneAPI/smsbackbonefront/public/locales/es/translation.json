@@ -18,7 +18,8 @@
       "cancel": "Cancelar",
       "send": "Enviar",
       "tooltipOnlyNumbers": "Solo caracteres numéricos",
-      "tooltipTenDigits": "El teléfono debe incluir el código del país"
+      "tooltipTenDigits": "El teléfono debe incluir el código del país",
+      "clear": "Limpiar"
     }
   }
 }

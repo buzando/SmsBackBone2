@@ -11,64 +11,108 @@ import infoicon from '../assets/Icon-info.svg';
 import infoiconerror from '../assets/Icon-infoerror.svg';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
+import SnackBar from "../components/commons/ChipBar";
+import ModalError from "../components/commons/ModalError";
+export interface Template {
+  id: number;
+  name: string;
+  message: string;
+  creationDate: string; // DateTime en C# es string en JS/TS
+  idRoom: number;
+}
+
+
 export default function TestSMS() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [numbersData, setNumbersData] = useState<{ id: number; number: string }[]>([]);
-  const [Loading, setLoading] = useState(true);
-  const [templates, setTemplates] = useState<{ id: number; name: string; message: string }[]>([]);
+  const [Loading, setLoading] = useState(false);
   const [fromNumber, setFromNumber] = useState("");
   const [toNumber, setToNumber] = useState("");
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
-  const isViewButtonEnabled = fromNumber && toNumber && selectedTemplateId;
+  const isViewButtonEnabled = toNumber && selectedTemplateId;
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<{ id: number, name: string, message: string } | null>(null);
   const [toNumberError, setToNumberError] = useState(false);
   const [message, setMessage] = useState("");
   const [messageError, setMessageError] = useState(false);
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'es');
-
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [showChipBar, setshowChipBar] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   useEffect(() => {
     i18n.changeLanguage(language);
   }, [language]);
 
   useEffect(() => {
-    const fetchNumbersAndTemplates = async () => {
-      try {
-        // Obtenemos email para números
-        const email = JSON.parse(localStorage.getItem('userData') || '{}')?.email; // Ajusta aquí si necesitas
-
-        // Obtenemos salaId para plantillas
-        const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
-
-        if (!email || !salaId) {
-          console.error("Falta email o salaId");
-          return;
-        }
-
-        // Petición de números
-        const numbersRequestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_NUMBERS}${email}`;
-        const numbersResponse = await axios.get(numbersRequestUrl);
-
-        // Petición de plantillas
-        const templatesRequestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM}${salaId}`;
-        const templatesResponse = await axios.get(templatesRequestUrl);
-
-        setNumbersData(numbersResponse.data);
-        setTemplates(templatesResponse.data);
-      } catch (error) {
-        console.error('Error al cargar números o plantillas', error);
-      }
-    };
-
     fetchNumbersAndTemplates();
   }, []);
+
+  const fetchNumbersAndTemplates = async () => {
+    try {
+      // Obtenemos email para números
+      const user = JSON.parse(localStorage.getItem('userData') || '{}')?.id; // Ajusta aquí si necesitas
+
+      // Obtenemos salaId para plantillas
+      const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
+
+      if (!user || !salaId) {
+        return;
+      }
+
+      // Petición de plantillas
+      const templatesRequestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM}${salaId}`;
+      const templatesResponse = await axios.get(templatesRequestUrl);
+
+
+      // Petición de números
+      const numbersRequestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_NUMBERS}${user}`;
+      const numbersResponse = await axios.get(numbersRequestUrl);
+
+
+      setNumbersData(numbersResponse.data);
+      setTemplates(templatesResponse.data);
+    } catch (error) {
+      console.error('Error al cargar números o plantillas', error);
+    }
+  };
+
+
   const handleLanguageChange = (e: any) => {
     const newLang = e.target.value;
     setLanguage(newLang);
     i18n.changeLanguage(newLang);
     localStorage.setItem('language', newLang);
   };
+
+  const handleSend = async () => {
+    if (!fromNumber || !toNumber || (message.length === 0 && !selectedTemplateId)) {
+      console.error('Faltan datos obligatorios');
+      return;
+    }
+  const clientId = JSON.parse(localStorage.getItem('userData') || '{}')?.clientId;
+    try {
+      const payload = {
+        from: fromNumber,
+        to: toNumber,
+        message: message || null,
+        templateId: selectedTemplateId || null,
+        clientID: clientId || null
+      };
+
+      const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MESSAGE_SEND}`;
+      const response = await axios.post(requestUrl, payload);
+
+      if (response.status === 200) {
+        setshowChipBar(true);
+      } else {
+        setIsErrorModalOpen(true);
+      }
+    } catch (error) {
+      setIsErrorModalOpen(true);
+    }
+  };
+
 
   return (
     <div style={{ padding: '20px', marginTop: '-80px', marginLeft: '40px', maxWidth: '1540px' }}>
@@ -253,6 +297,7 @@ export default function TestSMS() {
               setMessage(value);
               setMessageError(value.length === 0 || value.length > 160); // 🔥 Error si está vacío o pasa 160 caracteres
             }}
+            disabled={!!selectedTemplate}
             error={messageError}
             helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
             InputProps={{
@@ -338,10 +383,14 @@ export default function TestSMS() {
               sx={{ p: 1 }}
               onClick={() => {
                 if (!isViewButtonEnabled) return;
+
                 const template = templates.find((t) => t.id === Number(selectedTemplateId));
+
+                console.log("Plantilla seleccionada:", template); // ⬅️ Agrega esto
+
                 if (template) {
                   setSelectedTemplate(template);
-                  setIsPreviewOpen(true);
+                  setTimeout(() => setIsPreviewOpen(true), 0); // ⬅️ Esto también ayuda a que se renderice bien
                 }
               }}
               disabled={!isViewButtonEnabled}
@@ -349,6 +398,29 @@ export default function TestSMS() {
               <VisibilityIcon sx={{ color: isViewButtonEnabled ? "#7B354D" : "#C4C4C4" }} />
             </IconButton>
           </Box>
+        </Box>
+        <Box display="flex" justifyContent="flex-end" mt={4} gap={2}>
+          <SecondaryButton
+            text={t('pages.testSMS.clear')}
+            onClick={() => {
+              setFromNumber('');
+              setToNumber('');
+              setSelectedTemplateId('');
+              setMessage('');
+              setMessageError(false);
+              setToNumberError(false);
+            }}
+          />
+          <MainButton
+            text={t('pages.testSMS.send')}
+            onClick={() => {
+              setIsPreviewOpen(true);
+            }}
+            isLoading={Loading}
+            disabled={
+              toNumberError || messageError || message.length === 0
+            }
+          />
         </Box>
 
       </Box>
@@ -379,13 +451,26 @@ export default function TestSMS() {
           <Box display="flex" justifyContent="space-between">
             <SecondaryButton text={t('pages.testSMS.cancel')} onClick={() => setIsPreviewOpen(false)} />
             <MainButton text={t('pages.testSMS.send')} onClick={() => {
-              console.log("Enviando SMS...");
-              // Aquí luego puedes hacer la lógica de envío real
               setIsPreviewOpen(false);
-            }} />
+            }} isLoading={Loading} />
           </Box>
         </Box>
       </Modal>
+
+      {showChipBar && (
+        <SnackBar
+          message="Se han enviado los mensajes correctamente"
+          buttonText="Cerrar"
+          onClose={() => setshowChipBar(false)}
+        />
+      )}
+      <ModalError
+        isOpen={isErrorModalOpen}
+        title="Error al enviar"
+        message="Intentelo mas tarde"
+        buttonText="Cerrar"
+        onClose={() => setIsErrorModalOpen(false)}
+      />
     </div>
   );
 }

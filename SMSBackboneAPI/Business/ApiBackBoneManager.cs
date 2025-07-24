@@ -190,7 +190,7 @@ namespace Business
         public async Task<string> AddCredit(string token, int id, int newCredit)
         {
             using var client = CreateAuthenticatedClient(token);
-            var url = $"{_baseUrl}api/user/{id}/credit";
+            var url = $"{_baseUrl}user/{id}/credit";
 
             var content = new StringContent(JsonSerializer.Serialize(newCredit), System.Text.Encoding.UTF8, "application/json");
             var response = await client.PatchAsync(url, content);
@@ -200,7 +200,7 @@ namespace Business
         public async Task<string> GetOwnCredit(string token)
         {
             using var client = CreateAuthenticatedClient(token);
-            var url = $"{_baseUrl}api/user/credit";
+            var url = $"{_baseUrl}user/credit";
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();

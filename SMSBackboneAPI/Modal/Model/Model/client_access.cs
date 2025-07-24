@@ -14,5 +14,6 @@ namespace Modal.Model.Model
         public string password { get; set; } = string.Empty;
         public DateTime created_at { get; set; }
         public bool status { get; set; } = true;
+        public int id_backbone { get; set; }
     }
 }

@@ -23,6 +23,6 @@ namespace Contract.Request
         public string? ShortRateQty { get; set; }
         public string? LongRateQty { get; set; }
 
-        public List<string> RoomNames { get; set; }
+        public List<string>? RoomNames { get; set; }
     }
 }
