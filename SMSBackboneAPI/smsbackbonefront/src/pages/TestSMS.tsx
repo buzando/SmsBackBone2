@@ -11,6 +11,8 @@ import infoicon from '../assets/Icon-info.svg';
 import infoiconerror from '../assets/Icon-infoerror.svg';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
+import Iconeyesopen from '../assets/Iconeyesopen.svg';
+
 export default function TestSMS() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -71,24 +73,14 @@ export default function TestSMS() {
   };
 
   return (
-    <div style={{ padding: '20px', marginTop: '-80px', marginLeft: '40px', maxWidth: '1540px' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <FormControl size="small" sx={{ width: '150px', backgroundColor: "#ffffff" }}>
-          <Select value={language} onChange={handleLanguageChange}>
-            <MenuItem value="es">Español</MenuItem>
-            <MenuItem value="en">English</MenuItem>
-            <MenuItem value="pt">Português</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
-
+    <div style={{ padding: '14px', marginTop: '-70px', marginLeft: "40px", maxWidth: "1180px", height: "715px" }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
         <IconButton
           onClick={() => navigate('/')}
           sx={{
             p: 0,
             mr: 1,
-            ml: '-28px', // para que flote más a la izquierda si quieres
+            ml: '-30px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -119,45 +111,76 @@ export default function TestSMS() {
         </Typography>
       </Box>
 
-      <Divider sx={{ mb: 2 }} />
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', position: "absolute", ml: "980px", mt: "-50px" }}>
+        <FormControl size="small" sx={{ width: '150px', backgroundColor: "#ffffff" }}>
+          <Select value={language} onChange={handleLanguageChange}>
+            <MenuItem value="es" sx={{ fontFamily: "Poppins" }}>Español</MenuItem>
+            <MenuItem value="en" sx={{ fontFamily: "Poppins" }}>English</MenuItem>
+            <MenuItem value="pt" sx={{ fontFamily: "Poppins" }}>Português</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
-      <Typography sx={{ fontFamily: "Poppins", fontWeight: 500, fontSize: "16px", mb: 1 }}>
+      <Divider sx={{ mb: 2.5, mt: 2 }} />
+
+      <Typography sx={{ fontFamily: "Poppins", fontWeight: 500, fontSize: "18px", color: "#330F1B", mb: 1 }}>
         {t('pages.testSMS.smsTestDescription')}
       </Typography>
 
-      <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 2 }}>
+      <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 2, color: "#574B4F", mt: 2 }}>
         {t('pages.testSMS.smsSelectDescription')}
       </Typography>
 
-      <Box display="flex" gap={2} mb={3}>
-        <Box flex={1}>
-          <Typography sx={{ fontFamily: "Poppins", fontSize: "16px", fontWeight: 500, mb: 1 }}>
+      <Box display="flex" gap={4} mb={3} sx={{ alignItems: "left" }}>
+        <Box>
+          <Typography sx={{ fontFamily: "Poppins", fontSize: "16px", fontWeight: 500, mb: 1, color: "#330F1B" }}>
             {t('pages.testSMS.from')}
           </Typography>
-          <FormControl sx={{ backgroundColor: "#ffffff", fontFamily: "Poppins", borderRadius: "6px", width: "220px" }}>
+
+          <FormControl sx={{
+            backgroundColor: "#ffffff",
+            fontFamily: "Poppins",
+            borderRadius: "8px",
+            border: "1px solid #9B9295",
+            width: "220px", height: "40px"
+          }}>
             <Select defaultValue="" value={fromNumber}
-              onChange={(e) => setFromNumber(e.target.value)} displayEmpty sx={{ fontFamily: "Poppins" }}>
-              <MenuItem value="">
+              onChange={(e) => setFromNumber(e.target.value)}
+              displayEmpty sx={{
+                color: "#786E71",
+                borderRadius: '8px',
+                fontFamily: 'Poppins',
+                fontSize: '14px', mt: "-8px",
+                '& .MuiSelect-select': {
+                  display: 'flex',
+                  alignItems: 'center',
+                },
+                '& fieldset': {
+                  border: 'none',
+                },
+              }}
+            >
+              <MenuItem value="" sx={{ fontFamily: "Poppins", color: "#786E71", mt: "-8px", fontSize: "12px" }}>
                 <em>{t('pages.testSMS.numberPlaceholder')}</em>
               </MenuItem>
               {numbersData.map((number) => (
-                <MenuItem key={number.id} value={number.id} sx={{ fontFamily: "Poppins" }}>
+                <MenuItem key={number.id} value={number.id} sx={{ fontFamily: "Poppins", color: "#786E71", mt: "-8px" }}>
                   {number.number}
                 </MenuItem>
               ))}
             </Select>
-
           </FormControl>
+
         </Box>
 
-        <Box flex={1}>
+        <Box sx={{}}>
           <Typography
             sx={{
               fontFamily: "Poppins",
               fontSize: "16px",
               fontWeight: 500,
               mb: 1,
-              color: toNumberError ? "#D32F2F" : "#330F1B", // 🔥 cambia a rojo si hay error
+              color: toNumberError ? "#D32F2F" : "#330F1B",
             }}
           >
             {t('pages.testSMS.to')}
@@ -165,18 +188,26 @@ export default function TestSMS() {
 
           <TextField fullWidth
             value={toNumber}
+            placeholder="5255"
             onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, ''); // 🔥 Solo deja números
+              const value = e.target.value.replace(/\D/g, '');
               setToNumber(value);
-              setToNumberError(value.length !== 10); // 🔥 Error si no son exactamente 10 dígitos
+              setToNumberError(value.length !== 10);
             }}
+            sx={{ width: "221px", height: "54px" }}
             error={toNumberError}
             helperText={toNumberError ? t('pages.testSMS.invalidNumber') : " "}
 
             InputProps={{
-              sx: { backgroundColor: "#f7f7f7" },
+              sx: {
+                backgroundColor: "#FFFFFF", fontFamily: "Poppins",
+                '&::placeholder': {
+                  color: '#786E71',
+                  opacity: 0.8,
+                  fontFamily: "Poppins"
+                }
+              },
               endAdornment: (
-
                 <Tooltip
                   placement="bottom-end"
                   componentsProps={{
@@ -194,9 +225,9 @@ export default function TestSMS() {
                         borderRadius: "8px",
                         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
                         padding: "8px 12px",
-                        fontSize: "13px",
+                        fontSize: "14px",
                         fontFamily: "Poppins",
-                        color: "#000000",
+                        color: "#574B4F",
                         whiteSpace: "pre-line",
                         transform: "translate(-10px, -22px)",
                         borderColor: "#00131F3D",
@@ -215,7 +246,7 @@ export default function TestSMS() {
                   <img
                     src={toNumberError ? infoiconerror : infoicon}
                     alt="info"
-                    style={{ width: 20, height: 20, marginRight: 8 }}
+                    style={{ width: 24, height: 24, marginRight: 8 }}
                   />
                 </Tooltip>
               )
@@ -225,7 +256,7 @@ export default function TestSMS() {
         </Box>
       </Box>
 
-      <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 2 }}>
+      <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 3, color: "#786E71" }}>
         {t('pages.testSMS.writeMessageOrSelect')}
       </Typography>
 
@@ -237,7 +268,7 @@ export default function TestSMS() {
               fontSize: "16px",
               fontWeight: 500,
               mb: 1,
-              color: messageError ? "#D32F2F" : "#330F1B", // 🔥 Se pone rojo si hay error
+              color: messageError ? "#D32F2F" : "#330F1B",
             }}
           >
             {t('pages.testSMS.message')}
@@ -245,7 +276,7 @@ export default function TestSMS() {
           <TextField
             fullWidth
             multiline
-            rows={5}
+            rows={4}
             value={message}
             placeholder={t('pages.testSMS.writeMessageOrSelect')}
             onChange={(e) => {
@@ -256,7 +287,10 @@ export default function TestSMS() {
             error={messageError}
             helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
             InputProps={{
-              sx: { backgroundColor: "#f7f7f7", fontFamily: "Poppins" },
+              sx: {
+                backgroundColor: "#FFFFFF", fontFamily: "Poppins", borderRadius: "2px",
+                border: "1px solid #C6BFC299", width: "545px", height: "123px"
+              },
               endAdornment: (
                 <Tooltip
                   placement="bottom-end"
@@ -275,9 +309,9 @@ export default function TestSMS() {
                         borderRadius: "8px",
                         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
                         padding: "8px 12px",
-                        fontSize: "13px",
+                        fontSize: "14px",
                         fontFamily: "Poppins",
-                        color: "#000000",
+                        color: "#574B4F",
                         whiteSpace: "pre-line",
                         transform: "translate(-10px, -22px)",
                         borderColor: "#00131F3D",
@@ -296,7 +330,7 @@ export default function TestSMS() {
                   <img
                     src={messageError ? infoiconerror : infoicon}
                     alt="info"
-                    style={{ width: 20, height: 20, marginRight: 8 }}
+                    style={{ width: 24, height: 24, marginLeft: "5px", marginTop: "-65px" }}
                   />
                 </Tooltip>
               )
@@ -307,7 +341,7 @@ export default function TestSMS() {
               fontFamily: "Poppins",
               fontSize: "12px",
               color: "#A1A1A1",
-              mt: 1,
+              mt: -2, ml: 1.5
             }}
           >
             {t('pages.testSMS.charactersCounter', { count: message.length })}
@@ -320,10 +354,30 @@ export default function TestSMS() {
           </Typography>
 
           <Box display="flex" alignItems="center" gap={1}>
-            <FormControl sx={{ flex: 1, }}>
+            <FormControl sx={{
+              backgroundColor: "#ffffff",
+              fontFamily: "Poppins",
+              borderRadius: "8px",
+              border: "1px solid #9B9295",
+              width: "220px", height: "40px"
+            }}>
               <Select defaultValue="" value={selectedTemplateId}
-                onChange={(e) => setSelectedTemplateId(e.target.value)} displayEmpty>
-                <MenuItem value="">
+                onChange={(e) => setSelectedTemplateId(e.target.value)}
+                displayEmpty sx={{
+                  color: "#786E71",
+                  borderRadius: '8px',
+                  fontFamily: 'Poppins',
+                  fontSize: '14px', mt: "-8px",
+                  '& .MuiSelect-select': {
+                    display: 'flex',
+                    alignItems: 'center',
+                  },
+                  '& fieldset': {
+                    border: 'none',
+                  },
+                }}
+              >
+                <MenuItem value="" sx={{ fontFamily: "Poppins", color: "#786E71", mt: "-8px", fontSize: "12px" }}>
                   <em>{t('pages.testSMS.selectMessagePlaceholder')}</em>
                 </MenuItem>
                 {templates.map((template) => (
@@ -346,7 +400,40 @@ export default function TestSMS() {
               }}
               disabled={!isViewButtonEnabled}
             >
-              <VisibilityIcon sx={{ color: isViewButtonEnabled ? "#7B354D" : "#C4C4C4" }} />
+              <Tooltip title="Visualizar" arrow placement="top"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      backgroundColor: "rgba(0, 0, 0, 0.8)",
+                      color: "#CCC3C3",
+                      fontFamily: "Poppins, sans-serif",
+                      fontSize: "12px",
+                      padding: "6px 8px",
+                      borderRadius: "8px",
+                      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                    }
+                  },
+                  arrow: {
+                    sx: {
+                      color: "rgba(0, 0, 0, 0.8)"
+                    }
+                  }
+                }}
+                PopperProps={{
+                  modifiers: [
+                    {
+                      name: 'offset',
+                      options: {
+                        offset: [0, -12] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                      }
+                    }
+                  ]
+                }}
+              >
+                <img
+                  src={Iconeyesopen}
+                  style={{ color: isViewButtonEnabled ? "#7B354D" : "#C4C4C4" }} />
+              </Tooltip>
             </IconButton>
           </Box>
         </Box>
