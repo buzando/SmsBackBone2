@@ -199,7 +199,7 @@ namespace Business
                                     Extension = reader.IsDBNull(reader.GetOrdinal("extension"))
     ? (int?)null
     : reader.GetInt32(reader.GetOrdinal("extension")),
-                                    RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
+                                    RoomName = reader.GetString(reader.GetOrdinal("RoomName")) ?? "",
                                     TotalCredits = reader.GetDouble(reader.GetOrdinal("TotalCredits")),
                                     TotalLongSmsCredits = reader.GetDouble(reader.GetOrdinal("TotalLongSmsCredits")),
                                     TotalShortSmsCredits = reader.GetDouble(reader.GetOrdinal("TotalShortSmsCredits")),

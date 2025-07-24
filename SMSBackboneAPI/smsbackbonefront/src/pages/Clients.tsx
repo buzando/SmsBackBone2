@@ -1109,7 +1109,7 @@ const Clients: React.FC = () => {
                         justifyContent="center"
                         sx={{
                             width: '100%',
-                            minHeight: '400px',
+                            minHeight: '450px',
                             backgroundColor: '#F9F9F9',
                             padding: 4,
                             borderRadius: '12px',
@@ -1117,7 +1117,7 @@ const Clients: React.FC = () => {
                             mt: 2,
                         }}
                     >
-                        <img src={BoxEmpty} alt="Caja vacía" style={{ width: '220px', marginBottom: '16px' }} />
+                        <img src={NoResult} alt="No resultados" style={{ width: '240px', marginBottom: '16px' }} />
                         <Typography
                             sx={{
                                 fontFamily: 'Poppins',
@@ -1126,7 +1126,7 @@ const Clients: React.FC = () => {
                                 fontWeight: 500,
                             }}
                         >
-                            Da de alta un cliente para comenzar.
+                            No se encontraron resultados.
                         </Typography>
                     </Box>
                 ) : clientsList.length === 0 ? (
@@ -1138,14 +1138,14 @@ const Clients: React.FC = () => {
                         justifyContent="center"
                         sx={{
                             width: '100%',
-                            minHeight: '465px',
+                            minHeight: '450px',
                             backgroundColor: '#FFFFFF',
                             padding: 4,
                             borderRadius: '12px',
                             border: '1px solid #E0E0E0',
                         }}
                     >
-                        <img src={NoResult} alt="No resultados" style={{ width: '220px', marginBottom: '16px' }} />
+                        <img src={BoxEmpty} alt="Caja vacía" style={{ width: '240px', marginBottom: '16px' }} />
                         <Typography
                             sx={{
                                 fontFamily: 'Poppins',
@@ -1154,7 +1154,7 @@ const Clients: React.FC = () => {
                                 fontWeight: 500,
                             }}
                         >
-                            No se encontraron resultados
+                            Da de alta un cliente para comenzar.
                         </Typography>
                     </Box>
                 ) : (
@@ -1245,75 +1245,79 @@ const Clients: React.FC = () => {
                             </thead>
                             <tbody>
                                 {clientsList.map((Client) => (
-                                    <tr key={Client.id} style={{ borderBottom: '1px solid #E0E0E0' }}>
+                                    <tr key={Client.id} style={{
+                                        borderBottom: '1px solid #E0E0E0',
+                                        backgroundColor: Client.estatus === 0 ? '#FFFFFF' : '#F2F2F2',
+                                        color: Client.estatus === 0 ? '#574B4F' : '#9D9696',
+                                    }}>
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 14px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.creationDate}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.nombreCliente}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.firstName}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.lastName}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.phoneNumber}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px', maxWidth: '100px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.extension}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 46px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.email}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.rateForShort}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.rateForLong}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px', maxWidth: '100px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.roomName}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 28px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.estatus === 0 ? 'Habilitado' : 'Inhabilitado'}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.totalCredits}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>{Client.totalShortSmsCredits}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins',
                                             fontSize: "13px"
 
                                         }}>{Client.totalLongSmsCredits}</td>
@@ -1324,7 +1328,7 @@ const Clients: React.FC = () => {
                                             background: '#fff', borderLeft: '1px solid #E0E0E0',
                                             boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
                                             padding: '3.5px', width: '66px', height: "51px", whiteSpace: 'nowrap', overflow: 'hidden',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>
                                             <IconButton onClick={(event) => handleMenuOpen(event, Client.id as number)}>
                                                 <MoreVertIcon />
@@ -3303,12 +3307,9 @@ const Clients: React.FC = () => {
                         zIndex: 10
                     }}
                 >
-
-                    <SecondaryButton text="Cancelar" onClick={() => setOpenClientModal(false)} />
-
-
-                    <Box sx={{ display: "flex", gap: 2 }}>
-                        <Box sx={{ mt: -0.2 }}>
+                    <Box sx={{ display: "flex", gap: 3 }}>
+                        <SecondaryButton text="Cancelar" onClick={() => setOpenClientModal(false)} />
+                        <Box sx={{}}>
                             {step > 0 && (
                                 <SecondaryButton
 
@@ -3317,16 +3318,16 @@ const Clients: React.FC = () => {
                                 />
                             )}
                         </Box>
-                        <Box sx={{ display: "flex", gap: 2 }}>
+                    </Box>
 
-
+                    <Box sx={{ display: "flex", gap: 2 }}>
+                        <Box sx={{ display: "flex", gap: 1.5 }}>
                             <MainButton
                                 text={
                                     step === 2 || (step === 1 && isEditClient)
                                         ? isEditClient ? 'Guardar cambios' : 'Guardar'
                                         : 'Siguiente'
                                 }
-
                                 onClick={() => {
                                     if (step === 0) {
                                         const isEmailValid = validateEmailFormat(email);
@@ -3358,6 +3359,15 @@ const Clients: React.FC = () => {
                                 )}
                             </Box>
                         </Box>
+                        <Box sx={{ mt: -0 }}>
+                            {!isEditClient && step > 0 && step < 2 && (
+                                <MainButton
+                                    text="Guardars"
+                                    onClick={() => console.log("Guardars clicked")}
+                                />
+                            )}
+                        </Box>
+
                     </Box>
                 </Box>
 
