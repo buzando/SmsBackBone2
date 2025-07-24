@@ -96,11 +96,9 @@ namespace SMSBackboneAPI.Controllers
                 else
                 {
                     result = clientManager.CreateClient(dto);
+
                 }
-                if (result)
-                {
-                    //var userbackbone = new ApiBackBoneManager().CreateUser();
-                }
+             
 
                 if (result)
                     return Ok(new { success = true });

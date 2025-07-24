@@ -3315,7 +3315,6 @@ const MyNumbers: React.FC = () => {
                                                         fontSize: '13px',
                                                         backgroundColor: '#FFFFFF',
                                                         borderBottom: '1px solid #dcdcdc',
-                                                        borderRight: '1px solid #FFFFFF',
                                                     }}
                                                 >
                                                     Fecha del próx. pago

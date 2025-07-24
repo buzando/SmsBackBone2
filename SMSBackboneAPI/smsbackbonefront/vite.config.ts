@@ -17,7 +17,7 @@ export default defineConfig({
         }
     ],
     define: {
-        'process.env': process.env, // Si necesitas acceso completo a las variables de proceso
+        'process.env': process.env, 
     },
     optimizeDeps: {
         include: ['@mui/material/Tooltip',],
@@ -25,12 +25,12 @@ export default defineConfig({
     build: {
         outDir: 'build',
         sourcemap: true,
-        chunkSizeWarningLimit: 1000,
+        chunkSizeWarningLimit: 4000,
 
     },
     server: {
         port: 55578,
-        host: true, // Permite acceso desde la red local
+        host: true,
     },
     base: '/RedQuantum/',
 })

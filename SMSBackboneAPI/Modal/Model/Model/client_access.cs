@@ -8,11 +8,11 @@ namespace Modal.Model.Model
 {
     public class ClientAccess
     {
-        public int Id { get; set; }
-        public int ClientId { get; set; }
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-        public bool Status { get; set; } = true;
+        public int id { get; set; }
+        public int client_id { get; set; }
+        public string username { get; set; } = string.Empty;
+        public string password { get; set; } = string.Empty;
+        public DateTime created_at { get; set; }
+        public bool status { get; set; } = true;
     }
 }

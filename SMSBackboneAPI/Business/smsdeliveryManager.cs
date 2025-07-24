@@ -145,14 +145,14 @@ namespace Business
                         {
                             using (var ctx = new Entities())
                             {
-                                clientacces = ctx.ClientAccess.Where(x => x.ClientId == campaign.ClientId).FirstOrDefault();
+                                clientacces = ctx.Client_Access.Where(x => x.client_id == campaign.ClientId).FirstOrDefault();
                             }
                             if (clientacces == null)
                             {
                                 _logger.Error($"❌ No se encontró acceso para el cliente con ID {campaign.ClientId} en campaña {campaign.CampaignId}.");
                                 return;
                             }
-                            var loginResult = await new ApiBackBoneManager().LoginResponse(clientacces.Username, clientacces.Password);
+                            var loginResult = await new ApiBackBoneManager().LoginResponse(clientacces.username, clientacces.password);
                             if (loginResult == null)
                             {
                                 _logger.Error($"❌ Login fallido para la campaña {campaign.Name}");

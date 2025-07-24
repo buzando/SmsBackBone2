@@ -178,7 +178,7 @@ const HomePage: React.FC = () => {
             ]);
 
             setcampaigns(
-                response.data.campaigns?.map(c => ({
+                response.data.campaigns?.map((c: any) => ({
                     name: c.name,
                     numeroInicial: c.numeroInicial,
                     numeroActual: c.numeroActual
@@ -331,9 +331,11 @@ const HomePage: React.FC = () => {
     };
 
 
-    const CustomTooltip = styled(({ className, ...props }) => (
-        <Tooltip {...props} classes={{ popper: className }} arrow placement="bottom" />
-    ))(() => ({
+    const CustomTooltip = styled(
+        ({ className, ...props }: any) => (
+            <Tooltip {...props} classes={{ popper: className }} arrow placement="bottom" />
+        )
+    )(() => ({
         [`& .${tooltipClasses.tooltip}`]: {
             backgroundColor: '#FFFFFF !important',
             color: '#574B4F !important',

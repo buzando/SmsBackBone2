@@ -104,7 +104,7 @@ namespace Business
         public async Task<string> GetUsers(string token)
         {
             using var client = CreateAuthenticatedClient(token);
-            var url = $"{_baseUrl}api/user"; 
+            var url = $"{_baseUrl}api/user";
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
@@ -121,22 +121,37 @@ namespace Business
         }
         public async Task<string> CreateUser(string token, string username, string password, string email, int rol, string uri)
         {
-            using var client = CreateAuthenticatedClient(token);
-            var url = $"{_baseUrl}api/user";
-
-            var newUser = new
+            try
             {
-                Username = username,
-                Password = password,
-                Email = email,
-                Rol = rol,
-                Uri = uri
-            };
+                using var client = CreateAuthenticatedClient(token);
+                var url = $"{_baseUrl}user";
 
-            var content = new StringContent(JsonSerializer.Serialize(newUser), System.Text.Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+                var newUser = new
+                {
+                    Username = username,
+                    Password = password,
+                    Email = email,
+                    Rol = rol,
+                    Uri = uri
+                };
+
+                var content = new StringContent(JsonSerializer.Serialize(newUser), System.Text.Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(url, content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Error {(int)response.StatusCode}: {response.ReasonPhrase}\n{responseContent}");
+                }
+
+                return responseContent;
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
         }
         public async Task<string> UpdateUser(string token, int id, string username, string email, string apiUrl)
         {

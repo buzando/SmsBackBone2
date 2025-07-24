@@ -78,7 +78,7 @@ export interface PagedClientResponse {
 }
 
 export interface Clients {
-    id: number;
+    id?: number;
     nombreCliente: string;
     creationDate: string;
     rateForShort: number;
@@ -111,9 +111,9 @@ interface FormData {
 
 interface SmsCost {
     id: number;
-    SmsType: string;
-    Quantity: string;
-    DisplayPrice: number;
+    smsType: string;
+    quantity: string;
+    displayPrice: number;
 }
 
 const Clients: React.FC = () => {
@@ -207,6 +207,9 @@ const Clients: React.FC = () => {
     const [isSavingClient, setIsSavingClient] = useState(false);
     const [shortRates, setShortRates] = useState<SmsCost[]>([]);
     const [longRates, setLongRates] = useState<SmsCost[]>([]);
+    const [standardShortRates, setStandardShortRates] = useState<Record<string, number>>({});
+    const [standardLongRates, setStandardLongRates] = useState<Record<string, number>>({});
+
     const DualSpinner = () => (
         <Box
             sx={{
@@ -255,19 +258,6 @@ const Clients: React.FC = () => {
                 : '#574B4F66';
 
 
-    const handleSelect = (id: number) => {
-        setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-        );
-    };
-
-    const handleSelectAll = () => {
-        if (selectedIds.length === clientsList.length) {
-            setSelectedIds([]);
-        } else {
-            setSelectedIds(clientsList.map((n) => n.id));
-        }
-    };
 
     const GetClientsAdmin = async () => {
         setLoading(true);
@@ -321,12 +311,29 @@ const Clients: React.FC = () => {
             const response = await axios.get(request);
 
             if (response.status === 200) {
-                const data = response.data;
+                const data: SmsCost[] = response.data;
+
                 const shortOptions = data.filter((x) => x.smsType === 'short');
                 const longOptions = data.filter((x) => x.smsType === 'long');
 
                 setShortRates(shortOptions);
                 setLongRates(longOptions);
+
+                console.log(setShortRates);
+                console.log(setLongRates);
+
+                const shortRatesMap: Record<string, number> = {};
+                shortOptions.forEach((x) => {
+                    shortRatesMap[x.quantity] = x.displayPrice;
+                });
+
+                const longRatesMap: Record<string, number> = {};
+                longOptions.forEach((x) => {
+                    longRatesMap[x.quantity] = x.displayPrice;
+                });
+
+                setStandardShortRates(shortRatesMap);
+                setStandardLongRates(longRatesMap);
             }
         } catch {
 
@@ -397,93 +404,6 @@ const Clients: React.FC = () => {
         }, 1000);
     };
 
-    const exportClients = async (
-        format: 'csv' | 'xlsx' | 'pdf',
-        onComplete?: () => void
-    ) => {
-        const MAX_RECORDS_LOCAL = 100000;
-        const data = clientsList;
-
-        try {
-            if (data.length <= MAX_RECORDS_LOCAL) {
-                const cleanData = data.map(item => ({
-                    "Fecha de alta": item.creationDate,
-                    "Cliente": item.nombreCliente,
-                    "Nombre": item.firstName,
-                    "Apellidos": item.lastName,
-                    "Teléfono": item.phoneNumber,
-                    "Extensión": item.extension || '',
-                    "Correo electrónico": item.email,
-                    "Tarifa SMS # Cortos": item.rateForShort,
-                    "Tarifa SMS # Largos": item.rateForLong,
-                    "Salas": item.roomName,
-                    "Estatus": item.estatus,
-                    "Créditos Globales": item.totalCredits,
-                    "Créditos SMS # Cortos": item.totalShortSmsCredits,
-                    "Créditos SMS # Largos": item.totalLongSmsCredits
-                }));
-
-
-                if (format === 'csv') {
-                    const csv = unparse(cleanData);
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                    saveAs(blob, 'DescargaClientes.csv');
-                } else if (format === 'xlsx') {
-                    const worksheet = XLSX.utils.json_to_sheet(cleanData);
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, worksheet, 'NumerosDID');
-                    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-                    const blob = new Blob([excelBuffer], {
-                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    });
-                    saveAs(blob, 'DescargaClientes.xlsx');
-                } else if (format === 'pdf') {
-                    const input = document.querySelector('table');
-                    if (!input) return;
-
-                    const clone = input.cloneNode(true) as HTMLElement;
-                    clone.style.position = 'absolute';
-                    clone.style.top = '-9999px';
-                    document.body.appendChild(clone);
-
-                    const canvas = await html2canvas(clone, { scale: 2, useCORS: true });
-                    document.body.removeChild(clone);
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const pdf = new jsPDF('l', 'mm', 'a4');
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const imgProps = pdf.getImageProperties(imgData);
-                    const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
-                    pdf.save('DescargaClientes.pdf');
-                }
-            } else {
-                const payload = { Formato: format };
-                const response = await axios.post(
-                    `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_EXPORT_NUMBERS}`,
-                    payload,
-                    { headers: { 'Content-Type': 'application/json' }, responseType: 'blob' }
-                );
-
-                const blob = new Blob([response.data], { type: 'application/octet-stream' });
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', `NumerosDID.${format}`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        } catch (error) {
-            setTitleModalError('Error al generar el reporte');
-            setMessageModal('Intentelo màs tarde');
-            setShowModalError(true);
-        } finally {
-            onComplete?.();
-        }
-    };
-
     const goToFirstPage = () => setCurrentPage(0);
 
     const goToLastPage = () => setCurrentPage(totalPages);
@@ -534,7 +454,7 @@ const Clients: React.FC = () => {
 
     const visibleData = clientsList
         .filter(client =>
-            appliedClientIds.length === 0 || appliedClientIds.includes(client.id)
+            appliedClientIds.length === 0 || (client.id !== undefined && appliedClientIds.includes(client.id))
         )
         .filter(client =>
             client.nombreCliente.toLowerCase().includes(searchTerm.toLowerCase())
@@ -644,24 +564,6 @@ const Clients: React.FC = () => {
             setOpenClientModal(false);
             setIsSavingClient(false);
         }
-    };
-
-    const standardShortRates: Record<string, number> = {
-        "1–999": 0.2819,
-        "1,000": 0.2702,
-        "2,000": 0.2584,
-        "3,000": 0.2526,
-        "4,000": 0.2467,
-        "6,000": 0.2408,
-    };
-
-    const standardLongRates: Record<string, number> = {
-        "1": 0.150,
-        "1,000": 0.125,
-        "2,000": 0.100,
-        "4,000": 0.080,
-        "5,000": 0.075,
-        "8,000": 0.070,
     };
 
     const validateEmailFormat = (email: string) => {
@@ -861,8 +763,8 @@ const Clients: React.FC = () => {
 
     const handleFilterClients = () => {
         const selectedClientIds = clientsList
-            .filter(c => selectedClients.includes(c.id))
-            .map(c => c.id);
+            .filter(c => c.id !== undefined && selectedClients.includes(c.id))
+            .map(c => c.id as number);
 
         setAppliedClientIds(selectedClientIds);
         setClientMenuOpen(false);
@@ -1424,7 +1326,7 @@ const Clients: React.FC = () => {
                                             padding: '3.5px', width: '66px', height: "51px", whiteSpace: 'nowrap', overflow: 'hidden',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>
-                                            <IconButton onClick={(event) => handleMenuOpen(event, Client.id)}>
+                                            <IconButton onClick={(event) => handleMenuOpen(event, Client.id as number)}>
                                                 <MoreVertIcon />
                                             </IconButton>
                                         </td>
@@ -1715,14 +1617,14 @@ const Clients: React.FC = () => {
                                 key={client.id}
                                 onClick={() =>
                                     setSelectedClients((prev) =>
-                                        prev.includes(client.id)
+                                        prev.includes(client.id!)
                                             ? prev.filter((c) => c !== client.id)
-                                            : [...prev, client.id]
+                                            : [...prev, client.id!]
                                     )
                                 }
                                 sx={{ height: "32px", marginLeft: "-12px" }}
                             >
-                                <Checkbox checked={selectedClients.includes(client.id)}
+                                <Checkbox checked={selectedClients.includes(client.id as number)}
                                     checkedIcon={
                                         <Box
                                             sx={{
@@ -1747,7 +1649,7 @@ const Clients: React.FC = () => {
                                         fontFamily: 'Poppins',
                                         fontSize: '16px',
                                         fontWeight: 500,
-                                        color: selectedClients.includes(client.id) ? '#8F4E63' : '#786E71',
+                                        color: selectedClients.includes(client.id as number) ? '#8F4E63' : '#786E71',
                                     }}
                                 />
                             </MenuItem>
@@ -2008,7 +1910,10 @@ const Clients: React.FC = () => {
                                     </Typography>
                                     <TextField
                                         value={selectedClient?.nombreCliente || ''}
-                                        onChange={(e) => setSelectedClient({ ...selectedClient, nombreCliente: e.target.value })}
+                                        onChange={(e) => setSelectedClient({
+                                            ...(selectedClient as Clients),
+                                            nombreCliente: e.target.value
+                                        })}
                                         error={
                                             !!(selectedClient?.nombreCliente && (selectedClient?.nombreCliente.length > 40 || !/^[a-zA-Z0-9 ]+$/.test(selectedClient?.nombreCliente)))
                                         }
@@ -2122,7 +2027,10 @@ const Clients: React.FC = () => {
                                         </Typography>
                                         <TextField
                                             value={selectedClient?.firstName || ''}
-                                            onChange={(e) => setSelectedClient({ ...selectedClient, firstName: e.target.value })}
+                                            onChange={(e) => setSelectedClient({
+                                                ...(selectedClient as Clients),
+                                                firstName: e.target.value
+                                            })}
                                             sx={{
                                                 fontFamily: "Poppins",
                                                 "& .MuiInputBase-input": {
@@ -2207,7 +2115,10 @@ const Clients: React.FC = () => {
                                         </Typography>
                                         <TextField
                                             value={selectedClient?.lastName || ''}
-                                            onChange={(e) => setSelectedClient({ ...selectedClient, lastName: e.target.value })}
+                                            onChange={(e) => setSelectedClient({
+                                                ...(selectedClient as Clients),
+                                                lastName: e.target.value
+                                            })}
                                             sx={{
                                                 fontFamily: "Poppins",
                                                 "& .MuiInputBase-input": {
@@ -2295,7 +2206,10 @@ const Clients: React.FC = () => {
                                         </Typography>
                                         <TextField
                                             value={selectedClient?.phoneNumber || ''}
-                                            onChange={(e) => setSelectedClient({ ...selectedClient, phoneNumber: e.target.value })}
+                                            onChange={(e) => setSelectedClient({
+                                                ...(selectedClient as Clients),
+                                                phoneNumber: e.target.value
+                                            })}
                                             sx={{
                                                 fontFamily: "Poppins",
                                                 "& .MuiInputBase-input": {
@@ -2380,7 +2294,15 @@ const Clients: React.FC = () => {
                                         </Typography>
                                         <TextField
                                             value={selectedClient?.extension || ''}
-                                            onChange={(e) => setSelectedClient({ ...selectedClient, extension: e.target.value })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value);
+                                                if (!isNaN(value)) {
+                                                    setSelectedClient({
+                                                        ...(selectedClient as Clients),
+                                                        extension: value
+                                                    });
+                                                }
+                                            }}
                                             sx={{
                                                 fontFamily: "Poppins",
                                                 "& .MuiInputBase-input": {
@@ -2701,7 +2623,7 @@ const Clients: React.FC = () => {
                                                 }}
                                                 disabled={shortRateType !== 'estandar'}
                                                 renderValue={(selected) =>
-                                                    selected ? selected : (
+                                                    selected ? parseInt(selected).toLocaleString() : (
                                                         <span style={{ color: '#645E60', fontSize: '12px', fontFamily: 'Poppins' }}>
                                                             Seleccionar cantidad de mensajes
                                                         </span>
@@ -2727,55 +2649,14 @@ const Clients: React.FC = () => {
                                                     },
                                                 }}
                                             >
-                                                <MenuItem value="1–999" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    1–999
-                                                </MenuItem>
-                                                <MenuItem value="1,000" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    1,000
-                                                </MenuItem>
-                                                <MenuItem value="2,000" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    2,000
-                                                </MenuItem>
-                                                <MenuItem value="3,000" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    3,000
-                                                </MenuItem>
-                                                <MenuItem value="4,000" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    4,000
-                                                </MenuItem>
-                                                <MenuItem value="6,000" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    6,000
-                                                </MenuItem>
+                                                {shortRates.map((option, index) => (
+                                                    <MenuItem key={index} value={option.quantity}>
+                                                        {parseInt(option.quantity).toLocaleString()}
+                                                    </MenuItem>
+                                                ))}
+
                                             </Select>
+
 
                                             <Typography
                                                 sx={{
@@ -2905,12 +2786,14 @@ const Clients: React.FC = () => {
                                             <TextField
                                                 type="number"
                                                 value={selectedClient?.rateForShort || ''}
-                                                onChange={(e) =>
+                                                onChange={(e) => {
+                                                    const value = parseFloat(e.target.value);
                                                     setSelectedClient({
-                                                        ...selectedClient,
-                                                        rateForShort: parseFloat(e.target.value)
-                                                    })
-                                                }
+                                                        ...(selectedClient as Clients),
+                                                        rateForShort: isNaN(value) ? 0 : value
+                                                    });
+                                                }}
+
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                                     inputProps: {
@@ -3042,48 +2925,11 @@ const Clients: React.FC = () => {
                                                     }
                                                 }}
                                             >
-                                                <MenuItem value="1" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    1</MenuItem>
-                                                <MenuItem value="1,000" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    1,000</MenuItem>
-                                                <MenuItem value="2,000" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    2,000</MenuItem>
-                                                <MenuItem value="4,000" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    4,000</MenuItem>
-                                                <MenuItem value="5,000" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    5,000</MenuItem>
-                                                <MenuItem value="8,000" sx={{
-                                                    fontFamily: 'Poppins', fontSize: '12px',
-                                                    color: '#645E60', '&:hover': {
-                                                        backgroundColor: '#F2EBED'
-                                                    }
-                                                }}>
-                                                    8,000</MenuItem>
+                                                {longRates.map((option, index) => (
+                                                    <MenuItem key={index} value={option.quantity}>
+                                                        {parseInt(option.quantity).toLocaleString()}
+                                                    </MenuItem>
+                                                ))}
                                             </Select>
                                             <Typography
                                                 sx={{
@@ -3212,9 +3058,13 @@ const Clients: React.FC = () => {
                                             <TextField
                                                 type='number'
                                                 value={selectedClient?.rateForLong || ''}
-                                                onChange={(e) =>
-                                                    setSelectedClient({ ...selectedClient, rateForLong: parseFloat(e.target.value) })
-                                                }
+                                                onChange={(e) => {
+                                                    const value = parseFloat(e.target.value);
+                                                    setSelectedClient({
+                                                        ...selectedClient!,
+                                                        rateForLong: isNaN(value) ? 0 : value,
+                                                    });
+                                                }}
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                                 }}
@@ -3888,7 +3738,7 @@ const Clients: React.FC = () => {
                                     InputProps={{
                                         readOnly: true,
                                         endAdornment: (
-                                            <IconButton position="end">
+                                            <IconButton>
                                                 <CalendarTodayIcon sx={{ width: "15px", height: "15px", color: "#8F4D63" }} />
                                             </IconButton>
                                         ),

@@ -11,7 +11,7 @@ namespace Business
 {
     public class ClientAccessManager
     {
-        private static readonly string EncryptionKey = "MiSuperClaveDe32Caracteres!"; // 🔥 DEBE ser 32 caracteres para AES-256
+        public const string EncryptionKey = "16CharEncryptKey"; 
 
         // Método para insertar nuevo acceso
         public static async Task<bool> InsertClientAccess(int clientId, string username, string password)
@@ -24,14 +24,14 @@ namespace Business
 
                 var access = new ClientAccess
                 {
-                    ClientId = clientId,
-                    Username = username,
-                    Password = encryptedPassword,
-                    CreatedAt = DateTime.Now,
-                    Status = true
+                    client_id = clientId,
+                    username = username,
+                    password = encryptedPassword,
+                    created_at = DateTime.Now,
+                    status = true
                 };
 
-                ctx.ClientAccess.Add(access);
+                ctx.Client_Access.Add(access);
                 await ctx.SaveChangesAsync();
                 return true;
             }
@@ -46,11 +46,11 @@ namespace Business
         public static async Task<ClientAccess?> GetClientAccessByClientId(int clientId)
         {
             using var ctx = new Entities();
-            var access = await ctx.ClientAccess.Where(c => c.ClientId == clientId && c.Status).FirstOrDefaultAsync();
+            var access = await ctx.Client_Access.Where(c => c.client_id == clientId && c.status).FirstOrDefaultAsync();
 
             if (access != null)
             {
-                access.Password = Decrypt(access.Password); 
+                access.password = Decrypt(access.password); 
             }
 
             return access;
@@ -63,12 +63,12 @@ namespace Business
             try
             {
                 using var ctx = new Entities();
-                var access = await ctx.ClientAccess.Where(c => c.ClientId == clientId && c.Status).FirstOrDefaultAsync();
+                var access = await ctx.Client_Access.Where(c => c.client_id == clientId && c.status).FirstOrDefaultAsync();
                 if (access == null)
                     return false;
 
-                access.Username = newUsername;
-                access.Password = Encrypt(newPassword);
+                access.username = newUsername;
+                access.password = Encrypt(newPassword);
                 await ctx.SaveChangesAsync();
                 return true;
             }
@@ -84,11 +84,11 @@ namespace Business
             try
             {
                 using var ctx = new Entities();
-                var access = await ctx.ClientAccess.Where(c => c.ClientId == clientId && c.Status).FirstOrDefaultAsync();
+                var access = await ctx.Client_Access.Where(c => c.client_id == clientId && c.status).FirstOrDefaultAsync();
                 if (access == null)
                     return false;
 
-                access.Status = false;
+                access.status = false;
                 await ctx.SaveChangesAsync();
                 return true;
             }
@@ -103,20 +103,21 @@ namespace Business
         public static string Encrypt(string plainText)
         {
             using var aes = Aes.Create();
-            aes.Key = Encoding.UTF8.GetBytes(EncryptionKey);
-            aes.GenerateIV();
+            aes.Key = Encoding.UTF8.GetBytes(EncryptionKey); // 16 bytes
+            aes.GenerateIV(); // IV aleatorio
 
             var encryptor = aes.CreateEncryptor();
             var plainBytes = Encoding.UTF8.GetBytes(plainText);
             var cipherBytes = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
 
-            // Guardamos IV + cifrado
+            // Combina IV + texto cifrado
             var result = new byte[aes.IV.Length + cipherBytes.Length];
             Array.Copy(aes.IV, 0, result, 0, aes.IV.Length);
             Array.Copy(cipherBytes, 0, result, aes.IV.Length, cipherBytes.Length);
 
             return Convert.ToBase64String(result);
         }
+
 
         public static string Decrypt(string cipherText)
         {
@@ -125,8 +126,8 @@ namespace Business
             using var aes = Aes.Create();
             aes.Key = Encoding.UTF8.GetBytes(EncryptionKey);
 
-            // Extraemos IV
-            var iv = new byte[aes.BlockSize / 8];
+            // Extrae IV
+            var iv = new byte[16]; // AES block size = 128 bits = 16 bytes
             Array.Copy(fullCipher, 0, iv, 0, iv.Length);
             aes.IV = iv;
 
@@ -138,5 +139,6 @@ namespace Business
 
             return Encoding.UTF8.GetString(plainBytes);
         }
+
     }
 }

@@ -258,7 +258,7 @@ namespace Business
 
                         int clientId = client.id;
 
-                        string rawPassword = GenerarPasswordTemporal(8);;
+                        string rawPassword = GenerarPasswordTemporal(8); ;
                         string hashedPassword = SecurityHelper.GenerarPasswordHash(rawPassword);
                         // 2. Crear usuario
                         var user = new Modal.Model.Model.Users
@@ -316,13 +316,28 @@ namespace Business
                             ctx.roomsbyuser.Add(roomByUser);
                             ctx.SaveChanges();
                         }
-                        transaction.Commit();
+                        
                         if (dto.Id == null)
                         {
                             string sitioFront = Common.ConfigurationManagerJson("UrlSitio");
                             string mensaje = MailManager.GenerateMailMessage(dto.Email, rawPassword, sitioFront, "NewClient");
 
                             MailManager.SendEmail(dto.Email, "Bienvenido a Red Quantum", mensaje);
+
+                            var password = GenerarPasswordTemporalBackBone(16);
+
+                            var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
+                            var userbackbone = new ApiBackBoneManager()
+                                .CreateUser(admintoken.Result.token, dto.NombreCliente, password, dto.Email, 3, "")
+                                .GetAwaiter()
+                                .GetResult();
+
+                            var passencrypt = ClientAccessManager.Encrypt(password);
+
+                            var clientacces = new ClientAccess { client_id = client.id, password = passencrypt, username = dto.NombreCliente, status = true, created_at = DateTime.Now };
+                            ctx.Client_Access.Add(clientacces);
+                            ctx.SaveChanges();
+                            transaction.Commit();
                         }
                         return true;
                     }
@@ -333,15 +348,51 @@ namespace Business
                         return false;
                     }
                 }
+
+
+
             }
         }
-        private string GenerarPasswordTemporal(int length = 8)
+        public string GenerarPasswordTemporal(int length = 8)
         {
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
+
+        public string GenerarPasswordTemporalBackBone(int length = 8)
+        {
+            if (length < 4)
+                throw new ArgumentException("El password debe tener al menos 4 caracteres.");
+
+            const string lowercase = "abcdefghijklmnopqrstuvwxyz";
+            const string uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string digits = "0123456789";
+            const string specials = "!@#$%^&*";
+            const string all = lowercase + uppercase + digits + specials;
+
+            var random = new Random();
+
+            // Garantizamos al menos un carácter de cada tipo
+            var passwordChars = new List<char>
+    {
+        lowercase[random.Next(lowercase.Length)],
+        uppercase[random.Next(uppercase.Length)],
+        digits[random.Next(digits.Length)],
+        specials[random.Next(specials.Length)]
+    };
+
+            // Rellenamos el resto con caracteres aleatorios de todo el conjunto
+            for (int i = passwordChars.Count; i < length; i++)
+            {
+                passwordChars.Add(all[random.Next(all.Length)]);
+            }
+
+            // Mezclamos el resultado para evitar patrones predecibles
+            return new string(passwordChars.OrderBy(_ => random.Next()).ToArray());
+        }
+
 
         public bool UpdateClient(ClientRequestDto dto)
         {
@@ -605,7 +656,7 @@ namespace Business
 
             if (request.TipoReporte == 0)
             {
-                var (items, total) = GetReporteFacturacion(request.FechaInicio, request.FechaFin,request.ClientIds ,request.Page, pageSize);
+                var (items, total) = GetReporteFacturacion(request.FechaInicio, request.FechaFin, request.ClientIds, request.Page, pageSize);
                 return new ReportsAdminResponse
                 {
                     Items = items.Cast<object>().ToList(),
@@ -615,7 +666,7 @@ namespace Business
             }
             else if (request.TipoReporte == 1)
             {
-                var (items, total) = GetReporteConsumoCliente(request.FechaInicio, request.FechaFin,request.ClientIds, request.Page, pageSize);
+                var (items, total) = GetReporteConsumoCliente(request.FechaInicio, request.FechaFin, request.ClientIds, request.Page, pageSize);
                 return new ReportsAdminResponse
                 {
                     Items = items.Cast<object>().ToList(),
@@ -625,7 +676,7 @@ namespace Business
             }
             else if (request.TipoReporte == 2)
             {
-                var (items, total) = GetReporteConsumoSistema(request.FechaInicio, request.FechaFin, request.ClientIds,request.Page, pageSize);
+                var (items, total) = GetReporteConsumoSistema(request.FechaInicio, request.FechaFin, request.ClientIds, request.Page, pageSize);
                 return new ReportsAdminResponse
                 {
                     Items = items.Cast<object>().ToList(),
