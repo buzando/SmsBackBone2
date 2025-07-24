@@ -11,6 +11,7 @@ import MainButtonIcon from '../components/commons/MainButtonIcon'
 import MainButton from '../components/commons/MainButton'
 import SecondaryButton from '../components/commons/SecondaryButton'
 import seachicon from '../assets/icon-lupa.svg';
+import Iconseachred from "../assets/Iconseachred.svg";
 import backarrow from '../assets/MoveTable.svg';
 import iconclose from '../assets/icon-close.svg';
 import { saveAs } from 'file-saver';
@@ -125,6 +126,17 @@ const RoomsAdmin: React.FC = () => {
             />
         </Box>
     );
+
+    useEffect(() => {
+        const filtered = originalData.filter((room) =>
+            room.nombrecliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            room.nombreSala.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        setRoomsData(filtered);
+        setCurrentPage(1);
+    }, [searchTerm]);
+
 
     useEffect(() => {
         const term = searchTerm.toLowerCase();
@@ -377,7 +389,11 @@ const RoomsAdmin: React.FC = () => {
                                     height: "40px"
                                 }}
                             >
-                                <img src={seachicon} alt="Buscar" style={{ marginRight: 8, width: 24 }} />
+                                <img
+                                    src={searchTerm ? Iconseachred : seachicon}
+                                    alt="Buscar"
+                                    style={{ marginRight: 8, width: 24 }}
+                                />
                                 <input
                                     type="text"
                                     placeholder="Buscar"
@@ -603,7 +619,7 @@ const RoomsAdmin: React.FC = () => {
                         justifyContent="center"
                         sx={{
                             width: '100%',
-                            minHeight: '400px',
+                            minHeight: '450px',
                             backgroundColor: '#F9F9F9',
                             padding: 4,
                             borderRadius: '12px',
@@ -611,7 +627,7 @@ const RoomsAdmin: React.FC = () => {
                             mt: 2,
                         }}
                     >
-                        <img src={BoxEmpty} alt="Empty" width={220} />
+                        <img src={BoxEmpty} alt="Empty" width={240} />
                         <Typography variant="h6" mt={2}
                             sx={{
                                 fontFamily: 'Poppins',
@@ -632,7 +648,7 @@ const RoomsAdmin: React.FC = () => {
                         justifyContent="center"
                         sx={{
                             width: '100%',
-                            minHeight: '400px',
+                            minHeight: '450px',
                             backgroundColor: '#F9F9F9',
                             padding: 4,
                             borderRadius: '12px',
@@ -640,7 +656,7 @@ const RoomsAdmin: React.FC = () => {
                             mt: 2,
                         }}
                     >
-                        <img src={NoResult} alt="No results" width={220} />
+                        <img src={NoResult} alt="No results" width={240} />
                         <Typography variant="h6" mt={2}
                             sx={{
                                 fontFamily: 'Poppins',
@@ -790,9 +806,14 @@ const RoomsAdmin: React.FC = () => {
                                         }}
                                     />
                                 </InputAdornment>
-                            ),
+                            ),//clientSearch
                             endAdornment: clientSearch && (
-                                <IconButton onClick={() => setClientSearch('')}>
+                                <IconButton
+                                    onClick={() => {
+                                        setSearchTerm('');
+                                        setRoomsData(originalData);
+                                    }}
+                                >
                                     <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
                                 </IconButton>
                             ),
