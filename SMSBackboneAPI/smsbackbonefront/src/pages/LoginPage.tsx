@@ -24,7 +24,7 @@ import infoicon from '../assets/Icon-info.svg';
 import infoiconerror from '../assets/Icon-infoerror.svg';
 import Iconeyeslash from '../assets/Iconeyeslash.svg';
 import Iconeyesopen from '../assets/Iconeyesopen.svg';
-import logored from '../assets/Logo_Red-Quantum.svg';
+import QuantumLogo from '../assets/QuantumLogo.svg';
 
 type errorObj = {
     code: string;
@@ -704,7 +704,9 @@ const Login: React.FC = () => {
                         justifyContent: 'center',
                     }}
                 >
-                    <img src={logored} alt="Nuxiba Logo" width="410" />
+                    <img src={QuantumLogo} alt="Nuxiba Logo" width="700"
+                        style={{ marginTop: "-80px" }}
+                    />
                 </Box>
             </Grid>
         </Grid>

@@ -34,6 +34,7 @@ import ModalError from "../components/commons/ModalError";
 import SnackBar from "../components/commons/ChipBar";
 import { tr } from 'date-fns/locale';
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
+import infoicon from '../assets/Icon-info.svg'
 
 interface Clients {
     id: number;
@@ -350,19 +351,19 @@ const RoomsAdmin: React.FC = () => {
                                         setActiveFilter(label.toLowerCase() as any);
                                     }}
                                     sx={{
-                                        px: '16px',
-                                        py: '6px',
+                                        px: '18px',
+                                        py: '7px',
                                         border: '1px solid',
                                         borderColor: showClientHighlight ? '#7B354D' : '#CFCFCF',
                                         borderRadius: '50px',
                                         cursor: 'pointer',
-                                        fontFamily: 'Poppins',
+                                        fontFamily: 'Poppins', letterSpacing: "1.12px",
                                         fontWeight: 600,
                                         fontSize: '13px',
                                         backgroundColor: showClientHighlight ? '#F6EEF1' : '#FFFFFF',
                                         color: showClientHighlight ? '#7B354D' : '#9B9295',
                                         transition: 'all 0.2s ease-in-out',
-                                        userSelect: 'none',
+                                        userSelect: 'none', height: "36px"
                                     }}
                                 >
                                     {labelDisplay}
@@ -966,7 +967,7 @@ const RoomsAdmin: React.FC = () => {
                             }}
                             disabled={!selectedRow?.canBeDeleted}
                             sx={{
-                                fontFamily: 'Poppins',
+                                fontFamily: 'Poppins', width: "198px",
                                 fontSize: '14px',
                                 opacity: selectedRow?.canBeDeleted ? 1 : 0.5,
                                 cursor: selectedRow?.canBeDeleted ? 'pointer' : 'not-allowed',
@@ -993,12 +994,9 @@ const RoomsAdmin: React.FC = () => {
                                     Eliminar
                                 </Typography>
                                 {!selectedRow?.canBeDeleted && (
-                                    <img
-                                        src={InfoIcon}
-                                        alt="No se puede eliminar"
-                                        title="Esta sala tiene campañas activas"
-                                        style={{ width: 16, height: 16 }}
-                                    />
+                                    <Typography>
+
+                                    </Typography>
                                 )}
                             </Box>
                         </MenuItem>

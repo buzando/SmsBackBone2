@@ -839,19 +839,19 @@ const Clients: React.FC = () => {
                                         setActiveFilter(label.toLowerCase() as any);
                                     }}
                                     sx={{
-                                        px: '16px',
-                                        py: '6px',
+                                        px: '18px',
+                                        py: '7px',
                                         border: '1px solid',
                                         borderColor: highlight ? '#7B354D' : '#CFCFCF',
                                         borderRadius: '50px',
                                         cursor: 'pointer',
-                                        fontFamily: 'Poppins',
+                                        fontFamily: 'Poppins', letterSpacing: "1.12px",
                                         fontWeight: 600,
                                         fontSize: '13px',
                                         backgroundColor: highlight ? '#F6EEF1' : '#FFFFFF',
                                         color: highlight ? '#7B354D' : '#9B9295',
                                         transition: 'all 0.2s ease-in-out',
-                                        userSelect: 'none',
+                                        userSelect: 'none', height: "36px"
                                     }}
                                 >
                                     {labelDisplay}
@@ -1896,7 +1896,9 @@ const Clients: React.FC = () => {
                 <DialogContent>
                     <Box px={3} pt={1} sx={{ overflowX: "hidden" }}>
                         {step === 0 && (
-                            <Box display="flex" flexDirection="column" gap={2} sx={{ overflowX: "hidden" }}>
+                            <Box display="flex" flexDirection="column" gap={2} sx={{
+                                overflowX: "hidden", justifyContent: "center", alignItems: "left", marginLeft: "25px"
+                            }}>
                                 <Grid item xs={12} md={6} marginLeft={"10px"} mt={1} mb={1}>
                                     <Typography
                                         sx={{
@@ -1931,11 +1933,11 @@ const Clients: React.FC = () => {
                                         }
                                         FormHelperTextProps={{
                                             sx: {
-                                                fontFamily: 'Poppins', position: "absolute", marginTop: "58px"
+                                                fontFamily: 'Poppins', position: "absolute", marginTop: "58px",
                                             }
                                         }}
                                         sx={{
-                                            fontFamily: "Poppins",
+                                            fontFamily: "Poppins", width: "340px",
                                             "& .MuiInputBase-input": {
                                                 fontFamily: "Poppins",
                                             },
@@ -2010,551 +2012,557 @@ const Clients: React.FC = () => {
                                 <Typography sx={{
                                     color: "#330F1B", fontFamily: "Poppins", fontSize: "18px", fontWeight: 500,
                                     marginLeft: "10px"
-                                }}
-                                >Información de contacto</Typography>
-
-                                <Box display="flex" gap={2}>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"}>
-                                        <Typography
-                                            sx={{
-                                                textAlign: "left",
-                                                fontSize: "16px",
-                                                fontFamily: "Poppins",
-                                                letterSpacing: "0px",
-                                                opacity: 1,
-                                                marginBottom: "4px",
-                                                color: "#330F1B"
-                                            }}
-                                        >
-                                            Nombre
-                                            <span style={{ color: "#D01247" }}>*</span>
-                                        </Typography>
-                                        <TextField
-                                            value={selectedClient?.firstName || ''}
-                                            onChange={(e) => setSelectedClient({
-                                                ...(selectedClient as Clients),
-                                                firstName: e.target.value
-                                            })}
-                                            sx={{
-                                                fontFamily: "Poppins",
-                                                "& .MuiInputBase-input": {
+                                }}>
+                                    Información de contacto
+                                </Typography>
+                                <Box sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "left"
+                                }}>
+                                    <Box display="flex" gap={2}>
+                                        <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"} width={"340px"}>
+                                            <Typography
+                                                sx={{
+                                                    textAlign: "left",
+                                                    fontSize: "16px",
                                                     fontFamily: "Poppins",
-                                                },
-                                            }}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <Tooltip
-                                                            title={
-                                                                <Box
-                                                                    sx={{
-                                                                        backgroundColor: "#FFFFFF",
-                                                                        borderRadius: "8px",
-                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                        padding: "8px 12px",
-                                                                        fontSize: "14px",
-                                                                        fontFamily: "Poppins",
-                                                                        color: "#574B4F",
-                                                                        whiteSpace: "pre-line",
-                                                                        transform: "translate(-10px, -22px)",
-                                                                        borderColor: "#00131F3D",
-                                                                        borderStyle: "solid",
-                                                                        borderWidth: "1px"
-                                                                    }}
-                                                                >
-                                                                    <>
-                                                                        • Solo caracteres alfabéticos<br />
-                                                                        • Longitud máxima de 40<br />
-                                                                        caracteres
-                                                                    </>
-                                                                </Box>
-                                                            }
-                                                            placement="bottom-end"
-                                                            componentsProps={{
-                                                                tooltip: {
-                                                                    sx: {
-                                                                        backgroundColor: "transparent",
-                                                                        padding: 0,
+                                                    letterSpacing: "0px",
+                                                    opacity: 1,
+                                                    marginBottom: "4px",
+                                                    color: "#330F1B"
+                                                }}
+                                            >
+                                                Nombre
+                                                <span style={{ color: "#D01247" }}>*</span>
+                                            </Typography>
+                                            <TextField
+                                                value={selectedClient?.firstName || ''}
+                                                onChange={(e) => setSelectedClient({
+                                                    ...(selectedClient as Clients),
+                                                    firstName: e.target.value
+                                                })}
+                                                sx={{
+                                                    fontFamily: "Poppins",
+                                                    "& .MuiInputBase-input": {
+                                                        fontFamily: "Poppins",
+                                                    },
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <Tooltip
+                                                                title={
+                                                                    <Box
+                                                                        sx={{
+                                                                            backgroundColor: "#FFFFFF",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                            padding: "8px 12px",
+                                                                            fontSize: "14px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#574B4F",
+                                                                            whiteSpace: "pre-line",
+                                                                            transform: "translate(-10px, -22px)",
+                                                                            borderColor: "#00131F3D",
+                                                                            borderStyle: "solid",
+                                                                            borderWidth: "1px"
+                                                                        }}
+                                                                    >
+                                                                        <>
+                                                                            • Solo caracteres alfabéticos<br />
+                                                                            • Longitud máxima de 40<br />
+                                                                            caracteres
+                                                                        </>
+                                                                    </Box>
+                                                                }
+                                                                placement="bottom-end"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "transparent",
+                                                                            padding: 0,
 
-                                                                    },
-                                                                },
-                                                            }}
-                                                        >
-                                                            <IconButton
-                                                                disableRipple
-                                                                sx={{
-                                                                    backgroundColor: "transparent !important",
-                                                                    "&:hover": {
-                                                                        backgroundColor: "transparent !important",
+                                                                        },
                                                                     },
                                                                 }}
                                                             >
-                                                                <img
-                                                                    src={infoicon}
-                                                                    alt="info-icon"
-                                                                    style={{ width: 24, height: 24 }}
-                                                                />
-                                                            </IconButton>
-                                                        </Tooltip>
+                                                                <IconButton
+                                                                    disableRipple
+                                                                    sx={{
+                                                                        backgroundColor: "transparent !important",
+                                                                        "&:hover": {
+                                                                            backgroundColor: "transparent !important",
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={infoicon}
+                                                                        alt="info-icon"
+                                                                        style={{ width: 24, height: 24 }}
+                                                                    />
+                                                                </IconButton>
+                                                            </Tooltip>
 
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                        />
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                        </Box>
+                                        <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"} width={"340px"}>
+                                            <Typography
+                                                sx={{
+                                                    textAlign: "left",
+                                                    fontSize: "16px",
+                                                    fontFamily: "Poppins",
+                                                    letterSpacing: "0px",
+                                                    opacity: 1,
+                                                    marginBottom: "4px",
+                                                    color: "#330F1B"
+                                                }}
+                                            >
+                                                Apellidos
+                                                <span style={{ color: "#D01247" }}>*</span>
+                                            </Typography>
+                                            <TextField
+                                                value={selectedClient?.lastName || ''}
+                                                onChange={(e) => setSelectedClient({
+                                                    ...(selectedClient as Clients),
+                                                    lastName: e.target.value
+                                                })}
+                                                sx={{
+                                                    fontFamily: "Poppins",
+                                                    "& .MuiInputBase-input": {
+                                                        fontFamily: "Poppins",
+                                                    },
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <Tooltip
+                                                                title={
+                                                                    <Box
+                                                                        sx={{
+                                                                            backgroundColor: "#FFFFFF",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                            padding: "8px 12px",
+                                                                            fontSize: "14px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#574B4F",
+                                                                            whiteSpace: "pre-line",
+                                                                            transform: "translate(-10px, -22px)",
+                                                                            borderColor: "#00131F3D",
+                                                                            borderStyle: "solid",
+                                                                            borderWidth: "1px"
+                                                                        }}
+                                                                    >
+                                                                        <>
+                                                                            • Solo caracteres alfabéticos<br />
+                                                                            • Longitud máxima de 40<br />
+                                                                            caracteres
+                                                                        </>
+                                                                    </Box>
+                                                                }
+                                                                placement="bottom-end"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "transparent",
+                                                                            padding: 0,
+
+                                                                        },
+                                                                    },
+                                                                }}
+                                                            >
+                                                                <IconButton
+                                                                    disableRipple
+                                                                    sx={{
+                                                                        backgroundColor: "transparent !important",
+                                                                        "&:hover": {
+                                                                            backgroundColor: "transparent !important",
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={infoicon}
+                                                                        alt="info-icon"
+                                                                        style={{ width: 24, height: 24 }}
+                                                                    />
+                                                                </IconButton>
+                                                            </Tooltip>
+
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                                fullWidth
+                                            />
+                                        </Box>
                                     </Box>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"}>
-                                        <Typography
-                                            sx={{
-                                                textAlign: "left",
-                                                fontSize: "16px",
-                                                fontFamily: "Poppins",
-                                                letterSpacing: "0px",
-                                                opacity: 1,
-                                                marginBottom: "4px",
-                                                color: "#330F1B"
-                                            }}
-                                        >
-                                            Apellidos
-                                            <span style={{ color: "#D01247" }}>*</span>
-                                        </Typography>
-                                        <TextField
-                                            value={selectedClient?.lastName || ''}
-                                            onChange={(e) => setSelectedClient({
-                                                ...(selectedClient as Clients),
-                                                lastName: e.target.value
-                                            })}
-                                            sx={{
-                                                fontFamily: "Poppins",
-                                                "& .MuiInputBase-input": {
+                                    <Box display="flex" gap={2}>
+                                        <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"} width={"340px"}>
+                                            <Typography
+                                                sx={{
+                                                    textAlign: "left",
+                                                    fontSize: "16px",
                                                     fontFamily: "Poppins",
-                                                },
-                                            }}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <Tooltip
-                                                            title={
-                                                                <Box
-                                                                    sx={{
-                                                                        backgroundColor: "#FFFFFF",
-                                                                        borderRadius: "8px",
-                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                        padding: "8px 12px",
-                                                                        fontSize: "14px",
-                                                                        fontFamily: "Poppins",
-                                                                        color: "#574B4F",
-                                                                        whiteSpace: "pre-line",
-                                                                        transform: "translate(-10px, -22px)",
-                                                                        borderColor: "#00131F3D",
-                                                                        borderStyle: "solid",
-                                                                        borderWidth: "1px"
-                                                                    }}
-                                                                >
-                                                                    <>
-                                                                        • Solo caracteres alfabéticos<br />
-                                                                        • Longitud máxima de 40<br />
-                                                                        caracteres
-                                                                    </>
-                                                                </Box>
-                                                            }
-                                                            placement="bottom-end"
-                                                            componentsProps={{
-                                                                tooltip: {
-                                                                    sx: {
-                                                                        backgroundColor: "transparent",
-                                                                        padding: 0,
+                                                    letterSpacing: "0px",
+                                                    opacity: 1,
+                                                    marginBottom: "4px",
+                                                    color: "#330F1B"
+                                                }}
+                                            >
+                                                Teléfono
+                                                <span style={{ color: "#D01247" }}>*</span>
+                                            </Typography>
+                                            <TextField
+                                                value={selectedClient?.phoneNumber || ''}
+                                                onChange={(e) => setSelectedClient({
+                                                    ...(selectedClient as Clients),
+                                                    phoneNumber: e.target.value
+                                                })}
+                                                sx={{
+                                                    fontFamily: "Poppins",
+                                                    "& .MuiInputBase-input": {
+                                                        fontFamily: "Poppins",
+                                                    },
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <Tooltip
+                                                                title={
+                                                                    <Box
+                                                                        sx={{
+                                                                            backgroundColor: "#FFFFFF",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                            padding: "8px 12px",
+                                                                            fontSize: "14px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#574B4F",
+                                                                            whiteSpace: "pre-line",
+                                                                            transform: "translate(-10px, -22px)",
+                                                                            borderColor: "#00131F3D",
+                                                                            borderStyle: "solid",
+                                                                            borderWidth: "1px"
+                                                                        }}
+                                                                    >
+                                                                        <>
+                                                                            • Solo caracteres alfabéticos<br />
+                                                                            • Longitud máxima de 40<br />
+                                                                            caracteres
+                                                                        </>
+                                                                    </Box>
+                                                                }
+                                                                placement="bottom-end"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "transparent",
+                                                                            padding: 0,
 
-                                                                    },
-                                                                },
-                                                            }}
-                                                        >
-                                                            <IconButton
-                                                                disableRipple
-                                                                sx={{
-                                                                    backgroundColor: "transparent !important",
-                                                                    "&:hover": {
-                                                                        backgroundColor: "transparent !important",
+                                                                        },
                                                                     },
                                                                 }}
                                                             >
-                                                                <img
-                                                                    src={infoicon}
-                                                                    alt="info-icon"
-                                                                    style={{ width: 24, height: 24 }}
-                                                                />
-                                                            </IconButton>
-                                                        </Tooltip>
+                                                                <IconButton
+                                                                    disableRipple
+                                                                    sx={{
+                                                                        backgroundColor: "transparent !important",
+                                                                        "&:hover": {
+                                                                            backgroundColor: "transparent !important",
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={infoicon}
+                                                                        alt="info-icon"
+                                                                        style={{ width: 24, height: 24 }}
+                                                                    />
+                                                                </IconButton>
+                                                            </Tooltip>
 
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                            fullWidth
-                                        />
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                        </Box>
+                                        <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"} width={"340px"}>
+                                            <Typography
+                                                sx={{
+                                                    textAlign: "left",
+                                                    fontSize: "16px",
+                                                    fontFamily: "Poppins",
+                                                    letterSpacing: "0px",
+                                                    opacity: 1,
+                                                    marginBottom: "4px",
+                                                    color: "#330F1B"
+                                                }}
+                                            >
+                                                Extensión
+
+                                            </Typography>
+                                            <TextField
+                                                value={selectedClient?.extension || ''}
+                                                onChange={(e) => {
+                                                    const value = Number(e.target.value);
+                                                    if (!isNaN(value)) {
+                                                        setSelectedClient({
+                                                            ...(selectedClient as Clients),
+                                                            extension: value
+                                                        });
+                                                    }
+                                                }}
+                                                sx={{
+                                                    fontFamily: "Poppins",
+                                                    "& .MuiInputBase-input": {
+                                                        fontFamily: "Poppins",
+                                                    },
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <Tooltip
+                                                                title={
+                                                                    <Box
+                                                                        sx={{
+                                                                            backgroundColor: "#FFFFFF",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                            padding: "8px 12px",
+                                                                            fontSize: "14px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#574B4F",
+                                                                            whiteSpace: "pre-line",
+                                                                            transform: "translate(-10px, -22px)",
+                                                                            borderColor: "#00131F3D",
+                                                                            borderStyle: "solid",
+                                                                            borderWidth: "1px"
+                                                                        }}
+                                                                    >
+                                                                        <>
+                                                                            • Solo caracteres alfabéticos<br />
+                                                                            • Longitud máxima de 40<br />
+                                                                            caracteres
+                                                                        </>
+                                                                    </Box>
+                                                                }
+                                                                placement="bottom-end"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "transparent",
+                                                                            padding: 0,
+
+                                                                        },
+                                                                    },
+                                                                }}
+                                                            >
+                                                                <IconButton
+                                                                    disableRipple
+                                                                    sx={{
+                                                                        backgroundColor: "transparent !important",
+                                                                        "&:hover": {
+                                                                            backgroundColor: "transparent !important",
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={infoicon}
+                                                                        alt="info-icon"
+                                                                        style={{ width: 24, height: 24 }}
+                                                                    />
+                                                                </IconButton>
+                                                            </Tooltip>
+
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                        </Box>
                                     </Box>
-                                </Box>
-                                <Box display="flex" gap={2}>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"}>
-                                        <Typography
-                                            sx={{
-                                                textAlign: "left",
-                                                fontSize: "16px",
-                                                fontFamily: "Poppins",
-                                                letterSpacing: "0px",
-                                                opacity: 1,
-                                                marginBottom: "4px",
-                                                color: "#330F1B"
-                                            }}
-                                        >
-                                            Teléfono
-                                            <span style={{ color: "#D01247" }}>*</span>
-                                        </Typography>
-                                        <TextField
-                                            value={selectedClient?.phoneNumber || ''}
-                                            onChange={(e) => setSelectedClient({
-                                                ...(selectedClient as Clients),
-                                                phoneNumber: e.target.value
-                                            })}
-                                            sx={{
-                                                fontFamily: "Poppins",
-                                                "& .MuiInputBase-input": {
+                                    <Box display="flex" gap={2}>
+                                        <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"} width={"340px"}>
+                                            <Typography
+                                                sx={{
+                                                    textAlign: "left",
+                                                    fontSize: "16px",
                                                     fontFamily: "Poppins",
-                                                },
-                                            }}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <Tooltip
-                                                            title={
-                                                                <Box
-                                                                    sx={{
-                                                                        backgroundColor: "#FFFFFF",
-                                                                        borderRadius: "8px",
-                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                        padding: "8px 12px",
-                                                                        fontSize: "14px",
-                                                                        fontFamily: "Poppins",
-                                                                        color: "#574B4F",
-                                                                        whiteSpace: "pre-line",
-                                                                        transform: "translate(-10px, -22px)",
-                                                                        borderColor: "#00131F3D",
-                                                                        borderStyle: "solid",
-                                                                        borderWidth: "1px"
-                                                                    }}
-                                                                >
-                                                                    <>
-                                                                        • Solo caracteres alfabéticos<br />
-                                                                        • Longitud máxima de 40<br />
-                                                                        caracteres
-                                                                    </>
-                                                                </Box>
-                                                            }
-                                                            placement="bottom-end"
-                                                            componentsProps={{
-                                                                tooltip: {
-                                                                    sx: {
-                                                                        backgroundColor: "transparent",
-                                                                        padding: 0,
+                                                    letterSpacing: "0px",
+                                                    opacity: 1,
+                                                    marginBottom: "4px",
+                                                    color: "#330F1B"
+                                                }}
+                                            >
+                                                Correo electrónico
+                                                <span style={{ color: "#D01247" }}>*</span>
+                                            </Typography>
+                                            <TextField
+                                                value={email}
+                                                onChange={(e) => {
+                                                    setEmail(e.target.value);
+                                                    setEmailError(!validateEmailFormat(e.target.value));
+                                                }}
+                                                error={emailError}
+                                                helperText={emailError ? 'Formato inválido' : ''}
+                                                sx={{
+                                                    fontFamily: "Poppins",
+                                                    "& .MuiInputBase-input": {
+                                                        fontFamily: "Poppins",
+                                                    },
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <Tooltip
+                                                                title={
+                                                                    <Box
+                                                                        sx={{
+                                                                            backgroundColor: "#FFFFFF",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                            padding: "8px 12px",
+                                                                            fontSize: "14px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#574B4F",
+                                                                            whiteSpace: "pre-line",
+                                                                            transform: "translate(-10px, -22px)",
+                                                                            borderColor: "#00131F3D",
+                                                                            borderStyle: "solid",
+                                                                            borderWidth: "1px"
+                                                                        }}
+                                                                    >
+                                                                        <>
+                                                                            • Solo caracteres alfabéticos<br />
+                                                                            • Longitud máxima de 40<br />
+                                                                            caracteres
+                                                                        </>
+                                                                    </Box>
+                                                                }
+                                                                placement="bottom-end"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "transparent",
+                                                                            padding: 0,
 
-                                                                    },
-                                                                },
-                                                            }}
-                                                        >
-                                                            <IconButton
-                                                                disableRipple
-                                                                sx={{
-                                                                    backgroundColor: "transparent !important",
-                                                                    "&:hover": {
-                                                                        backgroundColor: "transparent !important",
+                                                                        },
                                                                     },
                                                                 }}
                                                             >
-                                                                <img
-                                                                    src={infoicon}
-                                                                    alt="info-icon"
-                                                                    style={{ width: 24, height: 24 }}
-                                                                />
-                                                            </IconButton>
-                                                        </Tooltip>
-
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                        />
-                                    </Box>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"}>
-                                        <Typography
-                                            sx={{
-                                                textAlign: "left",
-                                                fontSize: "16px",
-                                                fontFamily: "Poppins",
-                                                letterSpacing: "0px",
-                                                opacity: 1,
-                                                marginBottom: "4px",
-                                                color: "#330F1B"
-                                            }}
-                                        >
-                                            Extensión
-
-                                        </Typography>
-                                        <TextField
-                                            value={selectedClient?.extension || ''}
-                                            onChange={(e) => {
-                                                const value = Number(e.target.value);
-                                                if (!isNaN(value)) {
-                                                    setSelectedClient({
-                                                        ...(selectedClient as Clients),
-                                                        extension: value
-                                                    });
-                                                }
-                                            }}
-                                            sx={{
-                                                fontFamily: "Poppins",
-                                                "& .MuiInputBase-input": {
-                                                    fontFamily: "Poppins",
-                                                },
-                                            }}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <Tooltip
-                                                            title={
-                                                                <Box
+                                                                <IconButton
+                                                                    disableRipple
                                                                     sx={{
-                                                                        backgroundColor: "#FFFFFF",
-                                                                        borderRadius: "8px",
-                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                        padding: "8px 12px",
-                                                                        fontSize: "14px",
-                                                                        fontFamily: "Poppins",
-                                                                        color: "#574B4F",
-                                                                        whiteSpace: "pre-line",
-                                                                        transform: "translate(-10px, -22px)",
-                                                                        borderColor: "#00131F3D",
-                                                                        borderStyle: "solid",
-                                                                        borderWidth: "1px"
+                                                                        backgroundColor: "transparent !important",
+                                                                        "&:hover": {
+                                                                            backgroundColor: "transparent !important",
+                                                                        },
                                                                     }}
                                                                 >
-                                                                    <>
-                                                                        • Solo caracteres alfabéticos<br />
-                                                                        • Longitud máxima de 40<br />
-                                                                        caracteres
-                                                                    </>
-                                                                </Box>
-                                                            }
-                                                            placement="bottom-end"
-                                                            componentsProps={{
-                                                                tooltip: {
-                                                                    sx: {
-                                                                        backgroundColor: "transparent",
-                                                                        padding: 0,
+                                                                    <img
+                                                                        src={infoicon}
+                                                                        alt="info-icon"
+                                                                        style={{ width: 24, height: 24 }}
+                                                                    />
+                                                                </IconButton>
+                                                            </Tooltip>
 
-                                                                    },
-                                                                },
-                                                            }}
-                                                        >
-                                                            <IconButton
-                                                                disableRipple
-                                                                sx={{
-                                                                    backgroundColor: "transparent !important",
-                                                                    "&:hover": {
-                                                                        backgroundColor: "transparent !important",
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                        </Box>
+                                        <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"} width={"340px"}>
+                                            <Typography
+                                                sx={{
+                                                    textAlign: "left",
+                                                    fontSize: "16px",
+                                                    fontFamily: "Poppins",
+                                                    letterSpacing: "0px",
+                                                    opacity: 1,
+                                                    marginBottom: "4px",
+                                                    color: "#330F1B"
+                                                }}
+                                            >
+                                                Confirmar correo electrónico
+                                                <span style={{ color: "#D01247" }}>*</span>
+                                            </Typography>
+                                            <TextField
+                                                value={confirmEmail}
+                                                onChange={(e) => {
+                                                    setConfirmEmail(e.target.value);
+                                                    setConfirmEmailError(e.target.value !== email);
+                                                }}
+                                                error={confirmEmailError}
+                                                helperText={confirmEmailError ? 'Los correos no coinciden' : ''}
+                                                sx={{
+                                                    fontFamily: "Poppins",
+                                                    "& .MuiInputBase-input": {
+                                                        fontFamily: "Poppins",
+                                                    },
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <Tooltip
+                                                                title={
+                                                                    <Box
+                                                                        sx={{
+                                                                            backgroundColor: "#FFFFFF",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                            padding: "8px 12px",
+                                                                            fontSize: "14px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#574B4F",
+                                                                            whiteSpace: "pre-line",
+                                                                            transform: "translate(-10px, -22px)",
+                                                                            borderColor: "#00131F3D",
+                                                                            borderStyle: "solid",
+                                                                            borderWidth: "1px"
+                                                                        }}
+                                                                    >
+                                                                        <>
+                                                                            • Solo caracteres alfabéticos<br />
+                                                                            • Longitud máxima de 40<br />
+                                                                            caracteres
+                                                                        </>
+                                                                    </Box>
+                                                                }
+                                                                placement="bottom-end"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "transparent",
+                                                                            padding: 0,
+
+                                                                        },
                                                                     },
                                                                 }}
                                                             >
-                                                                <img
-                                                                    src={infoicon}
-                                                                    alt="info-icon"
-                                                                    style={{ width: 24, height: 24 }}
-                                                                />
-                                                            </IconButton>
-                                                        </Tooltip>
-
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                        />
-                                    </Box>
-                                </Box>
-                                <Box display="flex" gap={2}>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"10px"}>
-                                        <Typography
-                                            sx={{
-                                                textAlign: "left",
-                                                fontSize: "16px",
-                                                fontFamily: "Poppins",
-                                                letterSpacing: "0px",
-                                                opacity: 1,
-                                                marginBottom: "4px",
-                                                color: "#330F1B"
-                                            }}
-                                        >
-                                            Correo electrónico
-                                            <span style={{ color: "#D01247" }}>*</span>
-                                        </Typography>
-                                        <TextField
-                                            value={email}
-                                            onChange={(e) => {
-                                                setEmail(e.target.value);
-                                                setEmailError(!validateEmailFormat(e.target.value));
-                                            }}
-                                            error={emailError}
-                                            helperText={emailError ? 'Formato inválido' : ''}
-                                            sx={{
-                                                fontFamily: "Poppins",
-                                                "& .MuiInputBase-input": {
-                                                    fontFamily: "Poppins",
-                                                },
-                                            }}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <Tooltip
-                                                            title={
-                                                                <Box
+                                                                <IconButton
+                                                                    disableRipple
                                                                     sx={{
-                                                                        backgroundColor: "#FFFFFF",
-                                                                        borderRadius: "8px",
-                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                        padding: "8px 12px",
-                                                                        fontSize: "14px",
-                                                                        fontFamily: "Poppins",
-                                                                        color: "#574B4F",
-                                                                        whiteSpace: "pre-line",
-                                                                        transform: "translate(-10px, -22px)",
-                                                                        borderColor: "#00131F3D",
-                                                                        borderStyle: "solid",
-                                                                        borderWidth: "1px"
+                                                                        backgroundColor: "transparent !important",
+                                                                        "&:hover": {
+                                                                            backgroundColor: "transparent !important",
+                                                                        },
                                                                     }}
                                                                 >
-                                                                    <>
-                                                                        • Solo caracteres alfabéticos<br />
-                                                                        • Longitud máxima de 40<br />
-                                                                        caracteres
-                                                                    </>
-                                                                </Box>
-                                                            }
-                                                            placement="bottom-end"
-                                                            componentsProps={{
-                                                                tooltip: {
-                                                                    sx: {
-                                                                        backgroundColor: "transparent",
-                                                                        padding: 0,
+                                                                    <img
+                                                                        src={infoicon}
+                                                                        alt="info-icon"
+                                                                        style={{ width: 24, height: 24 }}
+                                                                    />
+                                                                </IconButton>
+                                                            </Tooltip>
 
-                                                                    },
-                                                                },
-                                                            }}
-                                                        >
-                                                            <IconButton
-                                                                disableRipple
-                                                                sx={{
-                                                                    backgroundColor: "transparent !important",
-                                                                    "&:hover": {
-                                                                        backgroundColor: "transparent !important",
-                                                                    },
-                                                                }}
-                                                            >
-                                                                <img
-                                                                    src={infoicon}
-                                                                    alt="info-icon"
-                                                                    style={{ width: 24, height: 24 }}
-                                                                />
-                                                            </IconButton>
-                                                        </Tooltip>
-
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                        />
-                                    </Box>
-                                    <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"}>
-                                        <Typography
-                                            sx={{
-                                                textAlign: "left",
-                                                fontSize: "16px",
-                                                fontFamily: "Poppins",
-                                                letterSpacing: "0px",
-                                                opacity: 1,
-                                                marginBottom: "4px",
-                                                color: "#330F1B"
-                                            }}
-                                        >
-                                            Confirmar correo electrónico
-                                            <span style={{ color: "#D01247" }}>*</span>
-                                        </Typography>
-                                        <TextField
-                                            value={confirmEmail}
-                                            onChange={(e) => {
-                                                setConfirmEmail(e.target.value);
-                                                setConfirmEmailError(e.target.value !== email);
-                                            }}
-                                            error={confirmEmailError}
-                                            helperText={confirmEmailError ? 'Los correos no coinciden' : ''}
-                                            sx={{
-                                                fontFamily: "Poppins",
-                                                "& .MuiInputBase-input": {
-                                                    fontFamily: "Poppins",
-                                                },
-                                            }}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <Tooltip
-                                                            title={
-                                                                <Box
-                                                                    sx={{
-                                                                        backgroundColor: "#FFFFFF",
-                                                                        borderRadius: "8px",
-                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                        padding: "8px 12px",
-                                                                        fontSize: "14px",
-                                                                        fontFamily: "Poppins",
-                                                                        color: "#574B4F",
-                                                                        whiteSpace: "pre-line",
-                                                                        transform: "translate(-10px, -22px)",
-                                                                        borderColor: "#00131F3D",
-                                                                        borderStyle: "solid",
-                                                                        borderWidth: "1px"
-                                                                    }}
-                                                                >
-                                                                    <>
-                                                                        • Solo caracteres alfabéticos<br />
-                                                                        • Longitud máxima de 40<br />
-                                                                        caracteres
-                                                                    </>
-                                                                </Box>
-                                                            }
-                                                            placement="bottom-end"
-                                                            componentsProps={{
-                                                                tooltip: {
-                                                                    sx: {
-                                                                        backgroundColor: "transparent",
-                                                                        padding: 0,
-
-                                                                    },
-                                                                },
-                                                            }}
-                                                        >
-                                                            <IconButton
-                                                                disableRipple
-                                                                sx={{
-                                                                    backgroundColor: "transparent !important",
-                                                                    "&:hover": {
-                                                                        backgroundColor: "transparent !important",
-                                                                    },
-                                                                }}
-                                                            >
-                                                                <img
-                                                                    src={infoicon}
-                                                                    alt="info-icon"
-                                                                    style={{ width: 24, height: 24 }}
-                                                                />
-                                                            </IconButton>
-                                                        </Tooltip>
-
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                        />
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                        </Box>
                                     </Box>
                                 </Box>
                             </Box>
@@ -3359,6 +3367,7 @@ const Clients: React.FC = () => {
                                 )}
                             </Box>
                         </Box>
+                        {/*Guardars*/}
                         <Box sx={{ mt: -0 }}>
                             {!isEditClient && step > 0 && step < 2 && (
                                 <MainButton

@@ -36,6 +36,7 @@ import Radio from '@mui/material/Radio';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import seachicon from '../assets/icon-lupa.svg'
+import Iconseachred from "../assets/Iconseachred.svg";
 import iconclose from "../assets/icon-close.svg"
 import BoxEmpty from '../assets/Nousers.svg';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -917,7 +918,7 @@ const BlackList: React.FC = () => {
                         alignItems="center"
                         sx={{
                             backgroundColor: "#FFFFFF",
-                            border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295", // Cambia el color del borde si hay texto
+                            border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
                             borderRadius: "4px",
                             padding: "8px 12px",
                             width: "218px",
@@ -926,14 +927,9 @@ const BlackList: React.FC = () => {
                         }}
                     >
                         <img
-                            src={seachicon}
+                            src={searchTerm ? Iconseachred : seachicon}
                             alt="Buscar"
-                            style={{
-                                marginRight: "8px",
-                                width: "18px",
-                                height: "18px",
-                                filter: searchTerm ? "invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)" : "none", // Ajusta el color si hay texto
-                            }}
+                            style={{ marginRight: 8, width: 24 }}
                         />
                         <input
                             type="text"

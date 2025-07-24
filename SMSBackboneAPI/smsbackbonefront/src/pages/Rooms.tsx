@@ -32,6 +32,9 @@ import infoiconerror from '../assets/Icon-infoerror.svg'
 import NoResult from '../assets/NoResultados.svg'
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import { useNavigate } from "react-router-dom";
+import seachicon from '../assets/icon-lupa.svg';
+import Iconseachred from "../assets/Iconseachred.svg";
+import iconclose from '../assets/icon-close.svg';
 
 type Room = {
     id: string | number;
@@ -332,20 +335,18 @@ const Rooms: React.FC = () => {
                         alignItems="center"
                         sx={{
                             backgroundColor: "#FFFFFF",
-                            borderRadius: "8px",
-                            padding: "8px 12px",
-                            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                            width: "400px", // Ancho fijo como estaba antes
+                            border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
+                            borderRadius: "4px",
+                            px: 2,
+                            py: 1,
+                            width: "218px",
+                            height: "40px"
                         }}
                     >
                         <img
-                            src={iconlupa}
+                            src={searchTerm ? Iconseachred : seachicon}
                             alt="Buscar"
-                            style={{
-                                height: "20px",
-                                width: "20px",
-                                marginRight: "8px",
-                            }}
+                            style={{ marginRight: 8, width: 24 }}
                         />
                         <input
                             type="text"
@@ -356,15 +357,19 @@ const Rooms: React.FC = () => {
                                 border: "none",
                                 outline: "none",
                                 width: "100%",
-                                fontSize: "14px",
-                                fontFamily: "Poppins, sans-serif",
+                                fontSize: "16px",
+                                fontFamily: "Poppins",
+                                color: searchTerm ? "#7B354D" : "#9B9295",
                                 backgroundColor: "transparent",
                             }}
                         />
                         {searchTerm && (
-                            <IconButton onClick={clearSearch} size="small" sx={{ color: "#A05B71" }}>
-                                <ClearIcon />
-                            </IconButton>
+                            <img
+                                src={iconclose}
+                                alt="Limpiar búsqueda"
+                                onClick={clearSearch}
+                                style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
+                            />
                         )}
                     </Box>
                 </Box>
