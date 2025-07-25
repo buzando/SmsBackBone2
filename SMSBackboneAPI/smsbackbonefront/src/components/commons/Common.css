@@ -165,8 +165,9 @@
 .modal-error-title {
     text-align: left;
     font: normal normal 600 20px/54px Poppins;
+    text-transform: none;
     letter-spacing: 0px;
-    color: #574b4f;
+    color: #574B4F;
     opacity: 1;
     font-size: 20px;
     margin-top: -10px;
@@ -193,6 +194,7 @@
     /* 🔥 Mueve el botón a la derecha */
     align-items: center;
     width: 100%;
+    gap: 200px;
 }
 
 

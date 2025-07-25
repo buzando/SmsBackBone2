@@ -92,7 +92,7 @@ export default function TestSMS() {
       console.error('Faltan datos obligatorios');
       return;
     }
-  const clientId = JSON.parse(localStorage.getItem('userData') || '{}')?.clientId;
+    const clientId = JSON.parse(localStorage.getItem('userData') || '{}')?.clientId;
     try {
       const payload = {
         from: fromNumber,
@@ -486,32 +486,32 @@ export default function TestSMS() {
             </IconButton>
           </Box>
         </Box>
-        <Box display="flex" justifyContent="flex-end" mt={4} gap={2}>
-          <SecondaryButton
-            text={t('pages.testSMS.clear')}
-            onClick={() => {
-              setFromNumber('');
-              setToNumber('');
-              setSelectedTemplateId('');
-              setMessage('');
-              setMessageError(false);
-              setToNumberError(false);
-            }}
-          />
-          <MainButton
-            text={t('pages.testSMS.send')}
-            onClick={() => {
-              setIsPreviewOpen(true);
-            }}
-            isLoading={Loading}
-            disabled={
-              toNumberError || messageError || message.length === 0
-            }
-          />
-        </Box>
+
 
       </Box>
-
+      <Box display="flex" justifyContent="flex-end" mt={-8} gap={3} marginRight={"310px"} >
+        <SecondaryButton
+          text={t('pages.testSMS.clear')}
+          onClick={() => {
+            setFromNumber('');
+            setToNumber('');
+            setSelectedTemplateId('');
+            setMessage('');
+            setMessageError(false);
+            setToNumberError(false);
+          }}
+        />
+        <MainButton
+          text={t('pages.testSMS.send')}
+          onClick={() => {
+            setIsPreviewOpen(true);
+          }}
+          isLoading={Loading}
+          disabled={
+            toNumberError || messageError || message.length === 0
+          }
+        />
+      </Box>
       <Modal open={isPreviewOpen} onClose={() => setIsPreviewOpen(false)}>
         <Box
           sx={{

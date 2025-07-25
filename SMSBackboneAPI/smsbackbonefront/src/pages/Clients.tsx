@@ -271,7 +271,7 @@ const Clients: React.FC = () => {
                 ClienteIds: selectedClients.length > 0 ? selectedClients.join(",") : null,
                 Estatus: selectedStatus.length > 0
                     ? selectedStatus
-                        .map((s) => (s === "Inhabilitado" ? 1 : s === "Habilitado" ? 0 : null))
+                        .map((s) => (s === "Inactivo" ? 1 : s === "Activo" ? 0 : null))
                         .filter((s) => s !== null)
                         .join(",")
                     : null,
@@ -599,8 +599,8 @@ const Clients: React.FC = () => {
     const handleOpenDeactivateModal = () => {
         if (menuRowId === null) return;
 
-        setMainModalTitle("¿Estás seguro que deseas dar de baja este cliente?");
-        setMainModalMessage("El cliente ya no podrá iniciar sesión, pero su información permanecerá en el sistema.");
+        setMainModalTitle("Dar de baja cliente");
+        setMainModalMessage("¿Está seguro de que desea dar de baja al cliente seleccionado?");
         setModalAction(() => () => handleDeactivateClient(menuRowId));
         setMainModal(true);
     };
@@ -1240,6 +1240,13 @@ const Clients: React.FC = () => {
                                         padding: '3.5px', width: '66px', height: "30px", whiteSpace: 'nowrap', overflow: 'hidden',
                                         textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F",
                                     }}>
+                                        <Divider sx={{
+                                            marginTop: "-51px", marginLeft: "-3px",
+                                            position: "absolute",
+                                            height: '90px',
+                                            width: "0px",
+                                            borderLeft: "1px solid #E0E0E0"
+                                        }} />
                                     </td>
                                 </tr>
                             </thead>
@@ -1303,7 +1310,7 @@ const Clients: React.FC = () => {
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 28px',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.estatus === 0 ? 'Habilitado' : 'Inhabilitado'}</td>
+                                        }}>{Client.estatus === 0 ? 'Activo' : 'Inactivo'}</td>
 
                                         <td style={{
                                             whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
@@ -1333,6 +1340,13 @@ const Clients: React.FC = () => {
                                             <IconButton onClick={(event) => handleMenuOpen(event, Client.id as number)}>
                                                 <MoreVertIcon />
                                             </IconButton>
+                                            <Divider sx={{
+                                                marginTop: "-51px", marginLeft: "-3px",
+                                                position: "absolute",
+                                                height: '60px',
+                                                width: "0px",
+                                                borderLeft: "1px solid #E0E0E0"
+                                            }} />
                                         </td>
                                     </tr>
                                 ))}
@@ -1390,7 +1404,10 @@ const Clients: React.FC = () => {
                 >
                     <img
                         src={IconSuS} alt="Recarga"
-                        style={{ width: '24px', height: '24px', marginRight: "9px", color: "#574B4FE6" }}
+                        style={{
+                            width: '24px', height: '24px', marginRight: "9px", color: "#574B4F"
+
+                        }}
                     />
                     <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4FE6" }}>
                         Recargar
@@ -1472,61 +1489,66 @@ const Clients: React.FC = () => {
                         </Typography>
 
                     </Box>
-                    <Tooltip
-                        title={
-                            <Box
-                                sx={{
-                                    backgroundColor: "#FFFFFF",
-                                    borderRadius: "8px",
-                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                    padding: "8px 12px",
-                                    fontSize: "14px",
-                                    fontFamily: "Poppins",
-                                    color: "#574B4F",
-                                    whiteSpace: "pre-line",
-                                    transform: "translate(-10px, -22px)",
-                                    borderColor: "#00131F3D",
-                                    borderStyle: "solid",
-                                    borderWidth: "1px"
-                                }}
-                            >
-                                <>
-                                    El cliente no puede ser<br />
-                                    eliminado debido a que<br />
-                                    no ha cumplido 6 meses<br />
-                                    sin inactividad
-                                </>
-                            </Box>
-                        }
-                        placement="bottom-end"
-                        componentsProps={{
-                            tooltip: {
-                                sx: {
-                                    backgroundColor: "transparent",
-                                    padding: 0,
+                    {currentClient && !canDeleteClient(currentClient) &&
+                        <Tooltip
+                            title={
+                                <Box
+                                    sx={{
+                                        backgroundColor: "#FFFFFF",
+                                        borderRadius: "8px",
+                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                        padding: "8px 12px",
+                                        fontSize: "14px",
+                                        fontFamily: "Poppins",
+                                        color: "#574B4F",
+                                        whiteSpace: "pre-line",
+                                        transform: "translate(-10px, -22px)",
+                                        borderColor: "#00131F3D",
+                                        borderStyle: "solid",
+                                        borderWidth: "1px"
+                                    }}
+                                >
+                                    <>
+                                        El cliente no puede ser<br />
+                                        eliminado debido a que<br />
+                                        no ha cumplido 6 meses<br />
+                                        sin inactividad
+                                    </>
+                                </Box>
+                            }
+                            placement="bottom-end"
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        backgroundColor: "transparent",
+                                        padding: 0,
 
-                                },
-                            },
-                        }}
-                    >
-                        <IconButton
-                            disableRipple
-                            sx={{
-                                backgroundColor: "transparent !important",
-                                pointerEvents: "auto",
-                                "&:hover": {
-                                    backgroundColor: "transparent !important",
+                                    },
                                 },
                             }}
                         >
-                            <img
-                                src={infoicon}
-                                alt="info-icon"
-                                style={{ width: 24, height: 24, marginLeft: "10px" }}
-                            />
-                        </IconButton>
-                    </Tooltip>
-
+                            <IconButton
+                                disableRipple
+                                sx={{
+                                    pointerEvents: "auto",
+                                    "&:hover": {
+                                        backgroundColor: "transparent !important",
+                                    },
+                                }}
+                            >
+                                <img
+                                    src={infoicon}
+                                    alt="info-icon"
+                                    style={{
+                                        width: 24,
+                                        height: 24,
+                                        marginLeft: "10px",
+                                        filter: currentClient ? "brightness(0)" : ''
+                                    }}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                    }
                 </MenuItem>
 
             </Menu>
@@ -1565,12 +1587,9 @@ const Clients: React.FC = () => {
                             startAdornment: (
                                 <InputAdornment position="start">
                                     <img
-                                        src={seachicon}
+                                        src={clientSearch ? Iconseachred : seachicon}
                                         alt="Buscar"
-                                        style={{
-                                            width: 24,
-                                            filter: clientSearch ? 'invert(14%) sepia(58%) saturate(1253%) hue-rotate(316deg) brightness(90%) contrast(95%)' : 'none'
-                                        }}
+                                        style={{ width: 24 }}
                                     />
                                 </InputAdornment>
                             ),
@@ -1708,7 +1727,7 @@ const Clients: React.FC = () => {
                 }}
             >
                 <Box sx={{ height: '65px', overflowY: 'hidden' }}>
-                    {['Habilitado', 'Inhabilitado'].map((status) => (
+                    {['Activo', 'Inactivo'].map((status) => (
                         <MenuItem
                             key={status}
                             onClick={() =>
