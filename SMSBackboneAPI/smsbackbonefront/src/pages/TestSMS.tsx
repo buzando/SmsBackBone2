@@ -88,19 +88,18 @@ export default function TestSMS() {
   };
 
   const handleSend = async () => {
-    if (!toNumber || (message.length === 0 && !selectedTemplateId)) {
+    if (!fromNumber || !toNumber || (message.length === 0 && !selectedTemplateId)) {
       console.error('Faltan datos obligatorios');
       return;
     }
-    const clientId = JSON.parse(localStorage.getItem('userData') || '{}');
+    const clientId = JSON.parse(localStorage.getItem('userData') || '{}')?.clientId;
     try {
       const payload = {
-        From: fromNumber,
-        To: [toNumber], // ⬅️ sigue siendo lista para mantener la consistencia con el backend
-        Message: message || null,
-        TemplateId: selectedTemplateId || null,
-        ClientID: clientId.idCliente || null,
-        UserID: clientId.id
+        from: fromNumber,
+        to: toNumber,
+        message: message || null,
+        templateId: selectedTemplateId || null,
+        clientID: clientId || null
       };
 
       const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MESSAGE_SEND}`;
@@ -487,32 +486,32 @@ export default function TestSMS() {
             </IconButton>
           </Box>
         </Box>
-        <Box display="flex" justifyContent="flex-end" mt={4} gap={2}>
-          <SecondaryButton
-            text={t('pages.testSMS.clear')}
-            onClick={() => {
-              setFromNumber('');
-              setToNumber('');
-              setSelectedTemplateId('');
-              setMessage('');
-              setMessageError(false);
-              setToNumberError(false);
-            }}
-          />
-          <MainButton
-            text={t('pages.testSMS.send')}
-            onClick={() => {
-              handleSend();
-            }}
-            isLoading={Loading}
-            disabled={
-              toNumberError || messageError || message.length === 0
-            }
-          />
-        </Box>
+
 
       </Box>
-
+      <Box display="flex" justifyContent="flex-end" mt={-8} gap={3} marginRight={"310px"} >
+        <SecondaryButton
+          text={t('pages.testSMS.clear')}
+          onClick={() => {
+            setFromNumber('');
+            setToNumber('');
+            setSelectedTemplateId('');
+            setMessage('');
+            setMessageError(false);
+            setToNumberError(false);
+          }}
+        />
+        <MainButton
+          text={t('pages.testSMS.send')}
+          onClick={() => {
+            setIsPreviewOpen(true);
+          }}
+          isLoading={Loading}
+          disabled={
+            toNumberError || messageError || message.length === 0
+          }
+        />
+      </Box>
       <Modal open={isPreviewOpen} onClose={() => setIsPreviewOpen(false)}>
         <Box
           sx={{
@@ -539,7 +538,6 @@ export default function TestSMS() {
           <Box display="flex" justifyContent="space-between">
             <SecondaryButton text={t('pages.testSMS.cancel')} onClick={() => setIsPreviewOpen(false)} />
             <MainButton text={t('pages.testSMS.send')} onClick={() => {
-              handleSend();
               setIsPreviewOpen(false);
             }} isLoading={Loading} />
           </Box>
