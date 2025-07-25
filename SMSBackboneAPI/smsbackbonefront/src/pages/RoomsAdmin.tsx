@@ -799,12 +799,9 @@ const RoomsAdmin: React.FC = () => {
                             startAdornment: (
                                 <InputAdornment position="start">
                                     <img
-                                        src={seachicon}
+                                        src={clientSearch ? Iconseachred : seachicon}
                                         alt="Buscar"
-                                        style={{
-                                            width: 24,
-                                            filter: clientSearch ? 'invert(14%) sepia(58%) saturate(1253%) hue-rotate(316deg) brightness(90%) contrast(95%)' : 'none'
-                                        }}
+                                        style={{ width: 24 }}
                                     />
                                 </InputAdornment>
                             ),//clientSearch
