@@ -698,3 +698,71 @@ select * from blacklistcampains
 select * from CampaignContacts
 
 select * from CampaignSchedules
+
+5512121191
+
+update users set emailConfirmed = 1
+
+alter table client_access add id_backbone int null
+
+select * from CreditRechargeOpenPay
+
+select * from CampaignContactScheduleSend
+
+use SMS_WEB_API
+
+CREATE TABLE TestMessage (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ToNumber NVARCHAR(20) NOT NULL,               -- Número destino
+    FromNumber NVARCHAR(20) NULL,                 -- Número origen (puede ser null)
+    Message NVARCHAR(500) NULL,                   -- Mensaje enviado (si aplica)
+    TemplateId INT NULL,                          -- ID de plantilla (si se usó)
+    UserId INT NOT NULL,                          -- Usuario que envió el mensaje
+    Status NVARCHAR(50) NOT NULL,                 -- Resultado ("Enviado", "Falló", etc)
+    ResponseMessage NVARCHAR(500) NULL,           -- Mensaje detallado del resultado
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE() -- Fecha de envío
+);
+
+select * from TestMessage
+
+select * from CampaignContactScheduleSend
+alter table client_access add id_backbone int null
+alter table CampaignContactScheduleSend add ResponseDate datetime null
+alter table CampaignContactScheduleSend add IdBackBone nvarchar(30) null
+
+select * from users
+
+
+7002
+
+
+update users set emailConfirmed = 1
+
+update users set userName = 'hec_tre_sa2n@hotmail.com', email = 'hec_tre_sa2n@hotmail.com', SecondaryEmail = 'hec_tre_sa2n@hotmail.com' where id = 2002
+
+CREATE FUNCTION dbo.SplitStringToTable
+(
+    @String NVARCHAR(MAX),
+    @Delimiter CHAR(1)
+)
+RETURNS @Output TABLE (Val NVARCHAR(100))
+AS
+BEGIN
+    DECLARE @Start INT = 1, @End INT;
+ 
+    WHILE CHARINDEX(@Delimiter, @String, @Start) > 0
+    BEGIN
+        SET @End = CHARINDEX(@Delimiter, @String, @Start);
+        INSERT INTO @Output (Val)
+        VALUES (SUBSTRING(@String, @Start, @End - @Start));
+        SET @Start = @End + 1;
+    END
+ 
+    IF @Start <= LEN(@String)
+    BEGIN
+        INSERT INTO @Output (Val)
+        VALUES (SUBSTRING(@String, @Start, LEN(@String) - @Start + 1));
+    END
+ 
+    RETURN;
+END

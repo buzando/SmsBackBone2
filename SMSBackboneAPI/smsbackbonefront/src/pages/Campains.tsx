@@ -1315,6 +1315,43 @@ const Campains: React.FC = () => {
   }, [selectedCampaign?.id, selectedCampaign?.schedules]);
   const [isChecked, setIsChecked] = useState(false);
 
+
+
+  const handleSend = async () => {
+    if (!phone) {
+      console.error('Faltan datos obligatorios');
+      return;
+    }
+    const clientId = JSON.parse(localStorage.getItem('userData') || '{}');
+    try {
+      const payload = {
+        From: "",
+        To: [phone],
+        Message: selectedCampaign?.message || null,
+        TemplateId: null,
+        ClientID: clientId.idCliente || null,
+        UserID: clientId.id
+      };
+
+      const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MESSAGE_SEND}`;
+      const response = await axios.post(requestUrl, payload);
+
+      if (response.status === 200) {
+        setMessageChipBar("Mensaje enviado con exito");
+        setShowChipBarAdd(true);
+      } else {
+        setTitleErrorModal("Error en el envio");
+        setMessageErrorModal("Intente más tarde");
+        setIsErrorModalOpen(true);
+      }
+    } catch (error) {
+      setTitleErrorModal("Error en el envio");
+      setMessageErrorModal("Intente más tarde");
+      setIsErrorModalOpen(true);
+    }
+  };
+
+
   return (
 
     <Box sx={{ padding: "20px", marginLeft: "30px", maxWidth: "81%", mt: -7 }}>

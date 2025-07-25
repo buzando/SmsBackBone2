@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Popper, Paper } from "@mui/material";
 import { DateRange } from "react-date-range";
 import 'react-date-range/dist/styles.css';
@@ -14,9 +14,10 @@ interface DatePickerProps {
     onApply: (start: Date, end: Date, startHour: number, startMinute: number, endHour: number, endMinute: number) => void;
     onClose: () => void;
     placement?: 'bottom-start' | 'bottom' | 'bottom-end' | 'top-start' | 'top' | 'top-end';
+    resetSignal?: boolean;
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ open, anchorEl, onApply, onClose, placement = 'bottom-start' }) => {
+const DatePicker: React.FC<DatePickerProps> = ({ open, anchorEl, onApply, onClose, placement = 'bottom-start', resetSignal }) => {
     const [dateRange, setDateRange] = useState([
         {
             startDate: new Date(),
@@ -35,7 +36,15 @@ const DatePicker: React.FC<DatePickerProps> = ({ open, anchorEl, onApply, onClos
         onApply(dateRange[0].startDate, dateRange[0].endDate, startHours, startMinutes, endHours, endMinutes);
         onClose();
     };
-
+    useEffect(() => {
+        if (resetSignal) {
+            setDateRange([{ startDate: new Date(), endDate: new Date(), key: 'selection' }]);
+            setStartHours(0);
+            setStartMinutes(0);
+            setEndHours(0);
+            setEndMinutes(0);
+        }
+    }, [resetSignal]);
     return (
         <Popper
             open={open}
@@ -99,7 +108,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ open, anchorEl, onApply, onClos
 
                 {/* Selector de Fecha */}
                 <DateRange
-                  key={shownDate.toString()}
+                    key={shownDate.toString()}
                     locale={es}
                     editableDateInputs={true}
                     onChange={(item) => {

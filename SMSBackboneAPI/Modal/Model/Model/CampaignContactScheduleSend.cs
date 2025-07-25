@@ -19,9 +19,11 @@ namespace Modal.Model.Model
 
         public int ScheduleId { get; set; }
 
+        public DateTime? ResponseDate { get; set; }
         public DateTime? SentAt { get; set; }
 
         public string? Status { get; set; } = "";
+        public string? IdBackBone { get; set; } = "";
 
         public string? ResponseMessage { get; set; }
 

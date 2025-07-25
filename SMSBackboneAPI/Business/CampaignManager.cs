@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using Contract.Request;
 using Contract.Response;
+using Contract.WebHooks;
 using Microsoft.EntityFrameworkCore;
 using Modal;
 using Modal.Model.Model;
@@ -864,6 +865,33 @@ namespace Business
                 return null;
             }
         }
+
+        //public bool Updatecampaign(WebhookStatusDto status)
+        //{
+        //    try
+        //    {
+        //        using var context = new Entities();
+
+        //        var record = context.CampaignContactScheduleSend.FirstOrDefault(c => c.IdBackBone == status.Id);
+
+        //        if (record == null)
+        //            return false;
+
+        //        // Actualizar valores
+        //        record.Status = status.Status.ToString();  // o simplemente status.Status si es int
+        //        record.IsCharged = status.IsCharged;
+        //        record.ResponseMessage = status.Error;
+
+        //        context.SaveChanges();
+        //        return true;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        // Puedes loguear si quieres: log.Error("Error al actualizar campaña", e);
+        //        return false;
+        //    }
+        //}
+
 
     }
 }

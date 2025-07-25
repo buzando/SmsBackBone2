@@ -88,18 +88,19 @@ export default function TestSMS() {
   };
 
   const handleSend = async () => {
-    if (!fromNumber || !toNumber || (message.length === 0 && !selectedTemplateId)) {
+    if (!toNumber || (message.length === 0 && !selectedTemplateId)) {
       console.error('Faltan datos obligatorios');
       return;
     }
-  const clientId = JSON.parse(localStorage.getItem('userData') || '{}')?.clientId;
+    const clientId = JSON.parse(localStorage.getItem('userData') || '{}');
     try {
       const payload = {
-        from: fromNumber,
-        to: toNumber,
-        message: message || null,
-        templateId: selectedTemplateId || null,
-        clientID: clientId || null
+        From: fromNumber,
+        To: [toNumber], // ⬅️ sigue siendo lista para mantener la consistencia con el backend
+        Message: message || null,
+        TemplateId: selectedTemplateId || null,
+        ClientID: clientId.idCliente || null,
+        UserID: clientId.id
       };
 
       const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MESSAGE_SEND}`;
@@ -501,7 +502,7 @@ export default function TestSMS() {
           <MainButton
             text={t('pages.testSMS.send')}
             onClick={() => {
-              setIsPreviewOpen(true);
+              handleSend();
             }}
             isLoading={Loading}
             disabled={
@@ -538,6 +539,7 @@ export default function TestSMS() {
           <Box display="flex" justifyContent="space-between">
             <SecondaryButton text={t('pages.testSMS.cancel')} onClick={() => setIsPreviewOpen(false)} />
             <MainButton text={t('pages.testSMS.send')} onClick={() => {
+              handleSend();
               setIsPreviewOpen(false);
             }} isLoading={Loading} />
           </Box>

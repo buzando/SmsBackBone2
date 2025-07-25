@@ -33,7 +33,7 @@ interface Clients {
 const ReportsAdmin = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState(0);
-    const [activeFilter, setActiveFilter] = useState<'fecha' | 'cliente'>('cliente');
+    const [activeFilter, setActiveFilter] = useState<'fecha' | 'cliente' | null>(null);
     const [anchorElFecha, setAnchorElFecha] = useState<null | HTMLElement>(null);
     const [openFecha, setOpenFecha] = useState(false);
     const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
@@ -59,6 +59,7 @@ const ReportsAdmin = () => {
     const [totalregisters, Settotalregisters] = useState(0);
     const [pagination, SetPagination] = useState(0);
     const [totaldivision, Settotaldivision] = useState(0);
+    const [resetKey, setResetKey] = useState(0);
     const DualSpinner = () => (
         <Box
             sx={{
@@ -101,6 +102,14 @@ const ReportsAdmin = () => {
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setActiveTab(newValue);
+        setSelectedStartDate(null);
+        setSelectedStartDate(null);
+        setSelectedClients([]);
+        setHasFiltered(false);
+        setOriginalData([]);
+        setAnchorElFecha(null);
+        setOpenFecha(false);
+        setResetKey(prev => prev + 1);
     };
 
     const handleFechaClose = () => {
@@ -345,52 +354,51 @@ const ReportsAdmin = () => {
                     sx={{ backgroundColor: "#F2F2F2", borderRadius: "8px" }}
                 >
                     {/* Rango de resultados */}
-                    <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E" }}>
-                        {(currentPage)}–{totaldivision} de {totalregisters}
-                    </Typography>
 
 
-                    {/* Flechas + Exportaciones */}
-                    <Box display="flex" alignItems="center" gap={1} height={"25px"} marginBottom={"-5px"} marginTop={"-5px"}>
-                        <Box sx={{ marginRight: "790px" }}>
-                            <Tooltip title="Primera página">
+
+
+                    <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" mt={-0.5} mb={-0.5}>
+                        {/* Paginación + texto */}
+                        <Box display="flex" alignItems="center" gap={2}>
+                            <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E", whiteSpace: "nowrap" }}>
+                                {`${(currentPage - 1) * pagination + 1}–${Math.min(currentPage * pagination, totalregisters)} de ${totalregisters}`}
+                            </Typography>
+
+                            {/* Botones de navegación */}
+                            <Tooltip title="Primera página" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
                                 <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
-                                    <Box
-                                        display="flex"
-                                        gap="0px"
-                                        alignItems="center"
-                                        sx={{
-                                            opacity: currentPage === 1 ? 0.3 : 1
-                                        }}
-                                    >
+                                    <Box display="flex" alignItems="center" sx={{ opacity: currentPage === 1 ? 0.3 : 1 }}>
                                         <img src={backarrow} style={{ width: 24, marginRight: "-16px" }} />
                                         <img src={backarrow} style={{ width: 24 }} />
                                     </Box>
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title="Página Anterior">
+
+                            <Tooltip title="Página anterior" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
                                 <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
                                     <img src={backarrow} style={{ width: 24, opacity: currentPage === 1 ? 0.3 : 1, marginLeft: "-18px" }} />
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title="Siguiente página">
+
+                            <Tooltip title="Siguiente página" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
                                 <IconButton onClick={handleNextPage} disabled={currentPage === totaldivision}>
-                                    <img src={backarrow} style={{
-                                        width: 24, transform: 'rotate(180deg)', marginRight: "-28px", marginLeft: "-28px",
-                                        opacity: currentPage === totaldivision ? 0.3 : 1
-                                    }} />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Ultima Página">
-                                <IconButton onClick={goToLastPage} disabled={currentPage === Math.ceil(pagination / totalregisters)}>
-                                    <Box
-                                        display="flex"
-                                        gap="0px"
-                                        alignItems="center"
-                                        sx={{
+                                    <img
+                                        src={backarrow}
+                                        style={{
+                                            width: 24,
+                                            transform: 'rotate(180deg)',
+                                            marginRight: "-28px",
+                                            marginLeft: "-28px",
                                             opacity: currentPage === totaldivision ? 0.3 : 1
                                         }}
-                                    >
+                                    />
+                                </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title="Última página" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
+                                <IconButton onClick={goToLastPage} disabled={currentPage === Math.ceil(pagination / totalregisters)}>
+                                    <Box display="flex" alignItems="center" sx={{ opacity: currentPage === totaldivision ? 0.3 : 1 }}>
                                         <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-6px" }} />
                                         <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-16px" }} />
                                     </Box>
@@ -398,38 +406,9 @@ const ReportsAdmin = () => {
                             </Tooltip>
                         </Box>
 
-                        {/* Exportaciones */}
-                        <Box display="flex" alignItems="center" gap={0} mr={-2.5}>
-                            <Tooltip title="Exportar a CSV" placement="top"
-                                arrow
-                                PopperProps={{
-                                    modifiers: [
-                                        {
-                                            name: 'arrow',
-                                            options: {
-                                                padding: 0,
-                                            },
-                                        },
-                                    ],
-                                }}
-                                componentsProps={{
-                                    tooltip: {
-                                        sx: {
-                                            fontFamily: 'Poppins',
-                                            backgroundColor: '#312D2E',
-                                            color: '#DEDADA',
-                                            fontSize: '12px',
-                                            borderRadius: '6px',
-                                            padding: '6px 10px',
-                                        },
-                                    },
-                                    arrow: {
-                                        sx: {
-                                            color: '#322D2E',
-                                        },
-                                    },
-                                }}
-                            >
+                        {/* Botones de exportación */}
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <Tooltip title="Exportar a CSV" placement="top" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
                                 <IconButton
                                     onClick={() => handleExportClick('csv', setIsExportingCSV)}
                                     disabled={anyExporting && !isExportingCSV}
@@ -439,36 +418,7 @@ const ReportsAdmin = () => {
                                 </IconButton>
                             </Tooltip>
 
-                            <Tooltip title="Exportar a Excel" placement="top"
-                                arrow
-                                PopperProps={{
-                                    modifiers: [
-                                        {
-                                            name: 'arrow',
-                                            options: {
-                                                padding: 0,
-                                            },
-                                        },
-                                    ],
-                                }}
-                                componentsProps={{
-                                    tooltip: {
-                                        sx: {
-                                            fontFamily: 'Poppins',
-                                            backgroundColor: '#312D2E',
-                                            color: '#DEDADA',
-                                            fontSize: '12px',
-                                            borderRadius: '6px',
-                                            padding: '6px 10px',
-                                        },
-                                    },
-                                    arrow: {
-                                        sx: {
-                                            color: '#322D2E',
-                                        },
-                                    },
-                                }}
-                            >
+                            <Tooltip title="Exportar a Excel" placement="top" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
                                 <IconButton
                                     onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
                                     disabled={anyExporting && !isExportingXLSX}
@@ -478,36 +428,7 @@ const ReportsAdmin = () => {
                                 </IconButton>
                             </Tooltip>
 
-                            <Tooltip title="Exportar a PDF" placement="top"
-                                arrow
-                                PopperProps={{
-                                    modifiers: [
-                                        {
-                                            name: 'arrow',
-                                            options: {
-                                                padding: 0,
-                                            },
-                                        },
-                                    ],
-                                }}
-                                componentsProps={{
-                                    tooltip: {
-                                        sx: {
-                                            fontFamily: 'Poppins',
-                                            backgroundColor: '#312D2E',
-                                            color: '#DEDADA',
-                                            fontSize: '12px',
-                                            borderRadius: '6px',
-                                            padding: '6px 10px',
-                                        },
-                                    },
-                                    arrow: {
-                                        sx: {
-                                            color: '#322D2E',
-                                        },
-                                    },
-                                }}
-                            >
+                            <Tooltip title="Exportar a PDF" placement="top" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
                                 <IconButton
                                     onClick={() => handleExportClick('pdf', setIsExportingPDF)}
                                     disabled={anyExporting && !isExportingPDF}
@@ -517,8 +438,8 @@ const ReportsAdmin = () => {
                                 </IconButton>
                             </Tooltip>
                         </Box>
-
                     </Box>
+
                 </Box>
                 <Box mt={0}>
                     {!hasFiltered ? (
@@ -926,6 +847,7 @@ const ReportsAdmin = () => {
                 </Box>
             </Menu>
             <CustomDateTimePicker
+                key={resetKey}
                 open={openFecha}
                 anchorEl={anchorElFecha}
                 onClose={handleFechaClose}
@@ -935,6 +857,18 @@ const ReportsAdmin = () => {
             />
         </Box>
     );
+};
+const tooltipStyle = {
+  fontFamily: 'Poppins',
+  backgroundColor: '#312D2E',
+  color: '#DEDADA',
+  fontSize: '12px',
+  borderRadius: '6px',
+  padding: '6px 10px',
+};
+
+const arrowStyle = {
+  color: '#322D2E',
 };
 
 export default ReportsAdmin;

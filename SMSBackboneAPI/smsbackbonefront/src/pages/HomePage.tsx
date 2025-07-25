@@ -92,6 +92,10 @@ const HomePage: React.FC = () => {
     const [enableTwoFactor, setenableTwoFactor] = useState(true);
     const [IsErrormodal, setIsErrormodal] = useState(false);
     const [ShowSnackBar, setShowSnackBar] = useState(false);
+    const [shouldConcatenate, setShouldConcatenate] = useState(false);
+    const [isFlashMessage, setIsFlashMessage] = useState(false);
+    const [MessageModalError, setMessageModalError] = useState("");
+    const [MessageSnackBar, setMessageSnackBar] = useState("");
     const Handletmppwwd = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -141,9 +145,11 @@ const HomePage: React.FC = () => {
                 localStorage.setItem('token', token);
                 localStorage.setItem('expirationDate', expiration);
                 localStorage.setItem('userData', JSON.stringify(user));
+                setMessageSnackBar("Cambio de contraseña exitoso");
                 setShowSnackBar(true);
             }
         } catch (error) {
+            setMessageModalError("Error al cambiar la contraseña");
             setIsErrormodal(true);
         }
         finally {
@@ -381,6 +387,39 @@ const HomePage: React.FC = () => {
             setPasswordError(false);
         }
     };
+
+    const handleSend = async () => {
+        if (!phoneNumbers || (message.length === 0)) {
+            console.error('Faltan datos obligatorios');
+            return;
+        }
+        const clientId = JSON.parse(localStorage.getItem('userData') || '{}');
+        try {
+            const payload = {
+                From: null,
+                To: phoneNumbers,
+                Message: message || null,
+                TemplateId: null,
+                ClientID: clientId.idCliente || null,
+                UserID: clientId.id,
+                Concatenate: shouldConcatenate,
+                Flash: isFlashMessage
+            };
+
+            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MESSAGE_SENDQUICK}`;
+            const response = await axios.post(requestUrl, payload);
+
+            if (response.status === 200) {
+                setMessageSnackBar("Mensaje Enviado con exito");
+                setShowSnackBar(true);
+            } else {
+                setIsErrormodal(true);
+            }
+        } catch (error) {
+            setIsErrormodal(true);
+        }
+    };
+
 
     return (
         <div style={{
@@ -1128,12 +1167,22 @@ const HomePage: React.FC = () => {
                         {/* Opciones de checkbox */}
                         <Box sx={{ marginTop: '20px', width: '100%' }}>  {/* 🔥 Evita desbordamiento */}
                             <FormControlLabel
-                                control={<Checkbox />}
+                                control={
+                                    <Checkbox
+                                        checked={shouldConcatenate}
+                                        onChange={(e) => setShouldConcatenate(e.target.checked)}
+                                    />
+                                }
                                 label="Concatenar mensajes de más de 160 caracteres"
                                 sx={{ '& .MuiTypography-root': { fontSize: '16px', fontWeight: '400', color: '#574B4FCC' } }}
                             />
                             <FormControlLabel
-                                control={<Checkbox />}
+                                control={
+                                    <Checkbox
+                                        checked={isFlashMessage}
+                                        onChange={(e) => setIsFlashMessage(e.target.checked)}
+                                    />
+                                }
                                 label="Mensaje flash"
                                 sx={{ '& .MuiTypography-root': { fontSize: '16px', fontWeight: '400', color: '#574B4FCC' } }}
                             />
@@ -1143,7 +1192,7 @@ const HomePage: React.FC = () => {
                     {/* Botones fijos */}
                     <Box sx={buttonContainer}>
                         <SecondaryButton text='Cancelar' onClick={handleClose} />
-                        <MainButton text='Enviar' onClick={() => console.log('Enviando...')} disabled={!isFormValid} />
+                        <MainButton text='Enviar' onClick={() => handleSend()} disabled={!isFormValid} />
                     </Box>
                 </Box>
             </Modal>
@@ -1670,7 +1719,7 @@ const HomePage: React.FC = () => {
 
             <ModalError
                 isOpen={IsErrormodal}
-                title="Error al cambiar la contraseña"
+                title={MessageModalError}
                 message='Intentelo mas tarde'
                 buttonText="Cerrar"
                 onClose={() => setIsErrormodal(false)}

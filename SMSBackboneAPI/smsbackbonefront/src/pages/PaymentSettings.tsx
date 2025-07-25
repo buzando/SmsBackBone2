@@ -862,24 +862,19 @@ const PaymentSettings: React.FC = () => {
                         </Box>
                     }
                 />
-
-
                 <span style={{ textAlign: 'left', fontFamily: "Poppins", letterSpacing: '0px', color: '#8F4D63', opacity: 1, fontSize: '16px' }}>
                     Recibir una alerta y realizar autorecarga cuando los créditos se muestren por debajo de la cantidad seleccionada
                 </span>
             </label>
-            {/* Nueva sección: Cantidad y Monto a Recargar */}
             <div
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
                     marginTop: '20px',
-                    opacity: isAutoRechargeEnabled ? 1 : 0.5,  // 🔴 Aplica grisecito cuando está deshabilitado
-                    pointerEvents: isAutoRechargeEnabled ? 'auto' : 'none'  // 🔴 Desactiva la interacción cuando está deshabilitado
+                    opacity: isAutoRechargeEnabled ? 1 : 0.5,
+                    pointerEvents: isAutoRechargeEnabled ? 'auto' : 'none'
                 }}
             >
-
-                {/* Cantidad y Monto */}
                 <div style={{ display: 'flex', gap: '20px', width: '100%' }}>
                     <div>
                         <h3 style={{
@@ -897,7 +892,7 @@ const PaymentSettings: React.FC = () => {
                                 const valor = e.target.value;
                                 setthresholdAutomatic(valor);
                                 const cantidad = parseFloat(valor) || 0;
-                                setRechargeAmount(cantidad > 0 ? calcularMontoRecarga(cantidad).toFixed(2) : '');  // 🔄 Calcula y establece el monto
+                                setRechargeAmount(cantidad > 0 ? calcularMontoRecarga(cantidad).toFixed(2) : '');
                             }}
                             type="number"
                             disabled={!isAutoRechargeEnabled}
@@ -911,9 +906,7 @@ const PaymentSettings: React.FC = () => {
                                 '& .MuiInputBase-input': {
                                     fontFamily: 'Poppins, sans-serif',
                                     fontWeight: 500,
-
-                                    // 🔽 Remueve las flechas en navegadores
-                                    MozAppearance: 'textfield', // Firefox
+                                    MozAppearance: 'textfield',
                                     '&::-webkit-outer-spin-button': {
                                         WebkitAppearance: 'none',
                                         margin: 0,
@@ -925,7 +918,6 @@ const PaymentSettings: React.FC = () => {
                                 }
                             }}
                         />
-
                     </div>
 
                     <div style={{ flex: '1' }}>
@@ -943,7 +935,7 @@ const PaymentSettings: React.FC = () => {
                             type="text"
                             disabled={!isAutoRechargeEnabled}
                             InputProps={{
-                                readOnly: true,  // 🔴 Solo lectura para evitar que el usuario lo edite manualmente
+                                readOnly: true,
                             }}
                             sx={{
                                 background: '#FFFFFF 0% 0% no-repeat padding-box',
@@ -958,11 +950,10 @@ const PaymentSettings: React.FC = () => {
                                 }
                             }}
                         />
-
                     </div>
                 </div>
+
                 <Divider sx={{ width: 'calc(100% + 0px)', marginLeft: '0px', mb: 2, mt: 3 }} />
-                {/* SECCIÓN SEPARADA - Método de pago */}
                 <h3 style={{
                     textAlign: 'left',
                     fontFamily: "Poppins",
@@ -1013,7 +1004,6 @@ const PaymentSettings: React.FC = () => {
                     </MainIcon>
                 </div>
 
-                {/* Tarjetas de Crédito - Scroll Horizontal */}
                 <div style={{
                     display: 'flex',
                     overflowX: 'auto',
@@ -1038,7 +1028,6 @@ const PaymentSettings: React.FC = () => {
                                     backgroundColor: selectedCard?.id === card.id ? 'rgba(237, 196, 209, 0.2)' : '#FFFFFF',
                                 }}
                             >
-                                {/* Barra lateral de color */}
                                 {selectedCard?.id === card.id && (
                                     <div style={{
                                         position: 'absolute',
@@ -1051,7 +1040,7 @@ const PaymentSettings: React.FC = () => {
                                         borderBottomLeftRadius: '8px',
                                     }}></div>
                                 )}
-                                {/* Marca de la tarjeta */}
+
                                 <div style={{
                                     marginBottom: '10px',
                                     display: 'flex',
@@ -1084,7 +1073,6 @@ const PaymentSettings: React.FC = () => {
                                     <span style={{ margin: '0', padding: '2px' }}>Vencimiento: {card.expiration_month.toString().padStart(2, '0')}/{card.expiration_year.toString().slice(-2)}</span>
                                 </div>
 
-                                {/* Radio para seleccionar */}
                                 <label style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '10px', cursor: 'pointer', }} onClick={() => handleSelectCard(card)} >
                                     <Radio
                                         checked={selectedCard?.id === card.id}
@@ -1105,138 +1093,9 @@ const PaymentSettings: React.FC = () => {
                                         {selectedCard?.id === card.id ? 'Tarjeta seleccionada' : 'Seleccionar tarjeta'}
                                     </span>
                                 </label>
-                                {/* Botón para eliminar */}
-                                <button
-                                    onClick={() => openDeleteModal(card)}
-                                    style={{
-                                        position: 'absolute',
-                                        marginTop: "-164px",
-                                        marginLeft: "278px",
-                                        backgroundColor: 'transparent',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    <Tooltip title="Eliminar" arrow placement="top"
-                                        componentsProps={{
-                                            tooltip: {
-                                                sx: {
-                                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                                    color: "#CCC3C3",
-                                                    fontFamily: "Poppins, sans-serif",
-                                                    fontSize: "12px",
-                                                    padding: "6px 8px",
-                                                    borderRadius: "8px",
-                                                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                                                }
-                                            },
-                                            arrow: {
-                                                sx: {
-                                                    color: "rgba(0, 0, 0, 0.8)"
-                                                }
-                                            }
-                                        }}
-                                        PopperProps={{
-                                            modifiers: [
-                                                {
-                                                    name: 'offset',
-                                                    options: {
-                                                        offset: [0, -7]
-                                                    }
-                                                }
-                                            ]
-                                        }}
-                                    >
-                                        <img src={trash} width='24px' height='24px' />
-                                    </Tooltip>
-                                </button>
                             </div>
                         ))}
                     </div>
-                </div>
-            </div>
-            <Box sx={{ marginBottom: '4px' }}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={generateInvoice}
-                            onChange={(e) => setGenerateInvoice(e.target.checked)}
-                            sx={{ color: '#8F4D63' }}
-                            checkedIcon={
-                                <Box
-                                    sx={{
-                                        width: '24px',
-                                        height: '24px',
-                                        position: 'relative',
-                                        marginTop: '0px',
-                                        marginLeft: '0px',
-                                    }}
-                                >
-                                    <img
-                                        src={IconCheckBox1}
-                                        alt="Seleccionado"
-                                        style={{ width: '24px', height: '24px' }}
-                                    />
-                                </Box>
-                            }
-                        />
-                    }
-                    label={
-                        <Typography
-                            sx={{
-                                fontFamily: 'Poppins',
-                                fontSize: '14px',
-                                color: generateInvoice ? '#8F4D63' : '#574B4FCC',
-                            }}
-                        >
-                            Generar factura automáticamente
-                        </Typography>
-                    }
-                />
-            </Box>
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    padding: '8px 0',
-                }}
-            >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography
-                        sx={{
-                            fontFamily: 'Poppins',
-                            fontSize: '14px',
-                            color: '#574B4F',
-                            fontWeight: 500,
-                        }}
-                    >
-                        Pagos procesados de forma segura con
-                    </Typography>
-                    <Box
-                        component="img"
-                        src={openpay}
-                        alt="Openpay"
-                        sx={{
-                            height: '34px', objectFit: 'contain',
-                            border: "1px solid #9B929566",
-                            borderRadius: "6px"
-                        }}
-                    />
-                </Box>
-
-                <Box sx={{ display: 'flex', gap: '10px' }}>
-                    <SecondaryButton onClick={() => navigate(-1)} text="Cancelar" />
-                    <MainButton text="Aceptar" isLoading={loading} onClick={addRechargeSetting} disabled={isAcceptButtonDisabled} />
-
-                </Box>
-            </Box>
-
-            <div style={{ padding: '20px', maxWidth: '1000px', marginLeft: '0', backgroundColor: '#F2F2F2', borderRadius: '8px', marginBottom: "50px" }}>
-
-                {/* Botones de acción debajo de las tarjetas de crédito */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0px' }}>
                 </div>
             </div>
 

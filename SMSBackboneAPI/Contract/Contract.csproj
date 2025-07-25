@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Modal\Modal.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder1\" />
+  </ItemGroup>
+
 </Project>

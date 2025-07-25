@@ -58,7 +58,39 @@ namespace Business
 
                 var body = new
                 {
-                    text = "Su Codigo para ingresar al portal RED QUANTUM es el siguiente: " + token,
+                    text = "Su Codigo para ingresar al portal QUANTUM es el siguiente: " + token,
+                    PhoneNumber = phoneNumber
+                };
+
+                var json = JsonSerializer.Serialize(body);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                request.Content = content;
+
+                var response = await client.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var loginResponse = JsonSerializer.Deserialize<SendResponse>(responseBody);
+
+                return loginResponse;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+        public async Task<SendResponse> SendTestMessage(string phoneNumber, string Message, LoginResponse tokenLogin)
+        {
+            try
+            {
+                var client = new HttpClient();
+                var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}message");
+
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenLogin.token);
+
+                var body = new
+                {
+                    text = Message,
                     PhoneNumber = phoneNumber
                 };
 
@@ -87,7 +119,7 @@ namespace Business
             var json = JsonSerializer.Serialize(messages);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync($"{_baseUrl}api/message/list", content);
+            var response = await client.PostAsync($"{_baseUrl}message/list", content);
             response.EnsureSuccessStatusCode();
 
             var responseBody = await response.Content.ReadAsStringAsync();

@@ -321,10 +321,10 @@ namespace Business
                             ctx.roomsbyuser.Add(roomByUser);
                             ctx.SaveChanges();
                         }
-                        
+
                         if (dto.Id == null)
                         {
-                           
+
 
                             var password = GenerarPasswordTemporalBackBone(16);
 
@@ -336,8 +336,14 @@ namespace Business
                             int id = JObject.Parse(userbackbone)["id"].Value<int>();
                             var passencrypt = ClientAccessManager.Encrypt(password);
 
-                            var clientacces = new ClientAccess { client_id = client.id, password = passencrypt, username = dto.NombreCliente, status = true,
-                                created_at = DateTime.Now, id_backbone = id
+                            var clientacces = new ClientAccess
+                            {
+                                client_id = client.id,
+                                password = passencrypt,
+                                username = dto.NombreCliente,
+                                status = true,
+                                created_at = DateTime.Now,
+                                id_backbone = id
                             };
                             ctx.Client_Access.Add(clientacces);
                             ctx.SaveChanges();
@@ -416,12 +422,24 @@ namespace Business
                         if (client == null) return false;
 
                         client.nombrecliente = dto.NombreCliente;
-                        client.RateForShort = decimal.Parse(dto.RateForShort);
-                        client.RateForLong = decimal.Parse(dto.RateForLong);
-                        client.ShortRateType = dto.ShortRateType;
-                        client.LongRateType = dto.LongRateType;
-                        client.ShortRateQty = dto.ShortRateQty;
-                        client.LongRateQty = dto.LongRateQty;
+                        if (dto.RateForShort != "NaN")
+                        {
+
+                            client.RateForShort = decimal.Parse(dto.RateForShort);
+                            client.ShortRateType = dto.ShortRateType;
+                            client.ShortRateQty = dto.ShortRateQty;
+                        }
+                        if (dto.RateForLong != "NaN")
+                        {
+
+                            client.RateForLong = decimal.Parse(dto.RateForLong);
+                            client.LongRateType = dto.LongRateType;
+
+                            client.LongRateQty = dto.LongRateQty;
+                        }
+                       
+                      
+           
 
                         ctx.SaveChanges();
 
@@ -710,7 +728,7 @@ namespace Business
                             join user in ctx.Users on recarga.idUser equals user.Id
                             join client in ctx.clients on user.IdCliente equals client.id
                             where recarga.RechargeDate >= fechaInicio && recarga.RechargeDate <= fechaFin
-                                  && (clientIds == null || clientIds.Contains(client.id))
+                                  && (!clientIds.Any() || clientIds.Contains(client.id))
                             select new ReporteConsumoDTO
                             {
                                 Fecha = recarga.RechargeDate,
@@ -782,7 +800,7 @@ namespace Business
                               join user in ctx.Users on roomUser.idUser equals user.Id
                               join client in ctx.clients on user.IdCliente equals client.id
                               where send.SentAt >= fechaInicio && send.SentAt <= fechaFin
-                                    && (clientIds == null || clientIds.Contains(client.id))
+                                    && (!clientIds.Any() || clientIds.Contains(client.id))
                               group send by client.nombrecliente into g
                               select new ReporteConsumoSistemaDto
                               {

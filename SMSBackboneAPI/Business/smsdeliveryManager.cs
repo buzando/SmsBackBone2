@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Modal;
 using Modal.Model.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Business
 {
@@ -31,7 +32,7 @@ namespace Business
 
             var campaignIdsTable = new DataTable();
             campaignIdsTable.Columns.Add("Value", typeof(int));
-            foreach (var id in  campaigns)
+            foreach (var id in campaigns)
                 campaignIdsTable.Rows.Add(id);
 
             try
@@ -159,8 +160,10 @@ namespace Business
                                 return;
                             }
                             var creditResponse = await new ApiBackBoneManager().GetOwnCredit(loginResult.token);
-                            if (decimal.TryParse(creditResponse, out var apiCredit))
+                            int credit = JObject.Parse(creditResponse)["credit"].Value<int>();
+                            if (decimal.TryParse(credit.ToString(), out var apiCredit))
                             {
+
                                 if (apiCredit <= 0)
                                 {
                                     _logger.Info($"⚠️ Crédito insuficiente en API para la campaña {campaign.Name}: {apiCredit} créditos.");
@@ -216,11 +219,11 @@ namespace Business
                                     var ladaRecord = new IFTLadas();
                                     string estado = "";
 
-                                        var blacklistids = ctx.blacklistcampains
-                                            .Where(x => x.idcampains == campaign.CampaignId)
-                                            .Select(x => x.idblacklist)
-                                            .ToList();
-                                    
+                                    var blacklistids = ctx.blacklistcampains
+                                        .Where(x => x.idcampains == campaign.CampaignId)
+                                        .Select(x => x.idblacklist)
+                                        .ToList();
+
                                     if (blacklistids != null && blacklistids.Count > 0)
                                     {
                                         bool isBlacklisted = ctx.BlackList
@@ -330,6 +333,7 @@ namespace Business
                                     {
                                         CampaignId = campaign.CampaignId,
                                         ContactId = int.Parse(message.registryClient),
+                                        IdBackBone = message.id,
                                         ScheduleId = campaign.ScheduleId,
                                         SentAt = DateTime.Now,
                                         Status = message.status.ToString(),
@@ -340,11 +344,13 @@ namespace Business
                                     var room = ctx.Rooms.FirstOrDefault(r => r.id == campaign.RoomId);
                                     if (room != null)
                                     {
-                                        if (campaign.NumberType == 1)
-                                            room.short_sms = Math.Max(0, room.short_sms - creditosConsumidos); // no bajar de 0
-                                        else if (campaign.NumberType == 2)
-                                            room.long_sms = Math.Max(0, room.long_sms - creditosConsumidos);
-
+                                        if (message.status == 1 || message.status == 2)
+                                        {
+                                            if (campaign.NumberType == 1)
+                                                room.short_sms = Math.Max(0, room.short_sms - creditosConsumidos); // no bajar de 0
+                                            else if (campaign.NumberType == 2)
+                                                room.long_sms = Math.Max(0, room.long_sms - creditosConsumidos);
+                                        }
                                         if (notif != null)
                                         {
                                             bool isShort = campaign.NumberType == 1;
