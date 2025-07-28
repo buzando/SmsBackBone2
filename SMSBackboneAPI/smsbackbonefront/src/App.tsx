@@ -83,7 +83,7 @@ function App() {
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='es-mx'>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
-                    <BrowserRouter basename='/RedQuantum/'>
+                    <BrowserRouter basename='/Quantum/'>
                         <Routes>
                             <Route path="/login" element={<LoginPage />} />
                          

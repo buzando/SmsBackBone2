@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Contract;
 using Contract.Request;
 using Contract.Response;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
@@ -264,6 +265,51 @@ namespace Business
 
             }
             catch (Exception e)
+            {
+                return false;
+            }
+        }
+        public bool ProcesarShortNumberRequest(ShortNumberRequestDTO request)
+        {
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    var emails = Common.ConfigurationManagerJson("EmailReceivers");
+
+                    var setupCost = decimal.Parse(Common.ConfigurationManagerJson("ShortNumberSetupCost"));
+                    var monthlyCost = decimal.Parse(Common.ConfigurationManagerJson("ShortNumberMonthlyCost"));
+
+
+                    var clientName = (from u in ctx.Users
+                                      join c in ctx.clients on u.IdCliente equals c.id
+                                      where u.email == request.Email
+                                      select c.nombrecliente).FirstOrDefault();
+
+
+                    var entity = new ShortNumberRequest
+                    {
+                        Quantity = request.Quantity,
+                        SetupCost = setupCost,
+                        MonthlyCost = monthlyCost,
+                        CreditCardId = request.CreditCardId,
+                        SentToEmails = string.Join(",", emails),
+                        WasSentSuccessfully = false,
+                        RequestDate = DateTime.Now
+                    };
+
+                    var subject = $"El cliente {clientName} esta solicitando la cantidad de {request.Quantity} de numeros cortos" +
+                        $"se le puede contactar por medio del siguiente correo: {clientName} ";
+                    var wasSent = MailManager.SendEmail(emails,"Peticion Numeros",subject); // tu función
+                    entity.WasSentSuccessfully = wasSent;
+
+                    ctx.ShortNumberRequest.Add(entity);
+                    ctx.SaveChanges();
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
             {
                 return false;
             }

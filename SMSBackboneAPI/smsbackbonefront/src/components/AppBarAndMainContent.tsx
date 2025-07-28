@@ -442,12 +442,12 @@ const NavBarAndDrawer: React.FC<Props> = props => {
     };
 
     const handleDownload = async () => {
-        const response = await fetch("/RedQuantum/Files/Documentacion_API_RedQuantum.pdf");
+        const response = await fetch("/Quantum/Files/Documentacion_API_Quantum.pdf");
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "Documentacion_API_RedQuantum.pdf";
+        a.download = "Documentacion_API_Quantum.pdf";
         a.click();
         window.URL.revokeObjectURL(url);
     };
@@ -2130,7 +2130,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                 maxWidth={false}
                 disableGutters
                 sx={{
-                    width: '83%',
+                    width: '81.5%',
                     height: '100%',
                     overflowX: 'hidden',
                     overflowY: 'hidden',

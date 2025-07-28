@@ -32,5 +32,5 @@ export default defineConfig({
         port: 55578,
         host: true,
     },
-    base: '/RedQuantum/',
+    base: '/Quantum/',
 })

@@ -85,5 +85,45 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
+
+        //[HttpPost("RequestShortNumber")]
+        //public async Task<IActionResult> RequestShortNumber(ShortNumberRequestDTO request)
+        //{
+        //    try
+        //    {
+        //        var manager = new MyNumbersManager();
+        //        var result = manager.RegisterShortNumberRequestAsync(request);
+
+        //        if (result)
+        //            return Ok(new { message = "Solicitud de número corto registrada correctamente." });
+        //        else
+        //            return BadRequest(new { message = "Error al registrar la solicitud de número corto." });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        log.Error("Error en RequestShortNumber", ex);
+        //        return StatusCode(500, new { message = "Error interno del servidor." });
+        //    }
+        //}
+
+        //[HttpPost("RequestLongNumber")]
+        //public async Task<IActionResult> RequestLongNumber(LongNumberRequestDTO request)
+        //{
+        //    try
+        //    {
+        //        var manager = new MyNumbersManager();
+        //        var result = manager.RegisterLongNumberRequestAsync(request);
+
+        //        if (result)
+        //            return Ok(new { message = "Solicitud de número largo registrada correctamente." });
+        //        else
+        //            return BadRequest(new { message = "Error al registrar la solicitud de número largo." });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        log.Error("Error en RequestLongNumber", ex);
+        //        return StatusCode(500, new { message = "Error interno del servidor." });
+        //    }
+        //}
     }
 }

@@ -804,11 +804,11 @@ const RoomsAdmin: React.FC = () => {
                                         style={{ width: 24 }}
                                     />
                                 </InputAdornment>
-                            ),//clientSearch
+                            ),
                             endAdornment: clientSearch && (
                                 <IconButton
                                     onClick={() => {
-                                        setSearchTerm('');
+                                        setClientSearch('');
                                         setRoomsData(originalData);
                                     }}
                                 >

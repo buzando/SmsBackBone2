@@ -57,11 +57,11 @@ const DatePicker: React.FC<DatePickerProps> = ({ open, anchorEl, onApply, onClos
                 },
                 {
                     name: 'offset',
-                    options: { offset: [0, 10] },
+                    options: { offset: [0, -10] },
                 },
             ]}
         >
-            <Paper elevation={3} className="date-picker-container">
+            <Paper elevation={3} className="custom-datepicker-scale">
                 <div className="date-picker-divider"></div>
                 <div style={{ position: 'relative' }}>
                     <img

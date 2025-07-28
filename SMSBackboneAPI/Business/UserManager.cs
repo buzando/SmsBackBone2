@@ -1140,7 +1140,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                     if (recharge != null)
                     {
 
-                        recharge.Users = ctx.AmountNotificationUser.Where(x => x.Id == recharge.Id).Select(x => x.UserId.ToString()).ToList();
+                        recharge.Users = ctx.AmountNotificationUser.Where(x => x.NotificationId == recharge.Id).Select(x => x.UserId.ToString()).ToList();
                     }
                 }
                 return recharge;

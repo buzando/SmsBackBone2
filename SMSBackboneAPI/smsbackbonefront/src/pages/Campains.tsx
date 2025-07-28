@@ -3894,7 +3894,7 @@ const Campains: React.FC = () => {
                           }}
                         >
                           <a
-                            href="/RedQuantum/Files/ArchivoEjemplo.xlsx"
+                            href="/Quantum/Files/ArchivoEjemplo.xlsx"
                             download
                             style={{ textDecoration: 'none' }}
                           >

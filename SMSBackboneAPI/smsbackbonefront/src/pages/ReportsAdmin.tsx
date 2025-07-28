@@ -110,6 +110,7 @@ const ReportsAdmin = () => {
         setAnchorElFecha(null);
         setOpenFecha(false);
         setResetKey(prev => prev + 1);
+        setActiveFilter(null);
     };
 
     const handleFechaClose = () => {
@@ -242,7 +243,7 @@ const ReportsAdmin = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", width: '90%', minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", width: '100%', minHeight: 'calc(100vh - 80px)', overflow: 'hidden' }}>
             <Box display="flex" alignItems="center" mb={2}>
                 <IconButton onClick={() => navigate('/')}>
                     <img src={ArrowBackIosNewIcon} alt="Regresar" style={{ width: 24, transform: 'rotate(270deg)' }} />
@@ -500,23 +501,41 @@ const ReportsAdmin = () => {
                                 <>
                                     {Array.isArray(originalData) && originalData.length > 0 ? (
                                         <TableContainer component={Paper} sx={{
-                                            borderRadius: '12px', boxShadow: '0 0 10px rgba(0,0,0,0.05)',
-                                            height: "410px", overflowY: "auto"
-                                        }}>
+                                            borderRadius: '12px',
+                                            boxShadow: '0 0 10px rgba(0,0,0,0.05)',
+                                            maxHeight: '350px', // Fija la altura visible
+                                            overflowY: 'auto',   // Scroll solo vertical
+                                        }}
+                                        >
                                             <Table>
                                                 <TableHead>
                                                     <TableRow>
                                                         {Object.keys(originalData[0]).map((key) => (
                                                             <TableCell
                                                                 key={key}
-                                                                sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#5A2836', fontSize: "13px" }}
+                                                                sx={{
+                                                                    fontWeight: 500,
+                                                                    fontFamily: 'Poppins',
+                                                                    color: '#574B4F',
+                                                                    fontSize: '13px',
+                                                                    maxWidth: 180,
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    whiteSpace: 'nowrap'
+                                                                }}
+
                                                             >
                                                                 {key}
                                                             </TableCell>
                                                         ))}
                                                     </TableRow>
                                                 </TableHead>
-                                                <TableBody>
+                                                <TableBody
+                                                    sx={{
+                                                        display: 'block',
+                                                        maxHeight: '370px',
+                                                        overflowY: 'auto',
+                                                    }}>
                                                     {originalData.map((row: any, index: number) => (
                                                         <TableRow key={index}>
                                                             {Object.keys(row).map((key) => (
@@ -567,26 +586,47 @@ const ReportsAdmin = () => {
                             {activeTab === 1 &&
                                 <>
                                     {Array.isArray(originalData) && originalData.length > 0 ? (
-                                        <TableContainer component={Paper} sx={{ borderRadius: '12px', boxShadow: '0 0 10px rgba(0,0,0,0.05)' }}>
-                                            <Table>
+                                        <TableContainer
+                                            component={Paper}
+                                            sx={{
+                                                borderRadius: '12px',
+                                                boxShadow: '0 0 10px rgba(0,0,0,0.05)',
+                                                maxHeight: '350px', // Fija la altura visible
+                                                overflowY: 'auto',   // Scroll solo vertical
+                                            }}
+                                        >
+                                            <Table stickyHeader>
                                                 <TableHead>
                                                     <TableRow>
                                                         {Object.keys(originalData[0]).map((key) => (
                                                             <TableCell
                                                                 key={key}
-                                                                sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#5A2836', fontSize: "13px" }}
+                                                                sx={{
+                                                                    fontWeight: 500,
+                                                                    fontFamily: 'Poppins',
+                                                                    color: '#5A2836',
+                                                                    fontSize: '13px',
+                                                                    backgroundColor: '#F5F5F5',
+                                                                }}
                                                             >
                                                                 {key}
                                                             </TableCell>
                                                         ))}
                                                     </TableRow>
                                                 </TableHead>
+
                                                 <TableBody>
                                                     {originalData.map((row: any, index: number) => (
                                                         <TableRow key={index}>
                                                             {Object.keys(row).map((key) => (
-                                                                <TableCell key={key}
-                                                                    sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#574B4F', fontSize: "13px" }}
+                                                                <TableCell
+                                                                    key={key}
+                                                                    sx={{
+                                                                        fontWeight: 500,
+                                                                        fontFamily: 'Poppins',
+                                                                        color: '#574B4F',
+                                                                        fontSize: '13px',
+                                                                    }}
                                                                 >
                                                                     {typeof row[key] === 'string' || typeof row[key] === 'number'
                                                                         ? row[key]
@@ -602,6 +642,8 @@ const ReportsAdmin = () => {
                                                 </TableBody>
                                             </Table>
                                         </TableContainer>
+
+
                                     ) : (
                                         <Box
                                             display="flex"
@@ -630,14 +672,29 @@ const ReportsAdmin = () => {
                             {activeTab === 2 &&
                                 <>
                                     {Array.isArray(originalData) && originalData.length > 0 ? (
-                                        <TableContainer component={Paper} sx={{ borderRadius: '12px', boxShadow: '0 0 10px rgba(0,0,0,0.05)' }}>
+                                        <TableContainer component={Paper} sx={{
+                                            borderRadius: '12px',
+                                            boxShadow: '0 0 10px rgba(0,0,0,0.05)',
+                                            maxHeight: '350px', // Fija la altura visible
+                                            overflowY: 'auto',   // Scroll solo vertical
+                                        }}>
                                             <Table>
                                                 <TableHead>
                                                     <TableRow>
                                                         {Object.keys(originalData[0]).map((key) => (
                                                             <TableCell
                                                                 key={key}
-                                                                sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#5A2836', fontSize: "13px" }}
+                                                                sx={{
+                                                                    fontWeight: 500,
+                                                                    fontFamily: 'Poppins',
+                                                                    color: '#574B4F',
+                                                                    fontSize: '13px',
+                                                                    maxWidth: 180,
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    whiteSpace: 'nowrap'
+                                                                }}
+
                                                             >
                                                                 {key}
                                                             </TableCell>
@@ -854,21 +911,22 @@ const ReportsAdmin = () => {
                 onApply={(startDate, endDate) => {
                     handleDateRangeChange(new Date(startDate), endDate)
                 }}
+                placement="bottom-start"
             />
         </Box>
     );
 };
 const tooltipStyle = {
-  fontFamily: 'Poppins',
-  backgroundColor: '#312D2E',
-  color: '#DEDADA',
-  fontSize: '12px',
-  borderRadius: '6px',
-  padding: '6px 10px',
+    fontFamily: 'Poppins',
+    backgroundColor: '#312D2E',
+    color: '#DEDADA',
+    fontSize: '12px',
+    borderRadius: '6px',
+    padding: '6px 10px',
 };
 
 const arrowStyle = {
-  color: '#322D2E',
+    color: '#322D2E',
 };
 
 export default ReportsAdmin;

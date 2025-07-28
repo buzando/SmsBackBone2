@@ -3,7 +3,14 @@
 .date-picker-container * {
     font-family: 'Poppins', sans-serif !important;
 }
+.custom-datepicker-scale {
+  transform: scale(0.85); /* Ajusta aquí */
+  transform-origin: top left;
+}
 
+.MuiPickersPopper-root {
+  overflow: visible !important;
+}
 /* Nombre del mes */
 .rdrMonthName {
     text-align: center;

@@ -174,17 +174,12 @@ const PaymentSettings: React.FC = () => {
     useEffect(() => {
         const loadData = async () => {
             await fetchAccounts();
-            await fetchCreditCards();
+            await fetchSettings();
         };
 
         loadData();
     }, []);
 
-    useEffect(() => {
-        if (Users.length > 0 && creditCards.length > 0) {
-            fetchSettings();
-        }
-    }, [Users, creditCards]);
 
     useEffect(() => {
         setIsShortSmsEnabled(selectedChannels.includes("SMS # cortos"));
@@ -268,11 +263,8 @@ const PaymentSettings: React.FC = () => {
                     if (card) setSelectedCard(card);
                 }
 
-                if (config.Users && config.Users.length > 0) {
-                    const matchedUserIds = Users
-                        .filter(u => config.Users.includes(u.email))
-                        .map(u => u.id);
-                    setSelectedUsers(matchedUserIds);
+                if (config.users && config.users.length > 0) {
+                    setSelectedUsers(config.users.map(u => Number(u)));
                 }
             }
 
@@ -557,16 +549,7 @@ const PaymentSettings: React.FC = () => {
     };
 
     return (
-        <Box p={4} sx={{ padding: '10px', marginLeft: "35px", marginTop: '-50px', maxWidth: "1140px" }}>
-            <Backdrop
-                open={loading}
-                sx={{
-                    color: "#fff",
-                    zIndex: (theme) => theme.zIndex.drawer + 1,
-                }}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
+        <Box p={4} sx={{ padding: '10px', marginLeft: "35px", marginTop: '-50px', maxWidth: "1140px", minHeight: '760px', }}>
             <Box sx={{ display: 'flex', alignItems: 'center', pl: '0px', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')} // ← O ajusta la ruta a donde quieras volver
@@ -786,7 +769,7 @@ const PaymentSettings: React.FC = () => {
                                 <TableRow key={user.id}>
                                     <TableCell>
                                         <Checkbox
-                                            checked={selectedUsers.includes(user.id)}
+                                            checked={selectedUsers.includes(Number(user.id))}
                                             onChange={() => handleUserToggle(user.id)}
                                             disabled={!isNotificationEnabled}
                                             checkedIcon={
@@ -824,10 +807,14 @@ const PaymentSettings: React.FC = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-                {/* Nueva sección: Activar Autorecarga */}
-
 
             </div>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
+                <MainButton text='Guardar' onClick={addRechargeSetting} disabled={isAcceptButtonDisabled} isLoading={loading} />
+            </Box>
+
+            {/* Nueva sección: Activar Autorecarga Comentada*/}
+            {/* 
             <Divider sx={{ width: 'calc(100% + 0px)', marginLeft: '0px', mb: 2, mt: 3 }} />
             <h3 style={{
                 textAlign: 'left', fontFamily: "Poppins", letterSpacing: '0px', fontWeight: "500",
@@ -1098,7 +1085,7 @@ const PaymentSettings: React.FC = () => {
                     </div>
                 </div>
             </div>
-
+*/}
 
             <ModalError
                 isOpen={isErrorModalOpen}

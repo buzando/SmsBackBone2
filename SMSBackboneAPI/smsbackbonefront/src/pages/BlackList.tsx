@@ -1795,7 +1795,7 @@ const BlackList: React.FC = () => {
                                     }}
                                 >
 
-                                    <a href="/RedQuantum/Files/ArchivomuestraListasNegras.xlsx" download style={{ textDecoration: 'none' }}>
+                                    <a href="/Quantum/Files/ArchivomuestraListasNegras.xlsx" download style={{ textDecoration: 'none' }}>
                                         <Button
                                             disableRipple
                                             sx={{

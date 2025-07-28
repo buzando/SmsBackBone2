@@ -47,6 +47,8 @@ namespace Modal
         public DbSet<IFTLadas> IFTLadas { get; set; }
         public DbSet<SmsDisplayRate> SmsDisplayRate { get; set; }
         public DbSet<TestMessage> TestMessage { get; set; }
+        public DbSet<ShortNumberRequest> ShortNumberRequest { get; set; }
+        public DbSet<LongNumberRequest> LongNumberRequest { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

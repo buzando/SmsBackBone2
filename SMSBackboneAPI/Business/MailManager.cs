@@ -13,38 +13,40 @@ namespace Business
     {
         public static bool SendEmail(string userEmail, string subject, string body)
         {
-            //_logger.LogInformation("Sending email confirmation");
             MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress("smsconnectnotifications@nuxiba.com");
-            mailMessage.To.Add(new MailAddress(userEmail));
+            mailMessage.From = new MailAddress(Common.ConfigurationManagerJson("EmailSettings:From"));
 
-            mailMessage.Subject = subject;//"Confirm your email";
+            // Separar los correos por coma y agregarlos uno por uno
+            foreach (var email in userEmail.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                mailMessage.To.Add(email.Trim());
+            }
+
+            mailMessage.Subject = subject;
             mailMessage.IsBodyHtml = true;
             mailMessage.Body = body;
 
-            //mailMessage.AlternateViews.Add();
-
-            SmtpClient client = new SmtpClient();
-            client.UseDefaultCredentials = false;
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.EnableSsl = true;
-            client.Credentials = new NetworkCredential("smsconnectnotifications@nuxiba.com", "kifqy5-samroh-pavByv");
-            client.Host = "smtp.ionos.com";//"smtpout.secureserver.net";
-            client.Port = 587;//80;
+            SmtpClient client = new SmtpClient
+            {
+                UseDefaultCredentials = false,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                EnableSsl = bool.TryParse(Common.ConfigurationManagerJson("EmailSettings:EnableSsl"), out bool n) ? n : true,
+                Credentials = new NetworkCredential(Common.ConfigurationManagerJson("EmailSettings:From"), Common.ConfigurationManagerJson("EmailSettings:Password")),
+                Host = Common.ConfigurationManagerJson("EmailSettings:Host"),
+                Port = int.TryParse(Common.ConfigurationManagerJson("EmailSettings:Port"), out int x) ? x : 587
+            };
 
             try
             {
                 client.Send(mailMessage);
-               // _logger.LogInformation("Confirmation email sent successfully");
                 return true;
             }
             catch (Exception ex)
             {
-                //_logger.LogError("Error when triying to send email confirmation.", ex); //An error occurred while trying to send the confirmation email
                 return false;
             }
-
         }
+
 
         public static string GenerateMailMessage(string email, string token, string url, string msgType)
         {
