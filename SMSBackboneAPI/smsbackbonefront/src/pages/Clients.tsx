@@ -1235,9 +1235,8 @@ const Clients: React.FC = () => {
                                     <td style={{
                                         position: 'sticky', textAlign: "center",
                                         right: -2,
-                                        background: '#fff', borderLeft: '1px solid #E0E0E0',
-                                        boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
-                                        padding: '3.5px', width: '66px', height: "30px", whiteSpace: 'nowrap', overflow: 'hidden',
+                                        background: '#fff',
+                                        padding: '3.5px', width: '75px', height: "30px", whiteSpace: 'nowrap', overflow: 'hidden',
                                         textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F",
                                     }}>
                                         <Divider sx={{
@@ -1332,9 +1331,8 @@ const Clients: React.FC = () => {
                                         <td style={{
                                             position: 'sticky', textAlign: "center",
                                             right: -2,
-                                            background: '#fff', borderLeft: '1px solid #E0E0E0',
-                                            boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
-                                            padding: '3.5px', width: '66px', height: "51px", whiteSpace: 'nowrap', overflow: 'hidden',
+                                            background: '#fff',
+                                            padding: '3.5px', width: '75px', height: "51px", whiteSpace: 'nowrap', overflow: 'hidden',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>
                                             <IconButton onClick={(event) => handleMenuOpen(event, Client.id as number)}>

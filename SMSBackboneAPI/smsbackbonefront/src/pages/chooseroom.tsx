@@ -17,6 +17,9 @@ import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import SecondaryButton from '../components/commons/SecondaryButton'
 import { Divider } from '@mui/material';
 import boxopen from '../assets/NoResultados.svg';
+import Iconseachred from "../assets/Iconseachred.svg";
+import seachicon from '../assets/icon-lupa.svg';
+import iconclose from '../assets/icon-close.svg';
 
 const customStyles = {
     content: {
@@ -159,64 +162,69 @@ const Chooseroom: React.FC = () => {
             <Backdrop open={loading} sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                 <CircularProgress color="inherit" />
             </Backdrop>
-            <Typography
-                variant="h5"
-                className="centered-title"
-                sx={{
-                    textAlign: 'center',
-                    fontFamily: 'Poppins',
-                    letterSpacing: '0px',
-                    color: '#330F1B',
-                    opacity: 1,
-                    fontSize: '28px',
-                    lineHeight: '55px',
-                }}
-            >
-                Seleccionar una sala para continuar
-            </Typography>
 
-
-            <div
-                className="search-container"
-                style={{
-                    width: '430px',
-                    margin: '0 auto 20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    border: '1px solid #CED2D54D',
-                    borderRadius: '4px',
-                    padding: '10px',
-                    boxShadow: '0px 4px 4px #E1E4E6',
-                    background: '#FFFFFF',
-                }}
-            >
-                <SearchIcon style={{ marginRight: '8px', color: '#8D4B62' }} /> {/* Lupa */}
-                <input
-                    type="text"
-                    placeholder="Buscar"
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    style={{
-                        flex: 1,
-                        border: 'none',
-                        outline: 'none',
-                        fontSize: '14px',
-                        fontFamily: 'Poppins, sans-serif',
-                        color: searchTerm ? '#7B354D' : '#574B4F',
+            <Box sx={{
+                display: "flex", justifyContent: "center",
+                flexDirection: "column", marginTop: "50px"
+            }}>
+                <Typography
+                    variant="h5"
+                    className="centered-title"
+                    sx={{
+                        textAlign: 'center',
+                        fontFamily: 'Poppins',
+                        letterSpacing: '0px',
+                        color: '#330F1B',
+                        opacity: 1,
+                        fontSize: '28px',
+                        lineHeight: '55px', mb: "56px"
                     }}
-                />
-                {searchTerm && (
-                    <CloseIcon
-                        onClick={() => setSearchTerm('')}
+                >
+                    Seleccionar una sala para continuar
+                </Typography>
+
+                <div
+                    className="search-container"
+                    style={{
+                        marginLeft: "43px",
+                        width: '430px', height: "40px",
+                        backgroundColor: "#FFFFFF",
+                        border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
+                        borderRadius: "4px",
+                    }}
+                >
+                    <img
+                        src={searchTerm ? Iconseachred : seachicon}
+                        alt="Buscar"
+                        style={{ marginRight: 8, width: 24 }}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Buscar"
+                        value={searchTerm}
+                        onChange={handleSearch}
                         style={{
-                            cursor: 'pointer',
-                            color: '#8D4B62',
-                            marginLeft: '8px',
+                            border: "none",
+                            outline: "none",
+                            width: "100%",
+                            fontSize: "16px",
+                            fontFamily: "Poppins",
+                            color: searchTerm ? "#7B354D" : "#9B9295",
+                            backgroundColor: "transparent",
                         }}
                     />
-                )}
-            </div>
-
+                    {searchTerm && (
+                        <img
+                            src={iconclose}
+                            alt="Limpiar búsqueda"
+                            onClick={() => {
+                                setSearchTerm('');
+                            }}
+                            style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
+                        />
+                    )}
+                </div>
+            </Box>
 
             {/* Lista de salas */}
             {rooms.filter((room) => {
@@ -225,7 +233,7 @@ const Chooseroom: React.FC = () => {
                 return nameWords.some((word) => word.startsWith(term));
             }).length === 0 ? (
                 <Box>
-                    <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '250px', height: 'auto', mt: 3 }} />
+                    <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '240px', height: 'auto', mt: 3 }} />
                     <Typography variant="body1" sx={{ textAlign: "center", marginTop: "20px", color: "#833A53", fontFamily: "Poppins" }}>
                         No se encontraron resultados.
                     </Typography>
@@ -238,89 +246,91 @@ const Chooseroom: React.FC = () => {
                         return nameWords.some((word) => word.startsWith(term));
                     })
                     .map((room) => (
-                        <div key={room.id} className="room-box"
-                            style={{
-                                background: "#FFFFFF 0% 0% no-repeat padding-box",
-                                boxShadow: "0px 4px 4px #E1E4E6",
-                                border: "1px solid #CED2D54D",
-                                borderRadius: "4px",
-                                opacity: 1,
-                                width: "430px",
-                                padding: "20px",
-                                margin: "10px auto",
-                            }}>
-                            <div className="room-info">
-                                <Box className="icon-container">
-                                    <HomeIcon />
-                                </Box>
-                                <div className="room-details" style={{ marginLeft: "10px" }}>
-                                    <h6 style={{ margin: "0", fontSize: "16px", color: "#330F1B" }}>{room.name}</h6>
-                                    <p style={{ margin: "0", fontSize: "14px", color: "#8F4D63" }}>{room.cliente}</p>
+                        <Box sx={{}}>
+                            <div key={room.id} className="room-box"
+                                style={{
+                                    background: "#FFFFFF 0% 0% no-repeat padding-box",
+                                    boxShadow: "0px 4px 4px #E1E4E6",
+                                    border: "1px solid #CED2D54D",
+                                    borderRadius: "4px",
+                                    opacity: 1,
+                                    width: "430px",
+                                    padding: "20px",
+                                    margin: "10px auto",
+                                }}>
+                                <div className="room-info">
+                                    <Box className="icon-container">
+                                        <HomeIcon />
+                                    </Box>
+                                    <div className="room-details" style={{ marginLeft: "10px" }}>
+                                        <h6 style={{ margin: "0", fontSize: "16px", color: "#330F1B" }}>{room.name}</h6>
+                                        <p style={{ margin: "0", fontSize: "14px", color: "#8F4D63" }}>{room.cliente}</p>
+                                    </div>
+
+                                </div>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'flex-end',
+                                        gap: '4px',
+                                    }}
+                                >
+                                    <span
+                                        style={{
+                                            textAlign: 'right',
+                                            fontFamily: 'Poppins',
+                                            fontWeight: '500',
+                                            fontSize: '12px',
+                                            lineHeight: '18px',
+                                            letterSpacing: '0px',
+                                            color: '#8D4B62',
+                                            opacity: 1,
+                                        }}
+                                    >
+                                        SMS cortos: {room.short_sms}
+                                    </span>
+                                    <span
+                                        style={{
+                                            textAlign: 'right',
+                                            fontFamily: 'Poppins',
+                                            fontWeight: '500',
+                                            fontSize: '12px',
+                                            lineHeight: '18px',
+                                            letterSpacing: '0px',
+                                            color: '#8D4B62',
+                                            opacity: 1,
+                                        }}
+                                    >
+                                        SMS largos: {room.long_sms}
+                                    </span>
                                 </div>
 
-                            </div>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'flex-end',
-                                    gap: '4px',
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        textAlign: 'right',
-                                        fontFamily: 'Poppins',
-                                        fontWeight: '500',
-                                        fontSize: '12px',
-                                        lineHeight: '18px',
-                                        letterSpacing: '0px',
-                                        color: '#8D4B62',
-                                        opacity: 1,
-                                    }}
-                                >
-                                    SMS cortos: {room.short_sms}
-                                </span>
-                                <span
-                                    style={{
-                                        textAlign: 'right',
-                                        fontFamily: 'Poppins',
-                                        fontWeight: '500',
-                                        fontSize: '12px',
-                                        lineHeight: '18px',
-                                        letterSpacing: '0px',
-                                        color: '#8D4B62',
-                                        opacity: 1,
-                                    }}
-                                >
-                                    SMS largos: {room.long_sms}
-                                </span>
-                            </div>
-
-                            {/* Botón para seleccionar la sala */}
-                            <Button
-                                onClick={() => handleRoomSelection(room)}
-                                sx={{
-                                    minWidth: 'auto',
-                                    padding: 0,
-                                    color: '#000',
-                                    backgroundColor: 'transparent',
-                                    border: 'none',
-                                    '&:hover': {
-                                        backgroundColor: 'transparent',
-                                    },
-                                }}
-                            >
-                                <Box
+                                {/* Botón para seleccionar la sala */}
+                                <Button
+                                    onClick={() => handleRoomSelection(room)}
                                     sx={{
-                                        fontSize: '24px',
-                                        lineHeight: 1,
+                                        minWidth: 'auto',
+                                        padding: 0,
+                                        color: '#000',
+                                        backgroundColor: 'transparent',
+                                        border: 'none',
+                                        '&:hover': {
+                                            backgroundColor: 'transparent',
+                                        },
                                     }}
                                 >
-                                    &gt;
-                                </Box>
-                            </Button>
-                        </div>
+                                    <Box
+                                        sx={{
+                                            fontSize: '24px',
+                                            lineHeight: 1,
+                                        }}
+                                    >
+                                        &gt;
+                                    </Box>
+                                </Button>
+                            </div>
+                        </Box>
                     ))
             )}
 
