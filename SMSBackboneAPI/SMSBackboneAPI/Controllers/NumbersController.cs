@@ -86,44 +86,56 @@ namespace SMSBackboneAPI.Controllers
 
         }
 
-        //[HttpPost("RequestShortNumber")]
-        //public async Task<IActionResult> RequestShortNumber(ShortNumberRequestDTO request)
-        //{
-        //    try
-        //    {
-        //        var manager = new MyNumbersManager();
-        //        var result = manager.RegisterShortNumberRequestAsync(request);
+        [HttpPost("RequestShortNumber")]
+        public async Task<IActionResult> RequestNumber(NumberRequestDTO request)
+        {
+            try
+            {
+                var manager = new MyNumbersManager();
+                var responseDto = manager.ProcesarShortNumberRequest(request);
+                log.Info(responseDto);
+                if (responseDto.StartsWith("http"))
+                {
+                    return Ok(responseDto);
+                }
+                if (!string.IsNullOrEmpty(responseDto))
+                {
+                    return BadRequest(new GeneralErrorResponseDto() { code = "Error", description = responseDto });
+                }
+                else
+                {
+                    var response = Ok(responseDto);
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error en RequestShortNumber", ex);
+                return StatusCode(500, new { message = "Error interno del servidor." });
+            }
+        }
+        [HttpGet("UpdateRecharge")]
+        public async Task<IActionResult> UpdateRecharge(string ID)
+        {
+            GeneralErrorResponseDto[] errorResponse = new GeneralErrorResponseDto[1];
+            //var login = await ServiceRequest.GetRequest<LoginDto>(Request.Body);
+            //if (login == null)
+            //{
+            //    return BadRequest("Sin request valido.");
+            //}
+            var UserManager = new Business.UserManager();
+            var responseDto = UserManager.VerifyRechargeStatus(ID);
 
-        //        if (result)
-        //            return Ok(new { message = "Solicitud de número corto registrada correctamente." });
-        //        else
-        //            return BadRequest(new { message = "Error al registrar la solicitud de número corto." });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        log.Error("Error en RequestShortNumber", ex);
-        //        return StatusCode(500, new { message = "Error interno del servidor." });
-        //    }
-        //}
+            if (!responseDto)
+            {
+                return BadRequest(new GeneralErrorResponseDto() { code = "Error", description = "Adding Recharge" });
+            }
+            else
+            {
+                var response = Ok(responseDto);
+                return response;
+            }
 
-        //[HttpPost("RequestLongNumber")]
-        //public async Task<IActionResult> RequestLongNumber(LongNumberRequestDTO request)
-        //{
-        //    try
-        //    {
-        //        var manager = new MyNumbersManager();
-        //        var result = manager.RegisterLongNumberRequestAsync(request);
-
-        //        if (result)
-        //            return Ok(new { message = "Solicitud de número largo registrada correctamente." });
-        //        else
-        //            return BadRequest(new { message = "Error al registrar la solicitud de número largo." });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        log.Error("Error en RequestLongNumber", ex);
-        //        return StatusCode(500, new { message = "Error interno del servidor." });
-        //    }
-        //}
+        }
     }
 }

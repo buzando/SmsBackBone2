@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
@@ -22,7 +22,11 @@ import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import IconCheckBox2 from "../assets/IconCheckBox2.svg";
 import IconResta from "../assets/IconResta.svg";
 import IconSuma from "../assets/IconSuma.svg";
-import modalerror from "../components/commons/ModalError";
+import SnackBar from "../components/commons/ChipBar";
+import Modalerror from "../components/commons/ModalError";
+import { number } from 'prop-types';
+import { useLocation } from 'react-router-dom';
+
 interface CreditCard {
     id: number;
     user_id: number;
@@ -95,13 +99,80 @@ const MyNumbers: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const isAllSelected = numbersData.length > 0 && selectedRows.length === numbersData.length;
     const isIndeterminate = selectedRows.length > 0 && selectedRows.length < numbersData.length;
+    const [automaticInvoiceChecked, setAutomaticInvoiceChecked] = useState(false);
+    const [ShowModalError, setShowModalError] = useState(false);
+    const [ShowSnackBar, setShowSnackBar] = useState(false);
 
-    // Función para manejar la navegación a la página de ayuda
     const handleNavigateToHelp = () => {
-        navigate('/help'); // Reemplaza '/help' con la ruta correcta a tu componente Help
+        navigate('/help');
+    };
+
+    const handleRent = async () => {
+        const userData = localStorage.getItem("userData");
+        const parsedUser = userData ? JSON.parse(userData) : null;
+        try {
+            const payload = {
+                Type: isLongNumber ? 'short' : 'long',
+                Quantity: numberQuantity,
+                CreditCardId: selectedCard?.id,
+                AutomaticInvoice: automaticInvoiceChecked,
+                DeviceSessionId: 'kR1v4EXgk0kpbv2e4HkQWg9oBytTR84f',
+                State: selectedState,
+                Municipality: selectedMunicipality,
+                Lada: selectedLada,
+                Email: parsedUser.email
+            };
+
+            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_NUMBERS_SEND}`;
+            const response = await axios.post(requestUrl, payload);
+            if (response.status === 200) {
+                if (response.data.startsWith('http'))
+                    window.location.href = response.data;
+                return;
+            }
+        } catch (error) {
+            setShowModalError(true);
+        }
+        finally {
+            handleCloseModal();
+        }
     };
 
 
+    const useQuery = () => {
+        return new URLSearchParams(useLocation().search);
+    };
+
+    const hasRunRef = useRef(false);
+    const query = useQuery();
+    const id = query.get('id');
+    useEffect(() => {
+        if (id && !hasRunRef.current) {
+            hasRunRef.current = true;
+            checkRechargeStatus(id);
+        }
+    }, [id]);
+
+    const checkRechargeStatus = async (id: string) => {
+        try {
+            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_VERIFY_RECHARGENUMBER}${id}`;
+            const response = await axios.get(requestUrl);
+
+            if (response.status === 200 && response.data) {
+                if (response.data) {
+                    setShowSnackBar(true);
+                    setTimeout(() => setShowSnackBar(false), 10000);
+                } else {
+                    setShowModalError(true);
+                }
+            }
+        } catch {
+
+        }
+        finally {
+            setShowSnackBar(true);
+        }
+    };
 
     const statesOfMexico = [
         {
@@ -1916,7 +1987,7 @@ const MyNumbers: React.FC = () => {
                 setFilteredData(fetchedNumbers);
             }
         } catch {
-       
+
         } finally {
             setLoading(false);
         }
@@ -2038,27 +2109,6 @@ const MyNumbers: React.FC = () => {
         municipality.name.toLowerCase().includes(municipalitySearch.toLowerCase())
     );
 
-
-
-    const handleRent = async () => {
-        try {
-            const payload = {
-                quantity: numberQuantity,
-                costSetup,
-                monthlyCost,
-                cardId: selectedCard?.id,
-            };
-
-            await axios.post('/api/rent', payload); // Ajusta la URL según tu API
-            alert('Renta realizada exitosamente.');
-            handleCloseModal();
-        } catch {
-            setErrorModal({
-                title: "Error al realizar renta",
-                message: "Algo salió mal. Inténtelo de nuevo o regrese más tarde.",
-            });
-        }
-    };
 
     const closeErrorModal = () => {
         setErrorModal(null);
@@ -4205,6 +4255,8 @@ const MyNumbers: React.FC = () => {
                                         }}>
                                             <Checkbox
                                                 sx={{ marginLeft: "45px" }}
+                                                checked={automaticInvoiceChecked}
+                                                onChange={(e) => setAutomaticInvoiceChecked(e.target.checked)}
                                                 checkedIcon={
 
                                                     <img
@@ -4656,7 +4708,20 @@ const MyNumbers: React.FC = () => {
                             onClose={() => setToastOpen(false)}
                         />
                     )}
-
+                    <Modalerror
+                        isOpen={ShowModalError}
+                        title="Error en la peticion de números"
+                        message='Intentelo más tarde'
+                        buttonText="Cerrar"
+                        onClose={() => setShowModalError(false)}
+                    />
+                    {ShowSnackBar && (
+                        <SnackBar
+                            message='Petición mandada con exito'
+                            buttonText="Cerrar"
+                            onClose={() => setShowSnackBar(false)}
+                        />
+                    )}
                 </div>
             )}
         </>
