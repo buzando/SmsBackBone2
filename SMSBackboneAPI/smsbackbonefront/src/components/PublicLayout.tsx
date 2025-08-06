@@ -24,9 +24,11 @@ const Layout: React.FC<Props> = props => {
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            {
-                props.children
-            }
+            <Box sx={{ backgroundColor: "#F2F2F2" }}>
+                {
+                    props.children
+                }
+            </Box>
             <footer>
                 <Box display="flex" justifyContent="space-between" sx={{ position: 'fixed', bottom: 0, width: '100%', padding: 1, borderTop: 'solid 1px #E6E4E4', background: '#FFFFFF' }}>
                     <Typography variant="caption" color="textSecondary" align="left">

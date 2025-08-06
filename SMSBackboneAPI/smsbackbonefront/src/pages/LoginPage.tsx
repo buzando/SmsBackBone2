@@ -294,7 +294,7 @@ const Login: React.FC = () => {
                                         marginBottom: "59px",
                                     }}
                                 >
-                                    ¡Bienvenida!
+                                    ¡Le damos la bienvenida!
                                 </Typography>
                                 <Typography
 
@@ -342,7 +342,7 @@ const Login: React.FC = () => {
                                                 fontFamily: 'Poppins',
                                                 fontSize: "12px",
                                                 color: "#D01247",
-                                                marginTop: "2px", marginBottom: "6px",
+                                                marginTop: "0px", marginBottom: "6px", position: "absolute"
                                             }}>
                                                 {!emailErr ? "Ingresa un correo electrónico válido" : " "}
                                             </span>
@@ -435,8 +435,8 @@ const Login: React.FC = () => {
                                             lineHeight: '20px',
                                             letterSpacing: '0px',
                                             color: !passwordErr ? "#D01247" : "#330F1B",
-                                            marginTop: "-8px",
-                                            marginBottom: "-8px",
+                                            marginTop: "20px",
+                                            marginBottom: "-9px",
                                             opacity: 1,
                                         }}
                                     >
@@ -455,7 +455,7 @@ const Login: React.FC = () => {
                                                 minHeight: "20px", display: "inline-block",
                                                 fontFamily: 'Poppins',
                                                 fontSize: "12px",
-                                                color: "#D01247"
+                                                color: "#D01247", position: "absolute"
                                             }}>
                                                 {!passwordErr ? "Ingresa una contraseña válida" : " "}
                                             </span>
@@ -492,10 +492,9 @@ const Login: React.FC = () => {
                                                                 boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
                                                                 padding: "8px 12px",
                                                                 fontSize: "14px",
-                                                                transform: "translate(-10px, -22px)",
                                                                 fontFamily: "Poppins",
-                                                                color: "#000000",
-                                                                whiteSpace: "pre-line",
+                                                                color: "#574B4F",
+                                                                transform: "translate(-10px, -22px)",
                                                             }}
                                                         >
                                                             <>
@@ -538,11 +537,12 @@ const Login: React.FC = () => {
 
                                 </Box>
 
-                                <Box display="flex" flexDirection="column" alignItems="center" gap={2} mt={2}>
+                                <Box display="flex" flexDirection="column" alignItems="center" gap={2} mt={4} mb={-1}>
                                     <ButtonLoadingSubmit
                                         text="Ingresar"
                                         isLoading={loading}
                                         disabled={disabled} // Depende de emailErr y passwordErr
+                                        width='208px'
                                     />
 
                                     <Link

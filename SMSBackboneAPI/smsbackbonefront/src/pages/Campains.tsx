@@ -34,12 +34,15 @@ import {
 import axios from 'axios';
 import AddIcon from '@mui/icons-material/Add';
 import seachicon from '../assets/icon-lupa.svg'
+import Iconseachred from "../assets/Iconseachred.svg";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import welcome from '../assets/icon-welcome.svg'
 import PushPinIcon from "@mui/icons-material/PushPin";
 import iconplus from "../assets/Icon-plus.svg";
 import IconArrowDown1 from "../assets/IconArrowDown1.svg";
 import CloseIcon from '@mui/icons-material/Close';
+import IconCheckedCircle1 from "../assets/IconCheckedCircle1.svg";
+import IconCheckedCircle2 from "../assets/IconCheckedCircle2.svg";
 import IconTache from "../assets/icon-close.svg";
 import iconclose from "../assets/icon-close.svg";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
@@ -1354,7 +1357,7 @@ const Campains: React.FC = () => {
 
   return (
 
-    <Box sx={{ padding: "20px", marginLeft: "30px", maxWidth: "81%", mt: -7 }}>
+    <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
       {loadingPage && (
         <Box sx={{
           position: 'fixed',
@@ -1386,16 +1389,7 @@ const Campains: React.FC = () => {
 
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
         <IconButton
-          onClick={() => navigate('/')}
-          sx={{
-            p: 0,
-            mr: 1,
-            ml: '-28px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
+          onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
           <img
             src={ArrowBackIosNewIcon}
             alt="Regresar"
@@ -1422,742 +1416,48 @@ const Campains: React.FC = () => {
         </Typography>
       </Box>
 
-      <Divider sx={{ marginBottom: "20px", marginTop: "17px" }} />
+      <Box sx={{ marginLeft: "32px", }}>
+        <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
+        <Grid container spacing={2}>
+          {/* Listado de campañas */}
 
-      <Grid container spacing={2}>
-        {/* Listado de campañas */}
-
-        <Grid item sx={{ display: 'flex', }}>
-          <Box sx={{ display: "flex", }}>
-            {/* Panel de campañas */}
-            {panelAbierto && (
-              <Paper
-                sx={{
-                  padding: "15px",
-                  borderRadius: "8px 0 0 8px", // borde izquierdo redondeado
-                  width: "370px",
-                  height: "581px",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <Box
+          <Grid item sx={{ display: 'flex', }}>
+            <Box sx={{ display: "flex", }}>
+              {/* Panel de campañas */}
+              {panelAbierto && (
+                <Paper
                   sx={{
+                    padding: "15px",
+                    borderRadius: "8px 0 0 8px", // borde izquierdo redondeado
+                    width: "370px",
+                    height: "581px",
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    width: "279px",
-                    marginBottom: "10px", marginLeft: "25px"
+                    flexDirection: "column",
                   }}
                 >
-                  <Typography
-                    variant="h6"
+                  <Box
                     sx={{
-                      textAlign: "left",
-                      fontFamily: "Poppins",
-                      letterSpacing: "0px",
-                      color: "#330F1B",
-                      opacity: 1,
-                      fontSize: "18px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      width: "279px",
+                      marginBottom: "10px", marginLeft: "25px"
                     }}
                   >
-                    Listado de campañas
-                  </Typography>
-                  <Tooltip title="Crear" arrow placement="top"
-                    componentsProps={{
-                      tooltip: {
-                        sx: {
-                          backgroundColor: "#000000",
-                          color: "#CCC3C3",
-                          fontFamily: "Poppins, sans-serif",
-                          fontSize: "12px",
-                          padding: "6px 8px",
-                          borderRadius: "8px",
-                          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.7)"
-                        }
-                      },
-                      arrow: {
-                        sx: {
-                          color: "#000000"
-                        }
-                      }
-                    }}
-                    PopperProps={{
-                      modifiers: [
-                        {
-                          name: 'offset',
-                          options: {
-                            offset: [0, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
-                          }
-                        }
-                      ]
-                    }}
-                  >
-                    <IconButton onClick={handleOpenModal} sx={{}}>
-                      <img src={iconplus} alt="Agregar" style={{ width: "20px", height: "20px", }} />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Buscar"
-                  value={Serchterm}
-                  onChange={handleSearch2}
-                  autoFocus
-                  onKeyDown={(e) => e.stopPropagation()} // Evita la navegación automática
-                  sx={{
-                    backgroundColor: "#FFFFFF",
-                    borderRadius: "4px",
-                    height: "40px",
-                    width: "279px",
-                    marginBottom: "15px", marginLeft: "25px",
-                    "& .MuiOutlinedInput-root": {
-                      padding: "8px 12px",
-                      height: "40px",
-                      "& fieldset": {
-                        borderColor: "#9B9295", // borde normal
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "#7B354D", // al pasar mouse
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#9B9295", // 👈 mismo que el normal
-                        borderWidth: "1px",     // 👈 evita que se ponga más grueso
-                      },
-                    },
-                    "& .MuiOutlinedInput-input": {
-                      fontSize: "16px",
-                      fontFamily: "Poppins, sans-serif",
-                      color: Serchterm ? "#7B354D" : "#9B9295",
-                      padding: "8px 12px",
-                      height: "100%",
-                    },
-                  }}
-
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <img
-                          src={seachicon}
-                          alt="Buscar"
-                          style={{
-                            width: "18px",
-                            height: "18px",
-                            filter: Serchterm
-                              ? "invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)"
-                              : "none",
-                          }}
-                        />
-                      </InputAdornment>
-                    ),
-                    endAdornment: Serchterm ? (
-                      <InputAdornment position="end">
-                        <img
-                          src={iconclose}
-                          alt="Limpiar búsqueda"
-                          style={{
-                            width: "16px",
-                            height: "16px",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => setSerchterm("")} // Borra el texto al hacer clic
-                        />
-                      </InputAdornment>
-                    ) : null,
-                  }}
-                />
-
-                <Select
-                  value={campaignFilter}
-                  onChange={(e) => setCampaignFilter(e.target.value as 'todas' | 'encendidas' | 'detenidas')}
-                  fullWidth
-                  size="small"
-                  displayEmpty
-                  sx={{
-                    marginTop: "10px",
-                    width: "279px", marginLeft: "25px",
-                    marginBottom: "10px",
-                    textAlign: "left",
-                    fontFamily: "Poppins, sans-serif",
-                    letterSpacing: "0px",
-                    color: "#645E60",
-                    opacity: 1,
-                    fontSize: "12px",
-                  }}
-                  renderValue={(selected) =>
-                    selected && typeof selected === "string" ? selected : (
-                      <span style={{ fontStyle: "normal" }}>Seleccionar estatus</span>
-                    )
-                  }
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        borderColor: "#9B9295",
-                        borderBottomLeftRadius: "14px",
-                        borderBottomRightRadius: "14px",
-                      }
-                    }
-                  }}
-                >
-                  <MenuItem sx={{
-                    marginTop: "5px",
-                    marginBottom: "5px",
-                    textAlign: "left",
-                    fontFamily: "Poppins",
-                    letterSpacing: "0px",
-                    color: "#645E60",
-                    opacity: 1,
-                    fontSize: "12px",
-                    "&:hover": {
-                      backgroundColor: "#F2EBED"
-                    }
-                  }} value="todas">Todos</MenuItem>
-
-                  <MenuItem sx={{
-                    marginTop: "5px",
-                    marginBottom: "5px",
-                    textAlign: "left",
-                    fontFamily: "Poppins",
-                    letterSpacing: "0px",
-                    color: "#645E60",
-                    opacity: 1,
-                    fontSize: "12px",
-                    "&:hover": {
-                      backgroundColor: "#F2EBED"
-                    }
-                  }} value="encendidas">Campañas encendidas</MenuItem>
-
-                  <MenuItem sx={{
-                    marginTop: "5px",
-                    marginBottom: "5px",
-                    textAlign: "left",
-                    fontFamily: "Poppins",
-                    letterSpacing: "0px",
-                    color: "#645E60",
-                    opacity: 1,
-                    fontSize: "12px",
-                    "&:hover": {
-                      backgroundColor: "#F2EBED"
-                    }
-                  }} value="detenidas">Campañas detenidas</MenuItem>
-                </Select>
-
-                {filteredCampaigns.length > 0 && (
-                  <Box sx={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px", marginLeft: "8px", }}>
-                    <Checkbox
-                      checked={selectedCampaigns.length === filteredCampaigns.length && filteredCampaigns.length > 0}
-                      indeterminate={
-                        selectedCampaigns.length > 0 &&
-                        selectedCampaigns.length < filteredCampaigns.length
-                      }
-                      onChange={() => {
-                        if (selectedCampaigns.length === 0) {
-                          setSelectedCampaigns(filteredCampaigns.map((_, index) => index));
-                        } else {
-                          setSelectedCampaigns([]);
-                        }
-                      }}
-                      icon={
-                        <Box
-                          sx={{
-                            width: "20px",
-                            height: "20px",
-                            borderRadius: "4px",
-                            border: "2px solid #8F4D63",
-                          }}
-                        />
-                      }
-                      checkedIcon={
-                        <Box
-                          sx={{
-                            width: "20px",
-                            height: "20px",
-                            borderRadius: "4px",
-                            backgroundColor: "#8F4D63",
-                            border: "2px solid #8F4D63",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Box
-                            component="span"
-                            sx={{
-                              color: "#FFFFFF",
-                              fontSize: "13px",
-                              fontWeight: "bold",
-                              fontFamily: "Poppins, sans-serif",
-                            }}
-                          >
-                            ✓
-                          </Box>
-                        </Box>
-                      }
-                      indeterminateIcon={
-                        <Box
-                          sx={{
-                            width: "20px",
-                            height: "20px",
-                            borderRadius: "4px",
-                            backgroundColor: "#8F4D63",
-                            border: "2px solid #8F4D63",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Box
-                            component="span"
-                            sx={{
-                              color: "#FFFFFF",
-                              fontSize: "20px",
-                              fontWeight: "bold",
-                              fontFamily: "Poppins, sans-serif",
-                              lineHeight: "1",
-                            }}
-                          >
-                            −
-                          </Box>
-                        </Box>
-                      }
-                    />
-
-
-                    <Tooltip title="Eliminar" arrow placement="top"
-                      componentsProps={{
-                        tooltip: {
-                          sx: {
-                            backgroundColor: "rgba(0, 0, 0, 0.8)",
-                            color: "#CCC3C3",
-                            fontFamily: "Poppins, sans-serif",
-                            fontSize: "12px",
-                            padding: "6px 8px",
-                            borderRadius: "8px",
-                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                          }
-                        },
-                        arrow: {
-                          sx: {
-                            color: "rgba(0, 0, 0, 0.8)"
-                          }
-                        }
-                      }}
-                      PopperProps={{
-                        modifiers: [
-                          {
-                            name: 'offset',
-                            options: {
-                              offset: [0, -7] // [horizontal, vertical] — aquí movemos 3px hacia abajo
-                            }
-                          }
-                        ]
-                      }}
-                    >
-                      <IconButton
-                        onClick={() => {
-                          const algunaEncendida = selectedCampaigns.some(
-                            index => filteredCampaigns[index]?.autoStart
-                          );
-
-                          if (algunaEncendida) {
-                            setTitleErrorModal("Error al eliminar campaña");
-                            setMessageErrorModal("No ha sido posible eliminar una o más campañas debido a que se encuentran encendidas.");
-                            setIsErrorModalOpen(true);
-                          } else {
-                            setOpenDeleteModal(true); // Abre modal de confirmación múltiple
-                          }
-                        }}
-                        sx={{ padding: 0 }}
-                      >
-                        <Box component="img" src={IconTrash} alt="Eliminar"
-                          sx={{ width: "24px", height: "24px", cursor: "pointer" }}
-                        />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-
-                )}
-                <Divider
-                  sx={{
-                    width: 'calc(100% + 30px)',
-                    marginLeft: '-15px',
-                    marginBottom: '5px',
-                  }}
-                />
-                <List sx={{ overflowY: "auto", flexGrow: 1 }}>
-                  {filteredCampaigns.length === 0 ? (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', textAlign: 'center' }}>
-                      <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '250px', height: 'auto' }} />
-                      <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
-                        No se encontraron resultados.
-                      </Typography>
-                    </Box>
-                  ) : (
-                    filteredCampaigns.map((campaign, index) => {
-                      const isSelected = selectedCampaigns.includes(index);
-                      const progreso = campaign.numeroInicial > 0
-                        ? Math.round((campaign.numeroActual / campaign.numeroInicial) * 100)
-                        : 0;
-                      return (
-                        <ListItem key={index} sx={{
-                          background: "#FFFFFF",
-                          backgroundColor:
-                            selectedCampaign?.id === campaign.id
-                              ? "#F2EBEDCC"  // ← mismo color que hover
-                              : isSelected
-                                ? "rgba(209, 119, 154, 0.15)"
-                                : "#FFFFFF",
-                          border: "1px solid #AE78884D",
-                          opacity: 1,
-                          width: "100%",
-                          height: "73px",
-                          borderRadius: "8px",
-                          marginBottom: "8px",
-                          padding: "10px",
-                          display: "flex",
-                          flexDirection: "column",
-                          transition: "background-color 0.3s",
-                          "&:hover": {
-                            backgroundColor: "#F2EBEDCC"
-                          }
-                        }}>
-
-                          <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
-                            <Box sx={{ marginTop: "-5px", display: "flex", alignItems: "center" }}>
-                              <Checkbox
-                                checked={isSelected}
-                                onChange={() => {
-                                  setSelectedCampaigns(prev =>
-                                    isSelected ? prev.filter(i => i !== index) : [...prev, index]
-                                  );
-                                }}
-                                icon={
-                                  <Box
-                                    sx={{
-                                      width: "20px",
-                                      height: "20px",
-                                      borderRadius: "4px",
-                                      border: "2px solid #8F4D63",
-                                    }}
-                                  />
-                                }
-                                checkedIcon={
-                                  <Box
-                                    sx={{
-                                      width: "20px",
-                                      height: "20px",
-                                      borderRadius: "4px",
-                                      backgroundColor: "#8F4D63",
-                                      border: "2px solid #8F4D63",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                    }}
-                                  >
-                                    <Box
-                                      component="span"
-                                      sx={{
-                                        color: "#FFFFFF",
-                                        fontSize: "13px",
-                                        fontWeight: "bold",
-                                        lineHeight: "1",
-                                        fontFamily: "Poppins, sans-serif",
-                                      }}
-                                    >
-                                      ✓
-                                    </Box>
-                                  </Box>
-                                }
-                                sx={{
-                                  color: "#8F4D63",
-                                  "&.Mui-checked": { color: "#8F4D63" },
-                                  alignSelf: "flex-start",
-                                }}
-                              />
-
-                              <img src={smsico} alt="SMS"
-                                style={{
-                                  width: "18px",
-                                  height: "18px",
-                                  marginRight: "8px",
-                                  color: isSelected ? "#8E5065" : "#574B4F",
-                                }} />
-                              <Typography sx={{
-                                fontSize: "12px",
-                                fontWeight: "500",
-                                fontFamily: "Poppins",
-                                color: isSelected ? "#8E5065" : "#574B4F", // 👈 Cambia de color cuando está seleccionado
-                                marginBottom: "6px"
-                              }}
-                              >
-                                {campaign.name}
-                              </Typography>
-                            </Box>
-                            <IconButton
-                              onClick={(e) => handleMenuClick(e, index)}
-                              sx={{
-                                position: "absolute",
-                                top: "30px",
-                                right: "30px",
-                                height: "24px",
-                                width: "24px",
-                                padding: 0
-                              }}
-                            >
-                              <MoreVertIcon sx={{ color: "#6C3A52" }} />
-                            </IconButton>
-                            <IconButton
-                              onClick={() => {
-                                handleSelectCampaign(campaign);
-                              }}
-                              sx={{ padding: 0 }}
-                            >
-                              <PushPinIcon
-                                sx={{
-                                  color: selectedCampaign?.id === campaign.id ? "#8E5065" : "#574B4F",
-                                  fontSize: "20px",
-                                  transform: selectedCampaign?.id === campaign.id ? "rotate(45deg)" : "none",
-                                  transition: "transform 0.3s ease, color 0.3s ease"
-                                }}
-                              />
-                            </IconButton>
-                          </Box>
-                          <Box sx={{ width: "65%", backgroundColor: "#E0E0E0", borderRadius: "6px", height: "10px", position: "relative", marginBottom: "10px", marginX: "auto" }}>
-                            <Box sx={{
-                              width: `${progreso}%`, backgroundColor: "#AE7888", borderRadius: "3px",
-                              height: "8px",
-                              position: "absolute",
-                              marginTop: "-9px",
-                            }} />
-                          </Box>
-                          <Box sx={{ display: "flex", justifyContent: "flex-start", alignItems: "center", width: "100%", marginTop: "0px", paddingLeft: "45px" }}>
-                            <Typography sx={{ fontSize: "12px", fontWeight: "600", marginLeft: "7px", marginTop: "-7px", color: isSelected ? "#8E5065" : "#574B4F" }}>{Math.round(progreso)}%</Typography>
-                            <Typography sx={{ fontSize: "12px", marginTop: "-7px", marginLeft: "7px", color: isSelected ? "#8E5065" : "#574B4F", fontFamily: "Poppins" }}>{campaign.numeroActual}/{campaign.numeroInicial}</Typography>
-                          </Box>
-                        </ListItem>
-                      );
-                    })
-                  )}
-                </List>
-              </Paper>
-            )}
-            <IconButton
-              onClick={() => setPanelAbierto(!panelAbierto)}
-              sx={{
-                height: "581px",
-                width: "30px",
-                borderRadius: "0 8px 8px 0", // redondeado derecho
-                borderLeft: "1px solid #D6D6D6", // 👉 esta es la línea gris
-                backgroundColor: "#FFFFFF",
-                '&:hover': { backgroundColor: "#FFFFFF" },
-                paddingX: "10px"
-              }}
-            >
-              <Typography sx={{
-                fontSize: "20px",
-                transform: panelAbierto ? "rotate(0deg)" : "rotate(180deg)",
-                transition: "transform 0.3s"
-              }}
-              >
-                ❮
-              </Typography>
-            </IconButton>
-          </Box>
-        </Grid>
-
-
-        {/* Visualización de campaña */}
-        {filteredCampaigns.length > 0 && (
-          <Grid item xs >
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>            <Typography
-              variant="h6"
-              sx={{
-                textAlign: "left",
-                fontFamily: "Poppins",
-                letterSpacing: "0px",
-                color: "#330F1B",
-                opacity: 1,
-                fontSize: "18px",
-              }}
-            >
-              Visualización
-            </Typography>
-
-              <Tooltip title="Añadir información" arrow placement="top"
-                componentsProps={{
-                  tooltip: {
-                    sx: {
-                      backgroundColor: "rgba(0, 0, 0, 0.8)", // Fondo negro con transparencia
-                      color: "#CCC3C3",
-                      fontFamily: "Poppins, sans-serif",
-                      fontSize: "12px",
-                      padding: "6px 8px",
-                      borderRadius: "8px",
-                      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)" // Sombra opcional
-                    }
-                  },
-                  arrow: {
-                    sx: {
-                      color: "rgba(0, 0, 0, 0.8)" // Flecha negra con transparencia
-                    }
-                  }
-                }}
-              >
-                <IconButton
-                  style={{
-                    backgroundColor: "#FFFFFF",
-                    left: "84%",
-                    border: '1px solid #CCCFD2',
-                    borderRadius: '8px',
-                    color: '#8F4D63',
-                    background: '#FFFFFF',
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = '#F2E9EC';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.border = '1px solid #CCCFD2';
-                  }}
-                  onClick={() => setOpenInfoModal(true)}
-                >
-                  <img src={welcome} alt="Welcome" style={{ width: '24px', height: '24px' }} />
-                </IconButton>
-              </Tooltip>
-            </Box>
-            <Box
-              sx={{
-                height: "540px",
-                overflowY: "auto",
-                pr: 1,
-                display: "flex",
-                flexDirection: "column",
-                gap: 2
-              }}
-            >
-              <Paper sx={{ padding: "10px", marginTop: "10px", borderRadius: "10px", width: "100%", maxWidth: "100%", height: "auto" }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <img alt="IconSMS" src={IconSMS}
-                      style={{ width: 35, height: 20, marginRight: "10px" }}
-                    />
                     <Typography
-                      variant="subtitle1"
+                      variant="h6"
                       sx={{
                         textAlign: "left",
                         fontFamily: "Poppins",
                         letterSpacing: "0px",
-                        color: "#574B4F",
+                        color: "#330F1B",
                         opacity: 1,
                         fontSize: "18px",
                       }}
                     >
-                      {selectedCampaign?.name}
+                      Listado de campañas
                     </Typography>
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <IconButton onClick={(e) => {
-                      setAnchorEl(e.currentTarget);
-                      setMenuIndex(-1);
-                    }}>
-                      <MoreVertIcon sx={{ color: "#574B4F", fontSize: "20px" }} />
-                    </IconButton>
-
-                    <PushPinIcon sx={{ color: "#6C3A52", fontSize: "20px", cursor: "pointer" }} />
-                  </Box>
-                </Box>
-
-                <Box
-                  sx={{
-                    border: "1px solid #D6CED2",
-                    borderRadius: "10px",
-                    opacity: 1,
-                    width: "100%", height: "auto",
-                    padding: "12px",
-                    marginTop: "10px",
-                  }}
-                >
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <Typography sx={{ fontFamily: "Poppins" }}>
-                      Progreso: <span style={{ color: "#8F4D63" }}>Completada al {progresoCampaña}%</span>
-                    </Typography>
-                    {selectedCampaign?.startDate && (
-                      <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                        <AccessTimeIcon sx={{ fontSize: "16px" }} />
-                        <Typography sx={{ fontFamily: "Poppins", opacity: 0.7, fontSize: "14px" }}>{elapsedTime}</Typography>
-                      </Box>
-                    )}
-                    <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <AutorenewIcon sx={{ fontSize: "16px" }} />
-                      <Typography>{selectedCampaign?.recycleCount ?? 0}</Typography>
-                    </Box>
-                  </Box>
-
-                  <LinearProgress
-                    variant="determinate"
-                    value={progresoCampaña}
-                    sx={{
-                      marginTop: "8px",
-                      height: "12px",
-                      borderRadius: "6px",
-                      backgroundColor: "#E0E0E0",
-                      '& .MuiLinearProgress-bar': {
-                        backgroundColor: "#AE7888"
-                      }
-                    }}
-                  />              <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: "8px" }}>
-                    <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
-                      Registros <br />procesados:<br />
-                      <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F" }}>
-                        {selectedCampaign?.numeroActual}
-                      </Box>
-                    </Typography>
-                    <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
-                      Registros <br />respondidos:<br />
-                      <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F" }}>
-                        {selectedCampaign?.respondedRecords ?? 0}
-                      </Box>
-                    </Typography>
-                    <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
-                      Registros <br />fuera de horario:<br />
-                      <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F" }}>
-                        {selectedCampaign?.outOfScheduleRecords ?? 0}
-                      </Box>
-                    </Typography>
-                    <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
-                      Registros <br />bloqueados:<br />
-                      <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F", }}>
-                        {selectedCampaign?.blockedRecords ?? 0}
-                      </Box>
-                    </Typography>
-                    <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
-                      Total de <br />registros:<br />
-                      <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F" }}>
-                        {selectedCampaign?.numeroInicial ?? "0"}
-                      </Box>
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "right", marginTop: "8px" }}>
-                  <MainButton
-                    text={selectedCampaign?.autoStart ? 'Detener' : 'Iniciar'}
-                    onClick={() => handleStartCampaign(selectedCampaign)}
-                  />
-                </Box>
-
-
-              </Paper>
-
-              {/* Paper Horarios */}
-              {infoChecks["Horarios"] && (
-                <Paper sx={{ padding: "10px", marginTop: "10px", borderRadius: "10px", width: "100%", maxWidth: "100%", height: "auto" }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
-                      Horarios
-                    </Typography>
-                    <Tooltip title="Cerrar" arrow placement="top"
+                    <Tooltip title="Crear" arrow placement="top"
                       componentsProps={{
                         tooltip: {
                           sx: {
@@ -2187,563 +1487,1270 @@ const Campains: React.FC = () => {
                         ]
                       }}
                     >
-                      <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, Horarios: false }))}>
-                        <CloseIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-
-                  <Box sx={{ display: "flex", gap: "16px", paddingLeft: "10px", paddingTop: "4px" }}>
-                    {[
-                      { label: "Vencido", color: "#B0B0B0" },
-                      { label: "Vigente", color: "#5CB85C" },
-                      { label: "Próximo", color: "#E38C28" }
-                    ].map((item, index) => (
-                      <Box key={index} sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <Box
-                          sx={{
-                            width: "10px",
-                            height: "10px",
-                            borderRadius: "50%",
-                            backgroundColor: item.color
-                          }}
-                        />
-                        <Typography sx={{ fontSize: "14px", fontFamily: "Poppins", color: "#574B4F" }}>
-                          {item.label}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                  <Box sx={{
-                    padding: "10px",
-                    marginTop: "10px",
-                    borderRadius: "10px",
-                    width: "100%",
-                    height: "auto",
-                    backgroundColor: "#D6D6D64D"
-                  }}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-                      {['expired', 'current', 'upcoming'].map((status) => {
-                        const colorMap = {
-                          expired: '#B4ACAC',
-                          current: '#5CB85C',
-                          upcoming: '#E38C28'
-                        };
-
-                        const horariosFiltrados = selectedCampaign?.schedules.filter(
-                          h => getScheduleStatus(h.startDateTime, h.endDateTime) === status
-                        ) || [];
-
-                        return (
-                          <Box key={status} sx={{ flex: 1, px: 1 }}>
-                            {horariosFiltrados.map((horario, index) => {
-                              const start = new Date(horario.startDateTime);
-                              const end = new Date(horario.endDateTime);
-                              const sameDay = start.toDateString() === end.toDateString();
-
-                              const formatted = sameDay
-                                ? `${start.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }).toUpperCase()}, ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}–${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                                : `${start.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }).toUpperCase()}–${end.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }).toUpperCase()}, ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}–${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-
-                              return (
-                                <Typography
-                                  key={index}
-                                  sx={{
-                                    color: colorMap[status as keyof typeof colorMap],
-                                    fontFamily: 'Poppins',
-                                    fontSize: '12px',
-                                    mb: 1,
-                                    whiteSpace: 'nowrap',
-                                  }}
-                                >
-                                  {formatted}
-                                </Typography>
-                              );
-                            })}
-                          </Box>
-                        );
-                      })}
-                    </Box>
-                  </Box>
-
-                </Paper>
-              )}
-
-              {/*Paper Mensaje*/}
-              {infoChecks["Prueba de envío de mensaje"] && (
-                <Paper
-                  sx={{
-                    padding: "10px",
-                    marginTop: "10px",
-                    borderRadius: "10px",
-                    width: "100%",
-                    height: "auto"
-                  }}
-                >
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
-                    <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
-                      Mensaje
-                    </Typography>
-                    <Tooltip title="Cerrar" arrow placement="top"
-                      componentsProps={{
-                        tooltip: {
-                          sx: {
-                            backgroundColor: "#000000",
-                            color: "#CCC3C3",
-                            fontFamily: "Poppins, sans-serif",
-                            fontSize: "12px",
-                            padding: "6px 8px",
-                            borderRadius: "8px",
-                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.7)"
-                          }
-                        },
-                        arrow: {
-                          sx: {
-                            color: "#000000"
-                          }
-                        }
-                      }}
-                      PopperProps={{
-                        modifiers: [
-                          {
-                            name: 'offset',
-                            options: {
-                              offset: [0, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
-                            }
-                          }
-                        ]
-                      }}
-                    >
-                      <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, "Prueba de envío de mensaje": false }))}>
-                        <CloseIcon />
+                      <IconButton onClick={handleOpenModal} sx={{}}>
+                        <img src={iconplus} alt="Agregar" style={{ width: "20px", height: "20px", }} />
                       </IconButton>
                     </Tooltip>
                   </Box>
 
                   <Box
+                    display="flex"
+                    alignItems="center"
+                    mb={"16px"}
+                    mt={"12px"}
                     sx={{
-                      fontFamily: 'Poppins',
-                      fontSize: '14px',
-                      color: '#574B4F',
-                      backgroundColor: '#F3F1F1',
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word',
-                      overflowWrap: 'break-word',
-                      maxWidth: '100%',
+                      backgroundColor: "#FFFFFF",
+                      border: Serchterm ? "1px solid #7B354D" : "1px solid #9B9295",
+                      borderRadius: "4px",
+                      px: 2,
+                      py: 1,
+                      width: "279px",
+                      height: "40px", ml: 3.1
                     }}
-
                   >
-                    <Typography sx={{ textAlign: "left", fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
-                      {selectedCampaign?.message}
-                    </Typography>
+                    <img
+                      src={Serchterm ? Iconseachred : seachicon}
+                      alt="Buscar"
+                      style={{ marginRight: 8, width: 24 }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Buscar"
+                      value={Serchterm}
+                      onChange={handleSearch2}
+                      autoFocus
+                      onKeyDown={(e) => e.stopPropagation()} // Evita la navegación automática
+                      style={{
+                        border: "none",
+                        outline: "none",
+                        width: "100%",
+                        fontSize: "16px",
+                        fontFamily: "Poppins",
+                        color: Serchterm ? "#7B354D" : "#9B9295",
+                        backgroundColor: "transparent",
+                      }}
+                    />
+                    {Serchterm && (
+                      <img
+                        src={iconclose}
+                        alt="Limpiar búsqueda"
+                        onClick={() => {
+                          setSerchterm('');
+                        }}
+                        style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
+                      />
+
+                    )}
                   </Box>
 
-                  <Divider sx={{ marginY: "15px" }} />
+                  <Select
+                    value={campaignFilter}
+                    onChange={(e) => setCampaignFilter(e.target.value as 'todas' | 'encendidas' | 'detenidas')}
+                    fullWidth
+                    size="small"
+                    displayEmpty
+                    sx={{
+                      marginTop: "10px",
+                      width: "279px", marginLeft: "25px",
+                      marginBottom: "10px",
+                      textAlign: "left",
+                      fontFamily: "Poppins, sans-serif",
+                      letterSpacing: "0px",
+                      color: "#645E60",
+                      opacity: 1,
+                      fontSize: "12px",
+                    }}
+                    renderValue={(selected) =>
+                      selected && typeof selected === "string" ? selected : (
+                        <span style={{ fontStyle: "normal" }}>Seleccionar estatus</span>
+                      )
+                    }
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          borderColor: "#9B9295",
+                          borderBottomLeftRadius: "14px",
+                          borderBottomRightRadius: "14px",
+                        }
+                      }
+                    }}
+                  >
+                    <MenuItem sx={{
+                      marginTop: "5px",
+                      marginBottom: "5px",
+                      textAlign: "left",
+                      fontFamily: "Poppins",
+                      letterSpacing: "0px",
+                      color: "#645E60",
+                      opacity: 1,
+                      fontSize: "12px",
+                      "&:hover": {
+                        backgroundColor: "#F2EBED"
+                      }
+                    }} value="todas">Todos</MenuItem>
 
+                    <MenuItem sx={{
+                      marginTop: "5px",
+                      marginBottom: "5px",
+                      textAlign: "left",
+                      fontFamily: "Poppins",
+                      letterSpacing: "0px",
+                      color: "#645E60",
+                      opacity: 1,
+                      fontSize: "12px",
+                      "&:hover": {
+                        backgroundColor: "#F2EBED"
+                      }
+                    }} value="encendidas">Campañas encendidas</MenuItem>
+
+                    <MenuItem sx={{
+                      marginTop: "5px",
+                      marginBottom: "5px",
+                      textAlign: "left",
+                      fontFamily: "Poppins",
+                      letterSpacing: "0px",
+                      color: "#645E60",
+                      opacity: 1,
+                      fontSize: "12px",
+                      "&:hover": {
+                        backgroundColor: "#F2EBED"
+                      }
+                    }} value="detenidas">Campañas detenidas</MenuItem>
+                  </Select>
+
+                  {filteredCampaigns.length > 0 && (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px", marginLeft: "8px", }}>
+                      <Checkbox
+                        checked={selectedCampaigns.length === filteredCampaigns.length && filteredCampaigns.length > 0}
+                        indeterminate={
+                          selectedCampaigns.length > 0 &&
+                          selectedCampaigns.length < filteredCampaigns.length
+                        }
+                        onChange={() => {
+                          if (selectedCampaigns.length === 0) {
+                            setSelectedCampaigns(filteredCampaigns.map((_, index) => index));
+                          } else {
+                            setSelectedCampaigns([]);
+                          }
+                        }}
+                        icon={
+                          <Box
+                            sx={{
+                              width: "20px",
+                              height: "20px",
+                              borderRadius: "4px",
+                              border: "2px solid #8F4D63",
+                            }}
+                          />
+                        }
+                        checkedIcon={
+                          <Box
+                            sx={{
+                              width: "20px",
+                              height: "20px",
+                              borderRadius: "4px",
+                              backgroundColor: "#8F4D63",
+                              border: "2px solid #8F4D63",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Box
+                              component="span"
+                              sx={{
+                                color: "#FFFFFF",
+                                fontSize: "13px",
+                                fontWeight: "bold",
+                                fontFamily: "Poppins, sans-serif",
+                              }}
+                            >
+                              ✓
+                            </Box>
+                          </Box>
+                        }
+                        indeterminateIcon={
+                          <Box
+                            sx={{
+                              width: "20px",
+                              height: "20px",
+                              borderRadius: "4px",
+                              backgroundColor: "#8F4D63",
+                              border: "2px solid #8F4D63",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Box
+                              component="span"
+                              sx={{
+                                color: "#FFFFFF",
+                                fontSize: "20px",
+                                fontWeight: "bold",
+                                fontFamily: "Poppins, sans-serif",
+                                lineHeight: "1",
+                              }}
+                            >
+                              −
+                            </Box>
+                          </Box>
+                        }
+                      />
+
+
+                      <Tooltip title="Eliminar" arrow placement="top"
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              backgroundColor: "rgba(0, 0, 0, 0.8)",
+                              color: "#DEDADA",
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: "12px",
+                              padding: "6px 8px",
+                              borderRadius: "8px",
+                            }
+                          },
+                          arrow: {
+                            sx: {
+                              color: "rgba(0, 0, 0, 0.8)"
+                            }
+                          }
+                        }}
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: 'offset',
+                              options: {
+                                offset: [0, -7]
+                              }
+                            }
+                          ]
+                        }}
+                      >
+                        <IconButton
+                          onClick={() => {
+                            const algunaEncendida = selectedCampaigns.some(
+                              index => filteredCampaigns[index]?.autoStart
+                            );
+
+                            if (algunaEncendida) {
+                              setTitleErrorModal("Error al eliminar campaña");
+                              setMessageErrorModal("No ha sido posible eliminar una o más campañas debido a que se encuentran encendidas.");
+                              setIsErrorModalOpen(true);
+                            } else {
+                              setOpenDeleteModal(true); // Abre modal de confirmación múltiple
+                            }
+                          }}
+                          sx={{ padding: 0 }}
+                        >
+                          <Box component="img" src={IconTrash} alt="Eliminar"
+                            sx={{ width: "24px", height: "24px", cursor: "pointer" }}
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+
+                  )}
+                  <Divider
+                    sx={{
+                      width: 'calc(100% + 30px)',
+                      marginLeft: '-15px',
+                      marginBottom: '5px',
+                    }}
+                  />
+                  <List sx={{ overflowY: "auto", flexGrow: 1 }}>
+                    {filteredCampaigns.length === 0 ? (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', textAlign: 'center' }}>
+                        <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '250px', height: 'auto' }} />
+                        <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
+                          No se encontraron resultados.
+                        </Typography>
+                      </Box>
+                    ) : (
+                      filteredCampaigns.map((campaign, index) => {
+                        const isSelected = selectedCampaigns.includes(index);
+                        const progreso = campaign.numeroInicial > 0
+                          ? Math.round((campaign.numeroActual / campaign.numeroInicial) * 100)
+                          : 0;
+                        return (
+                          <ListItem key={index} sx={{
+                            background: "#FFFFFF",
+                            backgroundColor:
+                              selectedCampaign?.id === campaign.id
+                                ? "#F2EBEDCC"  // ← mismo color que hover
+                                : isSelected
+                                  ? "rgba(209, 119, 154, 0.15)"
+                                  : "#FFFFFF",
+                            border: "1px solid #AE78884D",
+                            opacity: 1,
+                            width: "100%",
+                            height: "73px",
+                            borderRadius: "8px",
+                            marginBottom: "8px",
+                            padding: "10px",
+                            display: "flex",
+                            flexDirection: "column",
+                            transition: "background-color 0.3s",
+                            "&:hover": {
+                              backgroundColor: "#F2EBEDCC"
+                            }
+                          }}>
+
+                            <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
+                              <Box sx={{ marginTop: "-5px", display: "flex", alignItems: "center" }}>
+                                <Checkbox
+                                  checked={isSelected}
+                                  onChange={() => {
+                                    setSelectedCampaigns(prev =>
+                                      isSelected ? prev.filter(i => i !== index) : [...prev, index]
+                                    );
+                                  }}
+                                  icon={
+                                    <Box
+                                      sx={{
+                                        width: "20px",
+                                        height: "20px",
+                                        borderRadius: "4px",
+                                        border: "2px solid #8F4D63",
+                                      }}
+                                    />
+                                  }
+                                  checkedIcon={
+                                    <Box
+                                      sx={{
+                                        width: "20px",
+                                        height: "20px",
+                                        borderRadius: "4px",
+                                        backgroundColor: "#8F4D63",
+                                        border: "2px solid #8F4D63",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                      }}
+                                    >
+                                      <Box
+                                        component="span"
+                                        sx={{
+                                          color: "#FFFFFF",
+                                          fontSize: "13px",
+                                          fontWeight: "bold",
+                                          lineHeight: "1",
+                                          fontFamily: "Poppins, sans-serif",
+                                        }}
+                                      >
+                                        ✓
+                                      </Box>
+                                    </Box>
+                                  }
+                                  sx={{
+                                    color: "#8F4D63",
+                                    "&.Mui-checked": { color: "#8F4D63" },
+                                    alignSelf: "flex-start",
+                                  }}
+                                />
+
+                                <img src={smsico} alt="SMS"
+                                  style={{
+                                    width: "18px",
+                                    height: "18px",
+                                    marginRight: "8px",
+                                    color: isSelected ? "#8E5065" : "#574B4F",
+                                  }} />
+                                <Typography sx={{
+                                  fontSize: "12px",
+                                  fontWeight: "500",
+                                  fontFamily: "Poppins",
+                                  color: isSelected ? "#8E5065" : "#574B4F", // 👈 Cambia de color cuando está seleccionado
+                                  marginBottom: "6px"
+                                }}
+                                >
+                                  {campaign.name}
+                                </Typography>
+                              </Box>
+                              <IconButton
+                                onClick={(e) => handleMenuClick(e, index)}
+                                sx={{
+                                  position: "absolute",
+                                  top: "30px",
+                                  right: "30px",
+                                  height: "24px",
+                                  width: "24px",
+                                  padding: 0
+                                }}
+                              >
+                                <MoreVertIcon sx={{ color: "#6C3A52" }} />
+                              </IconButton>
+                              <IconButton
+                                onClick={() => {
+                                  handleSelectCampaign(campaign);
+                                }}
+                                sx={{ padding: 0 }}
+                              >
+                                <PushPinIcon
+                                  sx={{
+                                    color: selectedCampaign?.id === campaign.id ? "#8E5065" : "#574B4F",
+                                    fontSize: "20px",
+                                    transform: selectedCampaign?.id === campaign.id ? "rotate(45deg)" : "none",
+                                    transition: "transform 0.3s ease, color 0.3s ease"
+                                  }}
+                                />
+                              </IconButton>
+                            </Box>
+                            <Box sx={{ width: "65%", backgroundColor: "#E0E0E0", borderRadius: "6px", height: "10px", position: "relative", marginBottom: "10px", marginX: "auto" }}>
+                              <Box sx={{
+                                width: `${progreso}%`, backgroundColor: "#AE7888", borderRadius: "3px",
+                                height: "8px",
+                                position: "absolute",
+                                marginTop: "-9px",
+                              }} />
+                            </Box>
+                            <Box sx={{ display: "flex", justifyContent: "flex-start", alignItems: "center", width: "100%", marginTop: "0px", paddingLeft: "45px" }}>
+                              <Typography sx={{ fontSize: "12px", fontWeight: "600", marginLeft: "7px", marginTop: "-7px", color: isSelected ? "#8E5065" : "#574B4F" }}>{Math.round(progreso)}%</Typography>
+                              <Typography sx={{ fontSize: "12px", marginTop: "-7px", marginLeft: "7px", color: isSelected ? "#8E5065" : "#574B4F", fontFamily: "Poppins" }}>{campaign.numeroActual}/{campaign.numeroInicial}</Typography>
+                            </Box>
+                          </ListItem>
+                        );
+                      })
+                    )}
+                  </List>
+                </Paper>
+              )}
+              <IconButton
+                onClick={() => setPanelAbierto(!panelAbierto)}
+                sx={{
+                  height: "581px",
+                  width: "30px",
+                  borderRadius: "0 8px 8px 0", // redondeado derecho
+                  borderLeft: "1px solid #D6D6D6", // 👉 esta es la línea gris
+                  backgroundColor: "#FFFFFF",
+                  '&:hover': { backgroundColor: "#FFFFFF" },
+                  paddingX: "10px"
+                }}
+              >
+                <Typography sx={{
+                  fontSize: "20px",
+                  transform: panelAbierto ? "rotate(0deg)" : "rotate(180deg)",
+                  transition: "transform 0.3s"
+                }}
+                >
+                  ❮
+                </Typography>
+              </IconButton>
+            </Box>
+          </Grid>
+
+
+          {/* Visualización de campaña */}
+          {filteredCampaigns.length > 0 && (
+            <Grid item xs >
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>            <Typography
+                variant="h6"
+                sx={{
+                  textAlign: "left",
+                  fontFamily: "Poppins",
+                  letterSpacing: "0px",
+                  color: "#330F1B",
+                  opacity: 1,
+                  fontSize: "18px",
+                }}
+              >
+                Visualización
+              </Typography>
+
+                <Tooltip title="Añadir información" arrow placement="top"
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        backgroundColor: "rgba(0, 0, 0, 0.8)", // Fondo negro con transparencia
+                        color: "#CCC3C3",
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "12px",
+                        padding: "6px 8px",
+                        borderRadius: "8px",
+                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)" // Sombra opcional
+                      }
+                    },
+                    arrow: {
+                      sx: {
+                        color: "rgba(0, 0, 0, 0.8)" // Flecha negra con transparencia
+                      }
+                    }
+                  }}
+                >
+                  <IconButton
+                    style={{
+                      backgroundColor: "#FFFFFF",
+                      left: "84%",
+                      border: '1px solid #CCCFD2',
+                      borderRadius: '8px',
+                      color: '#8F4D63',
+                      background: '#FFFFFF',
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = '#F2E9EC';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.border = '1px solid #CCCFD2';
+                    }}
+                    onClick={() => setOpenInfoModal(true)}
+                  >
+                    <img src={welcome} alt="Welcome" style={{ width: '24px', height: '24px' }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Box
+                sx={{
+                  height: "540px",
+                  overflowY: "auto",
+                  pr: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2
+                }}
+              >
+                <Paper sx={{ padding: "10px", marginTop: "10px", borderRadius: "10px", width: "100%", maxWidth: "100%", height: "auto" }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <img alt="IconSMS" src={IconSMS}
+                        style={{ width: 35, height: 20, marginRight: "10px" }}
+                      />
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          textAlign: "left",
+                          fontFamily: "Poppins",
+                          letterSpacing: "0px",
+                          color: "#574B4F",
+                          opacity: 1,
+                          fontSize: "18px",
+                        }}
+                      >
+                        {selectedCampaign?.name}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <IconButton onClick={(e) => {
+                        setAnchorEl(e.currentTarget);
+                        setMenuIndex(-1);
+                      }}>
+                        <MoreVertIcon sx={{ color: "#574B4F", fontSize: "20px" }} />
+                      </IconButton>
+
+                      <PushPinIcon sx={{ color: "#6C3A52", fontSize: "20px", cursor: "pointer" }} />
+                    </Box>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      border: "1px solid #D6CED2",
+                      borderRadius: "10px",
+                      opacity: 1,
+                      width: "100%", height: "auto",
+                      padding: "12px",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Typography sx={{ fontFamily: "Poppins" }}>
+                        Progreso: <span style={{ color: "#8F4D63" }}>Completada al {progresoCampaña}%</span>
+                      </Typography>
+                      {selectedCampaign?.startDate && (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                          <AccessTimeIcon sx={{ fontSize: "16px" }} />
+                          <Typography sx={{ fontFamily: "Poppins", opacity: 0.7, fontSize: "14px" }}>{elapsedTime}</Typography>
+                        </Box>
+                      )}
+                      <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <AutorenewIcon sx={{ fontSize: "16px" }} />
+                        <Typography>{selectedCampaign?.recycleCount ?? 0}</Typography>
+                      </Box>
+                    </Box>
+
+                    <LinearProgress
+                      variant="determinate"
+                      value={progresoCampaña}
+                      sx={{
+                        marginTop: "8px",
+                        height: "12px",
+                        borderRadius: "6px",
+                        backgroundColor: "#E0E0E0",
+                        '& .MuiLinearProgress-bar': {
+                          backgroundColor: "#AE7888"
+                        }
+                      }}
+                    />              <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: "8px" }}>
+                      <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
+                        Registros <br />procesados:<br />
+                        <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F" }}>
+                          {selectedCampaign?.numeroActual}
+                        </Box>
+                      </Typography>
+                      <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
+                        Registros <br />respondidos:<br />
+                        <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F" }}>
+                          {selectedCampaign?.respondedRecords ?? 0}
+                        </Box>
+                      </Typography>
+                      <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
+                        Registros <br />fuera de horario:<br />
+                        <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F" }}>
+                          {selectedCampaign?.outOfScheduleRecords ?? 0}
+                        </Box>
+                      </Typography>
+                      <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
+                        Registros <br />bloqueados:<br />
+                        <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F", }}>
+                          {selectedCampaign?.blockedRecords ?? 0}
+                        </Box>
+                      </Typography>
+                      <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
+                        Total de <br />registros:<br />
+                        <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F" }}>
+                          {selectedCampaign?.numeroInicial ?? "0"}
+                        </Box>
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: "flex", justifyContent: "right", marginTop: "8px" }}>
+                    <MainButton
+                      text={selectedCampaign?.autoStart ? 'Detener' : 'Iniciar'}
+                      onClick={() => handleStartCampaign(selectedCampaign)}
+                    />
+                  </Box>
+
+
+                </Paper>
+
+                {/* Paper Horarios */}
+                {infoChecks["Horarios"] && (
+                  <Paper sx={{ padding: "10px", marginTop: "10px", borderRadius: "10px", width: "100%", maxWidth: "676px", height: "auto" }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
+                        Horarios
+                      </Typography>
+                      <Tooltip title="Cerrar" arrow placement="top"
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              backgroundColor: "#000000",
+                              color: "#CCC3C3",
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: "12px",
+                              padding: "6px 8px",
+                              borderRadius: "8px",
+                              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.7)"
+                            }
+                          },
+                          arrow: {
+                            sx: {
+                              color: "#000000"
+                            }
+                          }
+                        }}
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: 'offset',
+                              options: {
+                                offset: [0, -15]
+                              }
+                            }
+                          ]
+                        }}
+                      >
+                        <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, Horarios: false }))}>
+                          <CloseIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+
+                    <Box sx={{ display: "flex", gap: "16px", paddingLeft: "10px", paddingTop: "4px" }}>
+                      {[
+                        { label: "Vencido", color: "#B0B0B0" },
+                        { label: "Vigente", color: "#5CB85C" },
+                        { label: "Próximo", color: "#E38C28" }
+                      ].map((item, index) => (
+                        <Box key={index} sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <Box
+                            sx={{
+                              width: "10px",
+                              height: "10px",
+                              borderRadius: "50%",
+                              backgroundColor: item.color
+                            }}
+                          />
+                          <Typography sx={{ fontSize: "14px", fontFamily: "Poppins", color: "#574B4F" }}>
+                            {item.label}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                    <Box sx={{
+                      padding: "10px",
+                      marginTop: "10px",
+                      borderRadius: "10px",
+                      width: "100%px",
+                      height: "auto",
+                      backgroundColor: "#D6D6D64D"
+                    }}>
+                      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 0 }}>
+                        {['expired', 'current', 'upcoming'].map((status) => {
+                          const colorMap = {
+                            expired: '#B4ACAC',
+                            current: '#5CB85C',
+                            upcoming: '#E38C28'
+                          };
+
+                          const horariosFiltrados = selectedCampaign?.schedules.filter(
+                            h => getScheduleStatus(h.startDateTime, h.endDateTime) === status
+                          ) || [];
+
+                          return (
+                            <Box key={status} sx={{ flex: 1, px: 1 }}>
+                              {horariosFiltrados.map((horario, index) => {
+                                const start = new Date(horario.startDateTime);
+                                const end = new Date(horario.endDateTime);
+                                const sameDay = start.toDateString() === end.toDateString();
+
+                                const formatted = sameDay
+                                  ? `${start.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }).toUpperCase()}, ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}–${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                  : `${start.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }).toUpperCase()}–${end.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }).toUpperCase()}, ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}–${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+                                return (
+                                  <Typography
+                                    key={index}
+                                    sx={{
+                                      color: colorMap[status as keyof typeof colorMap],
+                                      fontFamily: 'Poppins',
+                                      fontSize: '12px',
+                                      mb: 1,
+                                    }}
+                                  >
+                                    {formatted}
+                                  </Typography>
+                                );
+                              })}
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    </Box>
+
+                  </Paper>
+                )}
+
+                {/*Paper Mensaje*/}
+                {infoChecks["Prueba de envío de mensaje"] && (
                   <Paper
                     sx={{
                       padding: "10px",
-                      marginTop: "15px",
+                      marginTop: "10px",
                       borderRadius: "10px",
                       width: "100%",
-                      height: "auto",
-                      boxShadow: "none"
+                      height: "auto"
                     }}
                   >
-                    <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginBottom: "5px" }}>
-                      Prueba de envío
-                    </Typography>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
+                      <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
+                        Mensaje
+                      </Typography>
+                      <Tooltip title="Cerrar" arrow placement="top"
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              backgroundColor: "#000000",
+                              color: "#CCC3C3",
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: "12px",
+                              padding: "6px 8px",
+                              borderRadius: "8px",
+                              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.7)"
+                            }
+                          },
+                          arrow: {
+                            sx: {
+                              color: "#000000"
+                            }
+                          }
+                        }}
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: 'offset',
+                              options: {
+                                offset: [0, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                              }
+                            }
+                          ]
+                        }}
+                      >
+                        <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, "Prueba de envío de mensaje": false }))}>
+                          <CloseIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+
                     <Box
                       sx={{
-                        padding: "16px",
-                        marginTop: "10px",
+                        fontFamily: 'Poppins',
+                        fontSize: '14px',
+                        color: '#574B4F',
+                        backgroundColor: '#F3F1F1',
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        overflowWrap: 'break-word',
+                        maxWidth: '100%',
+                      }}
+
+                    >
+                      <Typography sx={{ textAlign: "left", fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
+                        {selectedCampaign?.message}
+                      </Typography>
+                    </Box>
+
+                    <Divider sx={{ marginY: "15px" }} />
+
+                    <Paper
+                      sx={{
+                        padding: "10px",
+                        marginTop: "15px",
                         borderRadius: "10px",
-                        backgroundColor: "#FFFFFF"
+                        width: "100%",
+                        height: "auto",
+                        boxShadow: "none"
                       }}
                     >
-                      <Box sx={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                        <Box sx={{ flex: 1 }}>
-                          <Typography
-                            sx={{
-                              fontFamily: "Poppins",
-                              fontSize: "14px",
-                              color: "#574B4F",
-                              marginBottom: "6px"
-                            }}
-                          >
-                            Teléfono
-                          </Typography>
-                          <TextField
-                            fullWidth
-                            value={phone}
-                            onChange={(e) => {
-                              const onlyNumbers = e.target.value.replace(/\D/g, "");
-                              setPhone(onlyNumbers);
-                              setError(!validatePhone(onlyNumbers));
-                            }}
-                            error={error}
-                            helperText={error ? "Número inválido" : ""}
-                            placeholder="5255"
-                            inputProps={{
-                              inputMode: "numeric",
-                              pattern: "[0-9]*",
-                              maxLength: 12
-                            }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  <Tooltip
-                                    placement="bottom-start"
-                                    arrow
-                                    componentsProps={{
-                                      tooltip: {
-                                        sx: {
-                                          backgroundColor: "#FFFFFF",
-                                          color: "#574B4F",
-                                          fontFamily: "Poppins, sans-serif",
-                                          fontSize: "13px",
-                                          padding: "8px 12px",
-                                          borderRadius: "10px",
-                                          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-                                          maxWidth: 220,
-                                          border: "1px solid #9B9295" // 🔥 borde nuevo
-                                        }
-                                      },
-                                      arrow: {
-                                        sx: {
-                                          color: "#FFFFFF", opacity: 0.0
-                                        }
-                                      }
-                                    }}
-                                    PopperProps={{
-                                      modifiers: [
-                                        {
-                                          name: 'offset',
-                                          options: {
-                                            offset: [-200, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                      <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginBottom: "5px" }}>
+                        Prueba de envío
+                      </Typography>
+                      <Box
+                        sx={{
+                          padding: "16px",
+                          marginTop: "10px",
+                          borderRadius: "10px",
+                          backgroundColor: "#FFFFFF"
+                        }}
+                      >
+                        <Box sx={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
+                          <Box sx={{ flex: 1 }}>
+                            <Typography
+                              sx={{
+                                fontFamily: "Poppins",
+                                fontSize: "14px",
+                                color: "#574B4F",
+                                marginBottom: "6px"
+                              }}
+                            >
+                              Teléfono
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={phone}
+                              onChange={(e) => {
+                                const onlyNumbers = e.target.value.replace(/\D/g, "");
+                                setPhone(onlyNumbers);
+                                setError(!validatePhone(onlyNumbers));
+                              }}
+                              error={error}
+                              helperText={error ? "Número inválido" : ""}
+                              placeholder="5255"
+                              inputProps={{
+                                inputMode: "numeric",
+                                pattern: "[0-9]*",
+                                maxLength: 12
+                              }}
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    <Tooltip
+                                      placement="bottom-start"
+                                      arrow
+                                      componentsProps={{
+                                        tooltip: {
+                                          sx: {
+                                            backgroundColor: "#FFFFFF",
+                                            color: "#574B4F",
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            padding: "8px 12px",
+                                            borderRadius: "10px",
+                                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                                            maxWidth: 220,
+                                            border: "1px solid #9B9295" // 🔥 borde nuevo
+                                          }
+                                        },
+                                        arrow: {
+                                          sx: {
+                                            color: "#FFFFFF", opacity: 0.0
                                           }
                                         }
-                                      ]
-                                    }}
-                                    title={
-                                      <Box>
-                                        <Typography component="div" sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
-                                          Solo caracteres numéricos
-                                        </Typography>
-                                        <Typography component="div" sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
-                                          El teléfono debe incluir el número del país
-                                        </Typography>
-                                      </Box>
-                                    }
-                                  >
-                                    <img
-                                      src={error ? infoiconerror : infoicon}
-                                      alt="Info"
-                                      style={{ width: "24px", height: "24px", cursor: "pointer" }}
-                                    />
-                                  </Tooltip>
-                                </InputAdornment>
+                                      }}
+                                      PopperProps={{
+                                        modifiers: [
+                                          {
+                                            name: 'offset',
+                                            options: {
+                                              offset: [-200, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                            }
+                                          }
+                                        ]
+                                      }}
+                                      title={
+                                        <Box>
+                                          <Typography component="div" sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
+                                            Solo caracteres numéricos
+                                          </Typography>
+                                          <Typography component="div" sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
+                                            El teléfono debe incluir el número del país
+                                          </Typography>
+                                        </Box>
+                                      }
+                                    >
+                                      <img
+                                        src={error ? infoiconerror : infoicon}
+                                        alt="Info"
+                                        style={{ width: "24px", height: "24px", cursor: "pointer" }}
+                                      />
+                                    </Tooltip>
+                                  </InputAdornment>
 
-                              )
-                            }}
-                            sx={{
-                              backgroundColor: "#FFFFFF",
-                              borderRadius: "4px",
-                              "& .MuiInputBase-input": {
-                                fontFamily: "Poppins, sans-serif"
-                              },
-                              "& .MuiFormHelperText-root": {
-                                fontFamily: "Poppins, sans-serif",
+                                )
+                              }}
+                              sx={{
                                 backgroundColor: "#FFFFFF",
-                                padding: "4px 8px",
                                 borderRadius: "4px",
-                                margin: 0
-                              }
-                            }}
-                          />
-                        </Box>
-                        <Box sx={{ marginTop: "38px" }}>
-                          <MainButton
-                            text="Enviar"
-                            onClick={() => console.log("Enviar")}
-                            disabled={error}
-                          />
+                                "& .MuiInputBase-input": {
+                                  fontFamily: "Poppins, sans-serif"
+                                },
+                                "& .MuiFormHelperText-root": {
+                                  fontFamily: "Poppins, sans-serif",
+                                  backgroundColor: "#FFFFFF",
+                                  padding: "4px 8px",
+                                  borderRadius: "4px",
+                                  margin: 0
+                                }
+                              }}
+                            />
+                          </Box>
+                          <Box sx={{ marginTop: "38px" }}>
+                            <MainButton
+                              text="Enviar"
+                              onClick={() => console.log("Enviar")}
+                              disabled={error}
+                            />
+                          </Box>
                         </Box>
                       </Box>
-                    </Box>
+                    </Paper>
                   </Paper>
-                </Paper>
-              )}
+                )}
 
-              {/*Paper Gestión de registros*/}
-              {infoChecks["Registros"] && (
-                <Paper sx={{ padding: "10px", marginTop: "10px", borderRadius: "10px", width: "100%", height: "auto" }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
-                    <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
-                      Gestión de registros
-                    </Typography>
-                    <Tooltip title="Cerrar" arrow placement="top"
-                      componentsProps={{
-                        tooltip: {
-                          sx: {
-                            backgroundColor: "#000000",
-                            color: "#CCC3C3",
-                            fontFamily: "Poppins, sans-serif",
-                            fontSize: "12px",
-                            padding: "6px 8px",
-                            borderRadius: "8px",
-                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.7)"
-                          }
-                        },
-                        arrow: {
-                          sx: {
-                            color: "#000000"
-                          }
-                        }
-                      }}
-                      PopperProps={{
-                        modifiers: [
-                          {
-                            name: 'offset',
-                            options: {
-                              offset: [0, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                {/*Paper Gestión de registros*/}
+                {infoChecks["Registros"] && (
+                  <Paper sx={{ padding: "10px", marginTop: "10px", borderRadius: "10px", width: "100%", height: "auto" }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
+                      <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
+                        Gestión de registros
+                      </Typography>
+                      <Tooltip title="Cerrar" arrow placement="top"
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              backgroundColor: "#000000",
+                              color: "#CCC3C3",
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: "12px",
+                              padding: "6px 8px",
+                              borderRadius: "8px",
+                              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.7)"
+                            }
+                          },
+                          arrow: {
+                            sx: {
+                              color: "#000000"
                             }
                           }
-                        ]
-                      }}
-                    >
-                      <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, Registros: false }))}>
-                        <CloseIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                  <TableContainer>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell sx={{ fontFamily: "Poppins, sans-serif", padding: "10px 8px", opacity: 0.8 }}>Tipo</TableCell>
-                          <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", opacity: 0.8, padding: "10px 8px", }}>Total</TableCell>
-                          <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", opacity: 0.8, padding: "10px 8px", }}>Porcentaje</TableCell>
-                          <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", opacity: 0.8, padding: "10px 8px", }}>Acción</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {[
-                          {
-                            tipo: "Respondidos",
-                            total: selectedCampaign?.respondedRecords ?? 0
-                          },
-                          {
-                            tipo: "Fuera de horario",
-                            total: selectedCampaign?.outOfScheduleRecords ?? 0
-                          },
-                          {
-                            tipo: "Bloqueados",
-                            total: selectedCampaign?.blockedRecords ?? 0
-                          }
-                        ].map((row, index) => (
-                          <TableRow key={index}>
-                            <TableCell sx={{ fontSize: "13px", fontFamily: "Poppins, sans-serif", padding: "6px 8px", opacity: 0.5 }}>
-                              {row.tipo}
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", padding: "2px 8px", opacity: 0.6 }}>
-                              {row.total}
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", padding: "2px 8px", opacity: 0.7 }}>
-                              {getPercentage(row.total)}
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", padding: "2px 8px", opacity: 0.6 }}>
-                              <Tooltip title="Eliminar">
-                                <IconButton>
-                                  <Box component="img" src={IconTrash} alt="Eliminar" sx={{ width: "25px", height: "25px", cursor: "pointer", opacity: 0.6 }} />
-                                </IconButton>
-                              </Tooltip>
-                              <IconButton>
-                                <RestoreIcon sx={{ color: "#9B9295" }} />
-                              </IconButton>
-                            </TableCell>
+                        }}
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: 'offset',
+                              options: {
+                                offset: [0, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                              }
+                            }
+                          ]
+                        }}
+                      >
+                        <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, Registros: false }))}>
+                          <CloseIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                    <TableContainer>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontFamily: "Poppins, sans-serif", padding: "10px 8px", opacity: 0.8 }}>Tipo</TableCell>
+                            <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", opacity: 0.8, padding: "10px 8px", }}>Total</TableCell>
+                            <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", opacity: 0.8, padding: "10px 8px", }}>Porcentaje</TableCell>
+                            <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", opacity: 0.8, padding: "10px 8px", }}>Acción</TableCell>
                           </TableRow>
-                        ))}
-                      </TableBody>
-
-                    </Table>
-                  </TableContainer>
-                </Paper>
-              )}
-
-              {/*Paper Resultados de envío*/}
-              {infoChecks["Resultados de envío por día"] && (
-                <Paper sx={{ padding: "10px", marginTop: "25px", borderRadius: "10px", width: "100%", height: "auto" }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
-                    <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
-                      Resultados de envío
-                    </Typography>
-                    <Tooltip title="Cerrar" arrow placement="top"
-                      componentsProps={{
-                        tooltip: {
-                          sx: {
-                            backgroundColor: "#000000",
-                            color: "#CCC3C3",
-                            fontFamily: "Poppins, sans-serif",
-                            fontSize: "12px",
-                            padding: "6px 8px",
-                            borderRadius: "8px",
-                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.7)"
-                          }
-                        },
-                        arrow: {
-                          sx: {
-                            color: "#000000"
-                          }
-                        }
-                      }}
-                      PopperProps={{
-                        modifiers: [
-                          {
-                            name: 'offset',
-                            options: {
-                              offset: [0, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
-                            }
-                          }
-                        ]
-                      }}
-                    >
-                      <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, "Resultados de envío por día": false }))}>
-                        <CloseIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", padding: "10px", border: "2px solid #F2F2F2", borderRadius: "10px", marginBottom: "20px", }}>
-                    {indicadores.map((indicador, index) => (
-                      <Box key={index} sx={{ textAlign: "center" }}>
-                        <Tooltip
-                          placement="bottom-start"
-                          arrow
-                          componentsProps={{
-                            tooltip: {
-                              sx: {
-                                backgroundColor: "#FFFFFF",
-                                color: "#574B4F",
-                                fontFamily: "Poppins, sans-serif",
-                                fontSize: "13px",
-                                padding: "8px 12px",
-                                borderRadius: "10px",
-                                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-                                maxWidth: 220,
-                                border: "1px solid #9B9295"
-                              }
+                        </TableHead>
+                        <TableBody>
+                          {[
+                            {
+                              tipo: "Respondidos",
+                              total: selectedCampaign?.respondedRecords ?? 0
                             },
-                            arrow: {
-                              sx: {
-                                color: "#FFFFFF", opacity: 0
+                            {
+                              tipo: "Fuera de horario",
+                              total: selectedCampaign?.outOfScheduleRecords ?? 0
+                            },
+                            {
+                              tipo: "Bloqueados",
+                              total: selectedCampaign?.blockedRecords ?? 0
+                            }
+                          ].map((row, index) => (
+                            <TableRow key={index}>
+                              <TableCell sx={{ fontSize: "13px", fontFamily: "Poppins, sans-serif", padding: "6px 8px", opacity: 0.5 }}>
+                                {row.tipo}
+                              </TableCell>
+                              <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", padding: "2px 8px", opacity: 0.6 }}>
+                                {row.total}
+                              </TableCell>
+                              <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", padding: "2px 8px", opacity: 0.7 }}>
+                                {getPercentage(row.total)}
+                              </TableCell>
+                              <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", padding: "2px 8px", opacity: 0.6 }}>
+                                <Tooltip title="Eliminar" arrow placement="top"
+                                  componentsProps={{
+                                    tooltip: {
+                                      sx: {
+                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                        color: "#DEDADA",
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "12px",
+                                        padding: "6px 8px",
+                                        borderRadius: "8px",
+                                      }
+                                    },
+                                    arrow: {
+                                      sx: {
+                                        color: "rgba(0, 0, 0, 0.8)"
+                                      }
+                                    }
+                                  }}
+                                  PopperProps={{
+                                    modifiers: [
+                                      {
+                                        name: 'offset',
+                                        options: {
+                                          offset: [0, -7]
+                                        }
+                                      }
+                                    ]
+                                  }}
+                                >
+                                  <IconButton>
+                                    <Box component="img" src={IconTrash} alt="Eliminar" sx={{ width: "25px", height: "25px", cursor: "pointer", opacity: 0.6 }} />
+                                  </IconButton>
+                                </Tooltip>
+                                <IconButton>
+                                  <RestoreIcon sx={{ color: "#9B9295" }} />
+                                </IconButton>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+
+                      </Table>
+                    </TableContainer>
+                  </Paper>
+                )}
+
+                {/*Paper Resultados de envío*/}
+                {infoChecks["Resultados de envío por día"] && (
+                  <Paper sx={{ padding: "10px", marginTop: "25px", borderRadius: "10px", width: "100%", height: "auto" }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
+                      <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
+                        Resultados de envío
+                      </Typography>
+                      <Tooltip title="Cerrar" arrow placement="top"
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              backgroundColor: "#000000",
+                              color: "#CCC3C3",
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: "12px",
+                              padding: "6px 8px",
+                              borderRadius: "8px",
+                              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.7)"
+                            }
+                          },
+                          arrow: {
+                            sx: {
+                              color: "#000000"
+                            }
+                          }
+                        }}
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: 'offset',
+                              options: {
+                                offset: [0, -15]
                               }
                             }
-                          }}
-                          PopperProps={{
-                            modifiers: [
-                              {
-                                name: 'offset',
-                                options: {
-                                  offset: [-90, -15]
+                          ]
+                        }}
+                      >
+                        <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, "Resultados de envío por día": false }))}>
+                          <CloseIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", padding: "10px", border: "2px solid #F2F2F2", borderRadius: "10px", marginBottom: "20px", }}>
+                      {indicadores.map((indicador, index) => (
+                        <Box key={index} sx={{ textAlign: "center" }}>
+                          <Tooltip
+                            placement="bottom-start"
+                            arrow
+                            componentsProps={{
+                              tooltip: {
+                                sx: {
+                                  backgroundColor: "#FFFFFF",
+                                  color: "#574B4F",
+                                  fontFamily: "Poppins, sans-serif",
+                                  fontSize: "13px",
+                                  padding: "8px 12px",
+                                  borderRadius: "10px",
+                                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                                  maxWidth: 220,
+                                  border: "1px solid #9B9295"
+                                }
+                              },
+                              arrow: {
+                                sx: {
+                                  color: "#FFFFFF", opacity: 0
                                 }
                               }
-                            ]
-                          }}
-                          title={
-                            <Box>
-                              {mensajesIndicadores[index].map((mensaje, i) => (
-                                <Typography key={i} component="div" sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
-                                  {mensaje}
-                                </Typography>
-                              ))}
-                            </Box>
-                          }
-                        >
-                          <img src={infoicon} width="24px" height="24px" style={{ cursor: "pointer" }} />
-                        </Tooltip>
+                            }}
+                            PopperProps={{
+                              modifiers: [
+                                {
+                                  name: 'offset',
+                                  options: {
+                                    offset: [-90, -15]
+                                  }
+                                }
+                              ]
+                            }}
+                            title={
+                              <Box>
+                                {mensajesIndicadores[index].map((mensaje, i) => (
+                                  <Typography key={i} component="div" sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
+                                    {mensaje}
+                                  </Typography>
+                                ))}
+                              </Box>
+                            }
+                          >
+                            <img src={infoicon} width="24px" height="24px" style={{ cursor: "pointer" }} />
+                          </Tooltip>
+                          <Typography sx={{ fontSize: "18px", color: indicador.color, fontWeight: "500", fontFamily: "Poppins" }}>
+                            {indicador.value}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: "14px",
+                              color: "#9B9295",
+                              fontWeight: "500",
+                              fontFamily: "Poppins, sans-serif",
+                              whiteSpace: "pre-line",
+                              lineHeight: "16px"
+                            }}
+                            dangerouslySetInnerHTML={{
+                              __html: indicador.label.replace("Tasa de ", "Tasa de<br/>")
+                            }}
+                          />
 
-                        <Typography
-                          sx={{
-                            fontSize: "14px",
-                            color: "#9B9295",
-                            fontWeight: "500",
-                            fontFamily: "Poppins, sans-serif",
-                            whiteSpace: "pre-line",
-                            lineHeight: "16px"
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: indicador.label.replace("Tasa de ", "Tasa de<br/>")
-                          }}
-                        />
-                        <Typography sx={{ fontSize: "22px", color: indicador.color, fontWeight: "500", fontFamily: "Poppins" }}>
-                          {indicador.value}
-                        </Typography>
-                      </Box>
+                        </Box>
 
-                    ))}
-                  </Box>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={barData} margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
+                      ))}
+                    </Box>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <BarChart data={barData} margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name"
+                          tick={{
+                            fontFamily: 'Poppins', fontSize: "10px"
+                          }} />
+                        <YAxis
+                          tick={{
+                            fontFamily: 'Poppins', fontSize: "12px"
+                          }} />
 
-                      <Bar dataKey="value">
-                        {data.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Paper>
-              )}
+                        <Bar dataKey="value">
+                          {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </Paper>
+                )}
 
-              {/*Paper Mapa */}
-              {infoChecks["Mapa de concentración de mensajes"] && (
-                <Paper sx={{ padding: "10px", marginTop: "25px", borderRadius: "10px", width: "100%", height: "auto" }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
-                    <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
-                      Mapa de concentración de mensajes
-                    </Typography>
-                    <Tooltip title="Cerrar" arrow>
-                      <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, "Mapa de concentración de mensajes": false }))}>
-                        <CloseIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
+                {/*Paper Mapa */}
+                {infoChecks["Mapa de concentración de mensajes"] && (
+                  <Paper sx={{ padding: "10px", marginTop: "25px", borderRadius: "10px", width: "100%", height: "auto" }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
+                      <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
+                        Mapa de concentración de mensajes
+                      </Typography>
+                      <Tooltip title="Cerrar" arrow>
+                        <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, "Mapa de concentración de mensajes": false }))}>
+                          <CloseIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
 
-                  <MapChart enviadosData={stateMessageCounts} respondidosData={stateRespondedCounts} />
+                    <MapChart enviadosData={stateMessageCounts} respondidosData={stateRespondedCounts} />
 
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "10px",
-                      marginTop: "-5px",
-                    }}
-                  >
-                    <Typography sx={{ fontSize: "14px", color: "#7C7C7C" }}>–</Typography>
                     <Box
                       sx={{
-                        width: "200px",
-                        height: "12px",
-                        borderRadius: "6px",
-                        background: "linear-gradient(to right, #E0E0E0, #8F4E63)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "10px",
+                        marginTop: "-5px",
                       }}
-                    />
-                    <Typography sx={{ fontSize: "14px", color: "#7C7C7C" }}>+</Typography>
-                  </Box>
-                </Paper>
-              )}
+                    >
+                      <Typography sx={{ fontSize: "14px", color: "#7C7C7C" }}>–</Typography>
+                      <Box
+                        sx={{
+                          width: "200px",
+                          height: "12px",
+                          borderRadius: "6px",
+                          background: "linear-gradient(to right, #E0E0E0, #8F4E63)",
+                        }}
+                      />
+                      <Typography sx={{ fontSize: "14px", color: "#7C7C7C" }}>+</Typography>
+                    </Box>
+                  </Paper>
+                )}
 
-            </Box>
-          </Grid>
-        )}
-      </Grid>
+              </Box>
+            </Grid>
+          )}
+        </Grid>
+      </Box>
       <MainModal
         isOpen={openDeleteModal}
         Title="Eliminar campañas"
@@ -3012,7 +3019,7 @@ const Campains: React.FC = () => {
       >
         <Box
           sx={{
-            height: "120px"
+            height: "110px"
           }}
         >
           <DialogTitle
@@ -3045,23 +3052,10 @@ const Campains: React.FC = () => {
           </DialogTitle>
 
           {/* Línea divisoria */}
-          <Divider
-            sx={{
-              position: "absolute",
-              marginY: "15px",
-              left: "0px",
-              backgroundColor: "#9F94A5",
-              height: "1px",
-              width: "100%",
-              opacity: 0.3
-            }}
-          />
-
-          <Divider sx={{ marginTop: "14px", marginBottom: "18px", opacity: 0.3 }} />
+          <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mt: 1.5, mb: 1.5 }} />
 
           {/*Stepper */}
-          <DialogContent sx={{ padding: "0 8px", }}>
-
+          <Box sx={{ padding: "0 0px", }}>
 
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "24px", width: "100%" }}>
               {["Nombre y horarios", "Registros", "Mensaje", "Configuraciones"].map((label, index) => {
@@ -3071,49 +3065,52 @@ const Campains: React.FC = () => {
 
                 return (
                   <React.Fragment key={label}>
-                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "90px" }}>
                       <Box
                         sx={{
-                          width: "24px",
-                          height: "24px",
+                          width: "28px",
+                          height: "28px",
                           borderRadius: "50%",
-                          border: `2px solid ${isActive || isCompleted ? "#8F4D63" : "#D6D6D6"}`,
+                          border: `2px solid ${isActive || isCompleted ? "#8F4D63" : "#574B4F66"}`,
                           backgroundColor: isActive ? "#8F4D63" : isCompleted ? "#8F4D63" : "#FFFFFF",
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "center",
+                          justifyContent: "center", marginTop: "0px"
                         }}
                       >
-                        {isActive && (
-                          <Box
-                            component="span"
-                            sx={{
-                              color: "#FFFFFF",
-                              fontSize: "14px",
-                              fontWeight: "bold",
-                              fontFamily: "Poppins",
+                        {isActive ? (
+                          <img
+                            src={IconCheckedCircle1}
+                            alt="Paso activo"
+                            style={{
+                              width: '28px',
+                              height: '28px',
                             }}
-                          >
-                            ✓
-                          </Box>
-                        )}
-                        {!isActive && isCompleted && (
-                          <CheckIcon sx={{ fontSize: 16, color: "#FFFFFF" }} />
-                        )}
+                          />
+                        ) : isCompleted ? (
+                          <img
+                            src={IconCheckedCircle2}
+                            alt="Paso completado"
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                            }}
+                          />
+                        ) : null}
                       </Box>
 
                       <Typography
                         sx={{
-                          marginTop: "6px",
+                          position: "absolute",
+                          marginTop: "30px",
                           fontSize: "12px",
                           fontFamily: "Poppins",
                           color: isActive ? "#8F4D63" : "#9B9295",
                           textAlign: "center",
                           fontWeight: 500,
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          maxWidth: "80px",
+                          whiteSpace: "normal",
+                          overflowWrap: "break-word",
+                          maxWidth: "110px",
                         }}
                       >
                         {label}
@@ -3123,19 +3120,39 @@ const Campains: React.FC = () => {
                     {!isLast && (
                       <Box
                         sx={{
-                          width: "80px",
+                          width: "70px",
                           height: "2px",
-                          backgroundColor: "#D6D6D6",
                           mx: "20px",
                         }}
                       />
                     )}
+
                   </React.Fragment>
                 );
               })}
             </Box>
+            <Box>
+              <Divider
+                sx={{
+                  width: '174px', position: "absolute", border: '1.5px solid',
+                  mt: "-39px", ml: "86px", borderColor: activeStep > 0 && activeStep !== 0 ? "#8F4E63" : "#574B4F66"
+                }}
+              />
+              <Divider
+                sx={{
+                  width: '174px', position: "absolute", border: '1.5px solid',
+                  mt: "-39px", ml: "286px", borderColor: activeStep > 1 && activeStep !== 1 ? "#8F4E63" : "#574B4F66"
+                }}
+              />
+              <Divider
+                sx={{
+                  width: '174px', position: "absolute", border: '1.5px solid',
+                  mt: "-39px", ml: "486px", borderColor: activeStep > 2 && activeStep !== 2 ? "#8F4E63" : "#574B4F66"
+                }}
+              />
+            </Box>
+          </Box>
 
-          </DialogContent>
         </Box>
 
         {/* Línea divisoria */}
@@ -6206,7 +6223,7 @@ const Campains: React.FC = () => {
                       }}
                     >
                       <>
-                        No es posible editar<br />
+                        • No es posible editar<br />
                         mientras la campaña<br />
                         se encuentre en curso.
                       </>

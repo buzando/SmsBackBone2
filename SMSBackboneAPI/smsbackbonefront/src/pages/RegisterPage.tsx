@@ -18,6 +18,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Tooltip from '@mui/material/Tooltip';
 import infoicon from '../assets/Icon-info.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
+import MainButton from '../components/commons/MainButton';
 
 type RegisterFormData = {
     client: string;
@@ -68,6 +69,7 @@ const Register: React.FC = () => {
 
     const [errorModalOpen, setErrorModalOpen] = useState(false);
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+    const [isButton, setIsButton] = useState(false);
     const [hasPasswordInput, setHasPasswordInput] = useState(false);
     const termsContainerRef = useRef<HTMLDivElement>(null);
     const handleScroll = () => {
@@ -96,6 +98,7 @@ const Register: React.FC = () => {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setIsButtonEnabled(false);
+        setIsButton(true);
         try {
             const data = {
                 client: formData.client,
@@ -134,6 +137,7 @@ const Register: React.FC = () => {
             }
         } catch (error) {
             setIsButtonEnabled(true);
+            setIsButton(false);
             handleOpenErrorModal();
         }
     };
@@ -240,18 +244,13 @@ const Register: React.FC = () => {
         }
     };
 
-
-
-
-
     return (
-        //Color del fondo
         <Box
             sx={{
                 display: "flex",
                 flexDirection: "column",
                 backgroundColor: "#F2F2F2",
-                height: "755px", overflowY: "hidden"
+                height: "800px", overflowY: "hidden",
             }}
         >
             <PublicLayout>
@@ -1574,44 +1573,13 @@ const Register: React.FC = () => {
                                         }}>
                                         Cancelar
                                     </Button>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
+                                    <MainButton
+                                        text='Aceptar'
                                         onClick={handleSubmit}
+                                        isLoading={isButton}
                                         disabled={!isButtonEnabled}
-                                        sx={{
-                                            fontStyle: "normal",
-                                            fontVariant: "normal",
-                                            fontWeight: "500",
-                                            fontSize: "14px",
-                                            fontFamily: "Poppins",
-                                            letterSpacing: "1.12px",
-                                            height: "36px",
-                                            width: "114px",
-                                            color: "#FFFFFF",
-                                            opacity: 0.9,
-                                            marginLeft: "20px",
-                                            marginTop: "-5px",
-                                            backgroundColor: "#833A53",
+                                    />
 
-                                            padding: "10px 20px",
-                                            textTransform: "uppercase",
-
-                                            "&:hover": {
-                                                backgroundColor: "#A54261",
-                                                fontStyle: "normal",
-                                                fontVariant: "normal",
-                                                fontWeight: "600",
-                                                fontSize: "14px",
-                                                fontFamily: "Poppins",
-                                                letterSpacing: "1.12px",
-                                                color: "#FFFFFF",
-                                                opacity: 1,
-                                            },
-                                        }}
-                                    >
-                                        Aceptar
-                                    </Button>
                                 </Box>
                             </Box>
                         </Fade>

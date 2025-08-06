@@ -484,7 +484,7 @@ const HomePage: React.FC = () => {
                                             marginTop: "-3px",
                                             marginBottom: "-10px",
                                             fontFamily: "Poppins",
-                                            color: "#000000",
+                                            color: "#807D7E",
                                             "&.Mui-checked": {
                                                 color: "#8F4D63",
                                             },
@@ -517,7 +517,7 @@ const HomePage: React.FC = () => {
                                         sx={{
                                             marginLeft: "8px",
 
-                                            color: "#000000",
+                                            color: "#807D7E",
                                             "&.Mui-checked": {
                                                 color: "#8F4D63",
                                             },
