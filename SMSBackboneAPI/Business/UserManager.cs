@@ -52,7 +52,7 @@ namespace Business
                     {
                         return null;
                     }
-                    var config = new MapperConfiguration(cfg =>
+                     var config = new MapperConfiguration(cfg =>
 
 cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
@@ -993,7 +993,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
 
                             var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
-                            var recarga = new ApiBackBoneManager().AddCredit(admintoken.Result.token,acceso.id_backbone, (int)(creditRecharge.quantityCredits));
+                            //var recarga = new ApiBackBoneManager().AddCredit(admintoken.Result.token,acceso.id_backbone, (int)(creditRecharge.quantityCredits));
 
                         }
 

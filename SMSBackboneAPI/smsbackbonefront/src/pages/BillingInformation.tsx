@@ -3,7 +3,7 @@ import { TextField, InputAdornment, MenuItem, Typography, Paper, Box, IconButton
 import SecondaryButton from '../components/commons/SecondaryButton';
 import MainButton from '../components/commons/MainButton';
 import InfoIcon from '@mui/icons-material/Info';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import ChipBar from "../components/commons/ChipBar";
 import ModalError from "../components/commons/ModalError"
 import MainModal from "../components/commons/MainModal"
@@ -50,7 +50,7 @@ const BillingInformation: React.FC = () => {
             return;
         }
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ADD_USERS_BILLING}`;
+            const requestUrl = `${import.meta.env.VITE_API_ADD_USERS_BILLING}`;
             const Billing = {
                 Email: obj.userName,
                 PersonType: personType,
@@ -93,7 +93,7 @@ const BillingInformation: React.FC = () => {
                 return;
             }
             try {
-                const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GET_USERS_BILLING + obj.userName}`;
+                const requestUrl = `${import.meta.env.VITE_API_GET_USERS_BILLING + obj.userName}`;
                 const response = await axios.get(requestUrl);
                 // Supongamos que la respuesta tiene la información en response.data
                 const billingData = response.data;

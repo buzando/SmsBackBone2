@@ -9,7 +9,7 @@ import SecondaryButton from '../components/commons/SecondaryButton'
 import DatePicker from '../components/commons/DatePicker';
 import { format } from 'date-fns';
 import boxclose from '../assets/Nousers.svg'
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import boxopen from '../assets/NoResultados.svg'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EyeIcon from '../assets/eye-icon.svg';
@@ -66,7 +66,7 @@ const PaymentHistoric: React.FC = () => {
             const usuario = localStorage.getItem("userData");
             const obj = usuario ? JSON.parse(usuario) : null;
 
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GET_RECHARGE}`;
+            const requestUrl = `${import.meta.env.VITE_API_GET_RECHARGE}`;
             const payload = {
                 FechaInicio: start?.toISOString(), // Formato ISO 8601
                 FechaFin: end?.toISOString(),

@@ -14,7 +14,7 @@ import {
     Modal,
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import axios from "axios";
+import axios from "../components/commons/AxiosInstance";
 import { AppContext } from "../hooks/useContextInitialState";
 const ConfigurationAccount: React.FC = () => {
     const { setContextState } = useContext(AppContext);
@@ -43,7 +43,7 @@ const ConfigurationAccount: React.FC = () => {
 
     const fetchUserData = async (email: string) => {
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GETUSERBYEMAIL_USER + email}`;
+            const request = `${import.meta.env.VITE_API_GETUSERBYEMAIL_USER + email}`;
             const response = await axios.get(
                 request
             );
@@ -89,7 +89,7 @@ const ConfigurationAccount: React.FC = () => {
                 "Access-Control-Allow-Origin": "*",
             };
 
-            const apiEndpoint = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_FINISHREGISTER_USERS}`;
+            const apiEndpoint = `${import.meta.env.VITE_API_FINISHREGISTER_USERS}`;
             const response = await axios.post(apiEndpoint, data, { headers });
 
             if (response.status === 200) {
@@ -101,10 +101,8 @@ const ConfigurationAccount: React.FC = () => {
                 navigate('/Autentification');
             }
         } catch (error) {
-            if (axios.isAxiosError(error)) {
-
                 setErrorMessage("Ocurrió un error al guardar los cambios. Inténtelo de nuevo.");
-            }
+            
 
             setErrorModalOpen(true); // Mostrar modal de error
         }

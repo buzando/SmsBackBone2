@@ -7,7 +7,7 @@ import iconclose from '../assets/icon-close.svg';
 import BoxEmpty from '../assets/Nousers.svg';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import IconDownloadCSV from '../assets/IconCSV.svg';
 import IconDownloadExcel from '../assets/IconExcel.svg';
 import IconDownloadPDF from '../assets/IconPDF.svg';
@@ -215,8 +215,7 @@ const NumbersDids: React.FC = () => {
         setLoading(true);
 
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_GET_ALLNUMBERS}`;
+            const request = `${import.meta.env.VITE_API_GET_ALLNUMBERS}`;
             const response = await axios.get(request);
 
             if (response.status === 200) {
@@ -235,8 +234,7 @@ const NumbersDids: React.FC = () => {
         setLoading(true);
 
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_GET_CLIENTS}`;
+            const request = `${import.meta.env.VITE_API_GET_CLIENTS}`;
             const response = await axios.get<Clients[]>(request);
 
             if (response.status === 200) {
@@ -420,7 +418,7 @@ const NumbersDids: React.FC = () => {
             } else {
                 const payload = { Formato: format };
                 const response = await axios.post(
-                    `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_EXPORT_NUMBERS}`,
+                    `${import.meta.env.VITE_API_EXPORT_NUMBERS}`,
                     payload,
                     { headers: { 'Content-Type': 'application/json' }, responseType: 'blob' }
                 );
@@ -555,7 +553,7 @@ const NumbersDids: React.FC = () => {
         };
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MANAGE_NUMBERS}`, payload);
+            const response = await axios.post(`${import.meta.env.VITE_API_MANAGE_NUMBERS}`, payload);
 
             if (response.status === 200) {
                 const data = response.data;
@@ -587,7 +585,7 @@ const NumbersDids: React.FC = () => {
 
         try {
             const response = await axios.post(
-                `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MANAGEINDIVIDUAL_NUMBERS}`,
+                `${import.meta.env.VITE_API_MANAGEINDIVIDUAL_NUMBERS}`,
                 payload
             );
 

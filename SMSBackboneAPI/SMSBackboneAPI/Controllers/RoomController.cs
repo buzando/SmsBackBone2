@@ -19,6 +19,7 @@ namespace SMSBackboneAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RoomController : ControllerBase
     {
         string JwtIssuer = "Issuer";

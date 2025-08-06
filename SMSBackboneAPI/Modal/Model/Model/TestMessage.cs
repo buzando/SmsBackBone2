@@ -27,5 +27,6 @@ namespace Modal.Model.Model
         public string? ResponseMessage { get; set; } 
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public string? IdBackBone { get; set; }
     }
 }

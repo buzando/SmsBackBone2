@@ -26,7 +26,7 @@ import iconclose from '../assets/icon-close.svg';
 import BoxEmpty from '../assets/Nousers.svg';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import IconDownloadCSV from '../assets/IconCSV.svg';
 import IconDownloadExcel from '../assets/IconExcel.svg';
 import IconDownloadPDF from '../assets/IconPDF.svg';
@@ -263,8 +263,7 @@ const Clients: React.FC = () => {
         setLoading(true);
 
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_GET_CLIENTSADMIN}${currentPage + 1}`;
+            const request = `${import.meta.env.VITE_API_GET_CLIENTSADMIN}${currentPage + 1}`;
 
             const requestPayload = {
                 page: currentPage + 1,
@@ -306,8 +305,7 @@ const Clients: React.FC = () => {
     const Getcost = async () => {
 
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_Client_COST}`;
+            const request = `${import.meta.env.VITE_API_Client_COST}`;
             const response = await axios.get(request);
 
             if (response.status === 200) {
@@ -367,23 +365,19 @@ const Clients: React.FC = () => {
             };
 
             const response = await axios.post(
-                `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GETREPORTS_ALL}`,
+                `${import.meta.env.VITE_API_GETREPORTS_ALL}`,
                 payload
             );
 
             if (response.data?.success && response.data?.downloadUrl) {
-                const fileUrl = `${import.meta.env.VITE_SMS_API_URL}${response.data.downloadUrl}`;
-
-                // Paso 2: Descargar el archivo ya generado (GET)
-                const fileResponse = await axios.get(fileUrl, { responseType: 'blob' });
-
-                const blob = new Blob([fileResponse.data]);
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = response.data.fileName;
-                document.body.appendChild(a);
+                const responsedata = await fetch("/Quantum/Download/" + response.data?.fileName);
+                const blob = await responsedata.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = response.data?.fileName;
                 a.click();
-                a.remove();
+                window.URL.revokeObjectURL(url);
             } else {
                 console.error("Error: No se generó el archivo.");
             }
@@ -538,8 +532,7 @@ const Clients: React.FC = () => {
         };
 
         try {
-            const urlBase = import.meta.env.VITE_SMS_API_URL;
-            const endpoint = `${urlBase}${import.meta.env.VITE_API_UPDATE_CREATE_CLIENT}`
+            const endpoint = `${import.meta.env.VITE_API_UPDATE_CREATE_CLIENT}`
 
 
             const method = axios.post;
@@ -575,7 +568,7 @@ const Clients: React.FC = () => {
     const handleDeactivateClient = async (id: number) => {
         const newStatus = currentClient?.estatus === 1 ? 0 : 1;
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_DEACTIVATE_CLIENT}${id}`;
+            const requestUrl = `${import.meta.env.VITE_API_DEACTIVATE_CLIENT}${id}`;
             await axios.get(requestUrl);
 
             setClientsList(prev =>
@@ -626,7 +619,7 @@ const Clients: React.FC = () => {
     };
     const handleDeleteClient = async (id: number) => {
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_DELETE_CLIENT}${id}`;
+            const requestUrl = `${import.meta.env.VITE_API_DELETE_CLIENT}${id}`;
             await axios.get(requestUrl);
 
             GetClientsAdmin();
@@ -723,7 +716,7 @@ const Clients: React.FC = () => {
                 IdRoom: roomId
             };
 
-            const url = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_RECHARGE_CLIENT}`;
+            const url = `${import.meta.env.VITE_API_RECHARGE_CLIENT}`;
             const response = await axios.post(url, payload);
 
             if (response.status === 200) {

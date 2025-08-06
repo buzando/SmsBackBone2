@@ -19,7 +19,7 @@ namespace SMSBackboneAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
+    [Authorize]
     public class ReportsController : ControllerBase
     {
         [HttpPost("GetReports")]
@@ -32,11 +32,12 @@ namespace SMSBackboneAPI.Controllers
                 string fileName;
                 var fileBytes = reportManager.ExportReportToFile(report, report.Format, out fileName);
 
-                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "reports");
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
+                var folder = Common.ConfigurationManagerJson("ReactFolder");
 
-                var filePath = Path.Combine(folderPath, fileName);
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                var filePath = Path.Combine(folder, fileName);
                 System.IO.File.WriteAllBytes(filePath, fileBytes);
 
                 var url = $"/reports/{fileName}";

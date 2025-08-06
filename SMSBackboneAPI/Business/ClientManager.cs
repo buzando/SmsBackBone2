@@ -722,6 +722,10 @@ namespace Business
 
         public (List<ReporteConsumoDTO> Items, int Total) GetReporteConsumoCliente(DateTime fechaInicio, DateTime fechaFin, List<int> clientIds, int page, int pageSize)
         {
+            if (clientIds == null)
+            {
+                clientIds = new List<int>();
+            }
             using (var ctx = new Entities())
             {
                 var query = from recarga in ctx.CreditRecharge
@@ -755,6 +759,10 @@ namespace Business
 
         public (List<ReporteFacturacionDTO> Items, int Total) GetReporteFacturacion(DateTime fechaInicio, DateTime fechaFin, List<int> clientIds, int page, int pageSize)
         {
+            if (clientIds == null)
+            {
+                clientIds = new List<int>();
+            }
             using (var ctx = new Entities())
             {
                 var query = from recarga in ctx.CreditRecharge
@@ -792,6 +800,10 @@ namespace Business
 
         public (List<ReporteConsumoSistemaDto> Items, int Total) GetReporteConsumoSistema(DateTime fechaInicio, DateTime fechaFin, List<int> clientIds, int page, int pageSize)
         {
+            if (clientIds == null)
+            {
+                clientIds = new List<int>();
+            }
             using (var ctx = new Entities())
             {
                 var grouped = from send in ctx.CampaignContactScheduleSend

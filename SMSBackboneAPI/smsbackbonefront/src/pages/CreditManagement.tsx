@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
-import axios from "axios";
+import axios from "../components/commons/AxiosInstance";
 import TrashIcon from "../assets/Icon-trash.svg";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import seachicon from '../assets/icon-lupa.svg'
@@ -76,8 +76,7 @@ const CreditManagement: React.FC = () => {
         const obj = usuario ? JSON.parse(usuario) : null;
 
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_GetRooms}?email=${obj?.email}`;
+            const request = `${import.meta.env.VITE_API_GetRooms}?email=${obj?.email}`;
             const response = await axios.get(request);
 
             if (response.status === 200) {
@@ -202,7 +201,7 @@ const CreditManagement: React.FC = () => {
         };
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_TRANSFER_ROOMS}`;
+            const requestUrl = `${import.meta.env.VITE_API_TRANSFER_ROOMS}`;
             const response = await axios.post(requestUrl, payload);
 
             if (response.status === 200) {

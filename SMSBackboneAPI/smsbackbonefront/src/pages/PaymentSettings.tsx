@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Checkbox, TextField, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, Backdrop, CircularProgress, Typography, FormControlLabel, Divider } from '@mui/material';
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../components/commons/AxiosInstance";
 import ModalError from "../components/commons/ModalError"
 import usrAdmin from "../assets/usrAdmin.svg";
 import usrSup from "../assets/usrSup.svg";
@@ -206,7 +206,7 @@ const PaymentSettings: React.FC = () => {
                 return;
             }
 
-            const request = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GETBYCLIENT_USERS}?Client=${clientId}`;
+            const request = `${import.meta.env.VITE_API_GETBYCLIENT_USERS}?Client=${clientId}`;
             const response = await axios.get(request);
             if (response.status === 200) {
                 setUsers(response.data);
@@ -238,7 +238,7 @@ const PaymentSettings: React.FC = () => {
                 return;
             }
 
-            const request = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GET_AUTORECHARGE + selectedRoomid}`;
+            const request = `${import.meta.env.VITE_API_GET_AUTORECHARGE + selectedRoomid}`;
             const response = await axios.get(request);
             if (response.status === 200) {
                 const config = response.data;
@@ -286,7 +286,7 @@ const PaymentSettings: React.FC = () => {
         }
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GET_CREDITCARD}${obj.id}`;
+            const requestUrl = `${import.meta.env.VITE_API_GET_CREDITCARD}${obj.id}`;
             const response = await axios.get(requestUrl);
 
             if (response.status === 200) {
@@ -431,7 +431,7 @@ const PaymentSettings: React.FC = () => {
         }
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ADD_CREDITCARD}`;
+            const requestUrl = `${import.meta.env.VITE_API_ADD_CREDITCARD}`;
             const payload = {
                 user_id: obj.id,
                 card_number: formData.cardNumber,
@@ -485,7 +485,7 @@ const PaymentSettings: React.FC = () => {
         const objroom = savedRoom ? JSON.parse(savedRoom) : null;
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ADD_AUTORECHARGE}`;
+            const requestUrl = `${import.meta.env.VITE_API_ADD_AUTORECHARGE}`;
             const payload = {
                 shortSms: isShortSmsEnabled,
                 longSms: isLongSmsEnabled,

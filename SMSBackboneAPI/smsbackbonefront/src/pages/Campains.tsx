@@ -31,7 +31,7 @@ import {
   FormGroup,
   Popover
 } from "@mui/material";
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import AddIcon from '@mui/icons-material/Add';
 import seachicon from '../assets/icon-lupa.svg'
 import Iconseachred from "../assets/Iconseachred.svg";
@@ -156,6 +156,7 @@ export interface CampaignFullResponse {
   saveAsTemplate: boolean;
   templateName: String;
   campaignContactScheduleSendDTO?: CampaignContactScheduleSendDTO[];
+  isPinned: boolean;
 }
 
 export interface CampaignContactScheduleSendDTO {
@@ -388,7 +389,7 @@ const Campains: React.FC = () => {
     const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
     try {
       setLoadingTemplates(true);
-      const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM}${salaId}`;
+      const requestUrl = `${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM}${salaId}`;
       const response = await axios.get(requestUrl);
       setTemplates(response.data);
     } catch (error) {
@@ -404,7 +405,7 @@ const Campains: React.FC = () => {
 
     try {
 
-      const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_BLACKLIST}${salaId}`;
+      const requestUrl = `${import.meta.env.VITE_API_GET_BLACKLIST}${salaId}`;
       const response = await axios.get(requestUrl);
       if (response.status === 200) {
         setBlackLists(response.data);
@@ -671,7 +672,7 @@ const Campains: React.FC = () => {
     if (!salaId) return;
 
     try {
-      const url = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GET_CAMPAIGN + salaId}`;
+      const url = `${import.meta.env.VITE_API_GET_CAMPAIGN + salaId}`;
       const response = await axios.get(url);
       if (response.status === 200) {
         setCampaigns(response.data);
@@ -781,7 +782,7 @@ const Campains: React.FC = () => {
       };
 
       const response = await axios.post(
-        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_ADD_TMPSAVEFILE}`,
+        `${import.meta.env.VITE_API_ADD_TMPSAVEFILE}`,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -925,7 +926,7 @@ const Campains: React.FC = () => {
       };
 
       const response = await axios.post(
-        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_ADD_CAMPAIGN}`,
+        `${import.meta.env.VITE_API_ADD_CAMPAIGN}`,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -1066,7 +1067,7 @@ const Campains: React.FC = () => {
       };
 
       const response = await axios.post(
-        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_EDIT_CAMPAIGN}`,
+        `${import.meta.env.VITE_API_EDIT_CAMPAIGN}`,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -1112,7 +1113,7 @@ const Campains: React.FC = () => {
 
       // Enviar al backend (ajusta según tu endpoint)
       await axios.post(
-        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_DELETE_CAMPAIGN}`,
+        `${import.meta.env.VITE_API_DELETE_CAMPAIGN}`,
         idArray,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -1149,7 +1150,7 @@ const Campains: React.FC = () => {
       };
 
       const response = await axios.post(
-        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_CLONE_CAMPAIGN}`,
+        `${import.meta.env.VITE_API_CLONE_CAMPAIGN}`,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -1182,7 +1183,7 @@ const Campains: React.FC = () => {
     setCampaigns(prev =>
       prev.map(c => (c.id === campaign.id ? updated : c))
     );
-    const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_STAR_CAMPAIGN}${campaign.id}`
+    const requestUrl = `${import.meta.env.VITE_API_STAR_CAMPAIGN}${campaign.id}`
     await axios.get(requestUrl);
 
     setSelectedCampaign(updated);
@@ -1336,7 +1337,7 @@ const Campains: React.FC = () => {
         UserID: clientId.id
       };
 
-      const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MESSAGE_SEND}`;
+      const requestUrl = `${import.meta.env.VITE_API_MESSAGE_SEND}`;
       const response = await axios.post(requestUrl, payload);
 
       if (response.status === 200) {
@@ -1751,51 +1752,54 @@ const Campains: React.FC = () => {
                       </Tooltip>
                     </Box>
 
-                  )}
-                  <Divider
-                    sx={{
-                      width: 'calc(100% + 30px)',
-                      marginLeft: '-15px',
-                      marginBottom: '5px',
-                    }}
-                  />
-                  <List sx={{ overflowY: "auto", flexGrow: 1 }}>
-                    {filteredCampaigns.length === 0 ? (
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', textAlign: 'center' }}>
-                        <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '250px', height: 'auto' }} />
-                        <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
-                          No se encontraron resultados.
-                        </Typography>
-                      </Box>
-                    ) : (
-                      filteredCampaigns.map((campaign, index) => {
+                )}
+                <Divider
+                  sx={{
+                    width: 'calc(100% + 30px)',
+                    marginLeft: '-15px',
+                    marginBottom: '5px',
+                  }}
+                />
+                <List sx={{ overflowY: "auto", flexGrow: 1 }}>
+                  {filteredCampaigns.length === 0 ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', textAlign: 'center' }}>
+                      <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '250px', height: 'auto' }} />
+                      <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
+                        No se encontraron resultados.
+                      </Typography>
+                    </Box>
+                  ) : (
+                    filteredCampaigns.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0))
+                      .map((campaign, index) => {
                         const isSelected = selectedCampaigns.includes(index);
                         const progreso = campaign.numeroInicial > 0
                           ? Math.round((campaign.numeroActual / campaign.numeroInicial) * 100)
                           : 0;
                         return (
-                          <ListItem key={index} sx={{
-                            background: "#FFFFFF",
-                            backgroundColor:
-                              selectedCampaign?.id === campaign.id
-                                ? "#F2EBEDCC"  // ← mismo color que hover
-                                : isSelected
-                                  ? "rgba(209, 119, 154, 0.15)"
-                                  : "#FFFFFF",
-                            border: "1px solid #AE78884D",
-                            opacity: 1,
-                            width: "100%",
-                            height: "73px",
-                            borderRadius: "8px",
-                            marginBottom: "8px",
-                            padding: "10px",
-                            display: "flex",
-                            flexDirection: "column",
-                            transition: "background-color 0.3s",
-                            "&:hover": {
-                              backgroundColor: "#F2EBEDCC"
-                            }
-                          }}>
+                          <ListItem key={index}
+                            onClick={() => handleSelectCampaign(campaign)}
+                            sx={{
+                              background: "#FFFFFF",
+                              backgroundColor:
+                                selectedCampaign?.id === campaign.id
+                                  ? "#F2EBEDCC"
+                                  : isSelected
+                                    ? "rgba(209, 119, 154, 0.15)"
+                                    : "#FFFFFF",
+                              border: "1px solid #AE78884D",
+                              opacity: 1,
+                              width: "100%",
+                              height: "73px",
+                              borderRadius: "8px",
+                              marginBottom: "8px",
+                              padding: "10px",
+                              display: "flex",
+                              flexDirection: "column",
+                              transition: "background-color 0.3s",
+                              "&:hover": {
+                                backgroundColor: "#F2EBEDCC"
+                              }
+                            }}>
 
                             <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
                               <Box sx={{ marginTop: "-5px", display: "flex", alignItems: "center" }}>
@@ -1888,11 +1892,20 @@ const Campains: React.FC = () => {
                                 sx={{ padding: 0 }}
                               >
                                 <PushPinIcon
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // evita seleccionar campaña
+                                    setCampaigns(prev =>
+                                      prev.map(c =>
+                                        c.id === campaign.id ? { ...c, isPinned: !c.isPinned } : c
+                                      )
+                                    );
+                                  }}
                                   sx={{
-                                    color: selectedCampaign?.id === campaign.id ? "#8E5065" : "#574B4F",
+                                    color: campaign.isPinned ? "#8E5065" : "#574B4F",
                                     fontSize: "20px",
-                                    transform: selectedCampaign?.id === campaign.id ? "rotate(45deg)" : "none",
-                                    transition: "transform 0.3s ease, color 0.3s ease"
+                                    transform: campaign.isPinned ? "rotate(45deg)" : "none",
+                                    transition: "transform 0.3s ease, color 0.3s ease",
+                                    cursor: "pointer"
                                   }}
                                 />
                               </IconButton>
@@ -1912,33 +1925,33 @@ const Campains: React.FC = () => {
                           </ListItem>
                         );
                       })
-                    )}
-                  </List>
-                </Paper>
-              )}
-              <IconButton
-                onClick={() => setPanelAbierto(!panelAbierto)}
-                sx={{
-                  height: "581px",
-                  width: "30px",
-                  borderRadius: "0 8px 8px 0", // redondeado derecho
-                  borderLeft: "1px solid #D6D6D6", // 👉 esta es la línea gris
-                  backgroundColor: "#FFFFFF",
-                  '&:hover': { backgroundColor: "#FFFFFF" },
-                  paddingX: "10px"
-                }}
+                  )}
+                </List>
+              </Paper>
+            )}
+            <IconButton
+              onClick={() => setPanelAbierto(!panelAbierto)}
+              sx={{
+                height: "581px",
+                width: "30px",
+                borderRadius: "0 8px 8px 0", // redondeado derecho
+                borderLeft: "1px solid #D6D6D6", // 👉 esta es la línea gris
+                backgroundColor: "#FFFFFF",
+                '&:hover': { backgroundColor: "#FFFFFF" },
+                paddingX: "10px"
+              }}
+            >
+              <Typography sx={{
+                fontSize: "20px",
+                transform: panelAbierto ? "rotate(0deg)" : "rotate(180deg)",
+                transition: "transform 0.3s"
+              }}
               >
-                <Typography sx={{
-                  fontSize: "20px",
-                  transform: panelAbierto ? "rotate(0deg)" : "rotate(180deg)",
-                  transition: "transform 0.3s"
-                }}
-                >
-                  ❮
-                </Typography>
-              </IconButton>
-            </Box>
-          </Grid>
+                ❮
+              </Typography>
+            </IconButton>
+          </Box>
+        </Grid>
 
 
           {/* Visualización de campaña */}
@@ -6176,7 +6189,7 @@ const Campains: React.FC = () => {
               <Box sx={{ flexGrow: 1 }}>
                 <MenuItem
                   onClick={() => {
-                    if (selectedCampaign.autoStart) {
+                    if (selectedCampaign?.autoStart) {
                       handleOpenEditCampaignModal(selectedCampaign);
                     }
                     handleMenuClose();
@@ -6267,7 +6280,7 @@ const Campains: React.FC = () => {
 
             <MenuItem onClick={() => {
               if (menuIndex !== null && menuIndex >= 0) {
-                handleOpenDuplicateModal(selectedCampaign);
+                handleOpenDuplicateModal(selectedCampaign!);
               } else if (selectedCampaign) {
                 handleOpenDuplicateModal(selectedCampaign);
               }

@@ -24,7 +24,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import HomeIcon from "@mui/icons-material/Home";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import axios from "axios";
+import axios from "../components/commons/AxiosInstance";
 import iconlupa from "../assets/icon-lupa.svg";
 import ClearIcon from "@mui/icons-material/Clear";
 import infoicon from '../assets/Icon-info.svg'
@@ -101,8 +101,7 @@ const Rooms: React.FC = () => {
                     "Access-Control-Allow-Origin": "*"
                 };
                 const response = await axios.get(
-                    `${import.meta.env.VITE_SMS_API_URL +
-                    import.meta.env.VITE_API_DELETE_ROOM}?id=${selectedRoom.id}`,
+                    `${import.meta.env.VITE_API_DELETE_ROOM}?id=${selectedRoom.id}`,
                     { headers }
                 );
 
@@ -126,8 +125,7 @@ const Rooms: React.FC = () => {
         const obj = usuario ? JSON.parse(usuario) : null;
 
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_GetRooms}?email=${obj?.email}`;
+            const request = `${import.meta.env.VITE_API_GetRooms}?email=${obj?.email}`;
             const response = await axios.get(request);
 
             if (response.status === 200) {
@@ -195,8 +193,7 @@ const Rooms: React.FC = () => {
 
             // Realiza la solicitud POST al endpoint
             const response = await axios.post(
-                `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_UPDATE_ROOM}`,
+                `${import.meta.env.VITE_API_UPDATE_ROOM}`,
                 data,
                 { headers },
             );
@@ -241,9 +238,7 @@ const Rooms: React.FC = () => {
                 "Access-Control-Allow-Origin": "*"
             };
             const response = await axios.post(
-                `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_NEW_ROOM
-                }`,
+                `${import.meta.env.VITE_API_NEW_ROOM}`,
                 data,
                 { headers },
             );

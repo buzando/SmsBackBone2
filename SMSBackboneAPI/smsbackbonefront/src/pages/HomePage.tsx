@@ -16,9 +16,12 @@ import smsico from '../assets/Icon-sms.svg'
 import welcome from '../assets/icon-welcome.svg'
 import fast from '../assets/icon-fastsend.svg'
 import Secondarybutton from '../components/commons/SecondaryButton'
-import axios from "axios";
+import axios from "../components/commons/AxiosInstance";
 import ModalError from "../components/commons/ModalError";
 import SnackBar from "../components/commons/ChipBar";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
 interface CampaignKPIResponse {
     activeCampaigns: number;
     sentToday: number;
@@ -96,12 +99,13 @@ const HomePage: React.FC = () => {
     const [isFlashMessage, setIsFlashMessage] = useState(false);
     const [MessageModalError, setMessageModalError] = useState("");
     const [MessageSnackBar, setMessageSnackBar] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const Handletmppwwd = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('userData') || '{}');
             const userId = user?.idCliente;
-            const response = await axios.get(`${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_Client_TMPPSSW}`, {
+            const response = await axios.get(`${import.meta.env.VITE_API_Client_TMPPSSW}`, {
                 params: { userId }
             });
             setClient(response.data);
@@ -135,7 +139,7 @@ const HomePage: React.FC = () => {
                 "Access-Control-Allow-Origin": "*"
             };
 
-            const apiEndpoint = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_NEWPASSWORD_USER}`;
+            const apiEndpoint = `${import.meta.env.VITE_API_NEWPASSWORD_USER}`;
             const response = await axios.post(apiEndpoint, data, {
                 headers
             });
@@ -171,7 +175,7 @@ const HomePage: React.FC = () => {
         };
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_DASHBOARDINFO}`, payload);
+            const response = await axios.post(`${import.meta.env.VITE_API_GET_DASHBOARDINFO}`, payload);
             const data: CampaignKPIResponse = response.data;
 
             // Aquí ya no dependes del estado selectedOption
@@ -406,7 +410,7 @@ const HomePage: React.FC = () => {
                 Flash: isFlashMessage
             };
 
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MESSAGE_SENDQUICK}`;
+            const requestUrl = `${import.meta.env.VITE_API_MESSAGE_SENDQUICK}`;
             const response = await axios.post(requestUrl, payload);
 
             if (response.status === 200) {
@@ -1430,20 +1434,21 @@ const HomePage: React.FC = () => {
                             variant="outlined"
                             fullWidth
                             name="password"
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             margin="normal"
                             value={pssw}
                             onChange={handlePasswordChange}
-                            helperText={passwordError ?
-                                <span style={{
-                                    minHeight: "20px", display: "inline-block",
-                                    fontFamily: 'Poppins',
-                                    fontSize: "12px",
-                                    color: "#D01247", position: "absolute"
-                                }}>
-                                    Ingresa la contraseña válida.
-                                </span>
-                                : ''
+                            helperText={
+                                passwordError ? (
+                                    <span style={{
+                                        minHeight: "20px", display: "inline-block",
+                                        fontFamily: 'Poppins',
+                                        fontSize: "12px",
+                                        color: "#D01247", position: "absolute"
+                                    }}>
+                                        Ingresa la contraseña válida.
+                                    </span>
+                                ) : ''
                             }
                             error={passwordError}
                             InputProps={{
@@ -1468,10 +1473,9 @@ const HomePage: React.FC = () => {
                                 },
                                 endAdornment: (
                                     <InputAdornment position="end">
-
-                                        <Tooltip title={
-                                            <Box
-                                                sx={{
+                                        <Tooltip
+                                            title={
+                                                <Box sx={{
                                                     backgroundColor: "#FFFFFF",
                                                     borderRadius: "8px",
                                                     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
@@ -1480,52 +1484,25 @@ const HomePage: React.FC = () => {
                                                     fontFamily: "Poppins",
                                                     color: "#574B4F",
                                                     transform: "translate(-10px, -22px)",
-                                                }}
-                                            >
-                                                <>
+                                                }}>
                                                     · Solo caracteres tales <br />
                                                     · Longitud máxima de 40 <br />
                                                     caracteres
-                                                </>
-                                            </Box>
-                                        }
+                                                </Box>
+                                            }
                                             placement="bottom-end"
-                                            componentsProps={{
-                                                tooltip: {
-                                                    sx: {
-                                                        backgroundColor: "transparent",
-                                                        padding: 0,
-
-                                                    },
-                                                },
-                                            }}
+                                            componentsProps={{ tooltip: { sx: { backgroundColor: "transparent", padding: 0 } } }}
                                         >
-                                            <IconButton
-                                                disableRipple
-                                                sx={{
-                                                    backgroundColor: "transparent !important",
-                                                    "&:hover": {
-                                                        backgroundColor: "transparent !important",
-                                                    },
-                                                }}
-                                            >
-                                                {
-                                                    passwordError ? <img
-                                                        src={infoiconerror}
-                                                        alt="info-icon"
-                                                        style={{ width: 24, height: 24 }}
-                                                    /> :
-                                                        <img
-                                                            src={infoicon}
-                                                            alt="info-icon"
-                                                            style={{ width: 24, height: 24 }}
-                                                        />
-                                                }
+                                            <IconButton disableRipple sx={{ backgroundColor: "transparent !important", "&:hover": { backgroundColor: "transparent !important" } }}>
+                                                {passwordError ? <img src={infoiconerror} alt="info-icon" style={{ width: 24, height: 24 }} /> :
+                                                    <img src={infoicon} alt="info-icon" style={{ width: 24, height: 24 }} />}
                                             </IconButton>
                                         </Tooltip>
-
+                                        <IconButton onClick={() => setShowPassword(!showPassword)} sx={{ ml: 1 }}>
+                                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                        </IconButton>
                                     </InputAdornment>
-                                ),
+                                )
                             }}
                             required
                         />
@@ -1556,18 +1533,19 @@ const HomePage: React.FC = () => {
                             onChange={handleConfirmPasswordChange}
                             margin="normal"
                             name="password"
-                            type="password"
+                            type={showConfirmPassword ? "text" : "password"}
                             error={passwordError}
-                            helperText={passwordError ?
-                                <span style={{
-                                    minHeight: "20px", display: "inline-block",
-                                    fontFamily: 'Poppins',
-                                    fontSize: "12px",
-                                    color: "#D01247", position: "absolute"
-                                }}>
-                                    Las contraseñas no coinciden.
-                                </span>
-                                : ''
+                            helperText={
+                                passwordError ? (
+                                    <span style={{
+                                        minHeight: "20px", display: "inline-block",
+                                        fontFamily: 'Poppins',
+                                        fontSize: "12px",
+                                        color: "#D01247", position: "absolute"
+                                    }}>
+                                        Las contraseñas no coinciden.
+                                    </span>
+                                ) : ''
                             }
                             InputProps={{
                                 sx: {
@@ -1591,10 +1569,9 @@ const HomePage: React.FC = () => {
                                 },
                                 endAdornment: (
                                     <InputAdornment position="end">
-
-                                        <Tooltip title={
-                                            <Box
-                                                sx={{
+                                        <Tooltip
+                                            title={
+                                                <Box sx={{
                                                     backgroundColor: "#FFFFFF",
                                                     borderRadius: "8px",
                                                     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
@@ -1603,52 +1580,25 @@ const HomePage: React.FC = () => {
                                                     fontFamily: "Poppins",
                                                     color: "#574B4F",
                                                     transform: "translate(-10px, -22px)",
-                                                }}
-                                            >
-                                                <>
+                                                }}>
                                                     · Solo caracteres tales <br />
                                                     · Longitud máxima de 40 <br />
                                                     caracteres
-                                                </>
-                                            </Box>
-                                        }
+                                                </Box>
+                                            }
                                             placement="bottom-end"
-                                            componentsProps={{
-                                                tooltip: {
-                                                    sx: {
-                                                        backgroundColor: "transparent",
-                                                        padding: 0,
-
-                                                    },
-                                                },
-                                            }}
+                                            componentsProps={{ tooltip: { sx: { backgroundColor: "transparent", padding: 0 } } }}
                                         >
-                                            <IconButton
-                                                disableRipple
-                                                sx={{
-                                                    backgroundColor: "transparent !important",
-                                                    "&:hover": {
-                                                        backgroundColor: "transparent !important",
-                                                    },
-                                                }}
-                                            >
-                                                {
-                                                    passwordError ? <img
-                                                        src={infoiconerror}
-                                                        alt="info-icon"
-                                                        style={{ width: 24, height: 24 }}
-                                                    /> :
-                                                        <img
-                                                            src={infoicon}
-                                                            alt="info-icon"
-                                                            style={{ width: 24, height: 24 }}
-                                                        />
-                                                }
+                                            <IconButton disableRipple sx={{ backgroundColor: "transparent !important", "&:hover": { backgroundColor: "transparent !important" } }}>
+                                                {passwordError ? <img src={infoiconerror} alt="info-icon" style={{ width: 24, height: 24 }} /> :
+                                                    <img src={infoicon} alt="info-icon" style={{ width: 24, height: 24 }} />}
                                             </IconButton>
                                         </Tooltip>
-
+                                        <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} sx={{ ml: 1 }}>
+                                            {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                        </IconButton>
                                     </InputAdornment>
-                                ),
+                                )
                             }}
                             required
                         />

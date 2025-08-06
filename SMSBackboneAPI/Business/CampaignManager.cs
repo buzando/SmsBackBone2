@@ -109,14 +109,27 @@ namespace Business
                     // HORARIOS - Comentado por validación
                     // -----------------------------------
 
-                    var schedules = ctx.CampaignSchedules.Where(s => s.CampaignId == campaign.Id).ToList();
-                    ctx.CampaignSchedules.RemoveRange(schedules);
-                    ctx.SaveChanges();
+                    var existingSchedules = ctx.CampaignSchedules
+    .Where(s => s.CampaignId == campaign.Id)
+    .ToList();
 
-                    foreach (var schedule in campaigns.CampaignSchedules)
+                    var newSchedules = campaigns.CampaignSchedules;
+
+                    // Si no hay nada nuevo, no hacemos nada
+                    if (newSchedules != null && newSchedules.Any())
                     {
-                        schedule.CampaignId = campaign.Id;
-                        ctx.CampaignSchedules.Add(schedule);
+                        foreach (var newSchedule in newSchedules)
+                        {
+                            bool alreadyExists = existingSchedules.Any(existing =>
+                                existing.StartDateTime == newSchedule.StartDateTime &&
+                                existing.EndDateTime == newSchedule.EndDateTime);
+
+                            if (!alreadyExists)
+                            {
+                                newSchedule.CampaignId = campaign.Id;
+                                ctx.CampaignSchedules.Add(newSchedule);
+                            }
+                        }
                     }
 
 
@@ -734,9 +747,9 @@ namespace Business
                 using (var ctx = new Entities())
                 {
                     foreach (var campaignId in campaignIds)
-                        {
+                    {
 
-                    
+
                         var campaign = ctx.Campaigns.FirstOrDefault(c => c.Id == campaignId);
                         if (campaign == null) continue;
 
@@ -758,7 +771,7 @@ namespace Business
                         ctx.CampaignRecycleSettings.RemoveRange(recycle);
 
 
-                      
+
 
                         ctx.Campaigns.Remove(campaign);
                     }
