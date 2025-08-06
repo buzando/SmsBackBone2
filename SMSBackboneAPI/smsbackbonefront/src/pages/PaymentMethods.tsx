@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import MainIcon from '../components/commons/MainButtonIcon';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import ModalError from "../components/commons/ModalError"
 import ChipBar from "../components/commons/ChipBar";
 import MainModal from "../components/commons/MainModal"
@@ -181,7 +181,7 @@ const PaymentMethods: React.FC = () => {
     const handleDeleteCard = async () => {
         if (!cardToDelete) return;
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_DELETE_CREDITCARD + cardToDelete.id}`;
+            const requestUrl = `${import.meta.env.VITE_API_DELETE_CREDITCARD + cardToDelete.id}`;
             const response = await axios.get(requestUrl);
 
 
@@ -220,7 +220,7 @@ const PaymentMethods: React.FC = () => {
         }
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GET_CREDITCARD}${obj.id}`;
+            const requestUrl = `${import.meta.env.VITE_API_GET_CREDITCARD}${obj.id}`;
             const response = await axios.get(requestUrl);
 
             if (response.status === 200) {
@@ -264,7 +264,7 @@ const PaymentMethods: React.FC = () => {
         }
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ADD_CREDITCARD}`;
+            const requestUrl = `${import.meta.env.VITE_API_ADD_CREDITCARD}`;
             const payload = {
                 user_id: obj.id,
                 card_number: formData.cardNumber,
@@ -388,7 +388,7 @@ const PaymentMethods: React.FC = () => {
                 id: card.id,
                 is_default: true,
             };
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_DEFAULT_CREDITCARD}`;
+            const requestUrl = `${import.meta.env.VITE_API_DEFAULT_CREDITCARD}`;
             // Simulación de llamada al API
             const response = await axios.post(requestUrl, payload);
 

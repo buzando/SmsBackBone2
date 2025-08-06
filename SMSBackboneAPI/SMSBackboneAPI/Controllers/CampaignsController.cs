@@ -24,6 +24,7 @@ namespace SMSBackboneAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CampaignsController : Controller
     {
         public IActionResult Index()

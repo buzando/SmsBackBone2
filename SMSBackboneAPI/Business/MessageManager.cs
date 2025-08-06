@@ -73,7 +73,7 @@ namespace Business
                         var sendResult = api.SendTestMessage(smsRequestDto.To[0], finalMessage, loginResponse.Result).GetAwaiter()
                                 .GetResult();
 
-                        var testmessage = new TestMessage
+                        var testmessage = new Modal.Model.Model.TestMessage
                         {
                             CreatedAt = DateTime.Now,
                             FromNumber = smsRequestDto.From,
@@ -81,7 +81,8 @@ namespace Business
                             Status = sendResult.status.ToString(),
                             TemplateId = smsRequestDto.TemplateId,
                             ToNumber = smsRequestDto.To[0],
-                            UserId = smsRequestDto.UserID
+                            UserId = smsRequestDto.UserID,
+                            IdBackBone = sendResult.id
                         };
 
                         context.TestMessage.Add(testmessage);
@@ -101,7 +102,7 @@ namespace Business
 
                         foreach (var result in sendResults)
                         {
-                            var testMessage = new TestMessage
+                            var testMessage = new Modal.Model.Model.TestMessage
                             {
                                 CreatedAt = DateTime.Now,
                                 FromNumber = smsRequestDto.From,
@@ -109,7 +110,9 @@ namespace Business
                                 Status = result.status.ToString(),
                                 TemplateId = smsRequestDto.TemplateId,
                                 ToNumber = result.phoneNumber,
-                                UserId = smsRequestDto.UserID
+                                UserId = smsRequestDto.UserID,
+                                IdBackBone = result.id
+                                
                             };
 
                             context.TestMessage.Add(testMessage);

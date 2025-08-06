@@ -22,6 +22,7 @@ namespace SMSBackboneAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ClientController : ControllerBase
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(ClientController));

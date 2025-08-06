@@ -12,7 +12,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContai
 import ClearIcon from '@mui/icons-material/Clear';
 import IconLeft from '../assets/icon-punta-flecha-bottom.svg'
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import axios from "../components/commons/AxiosInstance";
 import seachicon from '../assets/icon-lupa.svg';
 import iconclose from '../assets/icon-close.svg';
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
@@ -170,7 +170,7 @@ const Use: React.FC = () => {
 
         setLoading(true);
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_USE}`;
+            const request = `${import.meta.env.VITE_API_GET_USE}`;
             const selectedRoom = localStorage.getItem("selectedRoom");
             const roomId = selectedRoom ? JSON.parse(selectedRoom).id : null;
             const response = await axios.post(request, {
@@ -213,7 +213,7 @@ const Use: React.FC = () => {
 
         const fetchCampaigns = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_CAMPAIGNSUSE}`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_GET_CAMPAIGNSUSE}`, {
                     params: { roomId, smsType }
                 });
                 setCampaigns(response.data || []);
@@ -224,7 +224,7 @@ const Use: React.FC = () => {
 
         const fetchUsers = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_USERSUSE}`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_GET_USERSUSE}`, {
                     params: { roomId }
                 });
                 setUsers(response.data || []);

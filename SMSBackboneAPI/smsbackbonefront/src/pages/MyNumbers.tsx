@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import { TextField, InputAdornment, MenuItem, Box, Select, Menu, Modal, Button, Typography, ListItemText, Checkbox, Grid, IconButton, Divider, FormControl } from '@mui/material';
 import HelpIco from '../assets/Icono_ayuda.svg';
 import IconTrash from "../assets/IconTrash.svg";
@@ -123,7 +123,7 @@ const MyNumbers: React.FC = () => {
                 Email: parsedUser.email
             };
 
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_NUMBERS_SEND}`;
+            const requestUrl = `${import.meta.env.VITE_API_NUMBERS_SEND}`;
             const response = await axios.post(requestUrl, payload);
             if (response.status === 200) {
                 if (response.data.startsWith('http'))
@@ -155,7 +155,7 @@ const MyNumbers: React.FC = () => {
 
     const checkRechargeStatus = async (id: string) => {
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_VERIFY_RECHARGENUMBER}${id}`;
+            const requestUrl = `${import.meta.env.VITE_API_VERIFY_RECHARGENUMBER}${id}`;
             const response = await axios.get(requestUrl);
 
             if (response.status === 200 && response.data) {
@@ -1977,8 +1977,7 @@ const MyNumbers: React.FC = () => {
         const obj = usuario ? JSON.parse(usuario) : null;
 
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_GET_NUMBERS}${obj?.idCliente}`;
+            const request = `${import.meta.env.VITE_API_GET_NUMBERS}${obj?.idCliente}`;
             const response = await axios.get(request);
 
             if (response.status === 200) {
@@ -2037,7 +2036,7 @@ const MyNumbers: React.FC = () => {
         }
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GET_CREDITCARD}${user.id}`;
+            const requestUrl = `${import.meta.env.VITE_API_GET_CREDITCARD}${user.id}`;
             const response = await axios.get(requestUrl);
 
             if (response.status === 200) {

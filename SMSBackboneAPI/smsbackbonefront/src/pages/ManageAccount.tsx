@@ -8,7 +8,7 @@ import {
     Tooltip,
     Modal,
 } from "@mui/material";
-import axios from "axios";
+import axios from "../components/commons/AxiosInstance";
 import { Divider } from "@mui/material";
 import infoicon from '../assets/Icon-info.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
@@ -118,7 +118,7 @@ const ManageAccount: React.FC = () => {
                 "Access-Control-Allow-Origin": "*",
             };
 
-            const apiEndpoint = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_UPDATE_USER}`; // Cambiar por el endpoint real de actualización
+            const apiEndpoint = `${import.meta.env.VITE_API_UPDATE_USER}`; 
             const response = await axios.post(apiEndpoint, data, { headers });
 
             if (response.status === 200) {

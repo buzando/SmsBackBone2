@@ -19,7 +19,7 @@ import * as XLSX from 'xlsx';
 import { unparse } from 'papaparse';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import IconDownloadCSV from '../assets/IconCSV.svg';
 import IconDownloadExcel from '../assets/IconExcel.svg';
 import IconDownloadPDF from '../assets/IconPDF.svg';
@@ -150,7 +150,7 @@ const RoomsAdmin: React.FC = () => {
     const getRooms = async () => {
         setLoading(true);
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_ROOMSADMIN}`;
+            const requestUrl = `${import.meta.env.VITE_API_GET_ROOMSADMIN}`;
             const response = await axios.get(requestUrl);
             setRoomsData(response.data);
             setOriginalData(response.data);
@@ -164,8 +164,7 @@ const RoomsAdmin: React.FC = () => {
         setLoading(true);
 
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL +
-                import.meta.env.VITE_API_GET_CLIENTS}`;
+            const request = `${import.meta.env.VITE_API_GET_CLIENTS}`;
             const response = await axios.get<Clients[]>(request);
 
             if (response.status === 200) {
@@ -266,7 +265,7 @@ const RoomsAdmin: React.FC = () => {
             } else {
                 const payload = { Formato: format };
                 const response = await axios.post(
-                    `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_EXPORT_NUMBERS}`,
+                    `${import.meta.env.VITE_API_EXPORT_NUMBERS}`,
                     payload,
                     { headers: { 'Content-Type': 'application/json' }, responseType: 'blob' }
                 );
@@ -290,7 +289,7 @@ const RoomsAdmin: React.FC = () => {
     const handleDelete = async (id: number) => {
         try {
 
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_DELETE_CLIENT}${id}`;
+            const requestUrl = `${import.meta.env.VITE_API_DELETE_CLIENT}${id}`;
             await axios.get(requestUrl);
 
             setDeleteModalOpen(false);

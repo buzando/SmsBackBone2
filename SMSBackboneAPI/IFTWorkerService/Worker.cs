@@ -58,8 +58,8 @@ namespace IFTWorkerService
                 }
 
                 _logger.Info($"Esperando {minutosEjecucion} minutos para la nueva ejecución del servicio Descarga Archivos Adjuntos...");
-
-                await Task.Delay(minutosEjecucion * 60000, stoppingToken);
+                await Task.Delay(Timeout.Infinite);
+                //await Task.Delay(minutosEjecucion * 60000, stoppingToken);
             }
         }
         public override Task StopAsync(CancellationToken cancellationToken)

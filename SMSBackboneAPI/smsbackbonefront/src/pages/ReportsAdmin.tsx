@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import CustomDateTimePicker from '../components/commons/DatePicker';
 import SecondaryButton from '../components/commons/SecondaryButton';
 import MainButton from '../components/commons/MainButton';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import dayjs from 'dayjs';
 import seachicon from '../assets/icon-lupa.svg';
 import iconclose from "../assets/icon-close.svg";
@@ -118,7 +118,7 @@ const ReportsAdmin = () => {
     };
     const GetClients = async () => {
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_CLIENTS}`;
+            const request = `${import.meta.env.VITE_API_GET_CLIENTS}`;
             const response = await axios.get<Clients[]>(request);
             if (response.status === 200) {
                 const fetchedClient = response.data;
@@ -140,7 +140,7 @@ const ReportsAdmin = () => {
         if (!start || !end) return;
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_REPORTSADMIN}`, {
+            const response = await axios.post(`${import.meta.env.VITE_API_GET_REPORTSADMIN}`, {
                 fechaInicio: start.toISOString(),
                 fechaFin: end.toISOString(),
                 tipoReporte: tab,
@@ -176,39 +176,28 @@ const ReportsAdmin = () => {
         callback: () => void
     ) => {
         try {
-            const selectedRoom = localStorage.getItem("selectedRoom");
-            if (!selectedRoom) {
-                return;
-            }
-
-            const roomId = JSON.parse(selectedRoom).id;
             const payload = {
                 ReportType: "ReportesAdmin",
                 Format: format,
-                RoomId: roomId,
                 PageOrigin: activeTab.toString(),
                 StartDate: selectedStartDate?.toISOString(),
                 EndDate: selectedEndDate?.toISOString(),
             };
 
             const response = await axios.post(
-                `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GETREPORTS_ALL}`,
+                `${import.meta.env.VITE_API_GETREPORTS_ALL}`,
                 payload
             );
 
             if (response.data?.success && response.data?.downloadUrl) {
-                const fileUrl = `${import.meta.env.VITE_SMS_API_URL}${response.data.downloadUrl}`;
-
-                // Paso 2: Descargar el archivo ya generado (GET)
-                const fileResponse = await axios.get(fileUrl, { responseType: 'blob' });
-
-                const blob = new Blob([fileResponse.data]);
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = response.data.fileName;
-                document.body.appendChild(a);
+                const responsedata = await fetch("/Quantum/Download/" + response.data?.fileName);
+                const blob = await responsedata.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = response.data?.fileName;
                 a.click();
-                a.remove();
+                window.URL.revokeObjectURL(url);
             } else {
                 console.error("Error: No se generó el archivo.");
             }

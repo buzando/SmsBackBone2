@@ -25,16 +25,19 @@ namespace SMSBackboneAPI.Controllers
     public class UserController : ControllerBase
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(UserController));
-        string JwtIssuer = "Issuer";
-        string JwtAudience = "Audience";
-        private IConfiguration configuration;
+        private readonly IConfiguration configuration;
+        private readonly string JwtIssuer;
+        private readonly string JwtAudience;
         public UserController(IConfiguration iConfig)
         {
-            configuration = iConfig;
+            this.configuration = iConfig;
+            this.JwtIssuer = configuration["JwtIssuer"];
+            this.JwtAudience = configuration["JwtAudience"];
         }
 
 
         [HttpPost("Login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Authenticate(LoginDto Login)
         {
             GeneralErrorResponseDto[] errorResponse = new GeneralErrorResponseDto[1];
@@ -47,23 +50,6 @@ namespace SMSBackboneAPI.Controllers
             var responseDto = userManager.Login(Login.email, Login.password);
             if (responseDto != null)
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var byteKey = Encoding.UTF8.GetBytes(configuration.GetSection("SecretKey").Value);
-
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new Claim[]
-                    {
-                        new Claim("User", JsonConvert.SerializeObject(responseDto))
-                    }),
-                    Expires = DateTime.UtcNow.AddDays(1),
-                    Issuer = JwtIssuer,
-                    Audience = JwtAudience,
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(byteKey), SecurityAlgorithms.HmacSha256Signature)
-                };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                var respuesta = new ResponseDTO { user = responseDto, token = token.ToString(), expiration = DateTime.Now.AddDays(1) };
-                // var response = Ok(tokenHandler.WriteToken(token));
                 if (!responseDto.emailConfirmed)
                 {
 
@@ -75,6 +61,30 @@ namespace SMSBackboneAPI.Controllers
                     return BadRequest(new GeneralErrorResponseDto() { code = "UserLocked", description = "User locked" });
 
                 }
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var byteKey = Encoding.UTF8.GetBytes(configuration["SecretKey"]);
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[]
+    {
+        new Claim(ClaimTypes.NameIdentifier, responseDto.Id.ToString()),
+        new Claim(ClaimTypes.Email, responseDto.email),
+        new Claim(ClaimTypes.Role, responseDto.rol)
+    }),
+                    Expires = DateTime.UtcNow.AddDays(30),
+                    Issuer = JwtIssuer,
+                    Audience = JwtAudience,
+                    SigningCredentials = new SigningCredentials(
+        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["SecretKey"])),
+        SecurityAlgorithms.HmacSha256Signature
+    )
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var jwtToken = tokenHandler.WriteToken(token);
+                var respuesta = new ResponseDTO { user = responseDto, token = jwtToken, expiration = DateTime.Now.AddDays(1) };
+                // var response = Ok(tokenHandler.WriteToken(token));
+
                 var response = Ok(respuesta);
 
                 return response;
@@ -85,7 +95,7 @@ namespace SMSBackboneAPI.Controllers
 
             }
         }
-
+        [Authorize]
         [HttpPost("LockUser")]
         public async Task<IActionResult> LockUser(lockDTO user)
         {
@@ -113,20 +123,9 @@ namespace SMSBackboneAPI.Controllers
 
         [AllowAnonymous]
         [HttpGet("GenerateconfirmationEmail")]
-        public async Task<IActionResult> GenerateMail(string email, string type)//string email,[FromBody] string urlCallback)
+        public async Task<IActionResult> GenerateMail(string email, string type)
         {
             GeneralErrorResponseDto errorResponse = new GeneralErrorResponseDto();
-            //if (_context.Users == null)
-            //{
-            //    return NoContent();
-            //}
-
-            //var user = await _userManager.FindByIdAsync(Convert.ToString(id));
-            //var valid = _emailServices.ValidateEmail(email);
-            //if (valid == null)
-            //{
-            //    return BadRequest(valid);
-            //}
 
             var userManager = new Business.UserManager();
 
@@ -168,7 +167,7 @@ namespace SMSBackboneAPI.Controllers
 
         [AllowAnonymous]
         [HttpGet("confirmationEmail")]
-        public IActionResult ConfirmMail(string email, string token)//string email,[FromBody] string urlCallback)
+        public IActionResult ConfirmMail(string email, string token)
         {
             GeneralErrorResponseDto errorResponse = new GeneralErrorResponseDto();
 
@@ -211,8 +210,7 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
-
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("SaveTwoFactor")]
         public IActionResult SaveTwoFactor(string email)
         {
@@ -234,7 +232,7 @@ namespace SMSBackboneAPI.Controllers
 
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("GetRooms")]
         public IActionResult Roomsbyuser(string email)
         {
@@ -256,7 +254,7 @@ namespace SMSBackboneAPI.Controllers
 
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("GetUserByEmail")]
         public IActionResult GetUserByEmail(string email)
         {
@@ -277,7 +275,7 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
-
+        [Authorize]
         [HttpPost("NewPassword")]
         public async Task<IActionResult> NewPassword(PasswordResetDTO Login)
         {
@@ -322,7 +320,7 @@ namespace SMSBackboneAPI.Controllers
             }
         }
 
-
+        [Authorize]
         [HttpGet("Credit")]
         public async Task<IActionResult> Credit()
         {
@@ -336,7 +334,7 @@ namespace SMSBackboneAPI.Controllers
             return Ok(result);
         }
 
-
+        [AllowAnonymous]
         [HttpPost("registerAccount")]
         public async Task<IActionResult> RegisterUser(RegisterUser user)
         {
@@ -413,7 +411,7 @@ namespace SMSBackboneAPI.Controllers
             }
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("GetUsersByClient")]
         public IActionResult GetUsersByClient(int Client)
         {
@@ -435,7 +433,7 @@ namespace SMSBackboneAPI.Controllers
 
         }
 
-
+        [Authorize]
         [HttpGet("DeleteUserByid")]
         public async Task<IActionResult> DeleteUserByid(int id)
         {
@@ -462,7 +460,7 @@ namespace SMSBackboneAPI.Controllers
                 return response;
             }
         }
-
+        [Authorize]
         [HttpPost("AddUser")]
         public async Task<IActionResult> AddUser(UserAddDTO user)
         {
@@ -511,7 +509,7 @@ namespace SMSBackboneAPI.Controllers
 
 
         }
-
+        [Authorize]
         [HttpPost("UpdateUser")]
         public async Task<IActionResult> UpdateUser(UserAddDTO user)
         {
@@ -547,7 +545,7 @@ namespace SMSBackboneAPI.Controllers
 
 
         }
-
+        [Authorize]
         [HttpPost("UpdateLogUser")]
         public async Task<IActionResult> UpdateLogUser(UpdateUser user)
         {
@@ -576,7 +574,7 @@ namespace SMSBackboneAPI.Controllers
 
 
         }
-
+        [Authorize]
         [HttpPost("FinishRegister")]
         public async Task<IActionResult> FinishRegister(UserFinishRegistrationDTO user)
         {
@@ -622,7 +620,7 @@ namespace SMSBackboneAPI.Controllers
 
 
         }
-
+        [Authorize]
         [HttpGet("GetCreditCardsByUser")]
         public async Task<IActionResult> GetCreditCardsByUser(int id)
         {
@@ -649,7 +647,7 @@ namespace SMSBackboneAPI.Controllers
                 return response;
             }
         }
-
+        [Authorize]
         [HttpPost("AddCreditCard")]
         public async Task<IActionResult> AddCreditCard(CreditCardRequest Creditcard)
         {
@@ -676,7 +674,7 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
-
+        [Authorize]
         [HttpPost("DefaultCreditCard")]
         public async Task<IActionResult> DefaultCreditCard(DefaultCreditCard Creditcard)
         {
@@ -703,7 +701,7 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
-
+        [Authorize]
         [HttpGet("DeleteCreditCard")]
         public async Task<IActionResult> DeleteCreditCard(int id)
         {
@@ -730,7 +728,7 @@ namespace SMSBackboneAPI.Controllers
                 return response;
             }
         }
-
+        [Authorize]
         [HttpGet("GetNumbersByUser")]
         public async Task<IActionResult> GetNumbersByUser(int id)
         {
@@ -760,7 +758,7 @@ namespace SMSBackboneAPI.Controllers
             }
         }
 
-
+        [Authorize]
         [HttpGet("GetAllNumbers")]
         public async Task<IActionResult> GetAllNumbers()
         {
@@ -788,7 +786,7 @@ namespace SMSBackboneAPI.Controllers
         }
 
         #region billingInformatión
-
+        [Authorize]
         [HttpPost("AddBilling")]
         public async Task<IActionResult> AddBillingInformationUser(BillingInformationDto Billing)
         {
@@ -818,7 +816,7 @@ namespace SMSBackboneAPI.Controllers
 
 
         }
-
+        [Authorize]
         [HttpPost("UpdateBilling")]
         public async Task<IActionResult> UpdateBillingUser(BillingInformationDto Billing)
         {
@@ -845,7 +843,7 @@ namespace SMSBackboneAPI.Controllers
 
 
         }
-
+        [Authorize]
         [HttpGet("GetBillingByUser")]
         public async Task<IActionResult> GetBillingByUser(string email)
         {
@@ -880,6 +878,7 @@ namespace SMSBackboneAPI.Controllers
         #endregion
 
         #region rechargue
+        [Authorize]
         [HttpPost("AddRechageUser")]
         public async Task<IActionResult> AddRechageUser(CreditRechargeRequest credit)
         {
@@ -908,7 +907,7 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
-
+        [Authorize]
         [HttpGet("UpdateRecharge")]
         public async Task<IActionResult> UpdateRecharge(string ID)
         {
@@ -932,7 +931,7 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
-
+        [Authorize]
         [HttpPost("GetRechargeByUser")]
         public async Task<IActionResult> GetRechargeByUser(Datepickers Date)
         {
@@ -955,7 +954,7 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
-
+        [Authorize]
         [HttpPost("SaveNotificationRecharge")]
         public async Task<IActionResult> SaveNotificationRecharge(AmountNotificationRequest Notification)
         {
@@ -972,7 +971,7 @@ namespace SMSBackboneAPI.Controllers
                 return response;
             }
         }
-
+        [Authorize]
         [HttpGet("GetNotificationRecharge")]
         public async Task<IActionResult> GetNotificationRecharge(int Id)
         {
@@ -993,6 +992,7 @@ namespace SMSBackboneAPI.Controllers
         #endregion
 
         #region BlackList
+        [Authorize]
         [HttpGet("GetBlackListByUsers")]
         public async Task<IActionResult> GetBlackListByUsers(int id)
         {
@@ -1019,7 +1019,7 @@ namespace SMSBackboneAPI.Controllers
                 return response;
             }
         }
-
+        [Authorize]
         [HttpPost("AddBlackList")]
         public async Task<IActionResult> AddBlackList(BlackListRequest blacklist)
         {
@@ -1059,7 +1059,7 @@ namespace SMSBackboneAPI.Controllers
 
 
         }
-
+        [Authorize]
         [HttpPost("UpdateBlackList")]
         public async Task<IActionResult> UpdateBlackList(UpdateBlackList blacklist)
         {
@@ -1083,6 +1083,7 @@ namespace SMSBackboneAPI.Controllers
 
 
         }
+        [Authorize]
         [HttpPost("GetBlackListRecords")]
         public async Task<IActionResult> GetBlackListRecords(BlackListRecords blacklist)
         {
@@ -1106,6 +1107,7 @@ namespace SMSBackboneAPI.Controllers
 
 
         }
+        [Authorize]
         [HttpPost("UpdateBlackListRecord")]
         public async Task<IActionResult> UpdateBlackListRecord(BlackListManagment blacklist)
         {
@@ -1148,6 +1150,7 @@ namespace SMSBackboneAPI.Controllers
 
         }
 
+        [Authorize]
         [HttpPost("DeleteBlackList")]
         public async Task<IActionResult> DeleteBlackList(DeleteBlackList blacklist)
         {
@@ -1177,7 +1180,7 @@ namespace SMSBackboneAPI.Controllers
         #endregion
 
         #region templates
-
+        [Authorize]
         [HttpPost("AddTemplate")]
         public IActionResult AddTemplate(AddTemplate addTemplate)
         {
@@ -1189,6 +1192,7 @@ namespace SMSBackboneAPI.Controllers
             else
                 return BadRequest(new GeneralErrorResponseDto() { code = "ErrorCreatingTemplate", description = "Error al crear template." });
         }
+        [Authorize]
         [HttpGet("GetTemplatesByRoom")]
         public IActionResult GetTemplatesByRoom(int idRoom)
         {
@@ -1200,6 +1204,7 @@ namespace SMSBackboneAPI.Controllers
             else
                 return BadRequest(new GeneralErrorResponseDto() { code = "TemplatesNotFound", description = "No se encontraron plantillas para este Room." });
         }
+        [Authorize]
         [HttpPost("UpdateTemplate")]
         public IActionResult UpdateTemplate(UpdateTemplateRequest updateTemplate)
         {
@@ -1211,6 +1216,7 @@ namespace SMSBackboneAPI.Controllers
             else
                 return BadRequest(new GeneralErrorResponseDto() { code = "TemplateNotFound", description = "No se encontró el template para actualizar." });
         }
+        [Authorize]
         [HttpPost("DeleteTemplate")]
         public IActionResult DeleteTemplate(TemplateRequest deleteTemplate)
         {
@@ -1222,6 +1228,7 @@ namespace SMSBackboneAPI.Controllers
             else
                 return BadRequest(new GeneralErrorResponseDto() { code = "TemplateNotFound", description = "No se encontró el template para eliminar." });
         }
+        [Authorize]
         [HttpPost("getcampaignsbytemplate")]
         public IActionResult getcampaignsbytemplate(TemplateRequest Template)
         {
@@ -1234,39 +1241,42 @@ namespace SMSBackboneAPI.Controllers
                 return BadRequest(new GeneralErrorResponseDto() { code = "TemplateNotFound", description = "No se encontró el template para actualizar." });
         }
         #endregion
-
+        [Authorize]
         [HttpPost("GetCampaignKPIByRoom")]
         public IActionResult GetCampaignKPIByRoom(CampaignKPIRequest request)
         {
             var result = new UserManager().GetCampaignKPIByRoom(request);
             return Ok(result);
         }
+        [Authorize]
         [HttpPost("GetUseData")]
         public IActionResult GetUseData(UseRequest request)
         {
             var data = new UserManager().GetUsageByRoom(request);
             return Ok(data);
         }
-
+        [Authorize]
         [HttpGet("GetCampaignsByRoom")]
         public IActionResult GetCampaignsByRoom(int roomId, int smsType)
         {
             var data = new UserManager().GetCampaignsByRoom(roomId, smsType);
             return Ok(data);
         }
+        [Authorize]
         [HttpGet("GetAllCampaignsByRoom")]
         public IActionResult GetAllCampaignsByRoom(int roomId)
         {
             var data = new UserManager().GetallCampaignsByRoom(roomId);
             return Ok(data);
         }
-
+        [Authorize]
         [HttpGet("GetUsersByRoom")]
         public IActionResult GetUsersByRoom(int roomId)
         {
             var data = new UserManager().GetUsersByRoom(roomId);
             return Ok(data);
         }
+        [Authorize]
         [HttpPost("GetReport")]
         public IActionResult GetReport([FromBody] ReportRequest request)
         {
@@ -1290,7 +1300,7 @@ namespace SMSBackboneAPI.Controllers
                     return BadRequest("Tipo de reporte no válido. Solo se permiten: global, entrantes, enviados, noenviados, rechazados.");
             }
         }
-
+        [Authorize]
         [HttpGet("GetConfigurationPss")]
         public IActionResult GetConfigurationPss(int userId)
         {

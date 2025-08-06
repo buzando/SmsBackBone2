@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import ChipBar from "../components/commons/ChipBar";
 import { Box, Divider, Typography, Checkbox, Radio, Modal, Select, MenuItem, SelectChangeEvent, TextField, FormControlLabel } from '@mui/material';
 import { InputAdornment, Tooltip, TooltipProps } from "@mui/material";
@@ -129,7 +129,7 @@ const AccountRecharge: React.FC = () => {
 
     const checkRechargeStatus = async (id: string) => {
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_VERIFY_RECHARGE}${id}`;
+            const requestUrl = `${import.meta.env.VITE_API_VERIFY_RECHARGE}${id}`;
             const response = await axios.get(requestUrl);
 
             if (response.status === 200 && response.data) {
@@ -181,7 +181,7 @@ const AccountRecharge: React.FC = () => {
         const userObj = userData ? JSON.parse(userData) : null;
 
         if (userObj?.idCliente) {
-            const url = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GETRATE_CLIENT}${userObj.idCliente}`;
+            const url = `${import.meta.env.VITE_API_GETRATE_CLIENT}${userObj.idCliente}`;
             axios.get(url)
                 .then(res => {
                     if (res.status === 200 && res.data) {
@@ -278,7 +278,7 @@ const AccountRecharge: React.FC = () => {
         }
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GET_CREDITCARD}${obj.id}`;
+            const requestUrl = `${import.meta.env.VITE_API_GET_CREDITCARD}${obj.id}`;
             const response = await axios.get(requestUrl);
 
             if (response.status === 200) {
@@ -305,8 +305,8 @@ const AccountRecharge: React.FC = () => {
 
         try {
             const storedRoom = localStorage.getItem('selectedRoom');
-            const room = JSON.parse(storedRoom);
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ADD_RECHARGE}`;
+            const room = JSON.parse(storedRoom!);
+            const requestUrl = `${import.meta.env.VITE_API_ADD_RECHARGE}`;
             const payload = {
                 IdCreditCard: selectedCard?.id,
                 IdUser: obj.id,
@@ -349,7 +349,7 @@ const AccountRecharge: React.FC = () => {
         }
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ADD_CREDITCARD}`;
+            const requestUrl = `${import.meta.env.VITE_API_ADD_CREDITCARD}`;
             const payload = {
                 user_id: obj.id,
                 card_number: cardDetails.cardNumber,
@@ -496,7 +496,7 @@ const AccountRecharge: React.FC = () => {
     const handleDeleteCard = async () => {
         if (!cardToDelete) return;
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_DELETE_CREDITCARD + cardToDelete.id}`;
+            const requestUrl = `${import.meta.env.VITE_API_DELETE_CREDITCARD + cardToDelete.id}`;
             const response = await axios.get(requestUrl);
 
 

@@ -29,7 +29,7 @@ import IconExcel from '../assets/IconExcel.svg';
 import IconPDF from '../assets/IconPDF.svg';
 import Tooltip from "@mui/material/Tooltip";
 
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import dayjs from 'dayjs';
 
 import { saveAs } from 'file-saver';
@@ -39,6 +39,8 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+
 
 interface Reports {
     id: number,
@@ -139,6 +141,13 @@ const Reports: React.FC = () => {
     const [totalXPage, settotalXPage] = useState(0);
     const navigate = useNavigate();
 
+    <ClickAwayListener onClickAway={() => {
+        setCampaignMenuOpen(false);
+        setUserMenuOpen(false);
+        setDatePickerOpen(false);
+    }}>
+
+    </ClickAwayListener>
 
     const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
         setSelectedTab(newValue);
@@ -147,6 +156,8 @@ const Reports: React.FC = () => {
 
     const handleDateClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
+        setCampaignMenuOpen(false);
+        setUserMenuOpen(false);
         setDatePickerOpen(true);
     };
 
@@ -159,6 +170,8 @@ const Reports: React.FC = () => {
 
     // Abre o cierra el menú de campañas
     const handleCampaignClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setUserMenuOpen(false);
+        setDatePickerOpen(false);
         if (campaignMenuOpen) {
             setCampaignMenuOpen(false);
             setAnchorElC(null);
@@ -189,6 +202,8 @@ const Reports: React.FC = () => {
 
     // Abre o cierra el menú de usuarios
     const handleUserClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setUserMenuOpen(false);
+        setDatePickerOpen(false);
         if (userMenuOpen) {
             setUserMenuOpen(false);
             setUserAnchorEl(null);
@@ -245,7 +260,7 @@ const Reports: React.FC = () => {
 
             if (!roomId) return;
 
-            const response = await axios.get(`${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_USERSUSE}`, {
+            const response = await axios.get(`${import.meta.env.VITE_API_GET_USERSUSE}`, {
                 params: { roomId }
             });
             setUsers(response.data);
@@ -266,7 +281,7 @@ const Reports: React.FC = () => {
 
             if (!roomId) return;
 
-            const response = await axios.get(`${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_ALLCAMPAIGNSUSE}`, {
+            const response = await axios.get(`${import.meta.env.VITE_API_GET_ALLCAMPAIGNSUSE}`, {
                 params: { roomId }
             });
             setCampaigns(response.data);
@@ -313,7 +328,7 @@ const Reports: React.FC = () => {
             };
 
             const response = await axios.post(
-                `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_REPORT}`,
+                `${import.meta.env.VITE_API_GET_REPORT}`,
                 payload
             );
             if (response.data) {
@@ -505,23 +520,19 @@ const Reports: React.FC = () => {
             };
 
             const response = await axios.post(
-                `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GETREPORTS_ALL}`,
+                `${import.meta.env.VITE_API_GETREPORTS_ALL}`,
                 payload
             );
 
             if (response.data?.success && response.data?.downloadUrl) {
-                const fileUrl = `${import.meta.env.VITE_SMS_API_URL}${response.data.downloadUrl}`;
-
-                // Paso 2: Descargar el archivo ya generado (GET)
-                const fileResponse = await axios.get(fileUrl, { responseType: 'blob' });
-
-                const blob = new Blob([fileResponse.data]);
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = response.data.fileName;
-                document.body.appendChild(a);
+                const responsedata = await fetch("/Quantum/Download/" + response.data?.fileName);
+                const blob = await responsedata.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = response.data?.fileName;
                 a.click();
-                a.remove();
+                window.URL.revokeObjectURL(url);
             } else {
                 console.error("Error: No se generó el archivo.");
             }
@@ -1031,18 +1042,18 @@ const Reports: React.FC = () => {
                         {/* Primera página (doble flecha izquierda) */}
                         <IconButton sx={{ p: 0 }} onClick={handleFirstPage} disabled={currentPage === 0}>
                             <Box display="flex" alignItems="center" >
-                                <img src={backarrow} alt="<<" style={{ marginRight: '-16px',opacity: currentPage === 0 ? 0.1 : 3  }} />
-                                <img src={backarrow} alt="<<" style={{ opacity: currentPage === 0 ? 0.1 : 3  }} />
+                                <img src={backarrow} alt="<<" style={{ marginRight: '-16px', opacity: currentPage === 0 ? 0.1 : 3 }} />
+                                <img src={backarrow} alt="<<" style={{ opacity: currentPage === 0 ? 0.1 : 3 }} />
                             </Box>
                         </IconButton>
 
                         {/* Página anterior (flecha izquierda) */}
-                        <IconButton sx={{ p: 0 }} onClick={handlePreviousPage}  disabled={currentPage === 0}>
-                            <img src={backarrow} alt="<" style={{  opacity: currentPage === 0 ? 0.1 : 3 }} />
+                        <IconButton sx={{ p: 0 }} onClick={handlePreviousPage} disabled={currentPage === 0}>
+                            <img src={backarrow} alt="<" style={{ opacity: currentPage === 0 ? 0.1 : 3 }} />
                         </IconButton>
 
                         {/* Página siguiente (flecha derecha volteada) */}
-                        <IconButton sx={{ p: 0 }} onClick={handleNextPage}  disabled={currentPage >= totalPages - 1}>
+                        <IconButton sx={{ p: 0 }} onClick={handleNextPage} disabled={currentPage >= totalPages - 1}>
                             <img
                                 src={backarrow}
                                 alt=">"
@@ -1052,7 +1063,7 @@ const Reports: React.FC = () => {
 
                         {/* Última página (doble flecha derecha) */}
                         <Box display="flex" alignItems="center">
-                            <IconButton sx={{ p: 0 }} onClick={handleLastPage}  disabled={currentPage >= totalPages - 1}>
+                            <IconButton sx={{ p: 0 }} onClick={handleLastPage} disabled={currentPage >= totalPages - 1}>
 
                                 <img
                                     src={backarrow}
@@ -1064,8 +1075,8 @@ const Reports: React.FC = () => {
                                 <img
                                     src={backarrow}
                                     alt=">>"
-                                    style={{ transform: 'scaleX(-1)', marginLeft: '-12px',   opacity: currentPage >= totalPages - 1 ? 0.1 : 1}}
-                                  
+                                    style={{ transform: 'scaleX(-1)', marginLeft: '-12px', opacity: currentPage >= totalPages - 1 ? 0.1 : 1 }}
+
 
                                 />
 

@@ -92,26 +92,51 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
     }
   };
 
-  function saveCaretPosition(container: HTMLElement): Range | null {
+  function saveCaretCharacterOffset(container: HTMLElement): number | null {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return null;
     const range = selection.getRangeAt(0);
-    if (!container.contains(range.startContainer)) return null;
-    return range;
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(container);
+    preCaretRange.setEnd(range.startContainer, range.startOffset);
+    return preCaretRange.toString().length;
   }
 
-  function restoreCaretPosition(container: HTMLElement, savedRange: Range | null) {
-    if (!savedRange) return;
+  function restoreCaretCharacterOffset(container: HTMLElement, offset: number | null) {
+    if (offset == null) return;
     const selection = window.getSelection();
-    if (!selection) return;
-    selection.removeAllRanges();
-    selection.addRange(savedRange);
+    const range = document.createRange();
+    let charCount = 0;
+
+    function traverse(node: Node): boolean {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const nextCount = charCount + node.textContent!.length;
+        if (offset <= nextCount) {
+          range.setStart(node, offset - charCount);
+          return true;
+        }
+        charCount = nextCount;
+      } else {
+        for (const child of node.childNodes) {
+          if (traverse(child)) return true;
+        }
+      }
+      return false;
+    }
+
+    traverse(container);
+    range.collapse(true);
+    selection!.removeAllRanges();
+    selection!.addRange(range);
   }
+
 
 
   const filteredTemplates = templates.filter(t => t.name.toLowerCase().includes(searchText.toLowerCase()));
   const filteredVars = variables.filter(v => v.toLowerCase().includes(chipSearch.toLowerCase()));
   const editableRef = useRef<HTMLDivElement>(null);
+
+
   return (
     <Box>
       <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '16px', mb: 2 }}>
@@ -193,34 +218,37 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
         suppressContentEditableWarning
         onInput={(e) => {
           const container = e.currentTarget;
-          const savedRange = saveCaretPosition(container);
+          const caretOffset = saveCaretCharacterOffset(container);
 
           const childNodes = Array.from(container.childNodes);
-          const parsed: (string | { variable: string })[] = [];
-
-          childNodes.forEach((node) => {
-            if (node.nodeType === Node.TEXT_NODE) {
-              parsed.push(node.textContent || '');
-            } else if (
+          const parsed = childNodes.map((node) => {
+            if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+            if (
               node.nodeType === Node.ELEMENT_NODE &&
               (node as HTMLElement).dataset?.type === 'chip'
             ) {
-              const chipVar = (node as HTMLElement).dataset.var ?? '';
-              parsed.push({ variable: chipVar });
-            } else if (
-              node.nodeType === Node.ELEMENT_NODE &&
-              (node as HTMLElement).tagName === 'SPAN'
-            ) {
-              parsed.push((node as HTMLElement).innerText);
+              return { variable: (node as HTMLElement).dataset.var ?? '' };
             }
+            return (node as HTMLElement).innerText;
           });
 
           const cleanRaw = parsed.map(t => typeof t === 'string' ? t : `{${t.variable}}`).join('');
-          onChange(cleanRaw);
-          setCharLimitExceeded(cleanRaw.length > 160);
 
-          requestAnimationFrame(() => restoreCaretPosition(container, savedRange));
+          if (cleanRaw.length <= 160) {
+            setTokens(parsed);
+            onChange(cleanRaw);
+            setCharLimitExceeded(false);
+          } else {
+            setCharLimitExceeded(true);
+            return;
+          }
+
+          requestAnimationFrame(() => {
+            restoreCaretCharacterOffset(container, caretOffset);
+          });
         }}
+
+
 
 
         sx={{

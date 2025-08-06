@@ -1,5 +1,6 @@
 using log4net;
 using log4net.Config;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -37,6 +38,29 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
+var key = Encoding.UTF8.GetBytes(builder.Configuration["SecretKey"]);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidIssuer = builder.Configuration["JwtIssuer"],
+        ValidAudience = builder.Configuration["JwtAudience"],
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -57,6 +81,8 @@ app.UseCors(x => x
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

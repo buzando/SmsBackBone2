@@ -81,6 +81,10 @@ namespace Business
                                         StartDateTime = reader.GetDateTime(reader.GetOrdinal("StartDateTime")),
                                         EndDateTime = reader.GetDateTime(reader.GetOrdinal("EndDateTime")),
                                         ClientId = reader.GetInt32(reader.GetOrdinal("ClientId")),
+                                        concatenate = reader.GetBoolean(reader.GetOrdinal("concatenate")),
+                                        shortenUrls = reader.GetBoolean(reader.GetOrdinal("shortenUrls")),
+                                        ShouldConcatenate = reader.GetBoolean(reader.GetOrdinal("ShouldConcatenate")),
+                                        ShouldShortenUrls = reader.GetBoolean(reader.GetOrdinal("ShouldShortenUrls")),
                                         Contacts = JsonConvert.DeserializeObject<List<CampaignContact>>(reader["ContactsJson"].ToString())
                                     };
 
@@ -281,6 +285,10 @@ namespace Business
                                         }
                                     }
                                     var FormatMessage = PersonalizeMessage(campaign.Message, contact);
+                                    if (campaign.ShouldShortenUrls || campaign.shortenUrls)
+                                    {
+                                        FormatMessage = ShortenUrlsIfNeeded(FormatMessage, campaign.ShouldShortenUrls);
+                                    }
                                     messagesToSend.Add(new MessageToSend
                                     {
                                         phoneNumber = contact.PhoneNumber,
@@ -470,9 +478,27 @@ namespace Business
             }
         }
 
+        private string ShortenUrlsIfNeeded(string message, bool shouldShorten)
+        {
+            if (!shouldShorten || string.IsNullOrWhiteSpace(message)) return message;
 
+            var urlRegex = new System.Text.RegularExpressions.Regex(@"\b(?:https?://|www\.)\S+\b", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            var urls = urlRegex.Matches(message).Cast<System.Text.RegularExpressions.Match>().Select(m => m.Value).Distinct();
 
+            foreach (var url in urls)
+            {
+                var shortened = ShortenUrl(url);
+                message = message.Replace(url, shortened);
+            }
 
+            return message;
+        }
+
+        private string ShortenUrl(string url)
+        {
+            // Por ahora puedes simularlo así, o llamar una API real tipo Bitly/TinyURL
+            return $"https://corta.link/{Guid.NewGuid().ToString().Substring(0, 6)}";
+        }
 
 
     }

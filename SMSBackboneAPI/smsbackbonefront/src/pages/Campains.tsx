@@ -31,7 +31,7 @@ import {
   FormGroup,
   Popover
 } from "@mui/material";
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import AddIcon from '@mui/icons-material/Add';
 import seachicon from '../assets/icon-lupa.svg'
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -153,6 +153,7 @@ export interface CampaignFullResponse {
   saveAsTemplate: boolean;
   templateName: String;
   campaignContactScheduleSendDTO?: CampaignContactScheduleSendDTO[];
+  isPinned: boolean;
 }
 
 export interface CampaignContactScheduleSendDTO {
@@ -385,7 +386,7 @@ const Campains: React.FC = () => {
     const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
     try {
       setLoadingTemplates(true);
-      const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM}${salaId}`;
+      const requestUrl = `${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM}${salaId}`;
       const response = await axios.get(requestUrl);
       setTemplates(response.data);
     } catch (error) {
@@ -401,7 +402,7 @@ const Campains: React.FC = () => {
 
     try {
 
-      const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_BLACKLIST}${salaId}`;
+      const requestUrl = `${import.meta.env.VITE_API_GET_BLACKLIST}${salaId}`;
       const response = await axios.get(requestUrl);
       if (response.status === 200) {
         setBlackLists(response.data);
@@ -668,7 +669,7 @@ const Campains: React.FC = () => {
     if (!salaId) return;
 
     try {
-      const url = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GET_CAMPAIGN + salaId}`;
+      const url = `${import.meta.env.VITE_API_GET_CAMPAIGN + salaId}`;
       const response = await axios.get(url);
       if (response.status === 200) {
         setCampaigns(response.data);
@@ -778,7 +779,7 @@ const Campains: React.FC = () => {
       };
 
       const response = await axios.post(
-        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_ADD_TMPSAVEFILE}`,
+        `${import.meta.env.VITE_API_ADD_TMPSAVEFILE}`,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -922,7 +923,7 @@ const Campains: React.FC = () => {
       };
 
       const response = await axios.post(
-        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_ADD_CAMPAIGN}`,
+        `${import.meta.env.VITE_API_ADD_CAMPAIGN}`,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -1063,7 +1064,7 @@ const Campains: React.FC = () => {
       };
 
       const response = await axios.post(
-        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_EDIT_CAMPAIGN}`,
+        `${import.meta.env.VITE_API_EDIT_CAMPAIGN}`,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -1109,7 +1110,7 @@ const Campains: React.FC = () => {
 
       // Enviar al backend (ajusta según tu endpoint)
       await axios.post(
-        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_DELETE_CAMPAIGN}`,
+        `${import.meta.env.VITE_API_DELETE_CAMPAIGN}`,
         idArray,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -1146,7 +1147,7 @@ const Campains: React.FC = () => {
       };
 
       const response = await axios.post(
-        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_CLONE_CAMPAIGN}`,
+        `${import.meta.env.VITE_API_CLONE_CAMPAIGN}`,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -1179,7 +1180,7 @@ const Campains: React.FC = () => {
     setCampaigns(prev =>
       prev.map(c => (c.id === campaign.id ? updated : c))
     );
-    const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_STAR_CAMPAIGN}${campaign.id}`
+    const requestUrl = `${import.meta.env.VITE_API_STAR_CAMPAIGN}${campaign.id}`
     await axios.get(requestUrl);
 
     setSelectedCampaign(updated);
@@ -1333,7 +1334,7 @@ const Campains: React.FC = () => {
         UserID: clientId.id
       };
 
-      const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MESSAGE_SEND}`;
+      const requestUrl = `${import.meta.env.VITE_API_MESSAGE_SEND}`;
       const response = await axios.post(requestUrl, payload);
 
       if (response.status === 200) {
@@ -1795,150 +1796,162 @@ const Campains: React.FC = () => {
                       </Typography>
                     </Box>
                   ) : (
-                    filteredCampaigns.map((campaign, index) => {
-                      const isSelected = selectedCampaigns.includes(index);
-                      const progreso = campaign.numeroInicial > 0
-                        ? Math.round((campaign.numeroActual / campaign.numeroInicial) * 100)
-                        : 0;
-                      return (
-                        <ListItem key={index} sx={{
-                          background: "#FFFFFF",
-                          backgroundColor:
-                            selectedCampaign?.id === campaign.id
-                              ? "#F2EBEDCC"  // ← mismo color que hover
-                              : isSelected
-                                ? "rgba(209, 119, 154, 0.15)"
-                                : "#FFFFFF",
-                          border: "1px solid #AE78884D",
-                          opacity: 1,
-                          width: "100%",
-                          height: "73px",
-                          borderRadius: "8px",
-                          marginBottom: "8px",
-                          padding: "10px",
-                          display: "flex",
-                          flexDirection: "column",
-                          transition: "background-color 0.3s",
-                          "&:hover": {
-                            backgroundColor: "#F2EBEDCC"
-                          }
-                        }}>
+                    filteredCampaigns.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0))
+                      .map((campaign, index) => {
+                        const isSelected = selectedCampaigns.includes(index);
+                        const progreso = campaign.numeroInicial > 0
+                          ? Math.round((campaign.numeroActual / campaign.numeroInicial) * 100)
+                          : 0;
+                        return (
+                          <ListItem key={index}
+                            onClick={() => handleSelectCampaign(campaign)}
+                            sx={{
+                              background: "#FFFFFF",
+                              backgroundColor:
+                                selectedCampaign?.id === campaign.id
+                                  ? "#F2EBEDCC"
+                                  : isSelected
+                                    ? "rgba(209, 119, 154, 0.15)"
+                                    : "#FFFFFF",
+                              border: "1px solid #AE78884D",
+                              opacity: 1,
+                              width: "100%",
+                              height: "73px",
+                              borderRadius: "8px",
+                              marginBottom: "8px",
+                              padding: "10px",
+                              display: "flex",
+                              flexDirection: "column",
+                              transition: "background-color 0.3s",
+                              "&:hover": {
+                                backgroundColor: "#F2EBEDCC"
+                              }
+                            }}>
 
-                          <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
-                            <Box sx={{ marginTop: "-5px", display: "flex", alignItems: "center" }}>
-                              <Checkbox
-                                checked={isSelected}
-                                onChange={() => {
-                                  setSelectedCampaigns(prev =>
-                                    isSelected ? prev.filter(i => i !== index) : [...prev, index]
-                                  );
-                                }}
-                                icon={
-                                  <Box
-                                    sx={{
-                                      width: "20px",
-                                      height: "20px",
-                                      borderRadius: "4px",
-                                      border: "2px solid #8F4D63",
-                                    }}
-                                  />
-                                }
-                                checkedIcon={
-                                  <Box
-                                    sx={{
-                                      width: "20px",
-                                      height: "20px",
-                                      borderRadius: "4px",
-                                      backgroundColor: "#8F4D63",
-                                      border: "2px solid #8F4D63",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                    }}
-                                  >
+                            <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
+                              <Box sx={{ marginTop: "-5px", display: "flex", alignItems: "center" }}>
+                                <Checkbox
+                                  checked={isSelected}
+                                  onChange={() => {
+                                    setSelectedCampaigns(prev =>
+                                      isSelected ? prev.filter(i => i !== index) : [...prev, index]
+                                    );
+                                  }}
+                                  icon={
                                     <Box
-                                      component="span"
                                       sx={{
-                                        color: "#FFFFFF",
-                                        fontSize: "13px",
-                                        fontWeight: "bold",
-                                        lineHeight: "1",
-                                        fontFamily: "Poppins, sans-serif",
+                                        width: "20px",
+                                        height: "20px",
+                                        borderRadius: "4px",
+                                        border: "2px solid #8F4D63",
+                                      }}
+                                    />
+                                  }
+                                  checkedIcon={
+                                    <Box
+                                      sx={{
+                                        width: "20px",
+                                        height: "20px",
+                                        borderRadius: "4px",
+                                        backgroundColor: "#8F4D63",
+                                        border: "2px solid #8F4D63",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
                                       }}
                                     >
-                                      ✓
+                                      <Box
+                                        component="span"
+                                        sx={{
+                                          color: "#FFFFFF",
+                                          fontSize: "13px",
+                                          fontWeight: "bold",
+                                          lineHeight: "1",
+                                          fontFamily: "Poppins, sans-serif",
+                                        }}
+                                      >
+                                        ✓
+                                      </Box>
                                     </Box>
-                                  </Box>
-                                }
-                                sx={{
-                                  color: "#8F4D63",
-                                  "&.Mui-checked": { color: "#8F4D63" },
-                                  alignSelf: "flex-start",
-                                }}
-                              />
+                                  }
+                                  sx={{
+                                    color: "#8F4D63",
+                                    "&.Mui-checked": { color: "#8F4D63" },
+                                    alignSelf: "flex-start",
+                                  }}
+                                />
 
-                              <img src={smsico} alt="SMS"
-                                style={{
-                                  width: "18px",
-                                  height: "18px",
-                                  marginRight: "8px",
-                                  color: isSelected ? "#8E5065" : "#574B4F",
-                                }} />
-                              <Typography sx={{
-                                fontSize: "12px",
-                                fontWeight: "500",
-                                fontFamily: "Poppins",
-                                color: isSelected ? "#8E5065" : "#574B4F", // 👈 Cambia de color cuando está seleccionado
-                                marginBottom: "6px"
-                              }}
-                              >
-                                {campaign.name}
-                              </Typography>
-                            </Box>
-                            <IconButton
-                              onClick={(e) => handleMenuClick(e, index)}
-                              sx={{
-                                position: "absolute",
-                                top: "30px",
-                                right: "30px",
-                                height: "24px",
-                                width: "24px",
-                                padding: 0
-                              }}
-                            >
-                              <MoreVertIcon sx={{ color: "#6C3A52" }} />
-                            </IconButton>
-                            <IconButton
-                              onClick={() => {
-                                handleSelectCampaign(campaign);
-                              }}
-                              sx={{ padding: 0 }}
-                            >
-                              <PushPinIcon
-                                sx={{
-                                  color: selectedCampaign?.id === campaign.id ? "#8E5065" : "#574B4F",
-                                  fontSize: "20px",
-                                  transform: selectedCampaign?.id === campaign.id ? "rotate(45deg)" : "none",
-                                  transition: "transform 0.3s ease, color 0.3s ease"
+                                <img src={smsico} alt="SMS"
+                                  style={{
+                                    width: "18px",
+                                    height: "18px",
+                                    marginRight: "8px",
+                                    color: isSelected ? "#8E5065" : "#574B4F",
+                                  }} />
+                                <Typography sx={{
+                                  fontSize: "12px",
+                                  fontWeight: "500",
+                                  fontFamily: "Poppins",
+                                  color: isSelected ? "#8E5065" : "#574B4F", // 👈 Cambia de color cuando está seleccionado
+                                  marginBottom: "6px"
                                 }}
-                              />
-                            </IconButton>
-                          </Box>
-                          <Box sx={{ width: "65%", backgroundColor: "#E0E0E0", borderRadius: "6px", height: "10px", position: "relative", marginBottom: "10px", marginX: "auto" }}>
-                            <Box sx={{
-                              width: `${progreso}%`, backgroundColor: "#AE7888", borderRadius: "3px",
-                              height: "8px",
-                              position: "absolute",
-                              marginTop: "-9px",
-                            }} />
-                          </Box>
-                          <Box sx={{ display: "flex", justifyContent: "flex-start", alignItems: "center", width: "100%", marginTop: "0px", paddingLeft: "45px" }}>
-                            <Typography sx={{ fontSize: "12px", fontWeight: "600", marginLeft: "7px", marginTop: "-7px", color: isSelected ? "#8E5065" : "#574B4F" }}>{Math.round(progreso)}%</Typography>
-                            <Typography sx={{ fontSize: "12px", marginTop: "-7px", marginLeft: "7px", color: isSelected ? "#8E5065" : "#574B4F", fontFamily: "Poppins" }}>{campaign.numeroActual}/{campaign.numeroInicial}</Typography>
-                          </Box>
-                        </ListItem>
-                      );
-                    })
+                                >
+                                  {campaign.name}
+                                </Typography>
+                              </Box>
+                              <IconButton
+                                onClick={(e) => handleMenuClick(e, index)}
+                                sx={{
+                                  position: "absolute",
+                                  top: "30px",
+                                  right: "30px",
+                                  height: "24px",
+                                  width: "24px",
+                                  padding: 0
+                                }}
+                              >
+                                <MoreVertIcon sx={{ color: "#6C3A52" }} />
+                              </IconButton>
+                              <IconButton
+                                onClick={() => {
+                                  handleSelectCampaign(campaign);
+                                }}
+                                sx={{ padding: 0 }}
+                              >
+                                <PushPinIcon
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // evita seleccionar campaña
+                                    setCampaigns(prev =>
+                                      prev.map(c =>
+                                        c.id === campaign.id ? { ...c, isPinned: !c.isPinned } : c
+                                      )
+                                    );
+                                  }}
+                                  sx={{
+                                    color: campaign.isPinned ? "#8E5065" : "#574B4F",
+                                    fontSize: "20px",
+                                    transform: campaign.isPinned ? "rotate(45deg)" : "none",
+                                    transition: "transform 0.3s ease, color 0.3s ease",
+                                    cursor: "pointer"
+                                  }}
+                                />
+                              </IconButton>
+                            </Box>
+                            <Box sx={{ width: "65%", backgroundColor: "#E0E0E0", borderRadius: "6px", height: "10px", position: "relative", marginBottom: "10px", marginX: "auto" }}>
+                              <Box sx={{
+                                width: `${progreso}%`, backgroundColor: "#AE7888", borderRadius: "3px",
+                                height: "8px",
+                                position: "absolute",
+                                marginTop: "-9px",
+                              }} />
+                            </Box>
+                            <Box sx={{ display: "flex", justifyContent: "flex-start", alignItems: "center", width: "100%", marginTop: "0px", paddingLeft: "45px" }}>
+                              <Typography sx={{ fontSize: "12px", fontWeight: "600", marginLeft: "7px", marginTop: "-7px", color: isSelected ? "#8E5065" : "#574B4F" }}>{Math.round(progreso)}%</Typography>
+                              <Typography sx={{ fontSize: "12px", marginTop: "-7px", marginLeft: "7px", color: isSelected ? "#8E5065" : "#574B4F", fontFamily: "Poppins" }}>{campaign.numeroActual}/{campaign.numeroInicial}</Typography>
+                            </Box>
+                          </ListItem>
+                        );
+                      })
                   )}
                 </List>
               </Paper>
@@ -6159,7 +6172,7 @@ const Campains: React.FC = () => {
               <Box sx={{ flexGrow: 1 }}>
                 <MenuItem
                   onClick={() => {
-                    if (selectedCampaign.autoStart) {
+                    if (selectedCampaign?.autoStart) {
                       handleOpenEditCampaignModal(selectedCampaign);
                     }
                     handleMenuClose();
@@ -6250,7 +6263,7 @@ const Campains: React.FC = () => {
 
             <MenuItem onClick={() => {
               if (menuIndex !== null && menuIndex >= 0) {
-                handleOpenDuplicateModal(selectedCampaign);
+                handleOpenDuplicateModal(selectedCampaign!);
               } else if (selectedCampaign) {
                 handleOpenDuplicateModal(selectedCampaign);
               }

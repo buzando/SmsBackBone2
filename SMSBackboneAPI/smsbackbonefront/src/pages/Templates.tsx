@@ -13,7 +13,7 @@ import SecondaryButton from '../components/commons/SecondaryButton'
 import MainButton from '../components/commons/MainButton'
 import infoicon from '../assets/Icon-info.svg'
 import DynamicMessageEditor from '../components/commons/DymanicMessageEditor';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import ModalError from "../components/commons/ModalError"
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
@@ -139,7 +139,7 @@ const Templates = () => {
                 };
 
                 const response = await axios.post(
-                    `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_ADD_GETCAMPAINSBYTEMPLATE}`,
+                    `${import.meta.env.VITE_API_ADD_GETCAMPAINSBYTEMPLATE}`,
                     payload,
                     { headers: { 'Content-Type': 'application/json' } }
                 );
@@ -178,7 +178,7 @@ const Templates = () => {
                 idRoom: salaId
             };
 
-            const response = await axios.post(`${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_DELETE_TEMPLATE}`, payload, {
+            const response = await axios.post(`${import.meta.env.VITE_API_DELETE_TEMPLATE}`, payload, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -211,7 +211,7 @@ const Templates = () => {
                 };
 
                 await axios.post(
-                    `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_DELETE_TEMPLATE}`,
+                    `${import.meta.env.VITE_API_DELETE_TEMPLATE}`,
                     payload,
                     {
                         headers: {
@@ -270,7 +270,7 @@ const Templates = () => {
                 idRoom: salaId
             };
 
-            const response = await axios.post(`${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ADD_GETCAMPAINSBYTEMPLATE}`, payload, {
+            const response = await axios.post(`${import.meta.env.VITE_API_ADD_GETCAMPAINSBYTEMPLATE}`, payload, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -301,7 +301,7 @@ const Templates = () => {
                 idRoom: salaId
             }
 
-            const response = await axios.post(`${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ADD_GETCAMPAINSBYTEMPLATE}`, payload, {
+            const response = await axios.post(`${import.meta.env.VITE_API_ADD_GETCAMPAINSBYTEMPLATE}`, payload, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -324,7 +324,7 @@ const Templates = () => {
             const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
 
             setLoadingTemplates(true);
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM + salaId}`;
+            const requestUrl = `${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM + salaId}`;
             const response = await axios.get(requestUrl);
             setTemplates(response.data);
         }
@@ -364,7 +364,7 @@ const Templates = () => {
                 };
 
                 const response = await axios.post(
-                    `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_UPDATE_TEMPLATES}`,
+                    `${import.meta.env.VITE_API_UPDATE_TEMPLATES}`,
                     payload,
                     { headers: { 'Content-Type': 'application/json' } }
                 );
@@ -388,7 +388,7 @@ const Templates = () => {
                 };
 
                 const response = await axios.post(
-                    `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_ADD_TEMPLATE}`,
+                    `${import.meta.env.VITE_API_ADD_TEMPLATE}`,
                     payload,
                     { headers: { 'Content-Type': 'application/json' } }
                 );

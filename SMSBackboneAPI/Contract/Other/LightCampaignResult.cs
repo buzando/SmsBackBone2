@@ -17,7 +17,10 @@ namespace Contract.Other
         public bool FlashMessage { get; set; }
         public bool CustomANI { get; set; }
         public int NumberType { get; set; }
-
+        public bool concatenate { get; set; }
+        public bool shortenUrls { get; set; }
+        public bool ShouldConcatenate { get; set; }
+        public bool ShouldShortenUrls { get; set; }
         public int RoomId { get; set; }
         public string RoomName { get; set; }
         public double Credits { get; set; }

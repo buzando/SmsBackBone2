@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Modal from 'react-modal';
@@ -69,7 +69,7 @@ const Chooseroom: React.FC = () => {
                 const obj = JSON.parse(usuario!);
 
 
-                const request = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_AUTENTIFICATIONSAVE_ENDPOINT}?email=${obj.email}`;
+                const request = `${import.meta.env.VITE_API_AUTENTIFICATIONSAVE_ENDPOINT}?email=${obj.email}`;
                 const response = await axios.get(
                     request
                 );
@@ -85,6 +85,7 @@ const Chooseroom: React.FC = () => {
             }
         }
         catch {
+            setLoading(false);
             console.log(`MODE: ${import.meta.env.MODE}`)
         }
 
@@ -97,7 +98,7 @@ const Chooseroom: React.FC = () => {
         const obj = JSON.parse(usuario!);
 
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GetRooms}?email=${obj.email}`;
+            const request = `${import.meta.env.VITE_API_GetRooms}?email=${obj.email}`;
             const response = await axios.get(
                 request
             );

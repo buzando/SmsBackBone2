@@ -1,7 +1,7 @@
 import { Box, Divider, Typography, Select, MenuItem, TextField, InputLabel, FormControl, IconButton, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
-import axios from "axios";
+import axios from "../components/commons/AxiosInstance";
 import { useState, useEffect } from "react";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import SecondaryButton from '../components/commons/SecondaryButton'
@@ -63,12 +63,12 @@ export default function TestSMS() {
       }
 
       // Petición de plantillas
-      const templatesRequestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM}${salaId}`;
+      const templatesRequestUrl = `${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM}${salaId}`;
       const templatesResponse = await axios.get(templatesRequestUrl);
 
 
       // Petición de números
-      const numbersRequestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_NUMBERS}${user}`;
+      const numbersRequestUrl = `${import.meta.env.VITE_API_GET_NUMBERS}${user}`;
       const numbersResponse = await axios.get(numbersRequestUrl);
 
 
@@ -103,7 +103,7 @@ export default function TestSMS() {
         UserID: clientId.id
       };
 
-      const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_MESSAGE_SEND}`;
+      const requestUrl = `${import.meta.env.VITE_API_MESSAGE_SEND}`;
       const response = await axios.post(requestUrl, payload);
 
       if (response.status === 200) {

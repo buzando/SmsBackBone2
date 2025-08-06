@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSBackboneAPI.Service;
 using Contract.WebHooks;
+using Microsoft.AspNetCore.Authorization;
 namespace SMSBackboneAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MessageController : ControllerBase
     {
         private IConfiguration configuration;

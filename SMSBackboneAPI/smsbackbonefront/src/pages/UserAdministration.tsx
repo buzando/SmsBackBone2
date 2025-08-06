@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../components/commons/AxiosInstance";
 import {
     Box,
     Button,
@@ -213,7 +213,7 @@ const ManageAccounts: React.FC = () => {
     const handleDeleteUser = async () => {
         if (selectedAccount) {
             try {
-                const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_DELETE_USERS}?id=${selectedAccount.id}`;
+                const requestUrl = `${import.meta.env.VITE_API_DELETE_USERS}?id=${selectedAccount.id}`;
                 const response = await axios.get(requestUrl);
 
                 if (response.status === 200) {
@@ -270,19 +270,19 @@ const ManageAccounts: React.FC = () => {
             };
 
             if (isEditing) {
-                // Lógica para actualizar un usuario existente
-                const apiEndpoint = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_UPDATE_USERS}`; // Cambiar por el endpoint real de actualización
+
+                const apiEndpoint = `${import.meta.env.VITE_API_UPDATE_USERS}`; 
                 const response = await axios.post(apiEndpoint, data, { headers });
 
                 if (response.status === 200) {
-                    setshowChipBarAdd(true); // Mostrar ChipBar para edición exitosa
+                    setshowChipBarAdd(true); 
                     setTimeout(() => setshowChipBarAdd(false), 3000);
-                    fetchAccounts(); // Refrescar la lista de usuarios
-                    setOpenAddUserModal(false); // Cerrar el modal
-                    setIsEditing(false); // Salir del modo de edición
+                    fetchAccounts();
+                    setOpenAddUserModal(false); 
+                    setIsEditing(false);
                 }
             } else {
-                const apiEndpoint = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ADD_USERS}`; // Cambia por tu endpoint real
+                const apiEndpoint = `${import.meta.env.VITE_API_ADD_USERS}`;
                 const response = await axios.post(apiEndpoint, data, {
                     headers
                 });
@@ -307,7 +307,6 @@ const ManageAccounts: React.FC = () => {
 
 
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response) {
                 const errorCode = error.response.data?.code;
 
                 if (errorCode === "DuplicateUserName") {
@@ -325,7 +324,7 @@ const ManageAccounts: React.FC = () => {
                         "Error al Agregar un usuario. por favor intente más tarde"
                     );
                 }
-            }
+            
 
             setErrorModalOpen(true);
         }
@@ -351,7 +350,7 @@ const ManageAccounts: React.FC = () => {
                 return;
             }
 
-            const request = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GETBYCLIENT_USERS}?Client=${clientId}`;
+            const request = `${import.meta.env.VITE_API_GETBYCLIENT_USERS}?Client=${clientId}`;
             const response = await axios.get(request);
             if (response.status === 200) {
                 setAccounts(response.data);
@@ -377,7 +376,7 @@ const ManageAccounts: React.FC = () => {
             const parsedUserData = JSON.parse(userData);
             const clientId = parsedUserData.idCliente;
 
-            const request = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ROOMBYCLIENTE_ROOM}?Client=${clientId}`;
+            const request = `${import.meta.env.VITE_API_ROOMBYCLIENTE_ROOM}?Client=${clientId}`;
             const response = await axios.get(request);
             if (response.status === 200) {
                 const roomsData = Array.isArray(response.data) ? response.data : [];

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MainIcon from '../components/commons/MainButtonIcon';
-import axios from 'axios';
+import axios from "../components/commons/AxiosInstance";
 import ModalError from "../components/commons/ModalError"
 import ChipBar from "../components/commons/ChipBar";
 import MainModal from "../components/commons/MainModal"
@@ -250,7 +250,7 @@ const BlackList: React.FC = () => {
         }
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_UPDATE_BLACKLIST}`;
+            const requestUrl = `${import.meta.env.VITE_API_UPDATE_BLACKLIST}`;
             const payload = {
                 oldname: originalName,
                 newname: formData.Name,
@@ -320,7 +320,7 @@ const BlackList: React.FC = () => {
         }
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_BLACKLIST}${salaId}`;
+            const requestUrl = `${import.meta.env.VITE_API_GET_BLACKLIST}${salaId}`;
             const response = await axios.get(requestUrl);
 
             if (response.status === 200) {
@@ -389,7 +389,7 @@ const BlackList: React.FC = () => {
 
         try {
             setLoading(true);
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_UPDATERECORDS_BLACKLIST}`;
+            const requestUrl = `${import.meta.env.VITE_API_UPDATERECORDS_BLACKLIST}`;
             const response = await axios.post(requestUrl, payload, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -428,7 +428,7 @@ const BlackList: React.FC = () => {
         }
 
         try {
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_ADD_BLACKLIST}`;
+            const requestUrl = `${import.meta.env.VITE_API_ADD_BLACKLIST}`;
             const payload = {
                 Name: formData.Name,
                 ExpirationDate: formData.ExpirationDate,
@@ -658,7 +658,7 @@ const BlackList: React.FC = () => {
                 return;
 
             }
-            const apicall = `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_BLACKLISTRECORDS}`;
+            const apicall = `${import.meta.env.VITE_API_GET_BLACKLISTRECORDS}`;
             const payload = {
                 Name: blackList.name,
                 id: salaId,
@@ -744,7 +744,7 @@ const BlackList: React.FC = () => {
         }
     };
 
-    const handleDeleteSelected = async (blackList: BlackList) => {
+    const handleDeleteSelected = async (blackList: BlackList | null) => {
         const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
         const tieneProtegidas = selectedRows.some((row) => row.hasActiveCampaign);
 
@@ -762,7 +762,7 @@ const BlackList: React.FC = () => {
 
         try {
             setLoading(true);
-            const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_DELETE_BLACKLISTRECORDS}`;
+            const requestUrl = `${import.meta.env.VITE_API_DELETE_BLACKLISTRECORDS}`;
             const response = await axios.post(requestUrl, payload, {
                 headers: {
                     'Content-Type': 'application/json',
