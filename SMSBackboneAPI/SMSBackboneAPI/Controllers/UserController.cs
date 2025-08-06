@@ -210,7 +210,7 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("SaveTwoFactor")]
         public IActionResult SaveTwoFactor(string email)
         {
@@ -232,7 +232,7 @@ namespace SMSBackboneAPI.Controllers
 
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("GetRooms")]
         public IActionResult Roomsbyuser(string email)
         {

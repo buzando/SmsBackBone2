@@ -44,7 +44,7 @@ namespace Business
                 var passwordhash = SecurityHelper.GenerarPasswordHash(password);
                 var userdb = context.Users.FirstOrDefault(p => p.email == user);
 
-                var iguales = SecurityHelper.VerificarPassword(password,userdb.passwordHash);
+                var iguales = SecurityHelper.VerificarPassword(password, userdb.passwordHash);
                 if (iguales)
                 {
                     var client = context.clients.Where(x => x.id == userdb.IdCliente).FirstOrDefault();
@@ -52,7 +52,7 @@ namespace Business
                     {
                         return null;
                     }
-                     var config = new MapperConfiguration(cfg =>
+                    var config = new MapperConfiguration(cfg =>
 
 cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
@@ -87,20 +87,27 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
             {
 
                 var userdto = new UserDto();
-                /*Petición a base de datos*/
+
                 using (var context = new Entities())
                 {
                     var userdb = context.Users.FirstOrDefault(p => p.email == email);
+                    if (userdb != null)
+                    {
 
-                    var config = new MapperConfiguration(cfg =>
+                        var config = new MapperConfiguration(cfg =>
 
-        cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
+            cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
-    ); var mapper = new Mapper(config);
+        ); var mapper = new Mapper(config);
 
-                    userdto = mapper.Map<UserDto>(userdb);
-                    userdto.Client = context.clients.Where(x => x.id == userdb.IdCliente).Select(x => x.nombrecliente).FirstOrDefault();
-                    userdto.rol = context.Roles.Where(x => x.id == userdb.idRole).Select(x => x.Role).FirstOrDefault();
+                        userdto = mapper.Map<UserDto>(userdb);
+                        userdto.Client = context.clients.Where(x => x.id == userdb.IdCliente).Select(x => x.nombrecliente).FirstOrDefault();
+                        userdto.rol = context.Roles.Where(x => x.id == userdb.idRole).Select(x => x.Role).FirstOrDefault();
+                    }
+                    else
+                    {
+                        return null;
+                    }
 
                 }
 
@@ -775,9 +782,9 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                     tarjeta = ctx.creditcards.Where(x => x.Id == credit.IdCreditCard).FirstOrDefault();
                     usuario = ctx.Users.Where(x => x.Id == credit.IdUser).FirstOrDefault();
                     room = (from r in ctx.Rooms
-                                join rbu in ctx.roomsbyuser on r.id equals rbu.idRoom
-                                where r.name == credit.room && rbu.idUser == credit.IdUser
-                                select r).FirstOrDefault();
+                            join rbu in ctx.roomsbyuser on r.id equals rbu.idRoom
+                            where r.name == credit.room && rbu.idUser == credit.IdUser
+                            select r).FirstOrDefault();
                 }
 
                 if (string.IsNullOrEmpty(tarjeta.token_id) || string.IsNullOrEmpty(tarjeta.token_id_customer))
@@ -823,7 +830,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                 try
                 {
 
-                    charge = openpay.ChargeService.Create(tarjeta.token_id_customer,chargeRequest);
+                    charge = openpay.ChargeService.Create(tarjeta.token_id_customer, chargeRequest);
 
                 }
                 catch (Exception e)
@@ -1029,7 +1036,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                                 join u in ctx.Users on cr.idUser equals u.Id
                                 join c in ctx.clients on u.IdCliente equals c.id
                                 join cc in ctx.creditcards on cr.idCreditCard equals cc.Id
-                                where cr.RechargeDate >= credit.FechaInicio && cr.RechargeDate <= credit.FechaFin && credit.IdUser == credit.IdUser 
+                                where cr.RechargeDate >= credit.FechaInicio && cr.RechargeDate <= credit.FechaFin && credit.IdUser == credit.IdUser
                                 select new CreditHystoric
                                 {
                                     id = cr.Id,
