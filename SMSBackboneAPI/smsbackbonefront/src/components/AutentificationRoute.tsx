@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import AutentificationLayout from "./AutentificationLayout";
+import { Box } from "@mui/material";
 
 type Props = {
     isAllowed?: boolean; // Hacer opcional si necesitas
@@ -11,7 +12,7 @@ const AutentificationRoute: React.FC<Props> = ({
     redirectTo = "/login",
     children,
 }) => {
-    // Simular lógica de autenticación
+    // Simular lï¿½gica de autenticaciï¿½n
     const isLogin = (): boolean => !!localStorage.getItem("token");
 
     if (!isLogin()) {
@@ -20,7 +21,9 @@ const AutentificationRoute: React.FC<Props> = ({
 
     return (
         <AutentificationLayout>
-            {children ? children : <Outlet />} {/* Renderiza children o usa <Outlet /> */}
+            <Box sx={{ backgroundColor: "#F2F2F2", overflowY: "hidden", overflowX: "hidden", maxHeight: "605px" }}>
+                {children ? children : <Outlet />} {/* Renderiza children o usa <Outlet /> */}
+            </Box>
         </AutentificationLayout>
     );
 };

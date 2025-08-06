@@ -3326,7 +3326,14 @@ const Clients: React.FC = () => {
                     }}
                 >
                     <Box sx={{ display: "flex", gap: 3 }}>
-                        <SecondaryButton text="Cancelar" onClick={() => setOpenClientModal(false)} />
+                        {step === 0 && (
+                            <SecondaryButton text="Cancelar" onClick={() => setOpenClientModal(false)} />
+                        )}
+
+                        {step === 1 && isEditClient && (
+                            <SecondaryButton text="Cancelar" onClick={() => setOpenClientModal(false)} />
+                        )}
+                        {/*isEditClient*/}
                         <Box sx={{}}>
                             {step > 0 && (
                                 <SecondaryButton

@@ -56,11 +56,11 @@ const colorScale = scaleLinear<string>()
   .range(["#E0E0E0", "#8F4E63"]);
 
 const MapChart = ({
-    enviadosData,
-    respondidosData
+  enviadosData,
+  respondidosData
 }: {
-    enviadosData: { stateName: string; messages: number }[];
-    respondidosData: { stateName: string; messages: number }[];
+  enviadosData: { stateName: string; messages: number }[];
+  respondidosData: { stateName: string; messages: number }[];
 }) => {
   const [tab, setTab] = useState(0);
   const [tooltipContent, setTooltipContent] = useState("");
@@ -74,10 +74,51 @@ const MapChart = ({
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   return (
     <Box sx={{ width: "100%", height: "auto" }}>
-      <Tabs value={tab} onChange={handleTabChange} centered sx={{ marginBottom: "12px" }}>
-        <Tab label="MENSAJES ENVIADOS" sx={{ fontFamily: "Poppins", fontWeight: 600 }} />
-        <Tab label="MENSAJES RESPONDIDOS" sx={{ fontFamily: "Poppins", fontWeight: 400 }} />
+      <Tabs
+        value={tab}
+        onChange={handleTabChange}
+        centered
+        sx={{ marginBottom: "12px" }}
+        TabIndicatorProps={{
+          style: {
+            backgroundColor: "#8F4E63",
+          },
+        }}
+      >
+        <Tab
+          label="MENSAJES ENVIADOS"
+          sx={{
+            fontFamily: "Poppins",
+            fontWeight: 600,
+            letterSpacing: "0.96px",
+            color: "#574B4FCC",
+            "&.Mui-selected": {
+              color: "#8F4E63",
+            },
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
+          }}
+        />
+        <Tab
+          label="MENSAJES RESPONDIDOS"
+          sx={{
+            fontFamily: "Poppins",
+            fontWeight: 600,
+            letterSpacing: "0.96px",
+            color: "#574B4FCC",
+            "&.Mui-selected": {
+              color: "#8F4E63",
+            },
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
+          }}
+        />
+
       </Tabs>
+
+
 
       <MapaPorDataset
         messageData={activeData}
@@ -96,8 +137,8 @@ type MapaProps = {
   messageData: { stateName: string; messages: number }[];
   tooltipContent: string;
   setTooltipContent: (val: string) => void;
-  tooltipPosition: { x: number; y: number }; 
-  setTooltipPosition: (val: { x: number; y: number }) => void; 
+  tooltipPosition: { x: number; y: number };
+  setTooltipPosition: (val: { x: number; y: number }) => void;
   colorScale: (val: number) => string;
   label: string;
 };
@@ -105,7 +146,7 @@ type MapaProps = {
 const MapaPorDataset = ({
   messageData,
   tooltipContent,
-  tooltipPosition, 
+  tooltipPosition,
   setTooltipContent,
   setTooltipPosition,
   colorScale,

@@ -69,73 +69,73 @@ const AutentificationLayout: React.FC<Props> = (props) => {
     return (
         <>
 
-<Box
-    sx={{
-        backgroundColor: "#F2F2F2", // Fondo gris
-        minHeight: "100vh", // Asegura que cubra toda la pantalla
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-    }}
->
-        
-            <CssBaseline />
-            {/* Barra superior */}
-            <AppBar position="fixed" sx={{ borderBottom: 1, borderColor: "primary.main" }}>
-                <Toolbar>
-                    <Box sx={{ flexGrow: 1, display: "flex" }}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="menu"
-                            onClick={() => navigate("/")}
-                        >
-                            <img src={logorq} alt="App Icon" width="170" />
-                        </IconButton>
-                    </Box>
+            <Box
+                sx={{
+                    backgroundColor: "#F2F2F2", // Fondo gris
+                    minHeight: "100vh", // Asegura que cubra toda la pantalla
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column"
+                }}
+            >
 
-                    {/* Información del usuario */}
-                    <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title={user.userName}>
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt={user.userName} sx={{ bgcolor: getColorRole(user.rol) }} />
+                <CssBaseline />
+                {/* Barra superior */}
+                <AppBar position="fixed" sx={{ borderBottom: 1, borderColor: "primary.main" }}>
+                    <Toolbar>
+                        <Box sx={{ flexGrow: 1, display: "flex" }}>
+                            <IconButton
+                                edge="start"
+                                color="inherit"
+                                aria-label="menu"
+                                onClick={() => navigate("/")}
+                            >
+                                <img src={logorq} alt="App Icon" width="170" />
                             </IconButton>
-                        </Tooltip>
-                        <Menu
-                            sx={{ mt: "45px" }}
-                            id="menu-appbar"
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{
-                                vertical: "top",
-                                horizontal: "right",
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: "top",
-                                horizontal: "right",
-                            }}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
-                        >
-                            <MenuItem id="1" onClick={handleCloseUserMenu}>
-                                <Typography textAlign="center">Perfil</Typography>
-                            </MenuItem>
-                            <MenuItem id="2" onClick={handleCloseUserMenu}>
-                                <Typography textAlign="center">Cuenta</Typography>
-                            </MenuItem>
-                            <MenuItem id="3" onClick={handleCloseUserMenu}>
-                                <Typography textAlign="center">Cerrar sesión</Typography>
-                            </MenuItem>
-                        </Menu>
-                    </Box>
-                </Toolbar>
-            </AppBar>
+                        </Box>
 
-            {/* Contenedor principal */}
-            <Container fixed maxWidth={false} sx={{ marginTop: "4.5rem", marginBottom: "8rem", backgroundColor: "#F2F2F2" }}>
-                {props.children}
-            </Container>
-</Box>
+                        {/* Información del usuario */}
+                        <Box sx={{ flexGrow: 0 }}>
+                            <Tooltip title={user.userName}>
+                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                    <Avatar alt={user.userName} sx={{ bgcolor: getColorRole(user.rol) }} />
+                                </IconButton>
+                            </Tooltip>
+                            <Menu
+                                sx={{ mt: "45px" }}
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{
+                                    vertical: "top",
+                                    horizontal: "right",
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: "top",
+                                    horizontal: "right",
+                                }}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
+                            >
+                                <MenuItem id="1" onClick={handleCloseUserMenu}>
+                                    <Typography textAlign="center">Perfil</Typography>
+                                </MenuItem>
+                                <MenuItem id="2" onClick={handleCloseUserMenu}>
+                                    <Typography textAlign="center">Cuenta</Typography>
+                                </MenuItem>
+                                <MenuItem id="3" onClick={handleCloseUserMenu}>
+                                    <Typography textAlign="center">Cerrar sesión</Typography>
+                                </MenuItem>
+                            </Menu>
+                        </Box>
+                    </Toolbar>
+                </AppBar>
+
+                {/* Contenedor principal */}
+                <Container fixed maxWidth={false} sx={{ marginTop: "4.5rem", marginBottom: "8rem", backgroundColor: "#F2F2F2" }}>
+                    {props.children}
+                </Container>
+            </Box>
             {/* Pie de página */}
             <footer>
                 <Box
@@ -252,7 +252,7 @@ const AutentificationLayout: React.FC<Props> = (props) => {
                         Ayuda
                     </Typography>
 
-                        
+
 
 
                     {/* Línea horizontal */}
@@ -452,7 +452,7 @@ const AutentificationLayout: React.FC<Props> = (props) => {
                                 font: "normal normal normal 14px/20px Poppins",
                                 color: "#574B4F",
                                 marginBottom: "10px",
-                                    marginTop: "10px",
+                                marginTop: "10px",
                                 mb: 0.5,
                             }}
                         >
@@ -490,17 +490,17 @@ const AutentificationLayout: React.FC<Props> = (props) => {
                     </Typography>
 
                     <Box sx={{ textAlign: "right", mt: 2 }}>
-                    <IconButton
-                                onClick={closeHelpModal}
-                                sx={{
-                                    position: "absolute",
-                                    top: 2,
-                                    right: 8,
-                                    color: "#C0C0C0",
-                                }}
-                            >
-                                ✕
-                            </IconButton>
+                        <IconButton
+                            onClick={closeHelpModal}
+                            sx={{
+                                position: "absolute",
+                                top: 2,
+                                right: 8,
+                                color: "#C0C0C0",
+                            }}
+                        >
+                            ✕
+                        </IconButton>
 
                     </Box>
                 </Box>

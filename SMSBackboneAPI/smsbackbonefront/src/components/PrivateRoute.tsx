@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import Layout from './Layout';
+import { Box } from "@mui/material";
 
 type Props = {
     isAllowed?: boolean; // Hacer opcional si es necesario

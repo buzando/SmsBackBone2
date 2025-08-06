@@ -96,7 +96,7 @@ const pages: Page[] = [
             { id: 1, title: 'Historial de pagos', path: '/PaymentHistoric', icon: <HistoryIcon sx={{ color: 'white' }} /> },
             { id: 2, title: 'Métodos de pago', path: '/PaymentMethods', icon: <PaymentIcon sx={{ color: 'white' }} /> },
             { id: 3, title: 'Facturación', path: '/BillingInformation', icon: <DataUsageIcon sx={{ color: 'white' }} /> },
-            { id: 4, title: 'Costos', path: '/Costs', icon: <AttachMoneyIcon sx={{ color: 'white' }} /> },
+            { id: 4, title: 'Datos de facturación', path: '/BillingInformation', icon: <AttachMoneyIcon sx={{ color: 'white' }} /> },
             { id: 5, title: 'Ajustes de pago', path: '/PaymentSettings', icon: <SettingsSuggestIcon sx={{ color: 'white' }} /> },
         ]
     },
@@ -1570,12 +1570,12 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                         <List component="div" disablePadding>
                                             {/* Usuarios */}
                                             <Link to="/UserAdministration" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                                {/*Fallo en esta parte; cuidao D:*/}
                                                 <ListItemButton
                                                     sx={{
                                                         pl: 4,
                                                         position: 'relative',
                                                         '&.Mui-selected': {
-                                                            backgroundColor: '#290013',
                                                             color: '#FFFFFF',
                                                             '&::before': {
                                                                 content: '""',
@@ -1583,8 +1583,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                                 left: 0,
                                                                 top: 0,
                                                                 bottom: 0,
-                                                                width: '4px',
-                                                                backgroundColor: '#FFFFFF',
                                                             },
                                                         },
                                                     }}
@@ -1622,7 +1620,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                         pl: 4,
                                                         position: 'relative',
                                                         '&.Mui-selected': {
-                                                            backgroundColor: '#290013',
                                                             color: '#FFFFFF',
                                                             '&::before': {
                                                                 content: '""',
@@ -1630,8 +1627,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                                 left: 0,
                                                                 top: 0,
                                                                 bottom: 0,
-                                                                width: '4px',
-                                                                backgroundColor: '#FFFFFF',
                                                             },
                                                         },
                                                     }}
@@ -1689,7 +1684,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                     pl: 4,
                                                     position: 'relative',
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#290013',
                                                         color: '#FFFFFF',
                                                         '&::before': {
                                                             content: '""',
@@ -1697,8 +1691,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                             left: 0,
                                                             top: 0,
                                                             bottom: 0,
-                                                            width: '4px',
-                                                            backgroundColor: '#FFFFFF',
                                                         },
                                                     },
                                                 }}
@@ -1736,7 +1728,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                     pl: 4,
                                                     position: 'relative',
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#290013',
                                                         color: '#FFFFFF',
                                                         '&::before': {
                                                             content: '""',
@@ -1744,8 +1735,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                             left: 0,
                                                             top: 0,
                                                             bottom: 0,
-                                                            width: '4px',
-                                                            backgroundColor: '#FFFFFF',
                                                         },
                                                     },
                                                 }}
@@ -1783,7 +1772,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                     pl: 4,
                                                     position: 'relative',
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#290013',
                                                         color: '#FFFFFF',
                                                         '&::before': {
                                                             content: '""',
@@ -1791,8 +1779,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                             left: 0,
                                                             top: 0,
                                                             bottom: 0,
-                                                            width: '4px',
-                                                            backgroundColor: '#FFFFFF',
                                                         },
                                                     },
                                                 }}
@@ -1830,7 +1816,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                     pl: 4,
                                                     position: 'relative',
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#290013',
                                                         color: '#FFFFFF',
                                                         '&::before': {
                                                             content: '""',
@@ -1838,8 +1823,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                             left: 0,
                                                             top: 0,
                                                             bottom: 0,
-                                                            width: '4px',
-                                                            backgroundColor: '#FFFFFF',
                                                         },
                                                     },
                                                 }}
@@ -1914,7 +1897,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                     pl: 4,
                                                     position: 'relative',
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#290013',
                                                         color: '#FFFFFF',
                                                         '&::before': {
                                                             content: '""',
@@ -1922,8 +1904,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                             left: 0,
                                                             top: 0,
                                                             bottom: 0,
-                                                            width: '4px',
-                                                            backgroundColor: '#FFFFFF',
                                                         },
                                                     },
                                                 }}
@@ -1959,7 +1939,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                     pl: 4,
                                                     position: 'relative',
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#290013',
                                                         color: '#FFFFFF',
                                                         '&::before': {
                                                             content: '""',
@@ -1967,8 +1946,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                             left: 0,
                                                             top: 0,
                                                             bottom: 0,
-                                                            width: '4px',
-                                                            backgroundColor: '#FFFFFF',
                                                         },
                                                     },
                                                 }}
@@ -2005,7 +1982,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                     pl: 4,
                                                     position: 'relative',
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#290013',
                                                         color: '#FFFFFF',
                                                         '&::before': {
                                                             content: '""',
@@ -2013,8 +1989,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                             left: 0,
                                                             top: 0,
                                                             bottom: 0,
-                                                            width: '4px',
-                                                            backgroundColor: '#FFFFFF',
                                                         },
                                                     },
                                                 }}
@@ -2046,14 +2020,13 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
 
 
-                                        {/* Costos */}
-                                        <Link to="/Costs" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        {/* Datos de facturación */}
+                                        <Link to="/BillingInformation" style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <ListItemButton
                                                 sx={{
                                                     pl: 4,
                                                     position: 'relative',
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#290013',
                                                         color: '#FFFFFF',
                                                         '&::before': {
                                                             content: '""',
@@ -2061,13 +2034,11 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                             left: 0,
                                                             top: 0,
                                                             bottom: 0,
-                                                            width: '4px',
-                                                            backgroundColor: '#FFFFFF',
                                                         },
                                                     },
                                                 }}
-                                                selected={location.pathname === '/Costs'}
-                                                onClick={() => handleSelection('Costos')}
+                                                selected={location.pathname === '/BillingInformation'}
+                                                onClick={() => handleSelection('Datos de facturación')}
                                             >
                                                 {/*Linea Gris*/}
 
@@ -2077,15 +2048,15 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                         left: "35px",
                                                         width: "4px",
                                                         height: "35px",
-                                                        backgroundColor: selectedLink === 'Costos' ? '#FFFFFF' : '#9F94A5',
+                                                        backgroundColor: selectedLink === 'Datos de facturación' ? '#FFFFFF' : '#9F94A5',
                                                     }} />
                                                 <ListItemText
-                                                    primary="Costos"
+                                                    primary="Datos de facturación"
                                                     primaryTypographyProps={{
                                                         fontFamily: "Poppins",
                                                         marginLeft: '30px',
                                                         fontSize: '14px',
-                                                        color: selectedLink === 'Costos' ? '#FFFFFF' : '#9F94A5',
+                                                        color: selectedLink === 'Datos de facturación' ? '#FFFFFF' : '#9F94A5',
                                                         marginBottom: "-5px",
                                                         marginTop: "-5px"
                                                     }} />

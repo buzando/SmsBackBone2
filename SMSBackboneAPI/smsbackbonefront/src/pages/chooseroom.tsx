@@ -155,7 +155,7 @@ const Chooseroom: React.FC = () => {
             className="container"
             sx={{
                 backgroundColor: "#F2F2F2",
-                minHeight: "100vh",
+                height: "800px",
                 padding: "5px",
             }}
         >
@@ -166,7 +166,7 @@ const Chooseroom: React.FC = () => {
 
             <Box sx={{
                 display: "flex", justifyContent: "center",
-                flexDirection: "column", marginTop: "50px"
+                flexDirection: "column", marginTop: "-200px"
             }}>
                 <Typography
                     variant="h5"
@@ -178,7 +178,7 @@ const Chooseroom: React.FC = () => {
                         color: '#330F1B',
                         opacity: 1,
                         fontSize: '28px',
-                        lineHeight: '55px', mb: "56px"
+                        lineHeight: '55px', mb: "20px"
                     }}
                 >
                     Seleccionar una sala para continuar
@@ -228,45 +228,62 @@ const Chooseroom: React.FC = () => {
             </Box>
 
             {/* Lista de salas */}
-            {rooms.filter((room) => {
-                const term = searchTerm.toLowerCase();
-                const nameWords = room.name.toLowerCase().split(" ");
-                return nameWords.some((word) => word.startsWith(term));
-            }).length === 0 ? (
-                <Box>
-                    <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '240px', height: 'auto', mt: 3 }} />
-                    <Typography variant="body1" sx={{ textAlign: "center", marginTop: "20px", color: "#833A53", fontFamily: "Poppins" }}>
-                        No se encontraron resultados.
-                    </Typography>
-                </Box>
-            ) : (
-                rooms
-                    .filter((room) => {
-                        const term = searchTerm.toLowerCase();
-                        const nameWords = room.name.toLowerCase().split(" ");
-                        return nameWords.some((word) => word.startsWith(term));
-                    })
-                    .map((room) => (
-                        <Box sx={{}}>
-                            <div key={room.id} className="room-box"
-                                style={{
-                                    background: "#FFFFFF 0% 0% no-repeat padding-box",
-                                    boxShadow: "0px 4px 4px #E1E4E6",
+            <Box sx={{ height: "445px", backgroundColor: "#F2F2F2", width: "500px", overflowY: "auto" }}>
+                {rooms.filter((room) => {
+                    const term = searchTerm.toLowerCase();
+                    const nameWords = room.name.toLowerCase().split(" ");
+                    return nameWords.some((word) => word.startsWith(term));
+                }).length === 0 ? (
+                    <Box>
+                        <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '240px', height: 'auto', mt: 3, ml: "125px" }} />
+                        <Typography variant="body1" sx={{ textAlign: "center", marginTop: "20px", color: "#833A53", fontFamily: "Poppins" }}>
+                            No se encontraron resultados.
+                        </Typography>
+                    </Box>
+                ) : (
+                    rooms
+                        .filter((room) => {
+                            const term = searchTerm.toLowerCase();
+                            const nameWords = room.name.toLowerCase().split(" ");
+                            return nameWords.some((word) => word.startsWith(term));
+                        })
+                        .map((room) => (
+
+                            <Box
+                                key={room.id}
+                                className="room-box"
+                                sx={{
+                                    backgroundColor: "#FFFFFF",
                                     border: "1px solid #CED2D54D",
                                     borderRadius: "4px",
                                     opacity: 1,
                                     width: "430px",
                                     padding: "20px",
                                     margin: "10px auto",
-                                }}>
+                                    transition: "background-color 0.3s, border-color 0.3s",
+                                    '&:hover': {
+                                        backgroundColor: "#F2EBED",
+                                        borderColor: "#83395329",
+                                    },
+                                }}
+                            >
                                 <div className="room-info">
                                     <Box className="icon-container">
-                                        <HomeIcon />
+                                        <HomeIcon sx={{}} />
                                     </Box>
-                                    <div className="room-details" style={{ marginLeft: "10px" }}>
-                                        <h6 style={{ margin: "0", fontSize: "16px", color: "#330F1B" }}>{room.name}</h6>
-                                        <p style={{ margin: "0", fontSize: "14px", color: "#8F4D63" }}>{room.cliente}</p>
-                                    </div>
+                                    <Box className="room-details" style={{
+                                        marginLeft: "10px"
+
+                                    }}>
+                                        <Typography sx={{
+                                            margin: "0", fontSize: "16px", color: "#574B4F",
+                                            '&:hover': {
+                                                color: "blue",
+                                            },
+                                        }}>{room.name}
+                                        </Typography>
+                                        <p style={{ margin: "0", fontSize: "14px", color: "#9B9295" }}>{room.cliente}</p>
+                                    </Box>
 
                                 </div>
                                 <div
@@ -330,11 +347,11 @@ const Chooseroom: React.FC = () => {
                                         &gt;
                                     </Box>
                                 </Button>
-                            </div>
-                        </Box>
-                    ))
-            )}
+                            </Box>
 
+                        ))
+                )}
+            </Box>
 
             <div>
                 <Modal
@@ -385,7 +402,7 @@ const Chooseroom: React.FC = () => {
                             <Checkbox
                                 checked={dontAskAgain}
                                 sx={{
-                                    color: '#6C3A52',
+                                    color: '#574B4FCC',
                                     '&.Mui-checked': { color: '#6C3A52' },
 
                                 }}
@@ -414,7 +431,7 @@ const Chooseroom: React.FC = () => {
                         label={
                             <Typography
                                 sx={{
-                                    color: "#8F4D63",
+                                    color: dontAskAgain ? "#8F4D63" : "#574B4FCC",
                                     fontFamily: "Poppins",
                                     fontSize: "16px",
                                     fontWeight: 500
@@ -438,7 +455,7 @@ const Chooseroom: React.FC = () => {
                             disabled={!dontAskAgain}
                             sx={{
                                 background: "#833A53",
-                                border: "1px solid #60293C",
+                                border: "1px solid #CCCFD2",
                                 borderRadius: "4px",
                                 color: "#FFFFFF",
                                 opacity: !dontAskAgain ? 0.4 : 1,

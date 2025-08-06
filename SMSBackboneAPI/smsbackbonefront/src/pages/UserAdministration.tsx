@@ -460,7 +460,7 @@ const ManageAccounts: React.FC = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1140px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             <Backdrop
                 open={loading}
                 sx={{
@@ -470,10 +470,11 @@ const ManageAccounts: React.FC = () => {
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
+
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
-                    sx={{ color: "#5A2836", mr: 1 }}
+                    sx={{ color: "#5A2836", p: 0, mr: 1 }}
                 >
                     <img
                         src={ArrowBackIosNewIcon}
@@ -491,8 +492,8 @@ const ManageAccounts: React.FC = () => {
             </Box>
 
 
-            <Box sx={{ pl: 5 }}>
-                <Divider sx={{ marginBottom: "21px", marginTop: "18px" }} />
+            <Box sx={{ marginLeft: "32px", }}>
+                <Divider sx={{ marginBottom: "24px", marginTop: "18px" }} />
                 <Button
                     variant="contained"
                     startIcon={<AddIcon />}
@@ -517,12 +518,12 @@ const ManageAccounts: React.FC = () => {
                     >
                         {accounts.length > 0 && (
                             <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ fontWeight: 'bold', color: '#5A2836', fontFamily: "Poppins" }}>Nombre</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold', color: '#5A2836', fontFamily: "Poppins" }}>Correo Electrónico</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold', color: '#5A2836', fontFamily: "Poppins" }}>Rol</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold', color: '#5A2836', fontFamily: "Poppins" }}>Ícono</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold', color: '#5A2836', fontFamily: "Poppins" }}>Salas</TableCell>
+                                <TableRow sx={{}}>
+                                    <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins", }}>Nombre</TableCell>
+                                    <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Correo Electrónico</TableCell>
+                                    <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Rol</TableCell>
+                                    <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Ícono</TableCell>
+                                    <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Salas</TableCell>
                                     <TableCell align="right"></TableCell>
                                 </TableRow>
                             </TableHead>
@@ -566,10 +567,10 @@ const ManageAccounts: React.FC = () => {
                                 </TableRow>
                             ) : (
                                 accounts.map((account) => (
-                                    <TableRow key={account.id}>
-                                        <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F" }}>{account.name} </Typography></TableCell>
-                                        <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F" }}>{account.email} </Typography></TableCell>
-                                        <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F" }}>{account.role} </Typography></TableCell>
+                                    <TableRow key={account.id} sx={{}}>
+                                        <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "13px" }}>{account.name} </Typography></TableCell>
+                                        <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "13px" }}>{account.email} </Typography></TableCell>
+                                        <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "13px" }}>{account.role} </Typography></TableCell>
                                         {/* Ícono condicional */}
                                         <TableCell>
                                             {account.role === "Administrador" && (
@@ -588,6 +589,34 @@ const ManageAccounts: React.FC = () => {
                                                     title={account.rooms}
                                                     placement="top"
                                                     arrow
+                                                    componentsProps={{
+                                                        tooltip: {
+                                                            sx: {
+                                                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                color: "#DEDADA",
+                                                                fontFamily: "Poppins, sans-serif",
+                                                                fontSize: "12px",
+                                                                padding: "6px 8px",
+                                                                borderRadius: "8px",
+                                                                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                            }
+                                                        },
+                                                        arrow: {
+                                                            sx: {
+                                                                color: "rgba(0, 0, 0, 0.8)"
+                                                            }
+                                                        }
+                                                    }}
+                                                    PopperProps={{
+                                                        modifiers: [
+                                                            {
+                                                                name: 'offset',
+                                                                options: {
+                                                                    offset: [0, -5]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }}
                                                 >
                                                     <Typography
                                                         noWrap
@@ -597,26 +626,60 @@ const ManageAccounts: React.FC = () => {
                                                             textOverflow: "ellipsis",
                                                             whiteSpace: "nowrap",
                                                             cursor: "pointer",
-                                                            fontFamily: "Poppins",
+                                                            fontFamily: "Poppins", fontSize: "13px", color: "#574B4F"
                                                         }}
                                                     >
                                                         {account.rooms}
                                                     </Typography>
                                                 </Tooltip>
                                             ) : (
-                                                <Typography
-                                                    noWrap
-                                                    sx={{
-                                                        maxWidth: "200px",
-                                                        overflow: "hidden",
-                                                        textOverflow: "ellipsis",
-                                                        whiteSpace: "nowrap",
-                                                        fontFamily: "Poppins",
-                                                        color: "#574B4F"
+                                                <Tooltip
+                                                    title={account.rooms}
+                                                    placement="top"
+                                                    arrow
+                                                    componentsProps={{
+                                                        tooltip: {
+                                                            sx: {
+                                                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                color: "#DEDADA",
+                                                                fontFamily: "Poppins, sans-serif",
+                                                                fontSize: "12px",
+                                                                padding: "6px 8px",
+                                                                borderRadius: "8px",
+                                                                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                            }
+                                                        },
+                                                        arrow: {
+                                                            sx: {
+                                                                color: "rgba(0, 0, 0, 0.8)"
+                                                            }
+                                                        }
+                                                    }}
+                                                    PopperProps={{
+                                                        modifiers: [
+                                                            {
+                                                                name: 'offset',
+                                                                options: {
+                                                                    offset: [0, -5]
+                                                                }
+                                                            }
+                                                        ]
                                                     }}
                                                 >
-                                                    {account.rooms}
-                                                </Typography>
+                                                    <Typography
+                                                        noWrap
+                                                        sx={{
+                                                            maxWidth: "200px",
+                                                            overflow: "hidden",
+                                                            textOverflow: "ellipsis",
+                                                            whiteSpace: "nowrap",
+                                                            fontFamily: "Poppins",
+                                                            color: "#574B4F", fontSize: "13px"
+                                                        }}
+                                                    >
+                                                        {account.rooms}
+                                                    </Typography>
+                                                </Tooltip>
                                             )}
                                         </TableCell>
 
@@ -705,7 +768,7 @@ const ManageAccounts: React.FC = () => {
                         top: "50%",
                         left: "50%",
                         transform: "translate(-50%, -50%)",
-                        width: "768px",
+                        width: "795px",
                         maxHeight: "704px",
                         overflowY: "auto",
                         overflowX: "hidden",
@@ -747,7 +810,7 @@ const ManageAccounts: React.FC = () => {
                     </Typography>
                     <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', my: 2 }} />
 
-                    <Box sx={{ overflowY: "auto", mt: -1, pt: 4, pr: 4, pb: 4, pl: 0, flexGrow: 1 }}>
+                    <Box sx={{ overflowX: "hidden", overflowY: "auto", mt: -1, pt: 4, pr: 4, pb: 4, pl: 0, flexGrow: 1 }}>
                         <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
 
                             <Box gridColumn="span 6">
@@ -1299,7 +1362,7 @@ const ManageAccounts: React.FC = () => {
                         {/* Selección de roles */}
                         {/* Roles en línea horizontal */}
                         <Divider sx={{ my: 2, backgroundColor: "#F2F2F2" }} />
-                        <Typography variant="subtitle1" fontWeight="bold" mb={2} sx={{ fontFamily: "Poppins", fontSize: "16px" }}>
+                        <Typography variant="subtitle1" mb={2} sx={{ fontFamily: "Poppins", fontSize: "16px" }}>
                             Rol de usuario<span style={{ color: "red" }}>*</span>
                         </Typography>
                         <Typography variant="body2" mb={3} mt={-1} sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "14px" }}>
@@ -1419,7 +1482,7 @@ const ManageAccounts: React.FC = () => {
                         <Divider sx={{ my: 2, backgroundColor: "#F2F2F2" }} />
 
                         <Box p={2}>
-                            <Typography variant="h6" fontWeight="bold" mb={2} mt={-2} sx={{ fontFamily: "Poppins", fontSize: "16px" }}>
+                            <Typography variant="h6" mb={2} mt={-2} sx={{ fontFamily: "Poppins", fontSize: "16px" }}>
                                 Salas a las que podrá acceder <span style={{ color: "red", }}>*</span>
                             </Typography>
                             <Typography variant="body2" mb={2} mt={-1} sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "14px" }}>
