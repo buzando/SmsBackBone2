@@ -140,7 +140,7 @@ const Reports: React.FC = () => {
     const [totalCount, settotalCount] = useState(0);
     const [totalXPage, settotalXPage] = useState(0);
     const navigate = useNavigate();
-
+{/*  
     <ClickAwayListener onClickAway={() => {
         setCampaignMenuOpen(false);
         setUserMenuOpen(false);
@@ -148,7 +148,7 @@ const Reports: React.FC = () => {
     }}>
 
     </ClickAwayListener>
-
+*/}
     const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
         setSelectedTab(newValue);
     };
