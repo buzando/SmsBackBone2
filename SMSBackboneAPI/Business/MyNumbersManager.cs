@@ -4,8 +4,12 @@ using Contract.Request;
 using Contract.Response;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Vml;
+using log4net;
 using Modal;
 using Modal.Model.Model;
+using Openpay;
+using Openpay.Entities;
+using Openpay.Entities.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +20,8 @@ namespace Business
 {
     public class MyNumbersManager
     {
+                private static readonly ILog log = LogManager.GetLogger(typeof(UserManager));
+
         public List<MyNumbersResponse> NumbersByUser(int id)
         {
             var numbres = new List<MyNumbersResponse>();
@@ -269,51 +275,241 @@ namespace Business
                 return false;
             }
         }
-        public bool ProcesarShortNumberRequest(ShortNumberRequestDTO request)
+        public string ProcesarShortNumberRequest(NumberRequestDTO request)
         {
             try
             {
                 using (var ctx = new Entities())
                 {
+                    var setupCost = 0.0m;
+                    var monthlyCost = 0.0m;
                     var emails = Common.ConfigurationManagerJson("EmailReceivers");
-
-                    var setupCost = decimal.Parse(Common.ConfigurationManagerJson("ShortNumberSetupCost"));
-                    var monthlyCost = decimal.Parse(Common.ConfigurationManagerJson("ShortNumberMonthlyCost"));
-
-
-                    var clientName = (from u in ctx.Users
-                                      join c in ctx.clients on u.IdCliente equals c.id
-                                      where u.email == request.Email
-                                      select c.nombrecliente).FirstOrDefault();
-
-
-                    var entity = new ShortNumberRequest
+                    if (request.Type == "long")
                     {
-                        Quantity = request.Quantity,
-                        SetupCost = setupCost,
-                        MonthlyCost = monthlyCost,
-                        CreditCardId = request.CreditCardId,
-                        SentToEmails = string.Join(",", emails),
-                        WasSentSuccessfully = false,
-                        RequestDate = DateTime.Now
+                        setupCost = decimal.Parse(Common.ConfigurationManagerJson("LongNumberSetupCost"));
+                        monthlyCost = decimal.Parse(Common.ConfigurationManagerJson("LongNumberMonthlyCost"));
+                    }
+                    else
+                    {
+                        setupCost = decimal.Parse(Common.ConfigurationManagerJson("ShortNumberSetupCost"));
+                        monthlyCost = decimal.Parse(Common.ConfigurationManagerJson("ShortNumberMonthlyCost"));
+                    }
+
+
+                    var user = ctx.Users.FirstOrDefault(u => u.email == request.Email);
+                    if (user == null) return "";
+
+                    var client = ctx.clients.FirstOrDefault(c => c.id == user.IdCliente);
+                    if (client == null) return "";
+
+                    var clientName = client.nombrecliente;
+                    var creditCard = ctx.creditcards.FirstOrDefault(c => c.Id == request.CreditCardId);
+                    if (creditCard == null) return "";
+
+                    // Total a cobrar
+                    var totalAmount = setupCost * (request.Quantity + monthlyCost);
+
+                    var apiKey = Common.ConfigurationManagerJson("APIKEY"); 
+                    var merchantId = Common.ConfigurationManagerJson("MERCHANTID");
+                    var openpay = new OpenpayAPI(apiKey, merchantId);
+
+                    var boolproduction = Common.ConfigurationManagerJson("OPENPAYPRODUCTION");
+                    var prodution = bool.Parse(boolproduction);
+                    openpay.Production = prodution;
+
+
+                    var chargeRequest = new ChargeRequest
+                    {
+                        Method = "card",
+                        SourceId = creditCard.token_id,
+                        Amount = totalAmount,
+                        Description = "Recarga de créditos",
+                        Currency = "MXN",
+                        DeviceSessionId = request.DeviceSessionId,
+                        Use3DSecure = true,
+                        RedirectUrl = Common.ConfigurationManagerJson("OPENPAY_REDIRECT_URL_MyNumbers"),
                     };
 
-                    var subject = $"El cliente {clientName} esta solicitando la cantidad de {request.Quantity} de numeros cortos" +
-                        $"se le puede contactar por medio del siguiente correo: {clientName} ";
-                    var wasSent = MailManager.SendEmail(emails,"Peticion Numeros",subject); // tu función
-                    entity.WasSentSuccessfully = wasSent;
+                    var charge = new Charge();
+                    try
+                    {
 
-                    ctx.ShortNumberRequest.Add(entity);
+                        charge = openpay.ChargeService.Create(creditCard.token_id_customer, chargeRequest);
+
+                    }
+                    catch (Exception e)
+                    {
+
+                        return "";
+                    }
+
+
+                    if (request.Type == "long")
+                    {
+                        var entity = new LongNumberRequest
+                        {
+                            Quantity = request.Quantity,
+                            SetupCost = setupCost,
+                            MonthlyCost = monthlyCost,
+                            CreditCardId = request.CreditCardId,
+                            NotificationEmails = string.Join(",", emails),
+                            SentSuccessfully = false,
+                            CreatedAt = DateTime.Now,
+                            PaymentStatus = "En espera",
+                            AutoInvoice = request.AutomaticInvoice,
+                            PaymentTransactionId = charge.Id,
+                            SentAt = DateTime.Now,
+                            TotalAmount = totalAmount,
+                            Lada = request.Lada,
+                            Municipality = request.Municipality,
+                            State = request.State
+                        };
+
+
+                        ctx.LongNumberRequest.Add(entity);
+                        ctx.SaveChanges();
+                    }
+                    else
+                    {
+                        var entity = new ShortNumberRequest
+                        {
+                            Quantity = request.Quantity,
+                            SetupCost = setupCost,
+                            MonthlyCost = monthlyCost,
+                            CreditCardId = request.CreditCardId,
+                            NotificationEmails = string.Join(",", emails),
+                            SentSuccessfully = false,
+                            CreatedAt = DateTime.Now,
+                            PaymentStatus = "En espera",
+                            AutoInvoice = request.AutomaticInvoice,
+                            PaymentTransactionId = charge.Id,
+                            SentAt = DateTime.Now,
+                            TotalAmount = totalAmount,
+                        };
+
+
+                        ctx.ShortNumberRequest.Add(entity);
+                        ctx.SaveChanges();
+                    }
+                   
+                    return charge.PaymentMethod.Url;
+                }
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
+        }
+        public bool VerifyRechargeStatus(string idRecharge)
+        {
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    // Buscar en Short y Long usando PaymentTransactionId
+                    var shortReq = ctx.ShortNumberRequest.FirstOrDefault(x => x.PaymentTransactionId == idRecharge);
+                    var longReq = ctx.LongNumberRequest.FirstOrDefault(x => x.PaymentTransactionId == idRecharge);
+
+                    if (shortReq == null && longReq == null)
+                    {
+                        log.Warn($"No se encontró recarga con ID {idRecharge} en ShortNumberRequest ni LongNumberRequest");
+                        return false;
+                    }
+
+                    dynamic rechargeReq;
+                    string tipo;
+
+                    if (shortReq != null)
+                    {
+                        rechargeReq = shortReq;
+                        tipo = "short";
+                    }
+                    else
+                    {
+                        rechargeReq = longReq;
+                        tipo = "long";
+                    }
+
+                    // OpenPay setup
+                    var apiKey = Common.ConfigurationManagerJson("APIKEY");
+                    var merchantId = Common.ConfigurationManagerJson("MERCHANTID");
+                    var production = bool.Parse(Common.ConfigurationManagerJson("OPENPAYPRODUCTION"));
+                    var openpay = new OpenpayAPI(apiKey, merchantId) { Production = production };
+
+                    // Obtener el cargo
+                    var charge = openpay.ChargeService.Get(rechargeReq.CustomerId, rechargeReq.ChargeId);
+                    if (charge == null)
+                    {
+                        log.Warn($"No se encontró el cargo en OpenPay para PaymentTransactionId {idRecharge}");
+                        return false;
+                    }
+
+                    string previousStatus = rechargeReq.Estatus;
+
+                    // Asignar estatus
+                    switch (charge.Status.ToLower())
+                    {
+                        case "completed":
+                            rechargeReq.Estatus = "Exitoso";
+                            break;
+                        case "in_progress":
+                            rechargeReq.Estatus = "En progreso";
+                            break;
+                        case "failed":
+                            rechargeReq.Estatus = "Fallida";
+                            rechargeReq.EstatusError = charge.ErrorMessage;
+                            break;
+                        case "cancelled":
+                            rechargeReq.Estatus = "Cancelada";
+                            break;
+                        case "charge_pending":
+                            rechargeReq.Estatus = "Cargo Pendiente";
+                            break;
+                        default:
+                            rechargeReq.Estatus = "Recarga fallida";
+                            rechargeReq.EstatusError = charge.ErrorMessage;
+                            break;
+                    }
+
+                    rechargeReq.Status = charge.Status;
+                    rechargeReq.Amount = charge.Amount;
+                    rechargeReq.FechaActualizacion = DateTime.Now;
+
+                    // Si fue exitosa y aún no se había aplicado
+                    if (rechargeReq.Estatus == "Exitoso" && previousStatus != "Exitoso")
+                    {
+                        int creditCardId = rechargeReq.CreditCardId;  // Esto ya no es dynamic
+
+                        var info = (from card in ctx.creditcards
+                                    join user in ctx.Users on card.user_id equals user.Id
+                                    join client in ctx.clients on user.IdCliente equals client.id
+                                    where card.Id == creditCardId
+                                    select new
+                                    {
+                                        NombreCliente = client.nombrecliente,
+                                        CorreoUsuario = user.email
+                                    }).FirstOrDefault();
+                        // Obtener correo de settings
+                        var emailDestino = rechargeReq.NotificationEmails;
+
+                        var asuntolong = "Se pidieron la cantidad de ";
+
+                        //SendRechargeEmail("Administrador", emailDestino, rechargeReq, "exitoso");
+                    }
+
+
                     ctx.SaveChanges();
-
                     return true;
                 }
             }
             catch (Exception ex)
             {
+                log.Error($"Error al verificar recarga {idRecharge}: {ex.Message}");
                 return false;
             }
         }
+
+
 
     }
 }

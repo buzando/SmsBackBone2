@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,10 +16,10 @@ namespace Modal.Model.Model
         public int Quantity { get; set; }
 
         [MaxLength(100)]
-        public string Estado { get; set; }
+        public string State { get; set; }
 
         [MaxLength(100)]
-        public string Municipio { get; set; }
+        public string Municipality { get; set; }
 
         [MaxLength(10)]
         public string Lada { get; set; }
@@ -27,13 +28,34 @@ namespace Modal.Model.Model
 
         public decimal MonthlyCost { get; set; }
 
-        public int CreditCardId { get; set; }
+        [ForeignKey("CreditCard")]
+        public int? CreditCardId { get; set; }
 
         [MaxLength(1000)]
-        public string SentToEmails { get; set; }
+        public string NotificationEmails { get; set; }
 
-        public bool WasSentSuccessfully { get; set; }
+        public bool SentSuccessfully { get; set; } = false;
 
-        public DateTime RequestDate { get; set; }
+        public DateTime? SentAt { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        [MaxLength(20)]
+        public string PaymentStatus { get; set; }
+
+        [MaxLength(100)]
+        public string PaymentTransactionId { get; set; }
+
+        public bool AutoInvoice { get; set; } = false;
+
+        [MaxLength(255)]
+        public string InvoiceXml { get; set; }
+
+        [MaxLength(255)]
+        public string InvoicePdf { get; set; }
+
+        public DateTime? InvoiceDate { get; set; }
+
+        public decimal TotalAmount { get; set; }
     }
 }

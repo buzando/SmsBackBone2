@@ -281,7 +281,7 @@ namespace Business
                             futurerooms = false,
                             lastPasswordChangeDate = DateTime.Now,
                             createDate = DateTime.Now,
-                            emailConfirmed = false,
+                            emailConfirmed = true,
                             clauseAccepted = false,
                             status = true,
                             SMS = false,
@@ -326,27 +326,27 @@ namespace Business
                         {
 
 
-                            var password = GenerarPasswordTemporalBackBone(16);
+                            //var password = GenerarPasswordTemporalBackBone(16);
 
-                            var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
-                            var userbackbone = new ApiBackBoneManager()
-                                .CreateUser(admintoken.Result.token, dto.NombreCliente, password, dto.Email, 3, "")
-                                .GetAwaiter()
-                                .GetResult();
-                            int id = JObject.Parse(userbackbone)["id"].Value<int>();
-                            var passencrypt = ClientAccessManager.Encrypt(password);
+                            //var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
+                            //var userbackbone = new ApiBackBoneManager()
+                            //    .CreateUser(admintoken.Result.token, dto.NombreCliente, password, dto.Email, 3, "")
+                            //    .GetAwaiter()
+                            //    .GetResult();
+                            //int id = JObject.Parse(userbackbone)["id"].Value<int>();
+                            //var passencrypt = ClientAccessManager.Encrypt(password);
 
-                            var clientacces = new ClientAccess
-                            {
-                                client_id = client.id,
-                                password = passencrypt,
-                                username = dto.NombreCliente,
-                                status = true,
-                                created_at = DateTime.Now,
-                                id_backbone = id
-                            };
-                            ctx.Client_Access.Add(clientacces);
-                            ctx.SaveChanges();
+                            //var clientacces = new ClientAccess
+                            //{
+                            //    client_id = client.id,
+                            //    password = passencrypt,
+                            //    username = dto.NombreCliente,
+                            //    status = true,
+                            //    created_at = DateTime.Now,
+                            //    id_backbone = id
+                            //};
+                            //ctx.Client_Access.Add(clientacces);
+                            //ctx.SaveChanges();
                             transaction.Commit();
 
                             string sitioFront = Common.ConfigurationManagerJson("UrlSitio");
