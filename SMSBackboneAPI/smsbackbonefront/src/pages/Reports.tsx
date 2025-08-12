@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import {
     Box,
     Button,
@@ -139,16 +139,10 @@ const Reports: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalCount, settotalCount] = useState(0);
     const [totalXPage, settotalXPage] = useState(0);
+    const campaignPopperRef = useRef<HTMLDivElement | null>(null);
+    const userPopperRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
-{/*  
-    <ClickAwayListener onClickAway={() => {
-        setCampaignMenuOpen(false);
-        setUserMenuOpen(false);
-        setDatePickerOpen(false);
-    }}>
 
-    </ClickAwayListener>
-*/}
     const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
         setSelectedTab(newValue);
     };
@@ -568,6 +562,37 @@ const Reports: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Node;
+
+            // Cierra menú de campañas si se hace clic fuera del botón y fuera del Popper
+            if (
+                campaignMenuOpen &&
+                anchorElC &&
+                !anchorElC.contains(target) &&
+                !campaignPopperRef.current?.contains(target)
+            ) {
+                setCampaignMenuOpen(false);
+            }
+
+            // Cierra menú de usuarios si se hace clic fuera del botón y fuera del Popper
+            if (
+                userMenuOpen &&
+                userAnchorEl &&
+                !userAnchorEl.contains(target) &&
+                !userPopperRef.current?.contains(target)
+            ) {
+                setUserMenuOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [campaignMenuOpen, userMenuOpen, anchorElC, userAnchorEl]);
+
 
     return (
         <Box p={4} sx={{ padding: '10px', marginLeft: "35px", marginTop: '-60px', }}>
@@ -660,6 +685,7 @@ const Reports: React.FC = () => {
             <Divider sx={{ mt: 1, mb: 2, marginTop: "-5px", maxWidth: "1140px" }} />
 
             {/* Filtros de Fecha, Campaña y Usuario */}
+
             <Box display="flex" gap={2} mb={4} marginBottom={2}>
                 <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleDateClick}>
                     {selectedDates ? `${selectedDates.start.toLocaleDateString()} - ${selectedDates.end.toLocaleDateString()}` : 'FECHA'}
@@ -668,20 +694,25 @@ const Reports: React.FC = () => {
                 {/* Mostrar solo si no es "Global" */}
                 {selectedSmsOption !== "Global" && (
                     <>
-                        <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleCampaignClick}>  {selectedCampaigns.length > 0
-                            ? `${selectedCampaigns.length} campaña${selectedCampaigns.length > 1 ? 's' : ''}`
-                            : 'CAMPAÑA'}</Button>
-                        <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleUserClick}> {selectedUsers.length > 0
-                            ? `${selectedUsers.length} usuario${selectedUsers.length > 1 ? 's' : ''}`
-                            : 'USUARIO'}</Button>
+                        <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleCampaignClick}>
+                            {selectedCampaigns.length > 0
+                                ? `${selectedCampaigns.length} campaña${selectedCampaigns.length > 1 ? 's' : ''}`
+                                : 'CAMPAÑA'}
+                        </Button>
+                        <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleUserClick}>
+                            {selectedUsers.length > 0
+                                ? `${selectedUsers.length} usuario${selectedUsers.length > 1 ? 's' : ''}`
+                                : 'USUARIO'}
+                        </Button>
                     </>
                 )}
             </Box>
 
 
+
             {/* Popper Campañas */}
             <Popper open={campaignMenuOpen} anchorEl={anchorElC} placement="bottom-start">
-                <Paper sx={{ width: 280, p: 2 }}>
+                <Paper ref={campaignPopperRef} sx={{ width: 280, p: 2 }}>
                     <TextField
                         placeholder="Buscar"
                         value={campaignSearch}
@@ -747,7 +778,13 @@ const Reports: React.FC = () => {
                             />
                         </MenuItem> */}
                         {campaigns.filter(c => c.name.toLowerCase().includes(campaignSearch.toLowerCase())).map(c => (
-                            <MenuItem key={c.id} disableRipple sx={{ height: "32px", marginLeft: "-12px" }}>
+                            <MenuItem key={c.id} disableRipple sx={{
+                                maxWidth: '100%',
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap',
+                                textOverflow: 'ellipsis',
+                                marginLeft: '-12px'
+                            }}>
                                 <Checkbox
                                     checked={selectedCampaigns.some(sc => sc.id === c.id)}
                                     onChange={() => handleCampaignSelection(c)}
@@ -847,11 +884,22 @@ const Reports: React.FC = () => {
                         >APLICAR</Button>
                     </Box>
                 </Paper>
+
             </Popper>
 
             {/* Popper Usuarios */}
             <Popper open={userMenuOpen} anchorEl={userAnchorEl} placement="bottom-start">
-                <Paper sx={{ width: 280, p: 2 }}>
+                <Paper
+                    sx={{
+                        width: 280,
+                        p: 2,
+                        maxHeight: 400,
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                        boxSizing: 'border-box',
+                    }}
+                    ref={userPopperRef}
+                >
                     <TextField
                         placeholder="Buscar"
                         value={userSearch}
@@ -900,24 +948,13 @@ const Reports: React.FC = () => {
                     </div>
 
                     <Box sx={{ maxHeight: 140, overflowY: 'auto', }}>
-                        {/* <MenuItem onClick={handleSelectAllUsers}>
-                            <Checkbox checked={selectedUsers.length === users.length}
-                                sx={{
-                                    marginBottom: "-10px",
-                                    marginTop: "-10px",
-                                    marginLeft: "-20px",
-                                    
-                                    color: '#6C3A52',
-                                    '&.Mui-checked': { color: '#6C3A52' },
-
-                                }}
-                            />
-                            <ListItemText primary="Seleccionar todo"
-                                primaryTypographyProps={{ fontFamily: 'Poppins' }}
-                            />
-                        </MenuItem> */}
                         {users.filter(u => u.name.toLowerCase().includes(userSearch.toLowerCase())).map(u => (
-                            <MenuItem key={u.id} onClick={() => handleUserSelection(u)}>
+                            <MenuItem key={u.id} onClick={() => handleUserSelection(u)} sx={{
+                                maxWidth: '100%',
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap',
+                                textOverflow: 'ellipsis',
+                            }}>
                                 <Checkbox checked={selectedUsers.includes(u)}
                                     checkedIcon={
                                         <Box
@@ -1020,6 +1057,7 @@ const Reports: React.FC = () => {
                         >APLICAR</Button>
                     </Box>
                 </Paper>
+
             </Popper>
 
             <Divider sx={{ mb: 4, maxWidth: "1140px" }} />

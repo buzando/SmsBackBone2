@@ -769,7 +769,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
         #endregion
 
         #region recharge
-        public string RechargeUser(CreditRechargeRequest credit)
+        public string RechargeUser2(CreditRechargeRequest credit)
         {
             log.Info("Comenzando proceso");
             var tarjeta = new creditcards();
@@ -902,6 +902,73 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
             }
         }
+
+        public string RechargeUser(CreditRechargeRequest credit)
+        {
+            log.Info("Comenzando proceso (modo simulado)");
+            var room = new rooms();
+            var usuario = new Modal.Model.Model.Users();
+
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    usuario = ctx.Users.Where(x => x.Id == credit.IdUser).FirstOrDefault();
+                    room = (from r in ctx.Rooms
+                            join rbu in ctx.roomsbyuser on r.id equals rbu.idRoom
+                            where r.name == credit.room && rbu.idUser == credit.IdUser
+                            select r).FirstOrDefault();
+                }
+
+                // Crear registro de recarga
+                var creditrecharge = new CreditRecharge
+                {
+                    Chanel = credit.Chanel,
+                    idCreditCard = credit.IdCreditCard,
+                    quantityCredits = credit.QuantityCredits,
+                    quantityMoney = credit.QuantityMoney,
+                    RechargeDate = DateTime.Now,
+                    idUser = credit.IdUser,
+                    AutomaticInvoice = credit.AutomaticInvoice,
+                    idRoom = room.id,
+                    Estatus = "Exitoso" // Simulación: siempre exitoso
+                };
+
+                using (var ctx = new Entities())
+                {
+                    ctx.CreditRecharge.Add(creditrecharge);
+                    ctx.SaveChanges();
+
+                    // Simular registro en tabla OpenPay
+                    var openpayRecord = new CreditRechargeOpenPay
+                    {
+                        IdCreditRecharge = creditrecharge.Id,
+                        ChargeId = Guid.NewGuid().ToString(),
+                        idopenpay = Guid.NewGuid().ToString(),
+                        BankAuthorization = "SIMULATED-AUTH",
+                        Amount = credit.QuantityMoney,
+                        Status = "completed",
+                        CreationDate = DateTime.Now,
+                        CardId = "SIMULATED-CARD",
+                        CustomerId = "SIMULATED-CUSTOMER",
+                        Conciliated = true,
+                        Description = "Recarga simulada de créditos"
+                    };
+
+                    ctx.CreditRechargeOpenPay.Add(openpayRecord);
+                    ctx.SaveChanges();
+                }
+
+                // Simular URL de retorno (en OpenPay sería la URL de redirección 3DS)
+                return "/recarga/simulado/exitoso";
+            }
+            catch (Exception e)
+            {
+                log.Error(e.ToString());
+                return "Error: " + e.Message;
+            }
+        }
+
 
         public bool VerifyRechargeStatus(string idRecharge)
         {
@@ -1337,7 +1404,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                     }
                     : null;
 
-                var twentyDaysAgo = DateTime.Now.Date.AddDays(-19);
+                var twentyDaysAgo = DateTime.Now.AddDays(-19);
 
                 var dailyCounts = sentQuery
                     .Where(s => s.SentAt.Value.Date >= twentyDaysAgo)
