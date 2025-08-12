@@ -275,16 +275,16 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                 }
                 if (tipo == "SMS")
                 {
+                    token = "123456";
+                    //Random random = new Random();
+                    //int randomNumber = random.Next(100000, 1000000);
 
-                    Random random = new Random();
-                    int randomNumber = random.Next(100000, 1000000);
+                    //token = randomNumber.ToString();
+                    //var usuario = Common.ConfigurationManagerJson("USRAUTENTIFICATION");
+                    //var PSS = Common.ConfigurationManagerJson("PSSAUTENTIFICATION");
+                    //var tokensesion = await new ApiBackBoneManager().LoginResponse(usuario, PSS);
 
-                    token = randomNumber.ToString();
-                    var usuario = Common.ConfigurationManagerJson("USRAUTENTIFICATION");
-                    var PSS = Common.ConfigurationManagerJson("PSSAUTENTIFICATION");
-                    var tokensesion = await new ApiBackBoneManager().LoginResponse(usuario, PSS);
-
-                    var envio = await new ApiBackBoneManager().SendCode(dato, token, tokensesion);
+                    //var envio = await new ApiBackBoneManager().SendCode(dato, token, tokensesion);
                 }
             }
             catch (Exception e)
@@ -902,7 +902,6 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
             }
         }
-
         public string RechargeUser(CreditRechargeRequest credit)
         {
             log.Info("Comenzando proceso (modo simulado)");
@@ -968,8 +967,6 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                 return "Error: " + e.Message;
             }
         }
-
-
         public bool VerifyRechargeStatus(string idRecharge)
         {
             try
@@ -1404,7 +1401,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                     }
                     : null;
 
-                var twentyDaysAgo = DateTime.Now.AddDays(-19);
+                var twentyDaysAgo = DateTime.Now.Date.AddDays(-19);
 
                 var dailyCounts = sentQuery
                     .Where(s => s.SentAt.Value.Date >= twentyDaysAgo)

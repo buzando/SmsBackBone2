@@ -276,13 +276,13 @@ const Chooseroom: React.FC = () => {
 
                                     }}>
                                         <Typography sx={{
-                                            margin: "0", fontSize: "16px", color: "#574B4F",
-                                            '&:hover': {
-                                                color: "blue",
-                                            },
-                                        }}>{room.name}
+                                            fontSize: "16px", color: "#574B4F", fontFamily: "Poppins"
+                                        }}>
+                                            {room.name}
                                         </Typography>
-                                        <p style={{ margin: "0", fontSize: "14px", color: "#9B9295" }}>{room.cliente}</p>
+                                        <Typography sx={{ fontSize: "14px", color: "#9B9295", fontFamily: "Poppins" }}>
+                                            {room.cliente}
+                                        </Typography>
                                     </Box>
 
                                 </div>

@@ -84,7 +84,9 @@ namespace Business
             }
         }
 
-        public string AddCreditCard(CreditCardRequest creditCard)
+
+
+        public string AddCreditCard2(CreditCardRequest creditCard)
         {
             try
             {
@@ -98,10 +100,7 @@ namespace Business
                     return "Error";
                 }
 
-                var random = new Random();
-                string tokenCustomer = "cus_" + Guid.NewGuid().ToString("N").Substring(0, 16);
-                string tokenCard = "kard_" + Guid.NewGuid().ToString("N").Substring(0, 16);
-                var token = $"{tokenCustomer}|{tokenCard}";
+                var token = CreateOpenPayCustomerAndCard(creditCard, usuario);
                 if (token.ToLower().Contains("error"))
                 {
                     return "Error";
@@ -115,7 +114,7 @@ namespace Business
                     var tokencustomer = token.Split("|")[0];
                     var creditscard = ctx.creditcards
                         .Where(x => x.token_id == tokencard && x.user_id == creditCard.user_id)
-                        .FirstOrDefault();
+                        .FirstOrDefault(); 
                     if (creditscard != null)
                     {
                         return "Existe";
@@ -157,7 +156,7 @@ namespace Business
 
         }
 
-        public string AddCreditCard2(CreditCardRequest creditCard)
+        public string AddCreditCard(CreditCardRequest creditCard)
         {
             try
             {
@@ -171,7 +170,10 @@ namespace Business
                     return "Error";
                 }
 
-                var token = CreateOpenPayCustomerAndCard(creditCard, usuario);
+                var random = new Random();
+                string tokenCustomer = "cus_" + Guid.NewGuid().ToString("N").Substring(0, 16);
+                string tokenCard = "kard_" + Guid.NewGuid().ToString("N").Substring(0, 16);
+                var token = $"{tokenCustomer}|{tokenCard}";
                 if (token.ToLower().Contains("error"))
                 {
                     return "Error";
@@ -185,7 +187,7 @@ namespace Business
                     var tokencustomer = token.Split("|")[0];
                     var creditscard = ctx.creditcards
                         .Where(x => x.token_id == tokencard && x.user_id == creditCard.user_id)
-                        .FirstOrDefault(); 
+                        .FirstOrDefault();
                     if (creditscard != null)
                     {
                         return "Existe";

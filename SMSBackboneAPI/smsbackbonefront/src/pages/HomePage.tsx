@@ -12,15 +12,19 @@ import { ReactNode } from 'react';
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import BoxEmpty from '../assets/Nousers.svg';
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
+import IconCheckBox3 from "../assets/IconCheckBox3.svg";
 import smsico from '../assets/Icon-sms.svg'
 import welcome from '../assets/icon-welcome.svg'
 import fast from '../assets/icon-fastsend.svg'
 import Secondarybutton from '../components/commons/SecondaryButton'
+import IconCirclePlus from "../assets/IconCirclePlus.svg";
+import IconTrash from "../assets/IconTrash.svg";
 import axios from "../components/commons/AxiosInstance";
 import ModalError from "../components/commons/ModalError";
 import SnackBar from "../components/commons/ChipBar";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
 
 interface CampaignKPIResponse {
     activeCampaigns: number;
@@ -207,49 +211,37 @@ const HomePage: React.FC = () => {
                 {
                     label: "Recepción",
                     value: total > 0 ? +(response.data.respondedRecords / total * 100).toFixed(1) : 0,
-                    color: "#9C6ADE",
+                    color: "#9674BF",
                     tooltip: `${response.data.respondedRecords} recibidos (${((response.data.respondedRecords / total) * 100).toFixed(1)}%)`
                 },
                 {
                     label: "Entregados",
                     value: total > 0 ? +(response.data.deliveredCount / total * 100).toFixed(1) : 0,
-                    color: "#4CAF50",
+                    color: "#D9A93D",
                     tooltip: `${response.data.deliveredCount} entregados (${((response.data.deliveredCount / total) * 100).toFixed(1)}%)`
                 },
                 {
                     label: "No recibidos",
                     value: total > 0 ? +(response.data.notDeliveredCount / total * 100).toFixed(1) : 0,
-                    color: "#FFD700",
+                    color: "#18ACED",
                     tooltip: `${response.data.notDeliveredCount} no recibidos (${((response.data.notDeliveredCount / total) * 100).toFixed(1)}%)`
-                },
-                {
-                    label: "En espera",
-                    value: total > 0 ? +(response.data.waitingCount / total * 100).toFixed(1) : 0,
-                    color: "#00BFFF",
-                    tooltip: `${response.data.waitingCount} en espera (${((response.data.waitingCount / total) * 100).toFixed(1)}%)`
-                },
-                {
-                    label: "Entregados-Falla",
-                    value: total > 0 ? +(response.data.failedCount / total * 100).toFixed(1) : 0,
-                    color: "#FFB6C1",
-                    tooltip: `${response.data.failedCount} con falla (${((response.data.failedCount / total) * 100).toFixed(1)}%)`
-                },
-                {
-                    label: "Rechazados",
-                    value: total > 0 ? +(response.data.rejectedCount / total * 100).toFixed(1) : 0,
-                    color: "#C75C3B",
-                    tooltip: `${response.data.rejectedCount} rechazados (${((response.data.rejectedCount / total) * 100).toFixed(1)}%)`
                 },
                 {
                     label: "No enviados",
                     value: total > 0 ? +(response.data.notSentCount / total * 100).toFixed(1) : 0,
-                    color: "#B0BEC5",
+                    color: "#FB8FB8",
                     tooltip: `${response.data.notSentCount} no enviados (${((response.data.notSentCount / total) * 100).toFixed(1)}%)`
+                },
+                {
+                    label: "Entregados-Falla",
+                    value: total > 0 ? +(response.data.failedCount / total * 100).toFixed(1) : 0,
+                    color: "#DD8E26",
+                    tooltip: `${response.data.failedCount} con falla (${((response.data.failedCount / total) * 100).toFixed(1)}%)`
                 },
                 {
                     label: "Excepción",
                     value: total > 0 ? +(response.data.exceptionCount / total * 100).toFixed(1) : 0,
-                    color: "#4CAF50",
+                    color: "#6EB139",
                     tooltip: `${response.data.exceptionCount} con excepción (${((response.data.exceptionCount / total) * 100).toFixed(1)}%)`
                 }
             ]);
@@ -347,15 +339,15 @@ const HomePage: React.FC = () => {
         )
     )(() => ({
         [`& .${tooltipClasses.tooltip}`]: {
-            backgroundColor: '#FFFFFF !important',
-            color: '#574B4F !important',
-            fontSize: '12px !important',
-            border: '1px solid #E0E0E0 !important',
-            borderRadius: '4px !important',
-            padding: '8px !important',
-            maxWidth: '250px !important',
-            whiteSpace: 'pre-line !important',
-            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1) !important',
+            backgroundColor: "#FFFFFF",
+            color: "#574B4F",
+            fontFamily: "Poppins, sans-serif",
+            fontSize: "13px",
+            padding: "8px 12px",
+            borderRadius: "10px",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+            maxWidth: 220,
+            border: "1px solid #9B9295"
         },
         [`& .${tooltipClasses.arrow}`]: {
             color: '#E0E0E0 !important',
@@ -426,14 +418,14 @@ const HomePage: React.FC = () => {
 
 
     return (
-        <div style={{
+        <Box sx={{
             padding: '30px',
-            maxWidth: "1140px",
-            height: '1000px',
+            width: "1180px",
+            minHeight: '800px',
             backgroundColor: '#F2F2F2',
             display: 'flex',
             flexDirection: 'column',
-            marginTop: "-70px",
+            marginTop: "-70px"
 
         }}>
 
@@ -452,7 +444,7 @@ const HomePage: React.FC = () => {
             </Typography>
 
             {/* Contenedor de botones alineados */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 {/* Botón de filtro */}
                 <Button
                     variant="outlined"
@@ -555,16 +547,15 @@ const HomePage: React.FC = () => {
                 </Popper>
 
                 {!!enableButtons && (
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                    <Box sx={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', position: "absolute", marginLeft: "1000px" }}>
                         <Button
                             onClick={() => navigate('/Use')}
-
                             variant="outlined"
                             style={{
                                 border: '1px solid #CCCFD2',
                                 borderRadius: '8px',
                                 padding: '6px 12px',
-                                fontWeight: 'bold',
+                                fontWeight: 'bold', width: "86px", height: "40px", marginTop: "2.5px",
                                 color: '#8F4D63',
                                 background: activeButton === 'uso' ? '#E6C2CD' : '#FFFFFF',
                                 borderColor: activeButton === 'uso' ? '#BE93A0' : '#C6BFC2',
@@ -583,33 +574,88 @@ const HomePage: React.FC = () => {
                         >
                             USO
                         </Button>
-
-                        <IconButton
-
-                            style={{
-                                border: '1px solid #CCCFD2',
-                                borderRadius: '8px',
-                                color: '#8F4D63',
-                                background: activeButton === 'chat' ? '#E6C2CD' : '#FFFFFF',
-                                borderColor: activeButton === 'chat' ? '#BE93A0' : '#CCCFD2',
+                        <Tooltip title="Envío rápido" arrow placement="top"
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                        color: "#DEDADA",
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "12px",
+                                        padding: "6px 8px",
+                                        borderRadius: "8px",
+                                    }
+                                },
+                                arrow: {
+                                    sx: {
+                                        color: "rgba(0, 0, 0, 0.8)"
+                                    }
+                                }
                             }}
-                            onMouseOver={(e) => {
-                                e.currentTarget.style.background = '#F2E9EC';
-
+                            PopperProps={{
+                                modifiers: [
+                                    {
+                                        name: 'offset',
+                                        options: {
+                                            offset: [0, -7]
+                                        }
+                                    }
+                                ]
                             }}
-                            onMouseOut={(e) => {
-                                e.currentTarget.style.background = activeButton === 'chat' ? '#E6C2CD' : '#FFFFFF';
-                                e.currentTarget.style.border = activeButton === 'chat' ? '1px solid #BE93A0' : '1px solid #CCCFD2';
-                            }}
-                            onMouseDown={() => setActiveButton('chat')}
-                            onMouseUp={() => setActiveButton(null)}
-                            onClick={handleOpen}
                         >
-                            <img src={fast} alt="Welcome" style={{ width: '24px', height: '24px' }} />
-                        </IconButton>
+                            <IconButton
+                                style={{
+                                    border: '1px solid #CCCFD2',
+                                    borderRadius: '8px', width: "46px", height: "44px",
+                                    color: '#8F4D63',
+                                    background: activeButton === 'chat' ? '#E6C2CD' : '#FFFFFF',
+                                    borderColor: activeButton === 'chat' ? '#BE93A0' : '#CCCFD2',
+                                }}
+                                onMouseOver={(e) => {
+                                    e.currentTarget.style.background = '#F2E9EC';
 
+                                }}
+                                onMouseOut={(e) => {
+                                    e.currentTarget.style.background = activeButton === 'chat' ? '#E6C2CD' : '#FFFFFF';
+                                    e.currentTarget.style.border = activeButton === 'chat' ? '1px solid #BE93A0' : '1px solid #CCCFD2';
+                                }}
+                                onMouseDown={() => setActiveButton('chat')}
+                                onMouseUp={() => setActiveButton(null)}
+                                onClick={handleOpen}
+                            >
+                                <img src={fast} alt="Welcome" style={{ width: '28px', height: '28px', position: "absolute" }} />
+                            </IconButton>
+                        </Tooltip>
 
-                        <Tooltip title="Editar información" arrow placement="top">
+                        <Tooltip title="Editar información" arrow placement="top"
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                        color: "#DEDADA",
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "12px",
+                                        padding: "6px 8px",
+                                        borderRadius: "8px",
+                                    }
+                                },
+                                arrow: {
+                                    sx: {
+                                        color: "rgba(0, 0, 0, 0.8)"
+                                    }
+                                }
+                            }}
+                            PopperProps={{
+                                modifiers: [
+                                    {
+                                        name: 'offset',
+                                        options: {
+                                            offset: [0, -7]
+                                        }
+                                    }
+                                ]
+                            }}
+                        >
                             <IconButton
 
                                 style={{
@@ -624,7 +670,7 @@ const HomePage: React.FC = () => {
 
                                 }}
                                 onMouseOut={(e) => {
-                                    e.currentTarget.style.background = activeButton === 'chat' ? '#E6C2CD' : 'transparent';
+                                    e.currentTarget.style.background = activeButton === 'chat' ? '#E6C2CD' : '#FFFFFF';
                                     e.currentTarget.style.border = activeButton === 'chat' ? '1px solid #BE93A0' : '1px solid #CCCFD2';
                                 }}
                                 onMouseDown={() => setActiveButton('chat')}
@@ -635,11 +681,10 @@ const HomePage: React.FC = () => {
                             </IconButton>
                         </Tooltip>
 
-                    </div>
+                    </Box>
                 )}
-            </div>
 
-
+            </Box>
 
             {!showData && (
                 <Box sx={{ textAlign: 'center', marginTop: '150px', marginLeft: '0px' }}>
@@ -651,66 +696,91 @@ const HomePage: React.FC = () => {
             )}
 
             {showData && selectedOption && (
-                <Grid container spacing={3} sx={{ marginTop: '20px', justifyContent: 'center', marginLeft: "15px" }}>
+                <Box sx={{
+                    marginTop: '20px',
+                    display: "flex",
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    gap: "126px",
+                    marginLeft: "15px",
+                    backgroundColor: "#F2F2F2",
+                    width: "1180px",
+                    minHeight: "800px",
+                }}>
+
                     {dataOptions.map((item, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
-                            <Paper
-                                elevation={3}
+                        <Box key={index} sx={{ display: "flex", width: "200px", height: "100px", justifyContent: 'left', mt: -3 }}>
+                            <Box
                                 sx={{
-                                    marginLeft: "-10px",
-                                    padding: "20px",
+                                    marginLeft: "0px",
+                                    padding: "10px",
                                     borderRadius: "8px",
                                     textAlign: "center",
+                                    backgroundColor: "#FFFFFF",
+                                    width: "219px", height: "95px", mt: 1
                                 }}
                             >
                                 <Typography
                                     variant="subtitle1"
-                                    sx={{ fontFamily: "Poppins", color: "#574B4F" }}
+                                    sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "16px" }}
                                 >
                                     {item.title}
                                 </Typography>
-                                <Typography variant="h5" sx={{ color: "#8F4D63" }}>
+                                <Typography variant="h5" sx={{ color: "#8F4D63", fontSize: "24px" }}>
                                     {item.value}
                                 </Typography>
-                            </Paper>
-                        </Grid>
+                            </Box>
+                        </Box>
                     ))}
 
                     {settings.listadoCampanas && (
-                        <Paper sx={{
+                        <Box sx={{
                             padding: 2,
                             borderRadius: '8px',
-                            marginTop: 2,
-                            overflow: 'hidden',
                             width: '100%',
                             marginLeft: '0px',
-
+                            backgroundColor: "#FFFFFF", mt: "-170px", height: "165px"
                         }}>
-                            <Typography
+                            <Box sx={{ display: "flex" }}>
+                                <Typography
 
-                                sx={{
-                                    textAlign: 'left',
-                                    fontSize: '16px',
-                                    fontWeight: '500',
-                                    lineHeight: '54px',
-                                    fontFamily: 'Poppins',
-                                    letterSpacing: '0px',
-                                    color: '#574B4F',
-                                    opacity: 1,
-                                    marginBottom: 0.5
-                                }}
-                            >
-                                Campañas activas
-                            </Typography>
+                                    sx={{
+                                        textAlign: 'left',
+                                        fontSize: '16px',
+                                        fontWeight: '500',
+                                        lineHeight: '54px',
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: '0px',
+                                        color: '#574B4F',
+                                        opacity: 1,
+                                        marginBottom: 0.5, marginTop: "-20px"
+                                    }}
+                                >
+                                    Campañas activas
+                                </Typography>
+                                <IconButton
+                                    onClick={() =>
+                                        handleChange({
+                                            target: {
+                                                name: "listadoCampanas",
+                                                checked: false
+                                            }
+                                        })
+                                    }
+                                    sx={{ marginLeft: "1110px", marginTop: "-10px", position: "absolute" }}>
+
+                                    <CloseIcon sx={{ color: '#A6A6A6', }} />
+                                </IconButton>
+                            </Box>
                             <Box
                                 sx={{
-
+                                    ml: 0.7,
                                     display: 'flex',
                                     overflowX: 'auto',
                                     whiteSpace: 'nowrap',
                                     gap: 4,
                                     paddingBottom: 1,
-                                    maxWidth: '100%',
+                                    maxWidth: '100%', height: "100px",
                                     '&::-webkit-scrollbar': {
                                         height: '6px',
                                     },
@@ -723,28 +793,27 @@ const HomePage: React.FC = () => {
                                 {campaigns.map((campaign, index) => {
                                     const percentage = (campaign.numeroActual / campaign.numeroInicial) * 100;
                                     return (
-                                        <Paper
+                                        <Box
                                             key={index}
                                             sx={{
-                                                minWidth: '200px',
+                                                minWidth: '188px',
                                                 maxWidth: '220px',
-                                                height: '90px',
+                                                height: '73px',
                                                 padding: 2,
                                                 border: '1px solid #D6CED2',
                                                 borderRadius: '8px',
                                                 textAlign: 'left',
                                                 display: 'flex',
                                                 flexDirection: 'column',
-                                                alignItems: 'flex-start', // Asegura alineación a la izquierda
+                                                alignItems: 'flex-start',
                                                 justifyContent: 'space-between',
-                                                opacity: 1,
-                                                position: 'relative', // Necesario para posicionar la línea
+                                                position: 'relative',
                                                 '&:not(:last-child)::after': { // Aplica solo a los elementos excepto el último
                                                     content: '""',
                                                     position: 'absolute',
-                                                    right: '-18px', // Ajusta la posición de la línea entre elementos
-                                                    top: '10%',
-                                                    height: '75px',
+                                                    right: '-18px',
+                                                    marginTop: "-15px",
+                                                    height: '70px',
                                                     width: '2px',
                                                     backgroundColor: '#D6CED2',
                                                 },
@@ -759,8 +828,7 @@ const HomePage: React.FC = () => {
                                                     lineHeight: '16px',
                                                     fontFamily: 'Poppins',
                                                     letterSpacing: '0px',
-                                                    color: '#574B4F',
-                                                    opacity: 1,
+                                                    color: '#574B4F', mb: "-3px", mt: "-6px"
                                                 }}
                                             >
                                                 {campaign.name}
@@ -768,7 +836,6 @@ const HomePage: React.FC = () => {
                                             <Box sx={{ width: '100%', position: 'relative', marginTop: 1 }}>
                                                 <Box
                                                     sx={{
-
                                                         width: '100%',
                                                         height: '8px',
                                                         borderRadius: '4px',
@@ -778,7 +845,6 @@ const HomePage: React.FC = () => {
                                                 />
                                                 <Box
                                                     sx={{
-
                                                         width: `${percentage}%`,
                                                         height: '8px',
                                                         borderRadius: '4px',
@@ -795,7 +861,7 @@ const HomePage: React.FC = () => {
                                                     justifyContent: 'space-between',
                                                     width: '100%',
                                                     paddingX: '8px',
-                                                    marginTop: '8px', // 🔥 Bajamos el contenido para mejor alineación
+                                                    marginTop: '13px',
                                                 }}
                                             >
                                                 <Typography
@@ -808,7 +874,7 @@ const HomePage: React.FC = () => {
                                                         fontFamily: 'Poppins',
                                                         letterSpacing: '0px',
                                                         color: '#574B4FCC',
-                                                        opacity: 1,
+                                                        marginLeft: "-6px"
                                                     }}
                                                 >
                                                     {Math.round(percentage)}%
@@ -824,52 +890,95 @@ const HomePage: React.FC = () => {
                                                         letterSpacing: '0px',
                                                         color: '#574B4FCC',
                                                         opacity: 1,
-                                                        marginLeft: '5px',
+                                                        marginLeft: '-20px',
                                                     }}
                                                 >
                                                     {campaign.numeroActual}/{campaign.numeroInicial}
                                                 </Typography>
-                                                <Tooltip title="Consultar" arrow placement="top">
+                                                <Tooltip title="Consultar" arrow placement="top"
+                                                    componentsProps={{
+                                                        tooltip: {
+                                                            sx: {
+                                                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                color: "#DEDADA",
+                                                                fontFamily: "Poppins, sans-serif",
+                                                                fontSize: "12px",
+                                                                padding: "6px 8px",
+                                                                borderRadius: "8px",
+                                                            }
+                                                        },
+                                                        arrow: {
+                                                            sx: {
+                                                                color: "rgba(0, 0, 0, 0.8)"
+                                                            }
+                                                        }
+                                                    }}
+                                                    PopperProps={{
+                                                        modifiers: [
+                                                            {
+                                                                name: 'offset',
+                                                                options: {
+                                                                    offset: [0, 2]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }}
+                                                >
                                                     <IconButton sx={{ padding: '0', marginLeft: '5px' }} onClick={() => navigate('/Campaigns')}>
-                                                        <img src={smsico} alt="SMS" style={{ width: '18px', height: '18px' }} />
+                                                        <img src={smsico} alt="SMS" style={{ width: '22px', height: '22px', marginLeft: "-6px", position: "absolute" }} />
                                                     </IconButton>
                                                 </Tooltip>
                                             </Box>
-                                        </Paper>
+                                        </Box>
                                     );
                                 })}
                             </Box>
-                        </Paper>
+                        </Box>
                     )}
                     {settings.resultadosEnvio && (
-                        <Paper
+                        <Box
                             sx={{
                                 padding: 2,
                                 borderRadius: '8px',
-                                marginTop: 2,
+                                marginTop: "-0px",
+                                backgroundColor: "#FFFFFF",
                                 width: "100%",
                                 minHeight: "250px",
                                 display: "flex",
                                 flexDirection: "column",
-                                justifyContent: "space-between",
+                                justifyContent: "space-between", mb: "50px", mt: "-180px"
                             }}
                         >
                             {/* Título */}
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    textAlign: "left",
-                                    fontSize: "16px",
-                                    fontWeight: "500",
-                                    lineHeight: "24px",
-                                    fontFamily: "Poppins, sans-serif",
-                                    color: "#574B4F",
-                                    opacity: 1,
-                                    marginBottom: 2,
-                                }}
-                            >
-                                Resultados de envío por día
-                            </Typography>
+                            <Box sx={{ display: "flex" }}>
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        textAlign: "left",
+                                        fontSize: "16px",
+                                        fontWeight: "500",
+                                        lineHeight: "24px",
+                                        fontFamily: "Poppins, sans-serif",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        marginBottom: 2,
+                                    }}
+                                >
+                                    Resultados de envío por día
+                                </Typography>
+                                <IconButton
+                                    onClick={() =>
+                                        handleChange({
+                                            target: {
+                                                name: "resultadosEnvio",
+                                                checked: false
+                                            }
+                                        })
+                                    }
+                                    sx={{ marginLeft: "1110px", marginTop: "-10px", position: "absolute" }}>
+                                    <CloseIcon sx={{ color: '#A6A6A6', }} />
+                                </IconButton>
+                            </Box>
 
                             {/* Contenedor de estadísticas */}
                             <Box
@@ -881,19 +990,19 @@ const HomePage: React.FC = () => {
                                     padding: 2,
                                     border: "1px solid #E0E0E0",
                                     borderRadius: 2,
-                                    background: "#FAFAFA",
+                                    background: "#FFFFFF",
                                     minHeight: "80px",
                                 }}
                             >
                                 {data.map((item, index) => (
                                     <Box key={index} sx={{ textAlign: "center", flex: 1 }}>
                                         <CustomTooltip title={item.tooltip}>
-                                            <img src={infoicon} alt="Info" style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                                            <img src={infoicon} alt="Info" style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
                                         </CustomTooltip>
-                                        <Typography sx={{ fontSize: "12px", color: "#574B4F", fontFamily: 'Poppins' }}>
+                                        <Typography sx={{ fontSize: "14px", color: "#574B4F", fontFamily: 'Poppins', opacity: 0.8 }}>
                                             {item.label}:
                                         </Typography>
-                                        <Typography sx={{ fontSize: "16px", fontWeight: "bold", color: item.color, fontFamily: 'Poppins' }}>
+                                        <Typography sx={{ fontSize: "22px", fontWeight: 500, color: item.color, fontFamily: 'Poppins' }}>
                                             {item.value}%
                                         </Typography>
                                     </Box>
@@ -906,7 +1015,7 @@ const HomePage: React.FC = () => {
                                     display: "flex",
                                     alignItems: "flex-end",
                                     justifyContent: "center",
-                                    height: "160px",
+                                    height: "161px",
                                     marginTop: 3,
                                     position: "relative",
                                     paddingBottom: 2,
@@ -917,20 +1026,18 @@ const HomePage: React.FC = () => {
                                     sx={{
                                         position: "absolute",
                                         left: 0,
-                                        bottom: 20, // 🔥 Bajamos la base del eje Y para dar espacio al texto
+                                        bottom: 20,
                                         height: "100%",
                                         width: "100%",
                                         display: "flex",
                                         flexDirection: "column",
                                         justifyContent: "space-between",
                                         alignItems: "flex-start",
-                                        borderLeft: "2px solid #E0E0E0",
-                                        borderBottom: "2px solid #E0E0E0",
                                         paddingLeft: "40px",
                                     }}
                                 >
                                     {[100, 80, 60, 40, 20, 0].map((percent) => (
-                                        <Box key={percent} sx={{ width: "100%", display: "flex", alignItems: "center" }}>
+                                        <Box key={percent} sx={{ width: "100%", display: "flex", alignItems: "center", }}>
                                             <Typography
                                                 sx={{
                                                     fontFamily: 'Poppins',
@@ -943,7 +1050,7 @@ const HomePage: React.FC = () => {
                                             >
                                                 {percent}%
                                             </Typography>
-                                            <Box sx={{ flexGrow: 1, borderBottom: "1px dashed #E0E0E0" }} />
+                                            <Box sx={{ flexGrow: 1, borderBottom: "1px dashed #E0E0E0", }} />
                                         </Box>
                                     ))}
                                 </Box>
@@ -954,48 +1061,60 @@ const HomePage: React.FC = () => {
                                         display: "flex",
                                         alignItems: "flex-end",
                                         justifyContent: "space-around",
-                                        width: "90%",
-                                        paddingLeft: "40px",
+                                        width: "1100px",
+                                        paddingLeft: "40px", marginLeft: "-10px"
                                     }}
                                 >
+                                    <Box
+                                        sx={{
+                                            width: "1px", height: "165px", backgroundColor: "#574B4F", opacity: 0.3,
+                                            position: "absolute", marginLeft: "-1020px"
+                                        }}>
+                                    </Box>
+                                    <Box
+                                        sx={{
+                                            width: "1070px", height: "1px", backgroundColor: "#574B4F", opacity: 0.3,
+                                            position: "absolute", marginLeft: "15px"
+                                        }}>
+                                    </Box>
                                     {data.map((item, index) => (
-                                        <Box key={index} sx={{ textAlign: "center", width: "50px", position: "relative" }}>
+                                        <Box key={index} sx={{ textAlign: "center", width: "50px", position: "relative", top: "0px" }}>
                                             <Box
                                                 sx={{
-                                                    width: "40px",
-                                                    height: `${(item.value / 100) * 120}px`, // 🔥 Ajustamos la altura con una escala de 120px
+                                                    width: "90px",
+                                                    height: `${(item.value / 100) * 120}px`,
                                                     minHeight: "10px",
-                                                    maxHeight: "120px", // 🔥 Evitamos que se salga de la escala
+                                                    maxHeight: "120px",
                                                     backgroundColor: item.color,
-                                                    borderRadius: "4px",
+                                                    borderRadius: "0px",
                                                     transition: "height 0.5s ease-in-out",
-                                                    margin: "auto",
+                                                    margin: "auto", marginLeft: "5px"
                                                 }}
                                             />
                                             {/* Nombres correctos debajo del 0% */}
                                             <Typography
                                                 sx={{
-                                                    fontFamily: 'Poppins',
+                                                    fontFamily: 'Poppins', textAlign: "center",
                                                     fontSize: "12px",
                                                     fontWeight: "500",
                                                     marginTop: "18px",
                                                     color: "#574B4F",
                                                     position: "absolute",
-                                                    bottom: "-35px",
-                                                    width: "100%",
+                                                    bottom: "-20px",
+                                                    width: "80px", whiteSpace: 'nowrap', marginLeft: "8px"
                                                 }}
                                             >
                                                 {[
                                                     "Recibidos",
-                                                    "No recibidos",
-                                                    "En espera",
-                                                    "Entregados-Falla",
-                                                    "Rechazados",
+                                                    "Entregados",
+                                                    "No entregados",
                                                     "No enviados",
+                                                    "Fallidos",
                                                     "Excepción",
                                                 ][index]}
                                             </Typography>
                                         </Box>
+
                                     ))}
                                 </Box>
 
@@ -1012,15 +1131,15 @@ const HomePage: React.FC = () => {
                                     letterSpacing: "0px",
                                     color: "#574B4FCC",
                                     opacity: 1,
-                                    marginTop: 2,
+                                    marginTop: 2
                                 }}
                             >
                                 * El cálculo de las tasas se basa en el total de mensajes enviados en el día.
                             </Typography>
-                        </Paper>
+                        </Box>
                     )}
 
-                </Grid>
+                </Box>
             )}
 
 
@@ -1036,28 +1155,25 @@ const HomePage: React.FC = () => {
                             fontWeight: 600,
                             fontSize: '20px',
                             lineHeight: '54px',
-                            fontFamily: 'Poppins, sans-serif',
+                            fontFamily: 'Poppins',
                             letterSpacing: '0px',
                             color: '#574B4F',
-                            opacity: 1
                         }}>
                             Envío rápido
                         </Typography>
-                        <IconButton onClick={handleClose}>
-                            <CloseIcon sx={{
-                                position: "absolute",
-                                marginTop: "-35px", marginLeft: "0px"
-                            }} />
+                        <IconButton onClick={handleClose}
+                            sx={{ position: "absolute", marginTop: "-40px", marginLeft: "502px" }}>
+                            <CloseIcon />
                         </IconButton>
                     </Box>
-                    <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5 }} />
+                    <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1 }} />
 
                     <Box sx={{
                         flexGrow: 1,
                         overflowY: 'auto',
                         overflowX: 'hidden',
                         maxHeight: 'calc(100% - 120px)',
-                        paddingRight: '10px',
+                        paddingRight: '10px', width: "540px"
                     }}>
 
                         <Box sx={{ marginBottom: '24px' }}>
@@ -1076,22 +1192,22 @@ const HomePage: React.FC = () => {
                                                         textAlign: 'left',
                                                         fontSize: '10px',
                                                         lineHeight: '18px',
-                                                        fontWeight: '500', // "medium" en Poppins
+                                                        fontWeight: '500',
                                                         fontFamily: 'Poppins, sans-serif',
                                                         letterSpacing: '0px',
-                                                        color: '#D01247', // 🔥 Color rojo personalizado
+                                                        color: '#D01247',
                                                         opacity: 1,
-                                                        marginLeft: '0px', // 🔥 Lo mueve totalmente a la izquierda
+                                                        marginLeft: '12px',
                                                         marginTop: '4px',
                                                     }
                                                 }}
                                                 sx={{
                                                     width: '232px',
                                                     height: '54px',
-                                                    marginBottom: '16px', // 🔥 Espacio extra debajo del input
+                                                    marginBottom: '16px',
                                                     '& .MuiOutlinedInput-root': {
                                                         '& fieldset': {
-                                                            borderColor: errors[index] ? '#D01247' : '#9B9295CC', // 🔥 Borde rojo en error
+                                                            borderColor: errors[index] ? '#D01247' : '#9B9295CC',
                                                         },
                                                         '&:hover fieldset': {
                                                             borderColor: errors[index] ? '#D01247' : '#574B4F',
@@ -1099,21 +1215,62 @@ const HomePage: React.FC = () => {
                                                         '&.Mui-focused fieldset': {
                                                             borderColor: errors[index] ? '#D01247' : '#8F4D63',
                                                         },
-                                                        '&.Mui-error fieldset': { // 🔥 Asegurar que se ponga rojo si tiene error
+                                                        '&.Mui-error fieldset': {
                                                             borderColor: '#D01247 !important',
                                                         }
+                                                    },
+                                                    '& .MuiInputBase-input': {
+                                                        fontFamily: 'Poppins, sans-serif',
+                                                        fontSize: '16px',
+                                                        color: '#574B4F'
                                                     }
                                                 }}
                                                 InputProps={{
                                                     endAdornment: (
 
-
                                                         <InputAdornment position="end">
-                                                            <img
-                                                                src={errors[index] ? infoiconerror : infoicon}
-                                                                alt="Info"
-                                                                style={{ width: "18px", height: "18px" }}
-                                                            />
+                                                            <Tooltip
+                                                                title={
+                                                                    <Box
+                                                                        sx={{
+                                                                            backgroundColor: "#FFFFFF",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                            padding: "8px 12px",
+                                                                            fontSize: "14px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#574B4F",
+                                                                            whiteSpace: "pre-line",
+                                                                            transform: "translate(-10px, -22px)",
+                                                                            borderColor: "#00131F3D",
+                                                                            borderStyle: "solid",
+                                                                            borderWidth: "1px"
+                                                                        }}
+                                                                    >
+                                                                        <>
+                                                                            • Solo caracteres alfabéticos<br />
+                                                                            • Longitud máxima de 160<br />
+                                                                            caracteres
+                                                                        </>
+                                                                    </Box>
+                                                                }
+                                                                placement="bottom-end"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "transparent",
+                                                                            padding: 0,
+
+                                                                        },
+                                                                    },
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={errors[index] ? infoiconerror : infoicon}
+                                                                    alt="Info"
+                                                                    style={{ width: "24px", height: "24px" }}
+                                                                />
+                                                            </Tooltip>
                                                         </InputAdornment>
 
                                                     ),
@@ -1121,14 +1278,89 @@ const HomePage: React.FC = () => {
                                             />
 
                                             {index === phoneNumbers.length - 1 && (
-                                                <IconButton onClick={handleAddInput} color="primary">
-                                                    <AddCircleOutlineIcon />
-                                                </IconButton>
+                                                <Box marginTop={"-14px"}>
+                                                    <Tooltip title="Añadir teléfono" arrow placement="top"
+                                                        componentsProps={{
+                                                            tooltip: {
+                                                                sx: {
+                                                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                    color: "#DEDADA",
+                                                                    fontFamily: "Poppins, sans-serif",
+                                                                    fontSize: "12px",
+                                                                    padding: "6px 8px",
+                                                                    borderRadius: "8px",
+                                                                }
+                                                            },
+                                                            arrow: {
+                                                                sx: {
+                                                                    color: "rgba(0, 0, 0, 0.8)"
+                                                                }
+                                                            }
+                                                        }}
+                                                        PopperProps={{
+                                                            modifiers: [
+                                                                {
+                                                                    name: 'offset',
+                                                                    options: {
+                                                                        offset: [0, -12]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }}
+                                                    >
+                                                        <IconButton onClick={handleAddInput} color="primary">
+                                                            <Box
+                                                                component="img"
+                                                                src={IconCirclePlus}
+                                                                alt="Agregar Horario"
+                                                                sx={{ width: "24px", height: "24px", cursor: "pointer", opacity: 0.6, }}
+                                                            />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Box>
                                             )}
                                             {index > 0 && (
-                                                <IconButton onClick={() => handleRemoveInput(index)} color="secondary">
-                                                    <RemoveCircleOutlineIcon />
-                                                </IconButton>
+                                                <Box marginTop={"-14px"}>
+                                                    <Tooltip title="Eliminar" arrow placement="top"
+                                                        componentsProps={{
+                                                            tooltip: {
+                                                                sx: {
+                                                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                    color: "#DEDADA",
+                                                                    fontFamily: "Poppins, sans-serif",
+                                                                    fontSize: "12px",
+                                                                    padding: "6px 8px",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                                }
+                                                            },
+                                                            arrow: {
+                                                                sx: {
+                                                                    color: "rgba(0, 0, 0, 0.8)"
+                                                                }
+                                                            }
+                                                        }}
+                                                        PopperProps={{
+                                                            modifiers: [
+                                                                {
+                                                                    name: 'offset',
+                                                                    options: {
+                                                                        offset: [-0, -10] // [h,v]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }}
+                                                    >
+                                                        <IconButton onClick={() => handleRemoveInput(index)} color="secondary">
+                                                            <Box
+                                                                component="img"
+                                                                src={IconTrash}
+                                                                alt="Eliminar"
+                                                                sx={{ width: 24, height: 24, cursor: "pointer", }}
+                                                            />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Box>
                                             )}
                                         </Box>
                                     </Box>
@@ -1145,26 +1377,72 @@ const HomePage: React.FC = () => {
                             value={message}
                             onChange={handleMessageChange}
                             placeholder="Escriba aquí su mensaje."
-                            sx={{ ...textFieldStyle, width: '100%' }}  // 🔥 Evita desbordamiento
+                            sx={{
+                                ...textFieldStyle, width: '510px', borderRadius: "6px",
+                                '& .MuiInputBase-input': {
+                                    fontFamily: 'Poppins',
+                                    fontSize: '16px',
+                                    color: '#574B4F', marginLeft: "-12px"
+                                },
+                                '& .MuiInputBase-input::placeholder': {
+                                    fontFamily: 'Poppins',
+                                    fontSize: '16px',
+                                    color: '#574B4F66',
+                                },
+                            }}
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                        <CustomTooltip
+                                        <Tooltip
                                             title={
-                                                <Box>
-                                                    <Typography variant="body2">• Solo caracteres alfanuméricos</Typography>
-                                                    <Typography variant="body2">• Longitud máxima 160 caracteres</Typography>
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        · Solo caracteres <br />
+                                                        alfanuméricos<br />
+                                                        · Longitud máxima de <br />
+                                                        160 caracteres
+                                                    </>
                                                 </Box>
                                             }
-                                            placement="top"
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
                                         >
-                                            <img src={infoicon} alt="Info" style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
-                                        </CustomTooltip>
+                                            <img src={infoicon} alt="Info" style={{
+                                                width: '24px', height: '24px',
+                                                cursor: 'pointer', position: "absolute", marginTop: "-80px", marginLeft: "-16px"
+                                            }} />
+                                        </Tooltip>
                                     </InputAdornment>
                                 ),
                             }}
                         />
-                        <Typography sx={{ textAlign: 'left', fontSize: '10px', fontWeight: '500', color: '#574B4FCC', marginTop: '4px' }}>
+                        <Typography sx={{
+                            textAlign: 'left', fontSize: '10px', fontWeight: '500',
+                            color: '#574B4FCC', marginTop: '4px', fontFamily: "Poppins", marginLeft: "10px"
+                        }}>
                             {message.length}/160 caracteres para que el mensaje se realice en un solo envío.
                         </Typography>
 
@@ -1175,28 +1453,60 @@ const HomePage: React.FC = () => {
                                     <Checkbox
                                         checked={shouldConcatenate}
                                         onChange={(e) => setShouldConcatenate(e.target.checked)}
+                                        checkedIcon={
+                                            <img
+                                                src={IconCheckBox1}
+                                                alt="Seleccionado"
+                                                style={{ width: '24px', height: '24px' }}
+                                            />
+                                        }
                                     />
                                 }
                                 label="Concatenar mensajes de más de 160 caracteres"
-                                sx={{ '& .MuiTypography-root': { fontSize: '16px', fontWeight: '400', color: '#574B4FCC' } }}
+                                sx={{
+                                    '& .MuiTypography-root': {
+                                        fontSize: '16px',
+                                        fontWeight: '400',
+                                        fontFamily: 'Poppins',
+                                        color: shouldConcatenate ? '#8F4D63' : '#574B4FCC',
+                                    },
+                                }}
+
                             />
                             <FormControlLabel
                                 control={
                                     <Checkbox
                                         checked={isFlashMessage}
                                         onChange={(e) => setIsFlashMessage(e.target.checked)}
+                                        checkedIcon={
+                                            <img
+                                                src={IconCheckBox1}
+                                                alt="Seleccionado"
+                                                style={{ width: '24px', height: '24px' }}
+                                            />
+                                        }
                                     />
                                 }
                                 label="Mensaje flash"
-                                sx={{ '& .MuiTypography-root': { fontSize: '16px', fontWeight: '400', color: '#574B4FCC' } }}
+                                sx={{
+                                    '& .MuiTypography-root': {
+                                        fontSize: '16px',
+                                        fontWeight: '400',
+                                        fontFamily: 'Poppins',
+                                        color: isFlashMessage ? '#8F4D63' : '#574B4FCC',
+                                    },
+                                }}
                             />
                         </Box>
                     </Box>
+                    <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 0, }} />
 
                     {/* Botones fijos */}
                     <Box sx={buttonContainer}>
-                        <SecondaryButton text='Cancelar' onClick={handleClose} />
-                        <MainButton text='Enviar' onClick={() => handleSend()} disabled={!isFormValid} />
+                        <Box sx={{ display: "flex", marginBottom: "-5px", gap: 35.2 }}>
+                            <SecondaryButton text='Cancelar' onClick={handleClose} />
+                            <MainButton text='Enviar' onClick={() => handleSend()} disabled={!isFormValid} />
+                        </Box>
                     </Box>
                 </Box>
             </Modal>
@@ -1226,67 +1536,97 @@ const HomePage: React.FC = () => {
                                 color: "#574B4F",
                                 opacity: 1,
                                 fontSize: "20px",
-                                fontWeight: "bold",
+                                fontWeight: 600, mb: 1.5
                             }}
                         >
                             Información visible en el tablero de control
                         </Typography>
-                        <IconButton onClick={() => setOpenControlModal(false)}>
-                            <CloseIcon />
+                        <IconButton onClick={() => setOpenControlModal(false)}
+                            sx={{ position: "absolute", mt: "-38px", marginLeft: "488px" }}>
+                            <CloseIcon sx={{}} />
                         </IconButton>
                     </Box>
 
-                    <Divider sx={{ my: 2 }} />
+                    <Divider sx={{ width: 'calc(100% + 49px)', marginLeft: '-24px', mb: 1.5, mt: 1 }} />
+
 
                     {/* Lista de opciones */}
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                         {/* Opciones deshabilitadas */}
                         <FormControlLabel
-                            control={<Checkbox checked disabled />}
+                            control={
+                                <Checkbox
+                                    checked
+                                    disabled
+                                    icon={<img src={IconCheckBox3} alt="Checked" style={{ display: "none" }} />} // Se puede poner algo aquí si quieres un ícono para no marcado
+                                    checkedIcon={<img src={IconCheckBox3} alt="Checked" />}
+                                />}
                             label="Número de campañas activas"
                             sx={{
                                 textAlign: "left",
-                                fontSize: "16px",
-                                fontFamily: "Poppins",
-                                color: "#A0A0A0",
-                                opacity: 1,
                                 marginBottom: "-10px",
+                                "& .MuiTypography-root": {
+                                    fontFamily: "Poppins",
+                                    fontSize: "16px",
+                                    color: "#D0D0D0",
+                                }
                             }}
                         />
                         <FormControlLabel
-                            control={<Checkbox checked disabled />}
+                            control={
+                                <Checkbox
+                                    checked
+                                    disabled
+                                    icon={<img src={IconCheckBox3} alt="Checked" style={{ display: "none" }} />} // Se puede poner algo aquí si quieres un ícono para no marcado
+                                    checkedIcon={<img src={IconCheckBox3} alt="Checked" />}
+                                />}
                             label="SMS enviados hoy"
                             sx={{
                                 textAlign: "left",
-                                fontSize: "16px",
-                                fontFamily: "Poppins",
-                                color: "#A0A0A0",
-                                opacity: 1,
                                 marginBottom: "-10px",
+                                "& .MuiTypography-root": {
+                                    fontFamily: "Poppins",
+                                    fontSize: "16px",
+                                    color: "#D0D0D0",
+                                }
                             }}
                         />
                         <FormControlLabel
-                            control={<Checkbox checked disabled />}
+                            control={
+                                <Checkbox
+                                    checked
+                                    disabled
+                                    icon={<img src={IconCheckBox3} alt="Checked" style={{ display: "none" }} />} // Se puede poner algo aquí si quieres un ícono para no marcado
+                                    checkedIcon={<img src={IconCheckBox3} alt="Checked" />}
+                                />}
                             label="Promedio de SMS por día"
                             sx={{
                                 textAlign: "left",
-                                fontSize: "16px",
-                                fontFamily: "Poppins",
-                                color: "#A0A0A0",
-                                opacity: 1,
                                 marginBottom: "-10px",
+                                "& .MuiTypography-root": {
+                                    fontFamily: "Poppins",
+                                    fontSize: "16px",
+                                    color: "#D0D0D0",
+                                }
                             }}
                         />
                         <FormControlLabel
-                            control={<Checkbox checked disabled />}
+                            control={
+                                <Checkbox
+                                    checked
+                                    disabled
+                                    icon={<img src={IconCheckBox3} alt="Checked" style={{ display: "none" }} />} // Se puede poner algo aquí si quieres un ícono para no marcado
+                                    checkedIcon={<img src={IconCheckBox3} alt="Checked" />}
+                                />}
                             label="Consumo de créditos"
                             sx={{
                                 textAlign: "left",
-                                fontSize: "16px",
-                                fontFamily: "Poppins",
-                                color: "#A0A0A0",
-                                opacity: 1,
                                 marginBottom: "-10px",
+                                "& .MuiTypography-root": {
+                                    fontFamily: "Poppins",
+                                    fontSize: "16px",
+                                    color: "#D0D0D0",
+                                }
                             }}
                         />
 
@@ -1297,15 +1637,18 @@ const HomePage: React.FC = () => {
                                     checked={settings.listadoCampanas}
                                     onChange={handleChange}
                                     name="listadoCampanas"
-                                    sx={{ color: "#8F4D63", "&.Mui-checked": { color: "#8F4D63" } }}
+                                    checkedIcon={<img src={IconCheckBox1} alt="Checked" />}
+                                    sx={{ color: "#574B4FCC", "&.Mui-checked": { color: "#8F4D63" } }}
                                 />
                             }
                             label="Listado de campañas en curso"
                             sx={{
                                 textAlign: "left",
-                                fontSize: "16px",
-                                fontFamily: "Poppins",
-                                color: "#8F4D63",
+                                "& .MuiTypography-root": {
+                                    fontFamily: "Poppins",
+                                    fontSize: "16px",
+                                    color: settings.listadoCampanas ? "#8F4D63" : "#574B4FCC",
+                                },
                                 opacity: 1,
                                 marginBottom: "-10px",
                             }}
@@ -1316,21 +1659,24 @@ const HomePage: React.FC = () => {
                                     checked={settings.resultadosEnvio}
                                     onChange={handleChange}
                                     name="resultadosEnvio"
-                                    sx={{ color: "#8F4D63", "&.Mui-checked": { color: "#8F4D63" } }}
+                                    checkedIcon={<img src={IconCheckBox1} alt="Checked" />}
+                                    sx={{ color: "#574B4FCC", "&.Mui-checked": { color: "#8F4D63" } }}
                                 />
                             }
                             label="Resultados de envío por día"
                             sx={{
                                 textAlign: "left",
-                                fontSize: "16px",
-                                fontFamily: "Poppins",
-                                color: "#8F4D63",
+                                "& .MuiTypography-root": {
+                                    fontFamily: "Poppins",
+                                    fontSize: "16px",
+                                    color: settings.resultadosEnvio ? "#8F4D63" : "#574B4FCC",
+                                },
                                 opacity: 1,
                                 marginBottom: "-10px",
                             }}
                         />
                     </Box>
-                    <Divider sx={{ my: 2 }} />
+                    <Divider sx={{ width: 'calc(100% + 49px)', marginLeft: '-24px', mb: 1.5, mt: 2 }} />
 
                     {/* Botones */}
                     <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
@@ -1341,19 +1687,19 @@ const HomePage: React.FC = () => {
                             onClick={handleSave}
                             sx={{
                                 borderRadius: "4px",
-                                fontWeight: "bold",
+                                fontWeight: 500,
                                 background: hasChanges ? "#833A53" : "#d3d3d3",
                                 border: "1px solid",
                                 borderColor: hasChanges ? "#60293C" : "#b3b3b3",
                                 color: "white",
                                 cursor: hasChanges ? "pointer" : "not-allowed",
                                 opacity: hasChanges ? 1 : 0.7,
-                                fontSize: "12px",
+                                fontSize: "14px",
                                 fontFamily: "Poppins, sans-serif",
                                 letterSpacing: "1.12px",
                                 transition: "all 0.3s ease",
-                                width: "180px", // 🔥 Mantiene el ancho original
-                                height: "36px", // 🔥 Fija la altura para evitar cambios
+                                width: "180px",
+                                height: "36px", whiteSpace: 'nowrap',
 
                                 "&:hover": {
                                     background: hasChanges ? "#90455F" : "#d3d3d3",
@@ -1685,7 +2031,7 @@ const HomePage: React.FC = () => {
                     />
                 )
             }
-        </div>
+        </Box>
     );
 };
 
@@ -1724,7 +2070,7 @@ const labelStyle = {
     letterSpacing: '0px',
     color: '#574B4F',
     opacity: 1,
-    marginTop: '10px',
+    marginTop: '10px', marginBottom: 1.5
 };
 
 const textFieldStyle = {
@@ -1743,7 +2089,7 @@ const textFieldStyle = {
 const buttonContainer = {
     display: 'flex',
     justifyContent: 'space-between',
-    marginTop: '20px',
+    marginTop: '18px',
 };
 
 
