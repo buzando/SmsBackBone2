@@ -71,8 +71,8 @@ const AutentificationLayout: React.FC<Props> = (props) => {
 
             <Box
                 sx={{
-                    backgroundColor: "#F2F2F2", // Fondo gris
-                    minHeight: "100vh", // Asegura que cubra toda la pantalla
+                    backgroundColor: "#F2F2F2",
+                    minHeight: "100vh",
                     width: "100%",
                     display: "flex",
                     flexDirection: "column"

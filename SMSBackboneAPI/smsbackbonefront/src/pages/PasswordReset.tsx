@@ -25,8 +25,12 @@ import infoicon from '../assets/Icon-info.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
 import IconCheckedCircle1 from "../assets/IconCheckedCircle1.svg";
 import IconCheckedCircle2 from "../assets/IconCheckedCircle2.svg";
+import Iconeyeslash from '../assets/Iconeyeslash.svg';
+import Iconeyesopen from '../assets/Iconeyesopen.svg';
+import ModalError from "../components/commons/ModalError";
 
 const TermsAndConditions: React.FC = () => {
+    const [ShowModalError, setShowModalError] = useState(false);
     const [loading, setLoading] = useState(false);
     const [activeStep, setActiveStep] = useState(0); // Estado del paso actual
     const [SendType, setSendType] = useState('');
@@ -63,6 +67,9 @@ const TermsAndConditions: React.FC = () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     };
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const startCountdown = () => {
         setCountdownTime(60000); // Reinicia a 1 minuto
@@ -144,7 +151,6 @@ const TermsAndConditions: React.FC = () => {
 
 
     useEffect(() => {
-        checkLockout();
     }, []);
 
 
@@ -178,7 +184,7 @@ const TermsAndConditions: React.FC = () => {
             }
         } catch (error) {
             console.error("Error al registrar el desbloqueo:", error);
-            showErrorModal("Hubo un problema al cambiar su contraseña intente más tarde");
+            setShowModalError(true);
         }
 
     };
@@ -271,7 +277,7 @@ const TermsAndConditions: React.FC = () => {
             }
             catch (error) {
                 console.error("Error al registrar el desbloqueo:", error);
-                showErrorModal("Hubo un problema al mandar su token");
+                setShowModalError(true);
             }
 
         }
@@ -451,7 +457,7 @@ const TermsAndConditions: React.FC = () => {
         >
 
             <PublicLayout>
-                <Container fixed sx={{ marginTop: "70px", backgroundColor: "#F2F2F2", width: "844px", height: "500px" }}>
+                <Container fixed sx={{ marginTop: "50px", backgroundColor: "#F2F2F2", width: "844px", height: "500px" }}>
                     <Typography
                         sx={{
                             textAlign: "center",
@@ -463,14 +469,19 @@ const TermsAndConditions: React.FC = () => {
                             letterSpacing: "0px",
                             color: "#330F1B",
                             opacity: 1,
-                            fontSize: "28px", mb: "46px", ml: "-30px"
+                            fontSize: "28px", mb: "20px", ml: "-30px"
                         }}
                     >
                         Recuperación de la cuenta
                     </Typography>
 
                     <Box sx={{
-                        height: activeStep === 5 ? '141px' : '377px',
+                        height:
+                            activeStep === 5
+                                ? '141px'
+                                : activeStep === 4
+                                    ? '527px'
+                                    : '422px',
                         width: '844px',
                         background: '#FFFFFF 0% 0% no-repeat padding-box',
                         border: '2px solid #E6E4E4CC',
@@ -486,7 +497,7 @@ const TermsAndConditions: React.FC = () => {
                                     activeStep={activeStep}
                                     connector={<CustomStepConnector />}
                                     alternativeLabel
-                                    sx={{ gap: "35px" }}
+                                    sx={{ gap: "35px", mt: "-30px" }}
                                 >
                                     {steps.map((label, index) => (
                                         <Step key={label}>
@@ -569,8 +580,9 @@ const TermsAndConditions: React.FC = () => {
 
                             </Box>
                         )}
-                        <Divider sx={{ width: 'calc(100% + 0px)', marginLeft: '-0px', mt: 1.5 }} />
-
+                        {activeStep !== 5 && (
+                            <Divider sx={{ width: 'calc(100% + 0px)', marginLeft: '-0px', mt: "-15px" }} />
+                        )}
                         <Box padding={0}>
                             {activeStep === 0 && (
                                 <Box sx={{ width: '840px', height: '220px', borderColor: "#FFFFFF" }}>
@@ -617,7 +629,7 @@ const TermsAndConditions: React.FC = () => {
                                                         color: errorMessage ? "#D01247" : "#330F1B",
                                                         opacity: 1,
                                                         fontSize: "16px",
-                                                        marginBottom: "6px",
+                                                        marginBottom: "10px",
                                                     }}
                                                 >
                                                     Correo Electrónico
@@ -725,12 +737,12 @@ const TermsAndConditions: React.FC = () => {
                                         )}
 
                                         {/* Línea horizontal */}
-                                        <Divider sx={{ width: 'calc(100% + 80px)', marginLeft: '-40px', mt: 5 }} />
+                                        <Divider sx={{ width: 'calc(100% + 80px)', marginLeft: '-40px', mt: 9.5 }} />
 
 
                                     </Box>
                                     {/* Botones */}
-                                    <Box display="flex" pt={3} gap={72} alignContent={"center"} justifyContent={"center"}>
+                                    <Box display="flex" pt={3} gap={72} alignContent={"center"} justifyContent={"center"} mt={4.5}>
                                         <Button
                                             variant="outlined"
                                             onClick={() => navigate("/")}
@@ -788,7 +800,7 @@ const TermsAndConditions: React.FC = () => {
                                         padding: "20px",
                                         width: "839px",
                                         textAlign: "center",
-                                        marginTop: "20px",
+                                        marginTop: "45px",
                                         backgroundColor: "#FFFFFF"
                                     }}
                                 >
@@ -796,7 +808,7 @@ const TermsAndConditions: React.FC = () => {
                                         display: "flex",
                                         flexDirection: "column",
                                         alignItems: "center",
-                                        justifyContent: "center",
+                                        justifyContent: "center", mt: -6
                                     }}>
                                         <Typography
                                             variant="body1"
@@ -807,7 +819,7 @@ const TermsAndConditions: React.FC = () => {
                                                 fontFamily: "Poppins",
                                                 letterSpacing: "0px",
                                                 color: "#330F1B",
-                                                opacity: 1, whiteSpace: 'nowrap', marginLeft: "-14px"
+                                                opacity: 1, whiteSpace: 'nowrap', marginLeft: "-14px", marginBottom: "25px", marginTop: "10px"
                                             }}
                                         >
                                             Seleccione el medio por el cual prefiere restablecer su cuenta.
@@ -875,10 +887,10 @@ const TermsAndConditions: React.FC = () => {
                                         </RadioGroup>
 
                                     </Box>
-                                    <Divider sx={{ width: 'calc(100% + 42px)', marginLeft: '-21px', marginTop: "35px", marginBottom: "-15px" }} />
+                                    <Divider sx={{ width: 'calc(100% + 42px)', marginLeft: '-21px', marginTop: "80px", marginBottom: "-15px" }} />
 
                                     <Box display="flex" gap={73} alignContent={"center"} justifyContent={"center"}
-                                        sx={{ backgroundColor: "#FFFFFF", position: "absolute", marginTop: "34px" }}
+                                        sx={{ backgroundColor: "#FFFFFF", position: "absolute", marginTop: "44px" }}
                                     >
                                         <Button
                                             variant="outlined"
@@ -1003,10 +1015,10 @@ const TermsAndConditions: React.FC = () => {
                                     </Box>
                                     {/* Línea horizontal */}
 
-                                    <Divider sx={{ width: 'calc(100% + 403px)', marginLeft: '-201px', mb: -1.5, mt: 4.5 }} />
+                                    <Divider sx={{ width: 'calc(100% + 403px)', marginLeft: '-201px', mb: -3.5, mt: 8 }} />
 
                                     <Box display="flex" gap={73} alignContent={"center"} justifyContent={"center"}
-                                        sx={{ backgroundColor: "#FFFFFF", position: "absolute", marginTop: "26px", marginLeft: "-173px" }}
+                                        sx={{ backgroundColor: "#FFFFFF", position: "absolute", marginTop: "50px", marginLeft: "-173px" }}
                                     >
                                         <Button
                                             variant="outlined"
@@ -1061,7 +1073,7 @@ const TermsAndConditions: React.FC = () => {
                                     }}
                                 >
                                     {/* Parte 1: Reenviar código */}
-                                    <Box sx={{ width: "408px", height: "26px", mt: 6 }}>
+                                    <Box sx={{ width: "408px", height: "26px", mt: 5 }}>
                                         <Typography
                                             variant="body2"
                                             sx={{
@@ -1070,7 +1082,7 @@ const TermsAndConditions: React.FC = () => {
                                                 letterSpacing: "0px",
                                                 color: "#330F1B",
                                                 opacity: 1,
-                                                fontSize: "16px",
+                                                fontSize: "16px"
                                             }}
                                         >
                                             ¿El código no fue recibido o caduco?{" "}
@@ -1083,12 +1095,12 @@ const TermsAndConditions: React.FC = () => {
                                                     fontFamily: "Poppins",
                                                     letterSpacing: "0px",
                                                     opacity: 1,
-                                                    fontSize: "16px",
-                                                    cursor: isResendDisabled ? "not-allowed" : "pointer", // Cambia el cursor si está bloqueado
-                                                    color: isResendDisabled ? "#ccc" : "#8F4D63", // Cambia el color si está bloqueado
+                                                    fontSize: "16px", position: "absolute",
+                                                    cursor: isResendDisabled ? "not-allowed" : "pointer",
+                                                    color: isResendDisabled ? "#ccc" : "#8F4D63",
                                                     textTransform: "none",
                                                     "&:hover": {
-                                                        backgroundColor: "transparent", // Evita que cambie de color al hacer hover
+                                                        backgroundColor: "transparent",
                                                     },
                                                 }}
                                             >
@@ -1097,20 +1109,20 @@ const TermsAndConditions: React.FC = () => {
                                         </Typography>
                                     </Box>
 
-                                    <Divider sx={{ width: 'calc(100% + 434px)', marginLeft: '-217px', mt: 2 }} />
+                                    <Divider sx={{ width: 'calc(100% + 434px)', marginLeft: '-217px', mt: 1.5 }} />
 
                                     <Box sx={{ width: "296px", height: "24px" }}>
                                         <Typography
                                             sx={{
                                                 display: "flex",
                                                 alignItems: "center",
-                                                justifyContent: "left", // Alineación a la izquierda
+                                                justifyContent: "left",
                                                 font: "normal normal normal 14px/54px Poppins",
                                                 fontFamily: "Poppins",
                                                 letterSpacing: "0px",
                                                 color: "#8F4D63",
                                                 opacity: 1,
-                                                marginTop: "1px", // Separación del texto superior
+                                                marginTop: "1px",
                                             }}
                                         >
                                             <span>Tiempo de expiración del código:</span>
@@ -1128,9 +1140,6 @@ const TermsAndConditions: React.FC = () => {
                                                     );
                                                 }}
                                             />
-
-
-
 
 
                                         </Typography>
@@ -1168,7 +1177,7 @@ const TermsAndConditions: React.FC = () => {
                                                 justifyContent: "space-between 10px",
                                                 marginTop: "1px",
                                                 margin: "0 -4px",
-                                                gap: "10px",
+                                                gap: "12px",
                                             }}
                                         >
                                             {authCode.map((digit, index) => (
@@ -1184,15 +1193,32 @@ const TermsAndConditions: React.FC = () => {
                                                             textAlign: "center",
                                                             fontFamily: "Poppins",
                                                             fontSize: "26px",
-                                                            height: "27px",
-                                                            marginTop: "-8px"
+                                                            height: "25px",
+                                                            marginTop: "0px", backgroundColor: "rgba(229, 228, 228, 0.3)",
+                                                            borderRadius: "6px", borderColor: "#9B9295"
                                                         },
                                                     }}
                                                     error={!isCodeValid}
                                                     sx={{
                                                         width: "54px",
                                                         height: "56px",
-                                                        margin: "0 3px",
+                                                        margin: "0 0px",
+                                                        "& .MuiOutlinedInput-root": {
+                                                            backgroundColor: "rgba(229, 228, 228, 0.3)",
+                                                            borderRadius: "6px",
+                                                            "& fieldset": {
+                                                                border: "1px solid #9B9295",
+                                                            },
+                                                            "&:hover fieldset": {
+                                                                border: "1px solid #9B9295",
+                                                            },
+                                                            "&.Mui-focused fieldset": {
+                                                                border: "1px solid #9B9295",
+                                                            },
+                                                        },
+                                                        "& input": {
+                                                            color: "#330F1B",
+                                                        },
 
                                                     }}
                                                 />
@@ -1202,11 +1228,11 @@ const TermsAndConditions: React.FC = () => {
                                             <Typography
                                                 variant="body2"
                                                 sx={{
-                                                    color: !codeExpired ? "red" : "inherit",
-                                                    marginTop: "15px",
+                                                    color: !codeExpired ? "red" : "red",
+                                                    marginTop: "102px", position: "absolute", fontFamily: "Poppins", fontSize: "12px"
                                                 }}
                                             >
-                                                "Código Inválido"
+                                                Código Inválido
                                             </Typography>
                                         )}
                                         {codeExpired && (
@@ -1217,7 +1243,7 @@ const TermsAndConditions: React.FC = () => {
                                                     fontSize: "14px",
                                                     fontFamily: "Poppins",
                                                     textAlign: "left",
-                                                    marginTop: "106px", position: "absolute"
+                                                    marginTop: "116px", position: "absolute"
                                                 }}
                                             >
                                                 El tiempo para validar el código expiró. Por favor, solicite un nuevo código.
@@ -1225,12 +1251,13 @@ const TermsAndConditions: React.FC = () => {
                                         )}
                                     </Box>
                                     {/* Línea horizontal */}
-                                    <Divider sx={{ width: 'calc(100% + 0px)', marginLeft: '-0px', mt: 1.5 }} />
+                                    <Divider sx={{ width: 'calc(100% + 432px)', marginLeft: '-216px', marginTop: "40px", marginBottom: "-10px" }} />
+
 
                                     {/* Parte 3: Botones */}
                                     <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: "28px", position: "absolute", gap: 74, ml: "-190px" }}>
                                         <Button variant="outlined" onClick={Return} sx={{
-                                            border: "1px solid #60293C",
+                                            border: "1px solid #CCCFD2",
                                             borderRadius: "4px",
                                             color: "#833A53",
                                             backgroundColor: "transparent",
@@ -1248,7 +1275,7 @@ const TermsAndConditions: React.FC = () => {
                                             disabled={authCode.some((digit) => digit === "") || codeExpired} // Desactiva si faltan dígitos o expiró el tiempo
                                             sx={{
                                                 background: "#833A53 0% 0% no-repeat padding-box",
-                                                border: "1px solid #60293C",
+                                                border: "1px solid #D0CDCD",
                                                 borderRadius: "4px",
                                                 opacity: 0.9,
                                                 color: "#FFFFFF",
@@ -1265,115 +1292,193 @@ const TermsAndConditions: React.FC = () => {
 
                             )}
                             {activeStep === 4 && (
-                                <Paper elevation={10} sx={{ width: '100%', borderRadius: '20px' }}>
-                                    <Box sx={{ margin: '20px', paddingX: '20px', paddingY: '30px' }}>
+                                <Box sx={{ backgroundColor: "#FFFFFF", marginTop: "25px", }}>
+                                    <Box sx={{
+                                        width: "468px", height: "214px"
+                                    }}>
                                         <Typography
                                             variant="h6"
                                             gutterBottom
                                             sx={{
-                                                textAlign: "left",
-                                                font: "normal normal normal 16px/20px Poppins",
+                                                textAlign: "center",
+                                                fontSize: "16px",
                                                 fontFamily: "Poppins",
                                                 letterSpacing: "0px",
                                                 color: "#330F1B",
                                                 opacity: 1,
                                             }}
                                         >
-                                            Ingrese una nueva contraseña
+                                            Ingrese una contraseña nueva para recuperar su cuenta
                                         </Typography>
-                                        <TextField
-
-                                            type="password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            variant="outlined"
-                                            fullWidth
-                                            required
-                                            error={!isPasswordValid(password) && password.length > 0}
-                                            helperText={
-                                                !isPasswordValid(password) && password.length > 0
-                                                    ? "Debe tener mínimo 8 caracteres, una mayúscula, una minúscula y un número."
-                                                    : ""
-                                            }
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <Tooltip
-                                                            title={
-                                                                <Box
-                                                                    sx={{
-                                                                        backgroundColor: "#FFFFFF",
-                                                                        borderRadius: "8px",
-                                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                        padding: "8px 12px",
-                                                                        fontSize: "14px",
-                                                                        fontFamily: "Poppins",
-                                                                        color: "#574B4F",
-                                                                        whiteSpace: "pre-line",
-                                                                        transform: "translate(-1px, -15px)",
-                                                                        borderColor: "#00131F3D",
-                                                                        borderStyle: "solid",
-                                                                        borderWidth: "1px"
-                                                                    }}
-                                                                >
-                                                                    <>
-                                                                        • Ingrese mínimo 8 carácteres.
-                                                                        <br />
-                                                                        • Ingrese una letra mayúscula.
-                                                                        <br />
-                                                                        • Ingrese una letra minúscula.
-                                                                        <br />
-                                                                        • Ingrese un número.
-                                                                    </>
-                                                                </Box>
-                                                            }
-                                                            placement="bottom-end"
-                                                            componentsProps={{
-                                                                tooltip: {
-                                                                    sx: {
-                                                                        backgroundColor: "transparent",
-                                                                        padding: 0,
-                                                                    },
-                                                                },
-                                                            }}
-                                                        >
+                                        <Box sx={{ display: "flex", flexDirection: "column", width: "380px", marginLeft: "35px", mt: 3 }}>
+                                            <Typography
+                                                sx={{
+                                                    textAlign: "left",
+                                                    fontSize: "16px",
+                                                    fontFamily: "Poppins",
+                                                    letterSpacing: "0px",
+                                                    color: !isPasswordValid(password) && password.length > 0 ? "#D01247" : "#330F1B",
+                                                    opacity: 1, mb: 1.5
+                                                }}
+                                            >
+                                                Nueva contraseña
+                                            </Typography>
+                                            <TextField
+                                                type={showPassword ? "text" : "password"}
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                variant="outlined"
+                                                fullWidth
+                                                required
+                                                error={!isPasswordValid(password) && password.length > 0}
+                                                helperText={
+                                                    !isPasswordValid(password) && password.length > 0
+                                                        ? "Ingresa una contraseña válida."
+                                                        : ""
+                                                }
+                                                FormHelperTextProps={{
+                                                    sx: {
+                                                        fontFamily: 'Poppins', position: "absolute", mt: "58px",
+                                                    },
+                                                }}
+                                                sx={{
+                                                    marginBottom: "20px",
+                                                    '& .MuiInputBase-input': {
+                                                        fontFamily: 'Poppins',
+                                                    },
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
                                                             <IconButton
+                                                                onClick={() => setShowPassword(!showPassword)}
                                                                 sx={{
-                                                                    padding: 0,
+                                                                    padding: 0, mr: 2,
                                                                     backgroundColor: 'transparent',
                                                                     '&:hover': {
                                                                         backgroundColor: 'transparent',
                                                                     },
                                                                 }}
                                                             >
-                                                                <img src={!isPasswordValid(password) && password.length > 0 ? infoiconerror : infoicon}></img>
+                                                                <img src={showPassword ? Iconeyesopen : Iconeyeslash} alt="Ver/Ocultar" />
                                                             </IconButton>
-                                                        </Tooltip>
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                        />
+                                                            <Tooltip
+                                                                title={
+                                                                    <Box
+                                                                        sx={{
+                                                                            backgroundColor: "#FFFFFF",
+                                                                            borderRadius: "8px",
+                                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                            padding: "8px 12px",
+                                                                            fontSize: "14px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#574B4F",
+                                                                            whiteSpace: "pre-line",
+                                                                            transform: "translate(-1px, -15px)",
+                                                                            borderColor: "#00131F3D",
+                                                                            borderStyle: "solid",
+                                                                            borderWidth: "1px"
+                                                                        }}
+                                                                    >
+                                                                        <>
+                                                                            • Ingrese mínimo 8 carácteres.
+                                                                            <br />
+                                                                            • Ingrese una letra mayúscula.
+                                                                            <br />
+                                                                            • Ingrese una letra minúscula.
+                                                                            <br />
+                                                                            • Ingrese un número.
+                                                                        </>
+                                                                    </Box>
+                                                                }
+                                                                placement="bottom-end"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "transparent",
+                                                                            padding: 0,
+                                                                        },
+                                                                    },
+                                                                }}
+                                                            >
+                                                                <IconButton
+                                                                    sx={{
+                                                                        padding: 0,
+                                                                        backgroundColor: 'transparent',
+                                                                        '&:hover': {
+                                                                            backgroundColor: 'transparent',
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    <img src={!isPasswordValid(password) && password.length > 0 ? infoiconerror : infoicon}></img>
+                                                                </IconButton>
+                                                            </Tooltip>
 
-                                        <TextField
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                        </Box>
 
-                                            type="password"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            variant="outlined"
-                                            fullWidth
-                                            required
-                                            error={confirmPassword.length > 0 && confirmPassword !== password}
-                                            helperText={
-                                                confirmPassword.length > 0 && confirmPassword !== password
-                                                    ? "La confirmación no coincide con la nueva contraseña."
-                                                    : ""
-                                            }
-
-                                            sx={{ marginTop: 3, fontFamily: "Poppins", }}
-
-
-                                        />
-
+                                        <Box sx={{ display: "flex", flexDirection: "column", width: "380px", marginLeft: "35px", mt: 1.5 }}>
+                                            <Typography
+                                                sx={{
+                                                    textAlign: "left",
+                                                    fontSize: "16px",
+                                                    fontFamily: "Poppins",
+                                                    letterSpacing: "0px",
+                                                    color: confirmPassword.length > 0 && confirmPassword !== password ? "#D01247" : "#330F1B",
+                                                    opacity: 1,
+                                                }}
+                                            >
+                                                Confirmar contraseña
+                                            </Typography>
+                                            <TextField
+                                                type={showConfirmPassword ? "text" : "password"}
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                                variant="outlined"
+                                                fullWidth
+                                                required
+                                                error={confirmPassword.length > 0 && confirmPassword !== password}
+                                                helperText={
+                                                    confirmPassword.length > 0 && confirmPassword !== password
+                                                        ? "La confirmación no coincide con la nueva contraseña."
+                                                        : ""
+                                                }
+                                                FormHelperTextProps={{
+                                                    sx: {
+                                                        fontFamily: 'Poppins', position: "absolute", mt: "58px"
+                                                    },
+                                                }}
+                                                sx={{
+                                                    marginTop: 1.5,
+                                                    '& .MuiInputBase-input': {
+                                                        fontFamily: 'Poppins',
+                                                    },
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <IconButton
+                                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                                sx={{
+                                                                    padding: 0, mr: 1,
+                                                                    backgroundColor: 'transparent',
+                                                                    '&:hover': {
+                                                                        backgroundColor: 'transparent',
+                                                                    },
+                                                                }}
+                                                            >
+                                                                <img src={showConfirmPassword ? Iconeyesopen : Iconeyeslash} alt="Ver/Ocultar" />
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                        </Box>
+                                    </Box>
+                                    <Box sx={{ mt: "66px", position: "absolute", ml: "45px" }}>
                                         <FormControlLabel
                                             control={
                                                 <Checkbox
@@ -1399,59 +1504,61 @@ const TermsAndConditions: React.FC = () => {
                                                     }
                                                 />
                                             }
-                                            label="Habilitar verificación en 2 pasos"
+                                            label="Habilitar verificación en dos pasos"
                                             sx={{
                                                 '& .MuiFormControlLabel-label': {
                                                     fontFamily: 'Poppins, sans-serif',
                                                     fontSize: '14px',
-                                                    color: '#574B4FCC',
+                                                    color: enableTwoFactor ? '#8F4D63' : '#574B4FCC',
                                                 },
                                             }}
                                         />
-                                        <Box display="flex" justifyContent="space-between" pt={2}>
-                                            <Button
-                                                variant="outlined"
-                                                onClick={() => {
-                                                    setActiveStep(1);
-                                                    setIsPhoneDigitsValid(true);
-                                                    setLoading(false);
-                                                }}
-                                                sx={{
-                                                    border: "1px solid #60293C",
-                                                    borderRadius: "4px",
-                                                    color: "#833A53",
-                                                    backgroundColor: "transparent",
-                                                    "&:hover": {
-                                                        backgroundColor: "#f3e6eb",
-                                                    },
-                                                }}
-                                            >
-                                                Regresar
-                                            </Button>
-                                            <Button
-                                                variant="contained"
-                                                onClick={handleSendNewPassword}
-                                                disabled={
-                                                    !isPasswordValid(password) ||
-                                                    password !== confirmPassword ||
-                                                    password === "" ||
-                                                    confirmPassword === ""
-                                                }
-                                                sx={{
-                                                    background: "#833A53 0% 0% no-repeat padding-box",
-                                                    border: "1px solid #60293C",
-                                                    fontFamily: "Poppins",
-                                                    borderRadius: "4px",
-                                                    opacity: 0.9,
-                                                    color: "#FFFFFF",
-                                                }}
-                                            >
-                                                Validar
-                                            </Button>
-
-                                        </Box>
                                     </Box>
-                                </Paper>
+                                    {/* Línea horizontal */}
+                                    <Divider sx={{ width: 'calc(100% + 373px)', marginLeft: '-187px', marginTop: "110px", marginBottom: "-25px" }} />
+                                    <Box display="flex" justifyContent="space-between" pt={2} gap={74} sx={{ position: "absolute", marginLeft: "-160px", mt: 3 }}>
+                                        <Button
+                                            variant="outlined"
+                                            onClick={() => {
+                                                setActiveStep(1);
+                                                setIsPhoneDigitsValid(true);
+                                                setLoading(false);
+                                            }}
+                                            sx={{
+                                                border: "1px solid #60293C",
+                                                borderRadius: "4px",
+                                                color: "#833A53",
+                                                backgroundColor: "transparent",
+                                                "&:hover": {
+                                                    backgroundColor: "#f3e6eb",
+                                                },
+                                            }}
+                                        >
+                                            Regresar
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleSendNewPassword}
+                                            disabled={
+                                                !isPasswordValid(password) ||
+                                                password !== confirmPassword ||
+                                                password === "" ||
+                                                confirmPassword === ""
+                                            }
+                                            sx={{
+                                                background: "#833A53 0% 0% no-repeat padding-box",
+                                                border: "1px solid #D0CDCD",
+                                                fontFamily: "Poppins",
+                                                borderRadius: "4px",
+                                                opacity: 0.9,
+                                                color: "#FFFFFF",
+                                            }}
+                                        >
+                                            Validar
+                                        </Button>
+
+                                    </Box>
+                                </Box>
 
                             )}
                             {activeStep === 5 && (
@@ -1467,13 +1574,13 @@ const TermsAndConditions: React.FC = () => {
                                             padding: "20px",
                                             fontSize: "16px", color: "#330F1B",
                                             fontFamily: "Poppins",
-                                            textAlign: "left",
+                                            textAlign: "left", mt: 1, ml: "-68px",
                                         }}
                                     >
                                         Se ha llegado al límite de envíos de código,
-                                        el ingreso a la cuenta quedará bloqueado <br></br>por :
+                                        el ingreso a la cuenta quedará bloqueado por <br></br>
 
-                                        <Box component="span" sx={{ color: "#f44336", fontWeight: 500, }}>
+                                        <Box component="span" sx={{ color: "#f44336", fontWeight: 500, position: "absolute", marginTop: "-23px", marginLeft: "742px" }}>
                                             <Countdown
                                                 date={lockoutEndTime || new Date()}
                                                 renderer={({ hours, minutes, seconds, completed }) =>
@@ -1483,6 +1590,7 @@ const TermsAndConditions: React.FC = () => {
                                                         <span>
                                                             0{hours}:{minutes}:{seconds}
                                                         </span>
+
                                                     )}
                                             />
                                         </Box>
@@ -1495,7 +1603,7 @@ const TermsAndConditions: React.FC = () => {
                                             padding: "5px",
                                             fontSize: "16px", color: "#330F1B",
                                             fontFamily: "Poppins",
-                                            textAlign: "left", ml: 2
+                                            textAlign: "left", ml: "-51px"
                                         }}
                                     >
                                         Inténtelo más tarde
@@ -1505,48 +1613,15 @@ const TermsAndConditions: React.FC = () => {
 
                         </Box>
                     </Box>
-                    <Modal
-                        open={isErrorModalOpen}
-                        onClose={closeErrorModal}
-                        aria-labelledby="error-modal-title"
-                        aria-describedby="error-modal-description"
-                    >
-                        <Box
-                            sx={{
-                                position: "absolute",
-                                top: "50%",
-                                left: "50%",
-                                transform: "translate(-50%, -50%)",
-                                width: 400,
-                                bgcolor: "background.paper",
-                                border: "2px solid #ccc",
-                                borderRadius: "8px",
-                                boxShadow: 24,
-                                p: 4,
-                            }}
-                        >
-                            <Typography id="error-modal-title" variant="h6" component="h2">
-                                Error en la recuperación de cuenta
-                            </Typography>
-                            <Typography id="error-modal-description" sx={{ mt: 2 }}>
-                                {messageError}
-                            </Typography>
-                            <Button
-                                onClick={handleAccept}
-                                sx={{
-                                    background: "#833A53 0% 0% no-repeat padding-box",
-                                    border: "1px solid #60293C",
-                                    borderRadius: "4px",
-                                    opacity: 0.9,
-                                    color: "#FFFFFF",
-                                    width: "100%",
-                                    "&:hover": { backgroundColor: "#60293C", },
-                                }}
-                            >
-                                Aceptar
-                            </Button>
-                        </Box>
-                    </Modal>
+                    <ModalError
+                        isOpen={ShowModalError}
+                        title='Ocurrió un problema'
+                        message='Intente más tarde'
+                        buttonText='Aceptar'
+                        onClose={() => setShowModalError(false)}
+
+                    />
+
                 </Container>
 
             </PublicLayout>

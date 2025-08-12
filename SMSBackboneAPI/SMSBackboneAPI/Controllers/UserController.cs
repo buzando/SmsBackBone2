@@ -95,7 +95,7 @@ namespace SMSBackboneAPI.Controllers
 
             }
         }
-        [Authorize]
+        [AllowAnonymous]
         [HttpPost("LockUser")]
         public async Task<IActionResult> LockUser(lockDTO user)
         {
@@ -254,7 +254,7 @@ namespace SMSBackboneAPI.Controllers
 
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("GetUserByEmail")]
         public IActionResult GetUserByEmail(string email)
         {
@@ -275,7 +275,7 @@ namespace SMSBackboneAPI.Controllers
             }
 
         }
-        [Authorize]
+        [AllowAnonymous]
         [HttpPost("NewPassword")]
         public async Task<IActionResult> NewPassword(PasswordResetDTO Login)
         {

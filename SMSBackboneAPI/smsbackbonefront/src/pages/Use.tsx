@@ -14,9 +14,12 @@ import IconLeft from '../assets/icon-punta-flecha-bottom.svg'
 import { useNavigate } from 'react-router-dom';
 import axios from "../components/commons/AxiosInstance";
 import seachicon from '../assets/icon-lupa.svg';
+import Iconseachred from "../assets/Iconseachred.svg";
 import iconclose from '../assets/icon-close.svg';
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
+import { color } from 'd3-color';
+import { overflow } from 'html2canvas/dist/types/css/property-descriptors/overflow';
 
 interface UseResponse {
     creditsUsed: number;
@@ -240,9 +243,9 @@ const Use: React.FC = () => {
 
 
     return (
-        <Box sx={{ padding: '20px', maxWidth: '1180px', marginTop: "-80px", marginLeft: "16px", minHeight: "650px", overflow: "hidden" }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             {/* Encabezado */}
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, mt: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
                     <img src={ArrowBackIosNewIcon} alt="Regresar" style={{ width: 24, transform: 'rotate(270deg)' }} />
                 </IconButton>
@@ -250,127 +253,303 @@ const Use: React.FC = () => {
                     Uso
                 </Typography>
             </Box>
-            <Divider sx={{ marginTop: '10px', marginBottom: '20px' }} />
+            <Box sx={{ marginLeft: "32px", backgroundColor: "#F2F2F2", height: "700px" }}>
+                <Divider sx={{ marginTop: '15px', marginBottom: '15px' }} />
 
-            {/* Botones de filtro */}
-            <Box sx={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                {/* Botón con Popper */}
-                <Button
-                    variant="outlined"
-                    sx={buttonStyle}
-                    onClick={handleClick}
-                    aria-describedby={id}
-                >
-                    {buttonText}
-                </Button>
+                {/* Botones de filtro */}
+                <Box sx={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                    {/* Botón con Popper */}
+                    <Button
+                        variant="outlined"
+                        sx={buttonStyle}
+                        onClick={handleClick}
+                        aria-describedby={id}
+                    >
+                        {buttonText}
+                    </Button>
 
-                {/* Popper para mostrar opciones */}
-                <Popper id={id} open={open} anchorEl={anchorEl} placement="bottom-start">
-                    <Paper sx={{
-                        width: '280px',
-                        height: '157px',
-                        padding: '10px',
-                        borderRadius: '8px',
-                        boxShadow: '0px 8px 16px #00131F29',
-                        border: "1px solid #C6BFC2"
-                    }}>
-                        <RadioGroup
-                            value={selectedOption}
-                            onChange={(e) => setSelectedOption(e.target.value)}
+                    {/* Popper para mostrar opciones */}
+                    <Popper id={id} open={open} anchorEl={anchorEl} placement="bottom-start">
+                        <Paper sx={{
+                            width: '280px',
+                            height: '157px',
+                            padding: '10px',
+                            borderRadius: '8px',
+                            boxShadow: '0px 8px 16px #00131F29',
+                            border: "1px solid #C6BFC2"
+                        }}>
+                            <RadioGroup
+                                value={selectedOption}
+                                onChange={(e) => setSelectedOption(e.target.value)}
+                            >
+                                <FormControlLabel
+                                    value="corto"
+                                    control={
+                                        <Radio
+                                            sx={{
+                                                marginLeft: "8px",
+                                                marginTop: "-3px",
+                                                marginBottom: "-10px",
+                                                fontFamily: "Poppins",
+                                                color: "#000000",
+                                                "&.Mui-checked": {
+                                                    color: "#8F4D63",
+                                                },
+                                                "& .MuiSvgIcon-root": {
+                                                    fontSize: 24,
+                                                },
+                                            }}
+                                        />
+                                    }
+                                    label={
+                                        <Typography
+                                            sx={{
+                                                marginBottom: "-8px",
+                                                fontFamily: 'Poppins',
+                                                fontSize: '16px',
+                                                fontWeight: selectedOption === 'corto' ? 500 : 'normal',
+                                                color: selectedOption === 'corto' ? '#8F4D63' : '#574B4F',
+                                            }}
+                                        >
+                                            SMS # cortos
+                                        </Typography>
+                                    }
+                                />
+
+                                <FormControlLabel
+                                    value="largo"
+                                    control={
+                                        <Radio
+                                            sx={{
+                                                marginLeft: "8px",
+
+                                                color: "#000000",
+                                                "&.Mui-checked": {
+                                                    color: "#8F4D63",
+                                                },
+                                                "& .MuiSvgIcon-root": {
+                                                    fontSize: 24,
+                                                },
+                                            }}
+                                        />
+                                    }
+                                    label={
+                                        <Typography
+                                            sx={{
+
+                                                fontFamily: 'Poppins',
+                                                fontSize: '16px',
+                                                fontWeight: selectedOption === 'largos' ? 500 : 'normal',
+                                                color: selectedOption === 'largos' ? '#8F4D63' : '#574B4F',
+                                            }}
+                                        >
+                                            SMS # largos
+                                        </Typography>
+                                    }
+                                />
+                            </RadioGroup>
+                            <Divider sx={{ width: 'calc(100% + 21px)', marginLeft: '-10px', mb: 2, mt: 0.5 }} />
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                                <SecondaryButton text='Limpiar' onClick={() => setSelectedOption("corto")} />
+                                <MainButton text='Aplicar' onClick={handleApply} />
+                            </Box>
+                        </Paper>
+                    </Popper>
+
+                    <Button
+                        variant="outlined"
+                        sx={buttonStyle}
+                        onClick={handleDateClick}
+                    >
+                        {formatDateRange()}
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={handleCampaignClick}
+                        sx={buttonStyle}
+                    >
+                        CAMPAÑA
+                    </Button>
+                    <Popper open={campaignMenuOpen} anchorEl={anchorElC} placement="bottom-start"
+                        sx={{}}
+                    >
+                        <Paper
+                            sx={{
+                                padding: 1,
+                                width: "290px",
+                                height: "282px",
+                                overflow: "hidden",
+                                borderRadius: '12px',
+                                boxShadow: '0px 8px 16px #00131F29',
+                            }}
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                         >
-                            <FormControlLabel
-                                value="corto"
-                                control={
-                                    <Radio
-                                        sx={{
-                                            marginLeft: "8px",
-                                            marginTop: "-3px",
-                                            marginBottom: "-10px",
-                                            fontFamily: "Poppins",
-                                            color: "#000000",
-                                            "&.Mui-checked": {
-                                                color: "#8F4D63",
-                                            },
-                                            "& .MuiSvgIcon-root": {
-                                                fontSize: 24,
-                                            },
-                                        }}
-                                    />
-                                }
-                                label={
-                                    <Typography
-                                        sx={{
-                                            marginBottom: "-8px",
+                            <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 1 }}>
+                                <TextField
+                                    placeholder="Buscar campaña"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={campaignSearch}
+                                    onChange={(e) => setCampaignSearch(e.target.value)}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <img
+                                                    src={campaignSearch ? Iconseachred : seachicon}
+                                                    alt="Buscar"
+                                                    style={{ marginRight: 4, width: 24 }}
+                                                />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: campaignSearch && (
+                                            <IconButton onClick={() => setCampaignSearch('')}>
+                                                <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
+                                            </IconButton>
+                                        ),
+                                        sx: {
                                             fontFamily: 'Poppins',
-                                            fontSize: '16px',
-                                            fontWeight: selectedOption === 'corto' ? 500 : 'normal',
-                                            color: selectedOption === 'corto' ? '#8F4D63' : '#574B4F',
-                                        }}
-                                    >
-                                        SMS # cortos
-                                    </Typography>
-                                }
-                            />
-
-                            <FormControlLabel
-                                value="largo"
-                                control={
-                                    <Radio
-                                        sx={{
-                                            marginLeft: "8px",
-
-                                            color: "#000000",
-                                            "&.Mui-checked": {
-                                                color: "#8F4D63",
-                                            },
-                                            "& .MuiSvgIcon-root": {
-                                                fontSize: 24,
-                                            },
-                                        }}
-                                    />
-                                }
-                                label={
-                                    <Typography
-                                        sx={{
-
+                                            color: campaignSearch ? '#7B354D' : '#000',
+                                        }
+                                    }}
+                                    inputProps={{
+                                        style: {
                                             fontFamily: 'Poppins',
-                                            fontSize: '16px',
-                                            fontWeight: selectedOption === 'largos' ? 500 : 'normal',
-                                            color: selectedOption === 'largos' ? '#8F4D63' : '#574B4F',
-                                        }}
+                                            color: campaignSearch ? '#7B354D' : '#000',
+                                        }
+                                    }}
+                                    sx={{
+                                        width: '248px',
+                                        height: '40px',
+                                        mb: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            height: '40px',
+                                            border: '1px solid #9B9295',
+                                            '& fieldset': {
+                                                borderColor: campaignSearch ? '#7B354D' : '#9B9295',
+                                            },
+                                            '&:hover fieldset': {
+                                                borderColor: campaignSearch ? '#7B354D' : '#9B9295',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: campaignSearch ? '#7B354D' : '#9B9295',
+                                            },
+                                        },
+                                    }}
+                                />
+                            </Box>
+                            <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+                            <Box sx={{ height: '126px', overflowY: 'auto' }}>
+                                {/* Checkbox de "Seleccionar todo" */}
+                                {campaigns.filter(c => c.name.toLowerCase().includes(campaignSearch)).length > 0 && (
+                                    <MenuItem onClick={handleSelectAllCampaigns}
+                                        sx={{ height: "32px", marginLeft: "-12px" }}
                                     >
-                                        SMS # largos
-                                    </Typography>
-                                }
-                            />
-                        </RadioGroup>
-                        <Divider sx={{ width: 'calc(100% + 21px)', marginLeft: '-10px', mb: 2, mt: 0.5 }} />
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-                            <SecondaryButton text='Limpiar' onClick={() => setSelectedOption("corto")} />
-                            <MainButton text='Aplicar' onClick={handleApply} />
-                        </Box>
-                    </Paper>
-                </Popper>
+                                        <Checkbox checked={selectedCampaigns.length === campaigns.length}
+                                            checkedIcon={
+                                                <Box
+                                                    sx={{
+                                                        width: '24px',
+                                                        height: '24px',
+                                                        position: 'relative',
+                                                        marginTop: '0px',
+                                                        marginLeft: '0px',
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={IconCheckBox1}
+                                                        alt="Seleccionado"
+                                                        style={{ width: '24px', height: '24px' }}
+                                                    />
+                                                </Box>
+                                            } />
 
-                <Button
-                    variant="outlined"
-                    sx={buttonStyle}
-                    onClick={handleDateClick}
-                >
-                    {formatDateRange()}
-                </Button>
-                <Button
-                    variant="outlined"
-                    onClick={handleCampaignClick}
-                    sx={buttonStyle}
-                >
-                    CAMPAÑA
-                </Button>
-                <Popper open={campaignMenuOpen} anchorEl={anchorElC} placement="bottom-start"
-                    sx={{}}
-                >
-                    <Paper
-                        sx={{
+                                        <ListItemText primary="Seleccionar todo"
+                                            primaryTypographyProps={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '16px',
+                                                fontWeight: 500,
+                                                color: selectedCampaigns.length === campaigns.length ? '#8F4E63' : '#786E71',
+                                            }}
+                                        />
+                                    </MenuItem>
+                                )}
+                                {/* Lista de campañas */}
+                                {campaigns.filter((campaign) => campaign.name.toLowerCase().includes(campaignSearch)).map((campaign) => (
+                                    <MenuItem key={campaign.id} value={campaign.id} onClick={() => handleCampaignSelection(campaign)}
+                                        sx={{ height: "32px", marginLeft: "-12px" }}
+                                    >
+                                        <Checkbox checked={selectedCampaigns.includes(campaign)}
+                                            checkedIcon={
+                                                <Box
+                                                    sx={{
+                                                        width: '24px',
+                                                        height: '24px',
+                                                        position: 'relative',
+                                                        marginTop: '0px',
+                                                        marginLeft: '0px',
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={IconCheckBox1}
+                                                        alt="Seleccionado"
+                                                        style={{ width: '24px', height: '24px' }}
+                                                    />
+                                                </Box>
+                                            } />
+                                        <ListItemText primary={campaign.name}
+                                            primaryTypographyProps={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '16px',
+                                                fontWeight: 500,
+                                                color: selectedCampaigns.includes(campaign) ? '#8F4E63' : '#786E71',
+                                            }}
+                                        />
+                                    </MenuItem>
+                                ))}
+
+                                {/* Mostrar mensaje si no hay resultados */}
+                                {campaigns.filter((campaign) => campaign.name.toLowerCase().includes(campaignSearch)).length === 0 && (
+                                    <Box sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins", mt: "50px" }}>
+                                        No se encontraron resultados.
+                                    </Box>
+                                )}
+                            </Box>
+                            <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+                            <Box display="flex" justifyContent="space-between" px={1} pb={1} gap={2.5}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={handleClearSelection}
+                                    sx={{
+                                        color: '#833A53',
+                                        borderColor: '#CCCFD2',
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: "1.12px",
+                                        '&:hover': {
+                                            backgroundColor: '#BE93A066',
+                                            borderColor: '#CCCFD2',
+                                        },
+                                    }}
+                                >
+                                    LIMPIAR
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => {
+                                        handleApplySelection();
+                                        fetchData();
+                                    }}
+                                    style={{ backgroundColor: '#833A53', color: '#fff' }}
+                                >
+                                    APLICAR
+                                </Button>
+                            </Box>
+                        </Paper>
+                    </Popper>
+                    <Button variant="outlined" sx={buttonStyle} onClick={handleUserClick}>USUARIO</Button>
+                    {/* Popper de Usuarios */}
+                    <Popper open={userMenuOpen} anchorEl={userAnchorEl} placement="bottom-start">
+                        <Paper sx={{
                             padding: 1,
                             width: "290px",
                             height: "282px",
@@ -378,441 +557,283 @@ const Use: React.FC = () => {
                             borderRadius: '12px',
                             boxShadow: '0px 8px 16px #00131F29',
                         }}
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                    >
-                        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 1 }}>
-                            <TextField
-                                placeholder="Buscar campaña"
-                                variant="outlined"
-                                fullWidth
-                                value={campaignSearch}
-                                onChange={(e) => setCampaignSearch(e.target.value)}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <img
-                                                src={seachicon}
-                                                alt="Buscar"
-                                                style={{
-                                                    width: 24,
-                                                    filter: campaignSearch ? 'invert(14%) sepia(58%) saturate(1253%) hue-rotate(316deg) brightness(90%) contrast(95%)' : 'none'
-                                                }}
-                                            />
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: campaignSearch && (
-                                        <IconButton onClick={() => setCampaignSearch('')}>
-                                            <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
-                                        </IconButton>
-                                    ),
-                                    sx: {
-                                        fontFamily: 'Poppins',
-                                        color: campaignSearch ? '#7B354D' : '#000',
-                                    }
-                                }}
-                                inputProps={{
-                                    style: {
-                                        fontFamily: 'Poppins',
-                                        color: campaignSearch ? '#7B354D' : '#000',
-                                    }
-                                }}
-                                sx={{
-                                    width: '248px',
-                                    height: '40px',
-                                    mb: 1,
-                                    '& .MuiOutlinedInput-root': {
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                        >
+                            <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 1 }}>
+                                <TextField
+                                    placeholder="Buscar usuario"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={userSearch}
+                                    onChange={handleUserSearchChange}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <img
+                                                    src={userSearch ? Iconseachred : seachicon}
+                                                    alt="Buscar"
+                                                    style={{ marginRight: 4, width: 24 }}
+                                                />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: userSearch && (
+                                            <IconButton onClick={() => setUserSearch('')}>
+                                                <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
+                                            </IconButton>
+                                        ),
+                                        sx: {
+                                            fontFamily: 'Poppins',
+                                            color: userSearch ? '#7B354D' : '#000',
+                                        }
+                                    }}
+                                    inputProps={{
+                                        style: {
+                                            fontFamily: 'Poppins',
+                                            color: userSearch ? '#7B354D' : '#000',
+                                        }
+                                    }}
+                                    sx={{
+                                        width: '248px',
                                         height: '40px',
-                                        border: '1px solid #9B9295',
-                                        '& fieldset': {
-                                            borderColor: campaignSearch ? '#7B354D' : '#9B9295',
+                                        mb: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            height: '40px',
+                                            border: '1px solid #9B9295',
+                                            '& fieldset': {
+                                                borderColor: userSearch ? '#7B354D' : '#9B9295',
+                                            },
+                                            '&:hover fieldset': {
+                                                borderColor: userSearch ? '#7B354D' : '#9B9295',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: userSearch ? '#7B354D' : '#9B9295',
+                                            },
                                         },
-                                        '&:hover fieldset': {
-                                            borderColor: campaignSearch ? '#7B354D' : '#9B9295',
-                                        },
-                                        '&.Mui-focused fieldset': {
-                                            borderColor: campaignSearch ? '#7B354D' : '#9B9295',
-                                        },
-                                    },
-                                }}
-                            />
-                        </Box>
-                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
-                        <Box sx={{ height: '126px', overflowY: 'auto' }}>
-                            {/* Checkbox de "Seleccionar todo" */}
-                            {campaigns.filter(c => c.name.toLowerCase().includes(campaignSearch)).length > 0 && (
-                                <MenuItem onClick={handleSelectAllCampaigns}
-                                    sx={{ height: "32px", marginLeft: "-12px" }}
-                                >
-                                    <Checkbox checked={selectedCampaigns.length === campaigns.length}
-                                        checkedIcon={
-                                            <Box
-                                                sx={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    position: 'relative',
-                                                    marginTop: '0px',
-                                                    marginLeft: '0px',
-                                                }}
-                                            >
-                                                <img
-                                                    src={IconCheckBox1}
-                                                    alt="Seleccionado"
-                                                    style={{ width: '24px', height: '24px' }}
-                                                />
-                                            </Box>
-                                        } />
-
-                                    <ListItemText primary="Seleccionar todo"
-                                        primaryTypographyProps={{
-                                            fontFamily: 'Poppins',
-                                            fontSize: '16px',
-                                            fontWeight: 500,
-                                            color: selectedCampaigns.length === campaigns.length ? '#8F4E63' : '#786E71',
-                                        }}
-                                    />
-                                </MenuItem>
-                            )}
-                            {/* Lista de campañas */}
-                            {campaigns.filter((campaign) => campaign.name.toLowerCase().includes(campaignSearch)).map((campaign) => (
-                                <MenuItem key={campaign.id} value={campaign.id} onClick={() => handleCampaignSelection(campaign)}
-                                    sx={{ height: "32px", marginLeft: "-12px" }}
-                                >
-                                    <Checkbox checked={selectedCampaigns.includes(campaign)}
-                                        checkedIcon={
-                                            <Box
-                                                sx={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    position: 'relative',
-                                                    marginTop: '0px',
-                                                    marginLeft: '0px',
-                                                }}
-                                            >
-                                                <img
-                                                    src={IconCheckBox1}
-                                                    alt="Seleccionado"
-                                                    style={{ width: '24px', height: '24px' }}
-                                                />
-                                            </Box>
-                                        } />
-                                    <ListItemText primary={campaign.name}
-                                        primaryTypographyProps={{
-                                            fontFamily: 'Poppins',
-                                            fontSize: '16px',
-                                            fontWeight: 500,
-                                            color: selectedCampaigns.includes(campaign) ? '#8F4E63' : '#786E71',
-                                        }}
-                                    />
-                                </MenuItem>
-                            ))}
-
-                            {/* Mostrar mensaje si no hay resultados */}
-                            {campaigns.filter((campaign) => campaign.name.toLowerCase().includes(campaignSearch)).length === 0 && (
-                                <Box sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins" }}>
-                                    No se encontraron resultados.
-                                </Box>
-                            )}
-                        </Box>
-                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
-                        <Box display="flex" justifyContent="space-between" px={1} pb={1} gap={2.5}>
-                            <Button
-                                variant="outlined"
-                                onClick={handleClearSelection}
-                                sx={{
-                                    color: '#833A53',
-                                    borderColor: '#CCCFD2',
-                                    fontFamily: 'Poppins',
-                                    letterSpacing: "1.12px",
-                                    '&:hover': {
-                                        backgroundColor: '#BE93A066',
-                                        borderColor: '#CCCFD2',
-                                    },
-                                }}
-                            >
-                                LIMPIAR
-                            </Button>
-                            <Button
-                                variant="contained"
-                                onClick={() => {
-                                    handleApplySelection();
-                                    fetchData();
-                                }}
-                                style={{ backgroundColor: '#8d406d', color: '#fff' }}
-                            >
-                                APLICAR
-                            </Button>
-                        </Box>
-                    </Paper>
-                </Popper>
-                <Button variant="outlined" sx={buttonStyle} onClick={handleUserClick}>USUARIO</Button>
-                {/* Popper de Usuarios */}
-                <Popper open={userMenuOpen} anchorEl={userAnchorEl} placement="bottom-start">
-                    <Paper sx={{
-                        padding: 1,
-                        width: "290px",
-                        height: "282px",
-                        overflow: "hidden",
-                        borderRadius: '12px',
-                        boxShadow: '0px 8px 16px #00131F29',
-                    }}
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                    >
-                        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 1 }}>
-                            <TextField
-                                placeholder="Buscar usuario"
-                                variant="outlined"
-                                fullWidth
-                                value={userSearch}
-                                onChange={handleUserSearchChange}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <img
-                                                src={seachicon}
-                                                alt="Buscar"
-                                                style={{
-                                                    width: 24,
-                                                    filter: userSearch ? 'invert(14%) sepia(58%) saturate(1253%) hue-rotate(316deg) brightness(90%) contrast(95%)' : 'none'
-                                                }}
-                                            />
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: userSearch && (
-                                        <IconButton onClick={() => setUserSearch('')}>
-                                            <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
-                                        </IconButton>
-                                    ),
-                                    sx: {
-                                        fontFamily: 'Poppins',
-                                        color: userSearch ? '#7B354D' : '#000',
-                                    }
-                                }}
-                                inputProps={{
-                                    style: {
-                                        fontFamily: 'Poppins',
-                                        color: userSearch ? '#7B354D' : '#000',
-                                    }
-                                }}
-                                sx={{
-                                    width: '248px',
-                                    height: '40px',
-                                    mb: 1,
-                                    '& .MuiOutlinedInput-root': {
-                                        height: '40px',
-                                        border: '1px solid #9B9295',
-                                        '& fieldset': {
-                                            borderColor: userSearch ? '#7B354D' : '#9B9295',
-                                        },
-                                        '&:hover fieldset': {
-                                            borderColor: userSearch ? '#7B354D' : '#9B9295',
-                                        },
-                                        '&.Mui-focused fieldset': {
-                                            borderColor: userSearch ? '#7B354D' : '#9B9295',
-                                        },
-                                    },
-                                }}
-                            />
-                        </Box>
-                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
-                        <Box sx={{ height: '126px', overflowY: 'auto' }}>
-                            {users.filter((user) => user.name.toLowerCase().includes(userSearch)).length > 0 && (
-                                <MenuItem onClick={handleSelectAllUsers}
-                                    sx={{ height: "32px", marginLeft: "-12px" }}>
-                                    <Checkbox checked={selectedUsers.length === users.length}
-                                        checkedIcon={
-                                            <Box
-                                                sx={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    position: 'relative',
-                                                    marginTop: '0px',
-                                                    marginLeft: '0px',
-                                                }}
-                                            >
-                                                <img
-                                                    src={IconCheckBox1}
-                                                    alt="Seleccionado"
-                                                    style={{ width: '24px', height: '24px' }}
-                                                />
-                                            </Box>
-                                        } />
-                                    <ListItemText
-                                        primary="Seleccionar todo"
-                                        primaryTypographyProps={{
-                                            fontFamily: 'Poppins',
-                                            fontSize: '16px',
-                                            fontWeight: 500,
-                                            color: selectedUsers.length === users.length ? '#8F4E63' : '#786E71',
-                                        }}
-                                    />
-
-                                </MenuItem>
-                            )}
-                            {users.filter((user) => user.name.toLowerCase().includes(userSearch)).map((user) => (
-                                <MenuItem key={user.id} value={user.id} onClick={() => handleUserSelection(user)}
-                                    sx={{ height: "32px", marginLeft: "-12px" }}
-                                >
-                                    <Checkbox checked={selectedUsers.includes(user)}
-                                        checkedIcon={
-                                            <Box
-                                                sx={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    position: 'relative',
-                                                    marginTop: '0px',
-                                                    marginLeft: '0px',
-                                                }}
-                                            >
-                                                <img
-                                                    src={IconCheckBox1}
-                                                    alt="Seleccionado"
-                                                    style={{ width: '24px', height: '24px' }}
-                                                />
-                                            </Box>
-                                        } />
-                                    <ListItemText primary={user.name}
-                                        primaryTypographyProps={{
-                                            fontFamily: 'Poppins',
-                                            fontSize: '16px',
-                                            fontWeight: 500,
-                                            color: selectedUsers.includes(user) ? '#8F4E63' : '#786E71',
-                                        }}
-                                    />
-                                </MenuItem>
-                            ))}
-                            {users.filter((user) => user.name.toLowerCase().includes(userSearch)).length === 0 && (
-                                <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins" }}>
-                                    No se encontraron resultados.
-                                </Typography>
-                            )}
-                        </Box>
-                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
-                        <Box display="flex" justifyContent="space-between" px={1} pb={1} gap={2.5}>
-                            <Button variant="outlined" onClick={handleClearUserSelection}
-                                sx={{
-                                    color: '#833A53',
-                                    borderColor: '#CCCFD2',
-                                    fontFamily: 'Poppins',
-                                    letterSpacing: "1.12px",
-                                    '&:hover': {
-                                        backgroundColor: '#BE93A066',
-                                        borderColor: '#CCCFD2',
-                                    },
-                                }}
-                            >
-                                LIMPIAR
-                            </Button>
-                            <Button
-                                variant="contained"
-                                onClick={() => {
-                                    handleApplySelection();
-                                    fetchData();
-                                }}
-                                style={{ backgroundColor: '#8d406d', color: '#fff' }}
-                            >
-                                APLICAR
-                            </Button>
-                        </Box>
-                    </Paper>
-                </Popper>
-            </Box>
-            <DatePicker
-                open={datePickerOpen}
-                anchorEl={anchorEl}
-                placement="bottom-start"
-                onApply={handleDateSelectionApply}
-                onClose={handleCancelDatePicker}
-            />
-
-            <Divider sx={{ marginBottom: '20px' }} />
-            {loading && (
-                <Box sx={loadingStyle}>
-                    <CircularProgress sx={{ color: '#8F4D63' }} size={80} />
-                </Box>
-            )}
-
-            {!loading && data && (
-                <>
-                    <Paper sx={paperStyle}>
-                        <Typography variant="h6" sx={{
-                            textAlign: 'left',
-                            fontSize: '16px',
-                            fontWeight: '500',
-                            fontFamily: 'Poppins, sans-serif',
-                            letterSpacing: '0px',
-                            color: '#574B4F',
-                            opacity: 1,
-                            marginBottom: '10px'
-                        }}>
-                            Detalle de consumo
-                        </Typography>
-
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '15px' }}>
-                            {detalleResumen.map((item, index) => (
-                                <Box key={index} sx={boxStyle}>
-                                    <Typography sx={titleBoxStyle}>{item.title}</Typography>
-                                    <Typography sx={valueBoxStyle}>{item.value}</Typography>
-                                </Box>
-                            ))}
-                        </Box>
-                    </Paper>
-                    <Paper sx={graphPaperStyle}>
-                        <Typography variant="h6" sx={graphTitleStyle}>
-                            Promedio de consumo
-                        </Typography>
-                        <Typography sx={{ textAlign: 'center', fontSize: '12px', color: '#574B4F', opacity: 0.8 }}>
-                            Información de los últimos 20 días
-                        </Typography>
-                        <ResponsiveContainer width="100%" height={250}>
-                            <AreaChart data={dataChart}>
-                                <defs>
-                                    <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#833A53" stopOpacity={0.8} />
-                                        <stop offset="100%" stopColor="#833A53" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="date" />
-                                <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
-                                <Tooltip />
-
-                                {/* Línea con Sombreado */}
-                                <Area
-                                    type="monotone"
-                                    dataKey="value"
-                                    stroke="#833A53"
-                                    strokeWidth={2}
-                                    fill="url(#colorGradient)"
+                                    }}
                                 />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                            </Box>
+                            <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+                            <Box sx={{ height: '126px', overflowY: 'auto' }}>
+                                {users.filter((user) => user.name.toLowerCase().includes(userSearch)).length > 0 && (
+                                    <MenuItem onClick={handleSelectAllUsers}
+                                        sx={{ height: "32px", marginLeft: "-12px" }}>
+                                        <Checkbox checked={selectedUsers.length === users.length}
+                                            checkedIcon={
+                                                <Box
+                                                    sx={{
+                                                        width: '24px',
+                                                        height: '24px',
+                                                        position: 'relative',
+                                                        marginTop: '0px',
+                                                        marginLeft: '0px',
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={IconCheckBox1}
+                                                        alt="Seleccionado"
+                                                        style={{ width: '24px', height: '24px' }}
+                                                    />
+                                                </Box>
+                                            } />
+                                        <ListItemText
+                                            primary="Seleccionar todo"
+                                            primaryTypographyProps={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '16px',
+                                                fontWeight: 500,
+                                                color: selectedUsers.length === users.length ? '#8F4E63' : '#786E71',
+                                            }}
+                                        />
 
-
-                    </Paper>
-                </>
-            )}
-            {/* Imagen de vacío y mensaje */}
-            {searchingData && (
-                <Box sx={emptyContainerStyle}>
-                    <Box component="img" src={BoxEmpty} alt="Caja Vacía"
-                        sx={{ width: '220px', height: 'auto' }} />
-
-                    <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
-                        Seleccione un rango para comenzar.
-                    </Typography>
-
+                                    </MenuItem>
+                                )}
+                                {users.filter((user) => user.name.toLowerCase().includes(userSearch)).map((user) => (
+                                    <MenuItem key={user.id} value={user.id} onClick={() => handleUserSelection(user)}
+                                        sx={{ height: "32px", marginLeft: "-12px" }}
+                                    >
+                                        <Checkbox checked={selectedUsers.includes(user)}
+                                            checkedIcon={
+                                                <Box
+                                                    sx={{
+                                                        width: '24px',
+                                                        height: '24px',
+                                                        position: 'relative',
+                                                        marginTop: '0px',
+                                                        marginLeft: '0px',
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={IconCheckBox1}
+                                                        alt="Seleccionado"
+                                                        style={{ width: '24px', height: '24px' }}
+                                                    />
+                                                </Box>
+                                            } />
+                                        <ListItemText primary={user.name}
+                                            primaryTypographyProps={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '16px',
+                                                fontWeight: 500,
+                                                color: selectedUsers.includes(user) ? '#8F4E63' : '#786E71',
+                                            }}
+                                        />
+                                    </MenuItem>
+                                ))}
+                                {users.filter((user) => user.name.toLowerCase().includes(userSearch)).length === 0 && (
+                                    <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins", mt: "50px" }}>
+                                        No se encontraron resultados.
+                                    </Typography>
+                                )}
+                            </Box>
+                            <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+                            <Box display="flex" justifyContent="space-between" px={1} pb={1} gap={2.5}>
+                                <Button variant="outlined" onClick={handleClearUserSelection}
+                                    sx={{
+                                        color: '#833A53',
+                                        borderColor: '#CCCFD2',
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: "1.12px",
+                                        '&:hover': {
+                                            backgroundColor: '#BE93A066',
+                                            borderColor: '#CCCFD2',
+                                        },
+                                    }}
+                                >
+                                    LIMPIAR
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => {
+                                        handleApplySelection();
+                                        fetchData();
+                                    }}
+                                    style={{ backgroundColor: '#833A53', color: '#fff' }}
+                                >
+                                    APLICAR
+                                </Button>
+                            </Box>
+                        </Paper>
+                    </Popper>
                 </Box>
-            )}
+                <DatePicker
+                    open={datePickerOpen}
+                    anchorEl={anchorEl}
+                    placement="bottom-start"
+                    onApply={handleDateSelectionApply}
+                    onClose={handleCancelDatePicker}
+                />
+
+                <Divider sx={{ marginBottom: '20px', marginTop: "-5px" }} />
+                {loading && (
+                    <Box sx={loadingStyle}>
+                        <CircularProgress sx={{ color: '#8F4D63' }} size={80} />
+                    </Box>
+                )}
+
+                {!loading && data && (
+                    <>
+                        <Paper sx={paperStyle}>
+                            <Typography variant="h6" sx={{
+                                textAlign: 'left',
+                                fontSize: '16px',
+                                fontWeight: '500',
+                                fontFamily: 'Poppins, sans-serif',
+                                letterSpacing: '0px',
+                                color: '#574B4F',
+                                opacity: 1,
+                                marginBottom: '10px'
+                            }}>
+                                Detalle de consumo
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', }}>
+                                {detalleResumen.map((item, index) => (
+                                    <Box key={index} sx={boxStyle}>
+                                        <Typography sx={titleBoxStyle}>{item.title}</Typography>
+                                        <Typography sx={valueBoxStyle}>{item.value}</Typography>
+                                    </Box>
+                                ))}
+                            </Box>
+                        </Paper>
+                        <Paper sx={graphPaperStyle}>
+                            <Typography variant="h6" sx={graphTitleStyle}>
+                                Promedio de consumo
+                            </Typography>
+                            <Typography sx={{ textAlign: 'center', fontSize: '12px', color: '#574B4F', opacity: 0.8, fontFamily: "Poppins" }}>
+                                Información de los últimos 20 días
+                            </Typography>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <AreaChart data={dataChart}>
+                                    <defs>
+                                        <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor="#833A53" stopOpacity={0.8} />
+                                            <stop offset="100%" stopColor="#833A53" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="date"
+                                        tick={{ fontFamily: 'Poppins', fontSize: "10px", fill: '#574B4F' }}
+                                    />
+                                    <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`}
+                                        tick={{ fontFamily: 'Poppins', fontSize: "12px", fill: '#574B4F' }}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            fontFamily: 'Poppins',
+                                            fontSize: '15px',
+                                            color: '#574B4F',
+                                            borderRadius: '6px', minWidth: "100px", minHeight: "40px",
+                                            border: '1px solid #C6BFC2',
+                                            boxShadow: '0px 8px 16px rgba(0, 19, 31, 0.16)',
+                                        }}
+                                        itemStyle={{
+                                            fontFamily: 'Poppins',
+                                            color: '#8F4D63',
+                                        }}
+                                        labelStyle={{
+                                            fontFamily: 'Poppins',
+                                            fontWeight: 500,
+                                            color: '#574B4F',
+                                        }}
+                                    />
+
+                                    {/* Línea con Sombreado */}
+                                    <Area
+                                        type="monotone"
+                                        dataKey="value"
+                                        stroke="#833A53"
+                                        strokeWidth={2}
+                                        fill="url(#colorGradient)"
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+
+
+                        </Paper>
+                    </>
+                )}
+                {/* Imagen de vacío y mensaje */}
+                {searchingData && (
+                    <Box sx={emptyContainerStyle}>
+                        <Box component="img" src={BoxEmpty} alt="Caja Vacía"
+                            sx={{ width: '220px', height: 'auto', marginTop: "60px" }} />
+
+                        <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
+                            Seleccione un rango para comenzar.
+                        </Typography>
+
+                    </Box>
+                )}
+            </Box>
         </Box>
     );
 };
 
 /* 🎨 Estilos */
 const buttonStyle = {
-    background: '#FFFFFF',
+    background: '#F6F6F6',
     border: '1px solid #C6BFC2',
     borderRadius: '18px',
     padding: '8px 16px',
@@ -822,14 +843,15 @@ const buttonStyle = {
     textTransform: "uppercase",
     fontFamily: "Poppins",
     letterSpacing: "1.12px",
-    opacity: 1,
+    opacity: 0.8,
     '&:hover': {
-        background: '#F2E9EC',
-        border: '1px solid #BE93A066',
+        background: '#F2F2F2',
+        border: '1px solid #8F4E63CC',
+        color: "#8F4E63"
     },
     '&:active': {
-        background: '#E6C2CD',
-        border: '1px solid #BE93A0',
+        background: '#FFFFFF',
+        border: '1px solid #8F4E63CC',
     }
 };
 
@@ -854,13 +876,13 @@ const titleBoxStyle = {
     lineHeight: '18px',
     letterSpacing: '0px',
     color: '#574B4F',
-    opacity: 0.8
+    opacity: 0.8, marginBottom: "10px"
 };
 
 const valueBoxStyle = {
     textAlign: 'center',
     fontSize: '18px',
-    fontWeight: '600',
+    fontWeight: 500,
     fontFamily: 'Poppins, sans-serif',
     lineHeight: '18px',
     letterSpacing: '0px',
@@ -874,7 +896,7 @@ const paperStyle = {
     border: '1px solid #E6E4E44D',
     padding: '20px',
     borderRadius: '10px',
-    width: '892px',
+    width: '1100px',
     height: '212px'
 };
 
@@ -887,8 +909,8 @@ const graphPaperStyle = {
     border: '1px solid #E6E4E44D',
     padding: '20px',
     borderRadius: '10px',
-    width: '892px',
-    height: '280px',
+    width: '1100px',
+    height: '330px',
     marginTop: '20px'
 };
 
