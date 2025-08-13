@@ -28,10 +28,11 @@ import IconCSV from '../assets/IconCSV.svg';
 import IconExcel from '../assets/IconExcel.svg';
 import IconPDF from '../assets/IconPDF.svg';
 import Tooltip from "@mui/material/Tooltip";
-
+import seachicon from '../assets/icon-lupa.svg';
+import Iconseachred from "../assets/Iconseachred.svg";
+import iconclose from '../assets/icon-close.svg';
 import axios from "../components/commons/AxiosInstance";
 import dayjs from 'dayjs';
-
 import { saveAs } from 'file-saver';
 import { unparse } from 'papaparse';
 import * as XLSX from 'xlsx';
@@ -595,18 +596,11 @@ const Reports: React.FC = () => {
 
 
     return (
-        <Box p={4} sx={{ padding: '10px', marginLeft: "35px", marginTop: '-60px', }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', pl: '0px', mb: 1 }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
-                    sx={{
-                        ml: '-20px',
-                        p: 0,
-                        mr: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
+                    sx={{ p: 0, mr: 1 }}
                 >
                     <img
                         src={ArrowBackIosNewIcon}
@@ -626,143 +620,155 @@ const Reports: React.FC = () => {
                     Reportes
                 </Typography>
             </Box>
+            <Box sx={{ marginLeft: "32px" }}>
+                <Divider sx={{ mt: 2, mb: 0, maxWidth: "1180px" }} />
+                <Tabs value={selectedTab} onChange={handleTabChange} >
+                    <Box
+                        onClick={handleSmsClick}
+                        sx={{
+                            height: "43px",
+                            minWidth: "109px",
+                            px: 2,
+                            fontFamily: "Poppins",
+                            fontStyle: "normal",
+                            fontWeight: "500",
+                            opacity: 1,
+                            fontSize: "16px",
+                            lineHeight: "25px",
+                            color: selectedSmsOption !== "SMS" || smsMenuOpen ? "#864058 !important" : "#574B4F !important",
+                            backgroundColor: selectedSmsOption !== "SMS" || smsMenuOpen ? "#EDD5DC99" : "transparent",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            whiteSpace: "nowrap",
+                            "&:hover": {
+                                backgroundColor: "#EDD5DC99 !important",
+                                color: "#864058 !important"
+                            }
+                        }} >
+                        {selectedSmsOption === "SMS" ? "SMS" : `SMS - ${selectedSmsOption}`}
+                    </Box>
 
-            <Divider sx={{ mt: 2, mb: 0, maxWidth: "1140px" }} />
-            <Tabs value={selectedTab} onChange={handleTabChange} >
-                <Box
-                    onClick={handleSmsClick}
-                    sx={{
-                        height: "43px",
-                        minWidth: "109px",
-                        px: 2,
-                        fontFamily: "Poppins",
-                        fontStyle: "normal",
-                        fontWeight: "500",
-                        opacity: 1,
-                        fontSize: "16px",
-                        lineHeight: "25px",
-                        color: selectedSmsOption !== "SMS" || smsMenuOpen ? "#864058 !important" : "#574B4F !important",
-                        backgroundColor: selectedSmsOption !== "SMS" || smsMenuOpen ? "#EDD5DC99" : "transparent",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        whiteSpace: "nowrap",
-                        "&:hover": {
-                            backgroundColor: "#EDD5DC99 !important",
-                            color: "#864058 !important"
-                        }
-                    }} >
-                    {selectedSmsOption === "SMS" ? "SMS" : `SMS - ${selectedSmsOption}`}
+                    <Popper open={smsMenuOpen} anchorEl={smsAnchorEl} placement="bottom-start">
+                        <Paper sx={{ width: 379 }}>
+                            {smsOptions
+                                .filter((option) => option !== "SMS")
+                                .map((option) => (
+
+                                    <MenuItem
+                                        key={option}
+                                        selected={option === selectedSmsOption}
+                                        onClick={() => handleSmsOptionSelect(option)}
+                                        sx={{
+                                            fontFamily: "Poppins",
+                                            color: "#84797C",
+                                            fontSize: "16px",
+                                            "&:hover": {
+                                                backgroundColor: "#F2EBED"
+                                            }
+                                        }}
+                                    >
+                                        {option}
+                                    </MenuItem>
+                                ))}
+                        </Paper>
+                    </Popper>
+
+                </Tabs>
+                <Divider sx={{ mt: 1, mb: 2, marginTop: "-5px", maxWidth: "1180px" }} />
+
+                {/* Filtros de Fecha, Campaña y Usuario */}
+
+                <Box display="flex" gap={2} mb={4} marginBottom={2}>
+                    <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleDateClick}>
+                        {selectedDates ? `${selectedDates.start.toLocaleDateString()} - ${selectedDates.end.toLocaleDateString()}` : 'FECHA'}
+                    </Button>
+
+                    {/* Mostrar solo si no es "Global" */}
+                    {selectedSmsOption !== "Global" && (
+                        <>
+                            <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleCampaignClick}>
+                                {selectedCampaigns.length > 0
+                                    ? `${selectedCampaigns.length} campaña${selectedCampaigns.length > 1 ? 's' : ''}`
+                                    : 'CAMPAÑA'}
+                            </Button>
+                            <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleUserClick}>
+                                {selectedUsers.length > 0
+                                    ? `${selectedUsers.length} usuario${selectedUsers.length > 1 ? 's' : ''}`
+                                    : 'USUARIO'}
+                            </Button>
+                        </>
+                    )}
                 </Box>
 
-                <Popper open={smsMenuOpen} anchorEl={smsAnchorEl} placement="bottom-start">
-                    <Paper sx={{ width: 379 }}>
-                        {smsOptions
-                            .filter((option) => option !== "SMS")
-                            .map((option) => (
-
-                                <MenuItem
-                                    key={option}
-                                    selected={option === selectedSmsOption}
-                                    onClick={() => handleSmsOptionSelect(option)}
-                                    sx={{
-                                        fontFamily: "Poppins",
-                                        color: "#84797C",
-                                        fontSize: "16px",
-                                        "&:hover": {
-                                            backgroundColor: "#F2EBED"
-                                        }
-                                    }}
-                                >
-                                    {option}
-                                </MenuItem>
-                            ))}
-                    </Paper>
-                </Popper>
-
-            </Tabs>
-            <Divider sx={{ mt: 1, mb: 2, marginTop: "-5px", maxWidth: "1140px" }} />
-
-            {/* Filtros de Fecha, Campaña y Usuario */}
-
-            <Box display="flex" gap={2} mb={4} marginBottom={2}>
-                <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleDateClick}>
-                    {selectedDates ? `${selectedDates.start.toLocaleDateString()} - ${selectedDates.end.toLocaleDateString()}` : 'FECHA'}
-                </Button>
-
-                {/* Mostrar solo si no es "Global" */}
-                {selectedSmsOption !== "Global" && (
-                    <>
-                        <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleCampaignClick}>
-                            {selectedCampaigns.length > 0
-                                ? `${selectedCampaigns.length} campaña${selectedCampaigns.length > 1 ? 's' : ''}`
-                                : 'CAMPAÑA'}
-                        </Button>
-                        <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleUserClick}>
-                            {selectedUsers.length > 0
-                                ? `${selectedUsers.length} usuario${selectedUsers.length > 1 ? 's' : ''}`
-                                : 'USUARIO'}
-                        </Button>
-                    </>
-                )}
-            </Box>
-
-
-
-            {/* Popper Campañas */}
-            <Popper open={campaignMenuOpen} anchorEl={anchorElC} placement="bottom-start">
-                <Paper ref={campaignPopperRef} sx={{ width: 280, p: 2 }}>
-                    <TextField
-                        placeholder="Buscar"
-                        value={campaignSearch}
-                        onChange={(e) => setCampaignSearch(e.target.value)}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                fontFamily: 'Poppins',
-                                fontSize: '16px',
-                                color: campaignSearch ? '#7B354D' : '#9B9295',
-                                '& fieldset': {
-                                    borderColor: campaignSearch ? '#7B354D' : '#9B9295',
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: '#7B354D',
-                                },
-                            },
-                            input: {
-                                fontFamily: 'Poppins',
-                                height: '10px',
-                            },
-                        }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon sx={{ color: campaignSearch ? '#7B354D' : '#B0A7AA' }} />
-                                </InputAdornment>
-                            ),
-                            endAdornment: campaignSearch && (
-                                <IconButton onClick={() => setCampaignSearch('')}>
-                                    <ClearIcon sx={{ color: '#7B354D' }} />
-                                </IconButton>
-                            ),
-                        }}
-                    />
-
-
-                    {/* Línea horizontal*/}
-                    <Divider sx={{ my: 1.5, bgcolor: '#dcdcdc', marginBottom: "10px", marginTop: "15px", }} />
-                    <div style={{
-                        position: 'absolute',
-                        top: '74px',
-                        left: 0,
-                        right: 0,
-                        height: '1px',
-                        backgroundColor: '#dcdcdc',
+                {/* Popper Campañas */}
+                <Popper open={campaignMenuOpen} anchorEl={anchorElC} placement="bottom-start">
+                    <Paper ref={campaignPopperRef} sx={{
+                        padding: 1,
+                        width: "280px",
+                        height: "282px",
+                        overflowY: "hidden",
+                        borderRadius: '12px',
+                        boxShadow: '0px 8px 16px #00131F29', overflowX: "hidden"
                     }}>
-                    </div>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 1 }}>
+                            <TextField
+                                placeholder="Buscar"
+                                value={campaignSearch}
+                                onChange={(e) => setCampaignSearch(e.target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <img
+                                                src={campaignSearch ? Iconseachred : seachicon}
+                                                alt="Buscar"
+                                                style={{ width: 24 }}
+                                            />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: campaignSearch && (
+                                        <IconButton onClick={() => setCampaignSearch('')}>
+                                            <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
+                                        </IconButton>
+                                    ),
+                                    sx: {
+                                        fontFamily: 'Poppins',
+                                        color: campaignSearch ? '#7B354D' : '#000',
+                                    }
+                                }}
+                                inputProps={{
+                                    style: {
+                                        fontFamily: 'Poppins',
+                                        color: campaignSearch ? '#7B354D' : '#000',
+                                    }
+                                }}
+                                sx={{
+                                    width: '248px',
+                                    height: '40px',
+                                    mb: 1,
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '40px',
+                                        border: '1px solid #9B9295',
+                                        '& fieldset': {
+                                            borderColor: campaignSearch ? '#7B354D' : '#9B9295',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: campaignSearch ? '#7B354D' : '#9B9295',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: campaignSearch ? '#7B354D' : '#9B9295',
+                                        },
+                                    },
+                                }}
+                            />
+                        </Box>
 
-                    <Box sx={{ maxHeight: 140, overflowY: 'auto' }}>
-                        {/* <MenuItem onClick={handleSelectAllCampaigns}>
+                        {/* Línea horizontal*/}
+                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+
+                        <Box sx={{ height: '126px', overflowY: 'auto' }}>
+                            {/* <MenuItem onClick={handleSelectAllCampaigns}>
                             <Checkbox checked={selectedCampaigns.length === campaigns.length}
                                 sx={{
                                     marginBottom: "-10px",
@@ -777,1644 +783,1629 @@ const Reports: React.FC = () => {
                                 primaryTypographyProps={{ fontFamily: 'Poppins', fontWeight: "500" }}
                             />
                         </MenuItem> */}
-                        {campaigns.filter(c => c.name.toLowerCase().includes(campaignSearch.toLowerCase())).map(c => (
-                            <MenuItem key={c.id} disableRipple sx={{
-                                maxWidth: '100%',
-                                overflow: 'hidden',
-                                whiteSpace: 'nowrap',
-                                textOverflow: 'ellipsis',
-                                marginLeft: '-12px'
-                            }}>
-                                <Checkbox
-                                    checked={selectedCampaigns.some(sc => sc.id === c.id)}
-                                    onChange={() => handleCampaignSelection(c)}
-                                    checkedIcon={
-                                        <Box
-                                            sx={{
-                                                width: '24px',
-                                                height: '24px',
-                                                position: 'relative',
-                                                marginTop: '0px',
-                                                marginLeft: '0px',
-                                            }}
-                                        >
-                                            <img
-                                                src={IconCheckBox1}
-                                                alt="Seleccionado"
-                                                style={{ width: '24px', height: '24px' }}
-                                            />
-                                        </Box>
-                                    }
-                                />
-                                <ListItemText
-                                    primary={c.name}
-                                    primaryTypographyProps={{
-                                        fontFamily: 'Poppins',
-                                        fontSize: '16px',
-                                        fontWeight: 500,
-                                        color: selectedCampaigns.some(s => s.id === c.id) ? '#8F4E63' : '#786E71',
-                                    }}
-                                />
-                            </MenuItem>
-                        ))}
+                            {campaigns.filter(c => c.name.toLowerCase().includes(campaignSearch.toLowerCase())).map(c => (
+                                <MenuItem key={c.id} disableRipple
+                                    sx={{ height: "32px", marginLeft: "-12px" }}>
+                                    <Checkbox
+                                        checked={selectedCampaigns.some(sc => sc.id === c.id)}
+                                        onChange={() => handleCampaignSelection(c)}
+                                        checkedIcon={
+                                            <Box
+                                                sx={{
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    position: 'relative',
+                                                    marginTop: '0px',
+                                                    marginLeft: '0px',
+                                                }}
+                                            >
+                                                <img
+                                                    src={IconCheckBox1}
+                                                    alt="Seleccionado"
+                                                    style={{ width: '24px', height: '24px' }}
+                                                />
+                                            </Box>
+                                        }
+                                    />
+                                    <ListItemText
+                                        primary={c.name}
+                                        primaryTypographyProps={{
+                                            fontFamily: 'Poppins',
+                                            fontSize: '16px',
+                                            fontWeight: 500,
+                                            color: selectedCampaigns.some(s => s.id === c.id) ? '#8F4E63' : '#786E71',
+                                        }}
+                                    />
+                                </MenuItem>
+                            ))}
+                            {campaigns.filter((c) => c.name.toLowerCase().includes(campaignSearch)).length === 0 && (
+                                <Box sx={{ marginTop: "60px" }}>
+                                    <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins" }}>
+                                        No se encontraron resultados.
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Box>
 
-                    </Box>
+                        {/* Línea horizontal arriba de los botones */}
+                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
 
-                    {/* Línea horizontal arriba de los botones */}
-                    <div style={{
-                        position: 'absolute',
-                        top: '245px', // ajusta según el contenido anterior
-                        left: 0,
-                        right: 0,
-                        height: '1px',
-                        backgroundColor: '#dcdcdc',
-                    }}>
-                    </div>
-
-                    <Box display="flex" justifyContent="space-between" sx={{ mt: 4.5 }}>
-                        <Button variant="outlined" onClick={() => {
-                            setSelectedCampaigns([]);
-                            setCurrentPage(0);
-                            if (selectedDates) {
-                                handleReport(selectedDates);
-                            }
-                            setCampaignMenuOpen(false);
-                        }}
-                            sx={{
-                                backgroundColor: '#FFFFFF',
-                                color: '#833A53',
-                                borderColor: '#CCCFD2',
-                                width: '116px',
-                                fontFamily: 'Poppins',
-                                fontWeight: 500,
-                                fontSize: '14px',
-                                letterSpacing: "1.12px",
-                                textTransform: 'none',
-                                '&:hover': {
-                                    backgroundColor: '#EDD5DC99',
-                                }
-                            }}
-
-                        >LIMPIAR</Button>
-
-
-
-                        <Button variant="contained"
-                            onClick={() => {
+                        <Box display="flex" justifyContent="space-between" px={1} pb={1} gap={2.5}>
+                            <Button variant="outlined" onClick={() => {
+                                setSelectedCampaigns([]);
                                 setCurrentPage(0);
+                                if (selectedDates) {
+                                    handleReport(selectedDates);
+                                }
                                 setCampaignMenuOpen(false);
-                                if (selectedDates) {
-                                    handleReport(selectedDates);
-                                }
                             }}
-                            sx={{
-                                backgroundColor: '#833A53',
-                                color: '#FFFFFF',
-                                borderColor: '#60293C',
-                                width: '109px',
-                                fontFamily: 'Poppins',
-                                fontWeight: 500,
-                                fontSize: '14px',
-                                letterSpacing: "1.12px",
-                                textTransform: 'none',
-                                '&:hover': {
-                                    backgroundColor: '#A54261',
-                                }
-                            }}
-                        >APLICAR</Button>
-                    </Box>
-                </Paper>
-
-            </Popper>
-
-            {/* Popper Usuarios */}
-            <Popper open={userMenuOpen} anchorEl={userAnchorEl} placement="bottom-start">
-                <Paper
-                    sx={{
-                        width: 280,
-                        p: 2,
-                        maxHeight: 400,
-                        overflowY: 'auto',
-                        overflowX: 'hidden',
-                        boxSizing: 'border-box',
-                    }}
-                    ref={userPopperRef}
-                >
-                    <TextField
-                        placeholder="Buscar"
-                        value={userSearch}
-                        onChange={(e) => setUserSearch(e.target.value)}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                fontFamily: 'Poppins',
-                                fontSize: '16px',
-                                color: userSearch ? '#7B354D' : '#9B9295',
-                                '& fieldset': {
-                                    borderColor: userSearch ? '#7B354D' : '#9B9295',
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: '#7B354D',
-                                },
-                            },
-                            input: {
-                                fontFamily: 'Poppins',
-                                height: '10px',
-                            },
-                        }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon sx={{ color: userSearch ? '#7B354D' : '#B0A7AA' }} />
-                                </InputAdornment>
-                            ),
-                            endAdornment: userSearch && (
-                                <IconButton onClick={() => setUserSearch('')}>
-                                    <ClearIcon sx={{ color: '#7B354D' }} />
-                                </IconButton>
-                            ),
-                        }}
-                    />
-
-                    {/* Línea horizontal*/}
-                    <Divider sx={{ my: 1.5, bgcolor: '#dcdcdc', marginBottom: "10px", marginTop: "15px", }} />
-                    <div style={{
-                        position: 'absolute',
-                        top: '74px',
-                        left: 0,
-                        right: 0,
-                        height: '1px',
-                        backgroundColor: '#dcdcdc',
-                    }}>
-                    </div>
-
-                    <Box sx={{ maxHeight: 140, overflowY: 'auto', }}>
-                        {users.filter(u => u.name.toLowerCase().includes(userSearch.toLowerCase())).map(u => (
-                            <MenuItem key={u.id} onClick={() => handleUserSelection(u)} sx={{
-                                maxWidth: '100%',
-                                overflow: 'hidden',
-                                whiteSpace: 'nowrap',
-                                textOverflow: 'ellipsis',
-                            }}>
-                                <Checkbox checked={selectedUsers.includes(u)}
-                                    checkedIcon={
-                                        <Box
-                                            sx={{
-                                                width: '24px',
-                                                height: '24px',
-                                                position: 'relative',
-                                                marginTop: '0px',
-                                                marginLeft: '0px',
-                                            }}
-                                        >
-                                            <img
-                                                src={IconCheckBox1}
-                                                alt="Seleccionado"
-                                                style={{ width: '24px', height: '24px' }}
-                                            />
-                                        </Box>
+                                sx={{
+                                    backgroundColor: '#FFFFFF',
+                                    color: '#833A53',
+                                    borderColor: '#CCCFD2',
+                                    width: '116px', height: "36px",
+                                    fontFamily: 'Poppins',
+                                    fontWeight: 500,
+                                    fontSize: '14px',
+                                    letterSpacing: "1.12px",
+                                    textTransform: 'none',
+                                    '&:hover': {
+                                        backgroundColor: '#EDD5DC99',
                                     }
-                                    sx={{
-                                        marginBottom: "-10px",
-                                        marginTop: "-10px",
-                                        marginLeft: "-20px",
-                                        color: '#786E71',
-                                        '&.Mui-checked': { color: '#6C3A52' },
-
-                                    }}
-                                />
-                                <ListItemText primary={u.name}
-                                    primaryTypographyProps={{
-                                        fontFamily: 'Poppins',
-                                        color: selectedUsers.includes(u) ? '#8F4E63' : '#786E71',
-                                    }}
-                                />
-                            </MenuItem>
-                        ))}
-                    </Box>
+                                }}
+                            >LIMPIAR
+                            </Button>
 
 
-                    <div style={{
-                        position: 'absolute',
-                        top: '245px',
-                        left: 0,
-                        right: 0,
-                        height: '1px',
-                        backgroundColor: '#dcdcdc',
-                    }}>
-                    </div>
 
+                            <Button variant="contained"
+                                onClick={() => {
+                                    setCurrentPage(0);
+                                    setCampaignMenuOpen(false);
+                                    if (selectedDates) {
+                                        handleReport(selectedDates);
+                                    }
+                                }}
+                                sx={{
+                                    backgroundColor: '#833A53',
+                                    color: '#FFFFFF',
+                                    borderColor: '#60293C',
+                                    width: '109px', height: "36px",
+                                    fontFamily: 'Poppins',
+                                    fontWeight: 500,
+                                    fontSize: '14px',
+                                    letterSpacing: "1.12px",
+                                    textTransform: 'none',
+                                    '&:hover': {
+                                        backgroundColor: '#A54261',
+                                    }
+                                }}
+                            >APLICAR</Button>
+                        </Box>
+                    </Paper>
+                </Popper>
 
-                    <Box display="flex" justifyContent="space-between" sx={{ mt: 4.5 }}>
-                        <Button variant="outlined" onClick={() => {
-                            setSelectedUsers([]);
-                            setCurrentPage(0);
-                            if (selectedDates) {
-                                handleReport(selectedDates);
-                            }
-                            setUserMenuOpen(false);
+                {/* Popper Usuarios */}
+                <Popper open={userMenuOpen} anchorEl={userAnchorEl} placement="bottom-start">
+                    <Paper
+                        sx={{
+                            padding: 1,
+                            width: "280px",
+                            height: "282px",
+                            overflowY: "hidden",
+                            borderRadius: '12px',
+                            boxShadow: '0px 8px 16px #00131F29', overflowX: "hidden"
                         }}
+                        ref={userPopperRef}
+                    >
+                        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 1 }}>
+                            <TextField
+                                placeholder="Buscar"
+                                value={userSearch}
+                                onChange={(e) => setUserSearch(e.target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <img
+                                                src={userSearch ? Iconseachred : seachicon}
+                                                alt="Buscar"
+                                                style={{ width: 24 }}
+                                            />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: userSearch && (
+                                        <IconButton onClick={() => setUserSearch('')}>
+                                            <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
+                                        </IconButton>
+                                    ),
+                                    sx: {
+                                        fontFamily: 'Poppins',
+                                        color: userSearch ? '#7B354D' : '#000',
+                                    }
+                                }}
+                                inputProps={{
+                                    style: {
+                                        fontFamily: 'Poppins',
+                                        color: userSearch ? '#7B354D' : '#000',
+                                    }
+                                }}
+                                sx={{
+                                    width: '248px',
+                                    height: '40px',
+                                    mb: 1,
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '40px',
+                                        border: '1px solid #9B9295',
+                                        '& fieldset': {
+                                            borderColor: userSearch ? '#7B354D' : '#9B9295',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: userSearch ? '#7B354D' : '#9B9295',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: userSearch ? '#7B354D' : '#9B9295',
+                                        },
+                                    },
+                                }}
+                            />
+                        </Box>
+                        {/* Línea horizontal*/}
+                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
 
-                            sx={{
-                                backgroundColor: '#FFFFFF',
-                                color: '#833A53',
-                                borderColor: '#CCCFD2',
-                                width: '116px',
-                                fontFamily: 'Poppins',
-                                fontWeight: 500,
-                                fontSize: '14px',
-                                letterSpacing: "1.12px",
-                                textTransform: 'none',
-                                '&:hover': {
-                                    backgroundColor: '#EDD5DC99',
-                                }
-                            }}
+                        <Box sx={{ height: '126px', overflowY: 'auto' }}>
+                            {users.filter(u => u.name.toLowerCase().includes(userSearch.toLowerCase())).map(u => (
+                                <MenuItem key={u.id} onClick={() => handleUserSelection(u)}
+                                    sx={{ height: "32px", marginLeft: "-12px" }}>
+                                    <Checkbox
+                                        checked={selectedUsers.includes(u)}
+                                        checkedIcon={
+                                            <Box
+                                                sx={{
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    position: 'relative',
+                                                    marginTop: '0px',
+                                                    marginLeft: '0px',
+                                                }}
+                                            >
+                                                <img
+                                                    src={IconCheckBox1}
+                                                    alt="Seleccionado"
+                                                    style={{ width: '24px', height: '24px' }}
+                                                />
+                                            </Box>
+                                        }
+                                    />
+                                    <ListItemText primary={u.name}
+                                        primaryTypographyProps={{
+                                            fontFamily: 'Poppins',
+                                            fontSize: '16px',
+                                            fontWeight: 500,
+                                            color: selectedUsers.includes(u) ? '#8F4E63' : '#786E71',
+                                        }}
+                                    />
+                                </MenuItem>
+                            ))}
+                            {users.filter((c) => c.name.toLowerCase().includes(userSearch)).length === 0 && (
+                                <Box sx={{ marginTop: "60px" }}>
+                                    <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins" }}>
+                                        No se encontraron resultados.
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Box>
 
-                        >LIMPIAR</Button>
-                        <Button variant="contained"
-                            onClick={() => {
+                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
+
+                        <Box display="flex" justifyContent="space-between" px={1} pb={1} gap={2.5}>
+                            <Button variant="outlined" onClick={() => {
+                                setSelectedUsers([]);
                                 setCurrentPage(0);
-                                setUserMenuOpen(false);
                                 if (selectedDates) {
                                     handleReport(selectedDates);
                                 }
-
-                            }}
-                            sx={{
-                                backgroundColor: '#833A53',
-                                color: '#FFFFFF',
-                                borderColor: '#60293C',
-                                width: '109px',
-                                fontFamily: 'Poppins',
-                                fontWeight: 500,
-                                fontSize: '14px',
-                                letterSpacing: "1.12px",
-                                textTransform: 'none',
-                                '&:hover': {
-                                    backgroundColor: '#A54261',
-                                }
+                                setUserMenuOpen(false);
                             }}
 
-                        >APLICAR</Button>
-                    </Box>
-                </Paper>
+                                sx={{
+                                    backgroundColor: '#FFFFFF',
+                                    color: '#833A53',
+                                    borderColor: '#CCCFD2',
+                                    width: '116px', height: "36px",
+                                    fontFamily: 'Poppins',
+                                    fontWeight: 500,
+                                    fontSize: '14px',
+                                    letterSpacing: "1.12px",
+                                    textTransform: 'none',
+                                    '&:hover': {
+                                        backgroundColor: '#EDD5DC99',
+                                    }
+                                }}
 
-            </Popper>
+                            >LIMPIAR</Button>
+                            <Button variant="contained"
+                                onClick={() => {
+                                    setCurrentPage(0);
+                                    setUserMenuOpen(false);
+                                    if (selectedDates) {
+                                        handleReport(selectedDates);
+                                    }
 
-            <Divider sx={{ mb: 4, maxWidth: "1140px" }} />
+                                }}
+                                sx={{
+                                    backgroundColor: '#833A53',
+                                    color: '#FFFFFF',
+                                    borderColor: '#60293C',
+                                    width: '109px', height: "36px",
+                                    fontFamily: 'Poppins',
+                                    fontWeight: 500,
+                                    fontSize: '14px',
+                                    letterSpacing: "1.12px",
+                                    textTransform: 'none',
+                                    '&:hover': {
+                                        backgroundColor: '#A54261',
+                                    }
+                                }}
+
+                            >APLICAR</Button>
+                        </Box>
+                    </Paper>
+
+                </Popper>
+
+                <Divider sx={{ mb: 4, maxWidth: "1180px" }} />
 
 
-            {selectedDates?.start && selectedDates?.end && (
-                <Box display="flex" gap={2} alignItems="center" mb={3} sx={{ marginTop: "-15px", marginBottom: "20px", }}>
-                    <Typography sx={{
-                        fontFamily: "Poppins",
-                        fontWeight: 500,
-                        color: "#6F565E",
-                        fontSize: "14px",
-                        marginLeft: "5px", position: "absolute"
+                {selectedDates?.start && selectedDates?.end && (
+                    <Box display="flex" gap={2} alignItems="center" mb={3} sx={{ marginTop: "-15px", marginBottom: "20px", }}>
+                        <Typography sx={{
+                            fontFamily: "Poppins",
+                            fontWeight: 500,
+                            color: "#6F565E",
+                            fontSize: "14px",
+                            marginLeft: "5px", position: "absolute"
 
-                    }}>
-                        {currentPage + 1}-{totalPages} de {totalCount}
-                    </Typography>
+                        }}>
+                            {currentPage + 1}-{totalPages} de {totalCount}
+                        </Typography>
 
-                    <Box display="flex" gap={1} ml={10}>
-                        {/* Primera página (doble flecha izquierda) */}
-                        <IconButton sx={{ p: 0 }} onClick={handleFirstPage} disabled={currentPage === 0}>
-                            <Box display="flex" alignItems="center" >
-                                <img src={backarrow} alt="<<" style={{ marginRight: '-16px', opacity: currentPage === 0 ? 0.1 : 3 }} />
-                                <img src={backarrow} alt="<<" style={{ opacity: currentPage === 0 ? 0.1 : 3 }} />
+                        <Box display="flex" gap={1} ml={10}>
+                            {/* Primera página (doble flecha izquierda) */}
+                            <IconButton sx={{ p: 0 }} onClick={handleFirstPage} disabled={currentPage === 0}>
+                                <Box display="flex" alignItems="center" >
+                                    <img src={backarrow} alt="<<" style={{ marginRight: '-16px', opacity: currentPage === 0 ? 0.1 : 3 }} />
+                                    <img src={backarrow} alt="<<" style={{ opacity: currentPage === 0 ? 0.1 : 3 }} />
+                                </Box>
+                            </IconButton>
+
+                            {/* Página anterior (flecha izquierda) */}
+                            <IconButton sx={{ p: 0 }} onClick={handlePreviousPage} disabled={currentPage === 0}>
+                                <img src={backarrow} alt="<" style={{ opacity: currentPage === 0 ? 0.1 : 3 }} />
+                            </IconButton>
+
+                            {/* Página siguiente (flecha derecha volteada) */}
+                            <IconButton sx={{ p: 0 }} onClick={handleNextPage} disabled={currentPage >= totalPages - 1}>
+                                <img
+                                    src={backarrow}
+                                    alt=">"
+                                    style={{ transform: 'scaleX(-1)', opacity: currentPage >= totalPages - 1 ? 0.1 : 3 }}
+                                />
+                            </IconButton>
+
+                            {/* Última página (doble flecha derecha) */}
+                            <Box display="flex" alignItems="center">
+                                <IconButton sx={{ p: 0 }} onClick={handleLastPage} disabled={currentPage >= totalPages - 1}>
+
+                                    <img
+                                        src={backarrow}
+                                        alt=">>"
+                                        style={{ transform: 'scaleX(-1)', marginRight: '-4px', opacity: currentPage >= totalPages - 1 ? 0.1 : 3 }}
+                                    />
+                                </IconButton>
+                                <IconButton sx={{ p: 0 }} onClick={handleLastPage} disabled={currentPage >= totalPages - 1}>
+                                    <img
+                                        src={backarrow}
+                                        alt=">>"
+                                        style={{ transform: 'scaleX(-1)', marginLeft: '-12px', opacity: currentPage >= totalPages - 1 ? 0.1 : 1 }}
+
+
+                                    />
+
+                                </IconButton>
                             </Box>
-                        </IconButton>
-
-                        {/* Página anterior (flecha izquierda) */}
-                        <IconButton sx={{ p: 0 }} onClick={handlePreviousPage} disabled={currentPage === 0}>
-                            <img src={backarrow} alt="<" style={{ opacity: currentPage === 0 ? 0.1 : 3 }} />
-                        </IconButton>
-
-                        {/* Página siguiente (flecha derecha volteada) */}
-                        <IconButton sx={{ p: 0 }} onClick={handleNextPage} disabled={currentPage >= totalPages - 1}>
-                            <img
-                                src={backarrow}
-                                alt=">"
-                                style={{ transform: 'scaleX(-1)', opacity: currentPage >= totalPages - 1 ? 0.1 : 3 }}
-                            />
-                        </IconButton>
-
-                        {/* Última página (doble flecha derecha) */}
-                        <Box display="flex" alignItems="center">
-                            <IconButton sx={{ p: 0 }} onClick={handleLastPage} disabled={currentPage >= totalPages - 1}>
-
-                                <img
-                                    src={backarrow}
-                                    alt=">>"
-                                    style={{ transform: 'scaleX(-1)', marginRight: '-4px', opacity: currentPage >= totalPages - 1 ? 0.1 : 3 }}
-                                />
-                            </IconButton>
-                            <IconButton sx={{ p: 0 }} onClick={handleLastPage} disabled={currentPage >= totalPages - 1}>
-                                <img
-                                    src={backarrow}
-                                    alt=">>"
-                                    style={{ transform: 'scaleX(-1)', marginLeft: '-12px', opacity: currentPage >= totalPages - 1 ? 0.1 : 1 }}
-
-
-                                />
-
-                            </IconButton>
-                        </Box>
-                        {/* Botones de CSV / Excel y PDF */}
-                        <Box sx={{ display: "flex", justifyContent: "flex-end", flex: 1, marginLeft: "810px", gap: 2 }}>
-                            <IconButton sx={{ p: 0, opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
-                                onClick={() => handleExportClick('csv', setIsExportingCSV)}
-                                disabled={anyExporting && !isExportingCSV}
-                            >
-                                <Tooltip title="Exportar a CSV" placement="top"
-                                    arrow
-                                    PopperProps={{
-                                        modifiers: [
-                                            {
-                                                name: 'arrow',
-                                                options: {
-                                                    padding: 8,
+                            {/* Botones de CSV / Excel y PDF */}
+                            <Box sx={{ display: "flex", justifyContent: "flex-end", flex: 1, marginLeft: "770px", gap: 2 }}>
+                                <IconButton sx={{ p: 0, opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
+                                    onClick={() => handleExportClick('csv', setIsExportingCSV)}
+                                    disabled={anyExporting && !isExportingCSV}
+                                >
+                                    <Tooltip title="Exportar a CSV" placement="top"
+                                        arrow
+                                        PopperProps={{
+                                            modifiers: [
+                                                {
+                                                    name: 'arrow',
+                                                    options: {
+                                                        padding: 8,
+                                                    },
+                                                },
+                                            ],
+                                        }}
+                                        componentsProps={{
+                                            tooltip: {
+                                                sx: {
+                                                    fontFamily: 'Poppins',
+                                                    backgroundColor: '#322D2E',
+                                                    color: '#FFFFFF',
+                                                    fontSize: '12px',
+                                                    borderRadius: '4px',
+                                                    padding: '6px 10px',
                                                 },
                                             },
-                                        ],
-                                    }}
-                                    componentsProps={{
-                                        tooltip: {
-                                            sx: {
-                                                fontFamily: 'Poppins',
-                                                backgroundColor: '#322D2E',
-                                                color: '#FFFFFF',
-                                                fontSize: '12px',
-                                                borderRadius: '4px',
-                                                padding: '6px 10px',
-                                            },
-                                        },
-                                        arrow: {
-                                            sx: {
-                                                color: '#322D2E',
-                                            },
-                                        },
-                                    }}
-
-                                >
-                                    {isExportingCSV ? (
-                                        <DualSpinner />
-                                    ) : (
-                                        <img src={IconCSV} alt="csv" style={{ transform: 'rotate(0deg)' }} />
-                                    )}
-                                </Tooltip>
-                            </IconButton>
-
-                            <IconButton sx={{ p: 0, opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
-                                onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
-                                disabled={anyExporting && !isExportingXLSX}
-                            >
-
-
-                                <Tooltip title="Exportar a Excel"
-                                    placement="top"
-                                    arrow
-
-                                    PopperProps={{
-                                        modifiers: [
-                                            {
-                                                name: 'arrow',
-                                                options: {
-                                                    padding: 8,
+                                            arrow: {
+                                                sx: {
+                                                    color: '#322D2E',
                                                 },
                                             },
-                                        ],
-                                    }}
-                                    componentsProps={{
-                                        tooltip: {
-                                            sx: {
-                                                fontFamily: 'Poppins',
-                                                backgroundColor: '#322D2E',
-                                                color: '#FFFFFF',
-                                                fontSize: '12px',
-                                                borderRadius: '4px',
-                                                padding: '6px 10px',
-                                            },
-                                        },
-                                        arrow: {
-                                            sx: {
-                                                color: '#322D2E',
-                                            },
-                                        },
-                                    }}
+                                        }}
 
+                                    >
+                                        {isExportingCSV ? (
+                                            <DualSpinner />
+                                        ) : (
+                                            <img src={IconCSV} alt="csv" style={{ transform: 'rotate(0deg)' }} />
+                                        )}
+                                    </Tooltip>
+                                </IconButton>
+
+                                <IconButton sx={{ p: 0, opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
+                                    onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
+                                    disabled={anyExporting && !isExportingXLSX}
                                 >
-                                    {isExportingXLSX ? (
-                                        <DualSpinner />
-                                    ) : (
-                                        <img src={IconExcel} alt="xlsx" style={{ transform: 'rotate(0deg)' }} />
-                                    )}
-                                </Tooltip>
-                            </IconButton>
 
 
-                            <IconButton sx={{ p: 0, opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
-                                onClick={() => handleExportClick('pdf', setIsExportingPDF)}
-                                disabled={anyExporting && !isExportingPDF}
-                            >
-                                <Tooltip title="Exportar a PDF"
-                                    placement="top"
-                                    arrow
+                                    <Tooltip title="Exportar a Excel"
+                                        placement="top"
+                                        arrow
 
-                                    PopperProps={{
-                                        modifiers: [
-                                            {
-                                                name: 'arrow',
-                                                options: {
-                                                    padding: 8,
+                                        PopperProps={{
+                                            modifiers: [
+                                                {
+                                                    name: 'arrow',
+                                                    options: {
+                                                        padding: 8,
+                                                    },
+                                                },
+                                            ],
+                                        }}
+                                        componentsProps={{
+                                            tooltip: {
+                                                sx: {
+                                                    fontFamily: 'Poppins',
+                                                    backgroundColor: '#322D2E',
+                                                    color: '#FFFFFF',
+                                                    fontSize: '12px',
+                                                    borderRadius: '4px',
+                                                    padding: '6px 10px',
                                                 },
                                             },
-                                        ],
-                                    }}
-                                    componentsProps={{
-                                        tooltip: {
-                                            sx: {
-                                                fontFamily: 'Poppins',
-                                                backgroundColor: '#322D2E',
-                                                color: '#FFFFFF',
-                                                fontSize: '12px',
-                                                borderRadius: '4px',
-                                                padding: '6px 10px',
+                                            arrow: {
+                                                sx: {
+                                                    color: '#322D2E',
+                                                },
                                             },
-                                        },
-                                        arrow: {
-                                            sx: {
-                                                color: '#322D2E',
-                                            },
-                                        },
-                                    }}
+                                        }}
 
+                                    >
+                                        {isExportingXLSX ? (
+                                            <DualSpinner />
+                                        ) : (
+                                            <img src={IconExcel} alt="xlsx" style={{ transform: 'rotate(0deg)' }} />
+                                        )}
+                                    </Tooltip>
+                                </IconButton>
+
+
+                                <IconButton sx={{ p: 0, opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
+                                    onClick={() => handleExportClick('pdf', setIsExportingPDF)}
+                                    disabled={anyExporting && !isExportingPDF}
                                 >
-                                    {isExportingPDF ? (
-                                        <DualSpinner />
-                                    ) : (
-                                        <img src={IconPDF} alt="pdf" style={{ transform: 'rotate(0deg)' }} />
-                                    )}
-                                </Tooltip>
-                            </IconButton>
+                                    <Tooltip title="Exportar a PDF"
+                                        placement="top"
+                                        arrow
+
+                                        PopperProps={{
+                                            modifiers: [
+                                                {
+                                                    name: 'arrow',
+                                                    options: {
+                                                        padding: 8,
+                                                    },
+                                                },
+                                            ],
+                                        }}
+                                        componentsProps={{
+                                            tooltip: {
+                                                sx: {
+                                                    fontFamily: 'Poppins',
+                                                    backgroundColor: '#322D2E',
+                                                    color: '#FFFFFF',
+                                                    fontSize: '12px',
+                                                    borderRadius: '4px',
+                                                    padding: '6px 10px',
+                                                },
+                                            },
+                                            arrow: {
+                                                sx: {
+                                                    color: '#322D2E',
+                                                },
+                                            },
+                                        }}
+
+                                    >
+                                        {isExportingPDF ? (
+                                            <DualSpinner />
+                                        ) : (
+                                            <img src={IconPDF} alt="pdf" style={{ transform: 'rotate(0deg)' }} />
+                                        )}
+                                    </Tooltip>
+                                </IconButton>
 
 
+
+                            </Box>
 
                         </Box>
-
                     </Box>
-                </Box>
-            )}
+                )}
 
-
-
-            {loading ? (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '512px'
-                    }}
-                >
-                    <CircularProgress sx={{ color: '#7B354D' }} size={60} />
-                </Box>
-            ) : (reportData === undefined && reportDatasms === undefined) ? (
-
-                <Box>
-
-                    <Card sx={{
-                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", p: 5, textAlign: "center",
-                        maxWidth: "1140px", maxHeight: "400px", marginBottom: "150px"
-                    }}>
-                        <CardContent>
-                            <Box component="img" src={BoxEmpty} alt="Caja Vacía" sx={{ width: '200px', height: "400px" }} />
-                            <Typography mt={2} sx={{
-                                color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins',
-                                fontSize: '14px', position: "absolute", marginLeft: "-100px", marginTop: "-100px"
-                            }}>
-                                Seleccione un canal del menú superior para comenzar.
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Box>
-            ) : (reportData === null && reportDatasms === undefined) ? (
-
-                <Box
-                    sx={{
-                        background: '#FFFFFF',
-                        border: '1px solid #E6E4E4',
-                        borderRadius: '8px',
-                        width: '892px',
-                        height: '512px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop: '20px'
-                    }}
-                >
-                    <img src={boxopen} alt="No results" style={{ width: '150px', height: '150px', }} />
-                    <Typography
+                {loading ? (
+                    <Box
                         sx={{
-                            textAlign: 'center',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            lineHeight: '18px',
-                            color: '#7B354D',
-                            marginTop: '10px'
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            height: '512px'
                         }}
                     >
-                        No se encontraron resultados.
-                    </Typography>
-                </Box>
-            ) : selectedSmsOption === "Global" ? (
+                        <CircularProgress sx={{ color: '#7B354D' }} size={60} />
+                    </Box>
+                ) : (reportData === undefined && reportDatasms === undefined) ? (
+
+                    <Box>
+
+                        <Card sx={{
+                            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", p: 5, textAlign: "center",
+                            maxWidth: "1180px", maxHeight: "400px", marginBottom: "150px"
+                        }}>
+                            <CardContent>
+                                <Box component="img" src={BoxEmpty} alt="Caja Vacía" sx={{ width: '200px', height: "400px" }} />
+                                <Typography mt={2} sx={{
+                                    color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins',
+                                    fontSize: '14px', position: "absolute", marginLeft: "-100px", marginTop: "-100px"
+                                }}>
+                                    Seleccione un canal del menú superior para comenzar.
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </Box>
+                ) : (reportData === null && reportDatasms === undefined) ? (
+
+                    <Box
+                        sx={{
+                            background: '#FFFFFF',
+                            border: '1px solid #E6E4E4',
+                            borderRadius: '8px',
+                            width: '892px',
+                            height: '512px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: '20px'
+                        }}
+                    >
+                        <img src={boxopen} alt="No results" style={{ width: '150px', height: '150px', }} />
+                        <Typography
+                            sx={{
+                                textAlign: 'center',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                lineHeight: '18px',
+                                color: '#7B354D',
+                                marginTop: '10px'
+                            }}
+                        >
+                            No se encontraron resultados.
+                        </Typography>
+                    </Box>
+                ) : selectedSmsOption === "Global" ? (
 
 
-                <Box
-                    ref={tableRef}
-                    sx={{
-                        background: '#FFFFFF',
-                        border: '1px solid #E6E4E4',
-                        borderRadius: '8px',
-                        width: '1140px',
-                        maxWidth: '100%',
-                        padding: '20px',
-                        marginTop: '5px',
-                        overflowX: 'auto',
-                        overflowY: 'auto',
-                        height: '500px',
-                        maxHeight: '100%',
+                    <Box
+                        ref={tableRef}
+                        sx={{
+                            background: '#FFFFFF',
+                            border: '1px solid #E6E4E4',
+                            borderRadius: '8px',
+                            width: '1180px',
+                            maxWidth: '100%',
+                            padding: '20px',
+                            marginTop: '5px',
+                            overflowX: 'auto',
+                            overflowY: 'auto',
+                            height: '360px',
+                            maxHeight: '100%',
 
-                    }}
+                        }}
 
 
-                >
-                    <table style={{ maxWidth: "1140px", borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
-                        {/* Encabezados */}
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid #E6E4E4', }}>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF',
-                                    opacity: 1,
-                                }}>
-                                    Fecha
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Teléfono
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Sala
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Campaña
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Id de Campaña
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Usuario
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Id de Mensaje
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Mensaje
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Estado
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Fecha de Recepción
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Costo
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Tipo
-                                </th>
-                            </tr>
-                        </thead>
+                    >
+                        <table style={{ maxWidth: "1180px", borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
+                            {/* Encabezados */}
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #E6E4E4', }}>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF',
+                                        opacity: 1,
+                                    }}>
+                                        Fecha
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Teléfono
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Sala
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Campaña
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Id de Campaña
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Usuario
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Id de Mensaje
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Mensaje
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Estado
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Fecha de Recepción
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Costo
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Tipo
+                                    </th>
+                                </tr>
+                            </thead>
 
-                        {/* Datos */}
-                        {Array.isArray(reportData) && reportData.length > 0 && (
+                            {/* Datos */}
+                            {Array.isArray(reportData) && reportData.length > 0 && (
+                                <tbody>
+
+                                    {reportData.map((recarga, index) => (
+                                        <tr key={index} style={{ borderBottom: '1px solid #E6E4E4', height: '50px' }}>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+
+                                            }}>
+                                                {new Date(recarga.Date).toLocaleString()}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {recarga.Phone}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {recarga.Room}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {recarga.Campaign}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {recarga.CampaignId}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {recarga.User}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {recarga.MessageId}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {recarga.Message}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {getStatusText(recarga.Status)}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {new Date(recarga.Date).toLocaleString()}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {recarga.Cost ?? 0}
+                                            </td>
+                                            <td style={{
+                                                padding: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '13px',
+                                                color: '#574B4F',
+                                                letterSpacing: "0.03",
+                                                textAlign: 'left',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>
+                                                {recarga.Type}
+                                            </td>
+
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            )}
+                        </table>
+                    </Box>
+                ) : selectedSmsOption === "Mensajes entrantes" ? (
+                    <Box
+                        ref={tableRef}
+                        sx={{
+                            background: '#FFFFFF',
+                            border: '1px solid #E6E4E4',
+                            borderRadius: '8px',
+                            width: '1180px',
+                            maxWidth: '100%',
+                            padding: '20px',
+                            marginTop: '5px',
+                            overflowX: 'auto',
+                            overflowY: 'auto',
+                            height: '360px',
+                            maxHeight: '100%',
+                        }}
+                    >
+                        <table style={{ maxWidth: "1180px", borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #E6E4E4' }}>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF',
+                                        opacity: 1,
+                                    }}>
+                                        Fecha
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Teléfono
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Sala
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Campaña
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Id de campaña
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Usuario
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Id de mensaje
+                                    </th>
+                                    <th style={{
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Mensaje
+                                    </th>
+                                </tr>
+                            </thead>
                             <tbody>
-
-                                {reportData.map((recarga, index) => (
+                                {(filteredReportsSms && filteredReportsSms.length > 0 ? filteredReportsSms : reportDatasms ?? []).map((item, index) => (
                                     <tr key={index} style={{ borderBottom: '1px solid #E6E4E4', height: '50px' }}>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-
-                                        }}>
-                                            {new Date(recarga.Date).toLocaleString()}
+                                        <td style={cellStyle}>
+                                            {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
                                         </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {recarga.Phone}
+                                        <td style={cellStyle}>
+                                            {item.phoneNumber}
                                         </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {recarga.Room}
+                                        <td style={cellStyle}>
+                                            {item.roomName}
                                         </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {recarga.Campaign}
+                                        <td style={cellStyle}>
+                                            {item.campaignName}
                                         </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {recarga.CampaignId}
+                                        <td style={cellStyle}>
+                                            {item.campaignId}
                                         </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {recarga.User}
+                                        <td style={cellStyle}>
+                                            {item.userName}
                                         </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {recarga.MessageId}
+                                        <td style={cellStyle}>
+                                            {item.messageId}
                                         </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {recarga.Message}
+                                        <td style={cellStyle}>
+                                            {item.message}
                                         </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {getStatusText(recarga.Status)}
-                                        </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {new Date(recarga.Date).toLocaleString()}
-                                        </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {recarga.Cost ?? 0}
-                                        </td>
-                                        <td style={{
-                                            padding: '10px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '13px',
-                                            color: '#574B4F',
-                                            letterSpacing: "0.03",
-                                            textAlign: 'left',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                            {recarga.Type}
-                                        </td>
-
                                     </tr>
                                 ))}
                             </tbody>
-                        )}
-                    </table>
-                </Box>
-            ) : selectedSmsOption === "Mensajes entrantes" ? (
-                <Box
-                    ref={tableRef}
-                    sx={{
-                        background: '#FFFFFF',
-                        border: '1px solid #E6E4E4',
-                        borderRadius: '8px',
-                        width: '1140px',
-                        maxWidth: '100%',
-                        padding: '20px',
-                        marginTop: '5px',
-                        overflowX: 'auto',
-                        overflowY: 'auto',
-                        height: '500px',
-                        maxHeight: '100%',
-                    }}
-                >
-                    <table style={{ maxWidth: "1140px", borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid #E6E4E4' }}>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF',
-                                    opacity: 1,
-                                }}>
-                                    Fecha
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Teléfono
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Sala
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Campaña
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Id de campaña
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Usuario
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Id de mensaje
-                                </th>
-                                <th style={{
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Mensaje
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {(filteredReportsSms && filteredReportsSms.length > 0 ? filteredReportsSms : reportDatasms ?? []).map((item, index) => (
-                                <tr key={index} style={{ borderBottom: '1px solid #E6E4E4', height: '50px' }}>
-                                    <td style={cellStyle}>
-                                        {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.phoneNumber}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.roomName}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.campaignName}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.campaignId}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.userName}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.messageId}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.message}
-                                    </td>
+
+
+                        </table>
+                    </Box>
+
+                ) : selectedSmsOption === "Mensajes enviados" ? (
+                    <Box
+                        ref={tableRef}
+                        sx={{
+                            background: '#FFFFFF',
+                            border: '1px solid #E6E4E4',
+                            borderRadius: '8px',
+                            width: '1180px',
+                            maxWidth: '100%',
+                            padding: '20px',
+                            marginTop: '5px',
+                            overflowX: 'auto',
+                            overflowY: 'auto',
+                            height: '360px',
+                            maxHeight: '100%',
+                        }}
+                    >
+                        <table style={{ width: '83%', borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #E6E4E4' }}>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Fecha
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Teléfono de destinatario
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Campaña
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        ID de campaña
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Usuario
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Resultado
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Fecha de recepción
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        ID de mensaje
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Mensaje
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-
-
-                    </table>
-                </Box>
-
-            ) : selectedSmsOption === "Mensajes enviados" ? (
-                <Box
-                    ref={tableRef}
-                    sx={{
-                        background: '#FFFFFF',
-                        border: '1px solid #E6E4E4',
-                        borderRadius: '8px',
-                        width: '1140px',
-                        maxWidth: '100%',
-                        padding: '20px',
-                        marginTop: '5px',
-                        overflowX: 'auto',
-                        overflowY: 'auto',
-                        height: '500px',
-                        maxHeight: '100%',
-                    }}
-                >
-                    <table style={{ width: '83%', borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid #E6E4E4' }}>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Fecha
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Teléfono de destinatario
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Campaña
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    ID de campaña
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Usuario
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Resultado
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Fecha de recepción
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    ID de mensaje
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Mensaje
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {(filteredReportsSms !== null ? filteredReportsSms : reportDatasms ?? []).map((item, index) => (
-                                <tr key={index} style={{ borderBottom: '1px solid #E6E4E4', height: '50px' }}>
-                                    <td style={cellStyle}>
-                                        {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.phoneNumber}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.campaignName}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.campaignId}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.userName}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        Envio Exitoso
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.messageId}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.message}
-                                    </td>
+                            </thead>
+                            <tbody>
+                                {(filteredReportsSms !== null ? filteredReportsSms : reportDatasms ?? []).map((item, index) => (
+                                    <tr key={index} style={{ borderBottom: '1px solid #E6E4E4', height: '50px' }}>
+                                        <td style={cellStyle}>
+                                            {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.phoneNumber}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.campaignName}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.campaignId}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.userName}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            Envio Exitoso
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.messageId}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.message}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </Box>
+                ) : selectedSmsOption === "Mensajes no enviados" ? (
+                    <Box
+                        ref={tableRef}
+                        sx={{
+                            background: '#FFFFFF',
+                            border: '1px solid #E6E4E4',
+                            borderRadius: '8px',
+                            width: '1180px',
+                            maxWidth: '100%',
+                            padding: '20px',
+                            marginTop: '5px',
+                            overflowX: 'auto',
+                            overflowY: 'auto',
+                            height: '360px',
+                            maxHeight: '100%',
+                        }}
+                    >
+                        <table style={{ width: '83%', borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #E6E4E4' }}>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Fecha
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Usuario
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Sala
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Campaña
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Teléfono de destinatario
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Resultado
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Razón
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        ID de mensaje
+                                    </th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Mensaje
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </Box>
-            ) : selectedSmsOption === "Mensajes no enviados" ? (
-                <Box
-                    ref={tableRef}
-                    sx={{
-                        background: '#FFFFFF',
-                        border: '1px solid #E6E4E4',
-                        borderRadius: '8px',
-                        width: '1140px',
-                        maxWidth: '100%',
-                        padding: '20px',
-                        marginTop: '5px',
-                        overflowX: 'auto',
-                        overflowY: 'auto',
-                        height: '500px',
-                        maxHeight: '100%',
-                    }}
-                >
-                    <table style={{ width: '83%', borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid #E6E4E4' }}>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Fecha
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Usuario
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Sala
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Campaña
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Teléfono de destinatario
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Resultado
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Razón
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    ID de mensaje
-                                </th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Mensaje
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {(filteredReportsSms && filteredReportsSms.length > 0 ? filteredReportsSms : reportDatasms ?? []).map((item, index) => (
-                                <tr key={index} style={{ borderBottom: '1px solid #E6E4E4', height: '50px' }}>
-                                    <td style={cellStyle}>
-                                        {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.phoneNumber}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.campaignName}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.campaignId}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.userName}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        No enviado
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.status === '2'
-                                            ? 'No entregado'
-                                            : item.status === '3'
-                                                ? 'Sin Carrier Disponible'
-                                                : item.status}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.messageId}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.message}
-                                    </td>
+                            </thead>
+                            <tbody>
+                                {(filteredReportsSms && filteredReportsSms.length > 0 ? filteredReportsSms : reportDatasms ?? []).map((item, index) => (
+                                    <tr key={index} style={{ borderBottom: '1px solid #E6E4E4', height: '50px' }}>
+                                        <td style={cellStyle}>
+                                            {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.phoneNumber}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.campaignName}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.campaignId}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.userName}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            No enviado
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.status === '2'
+                                                ? 'No entregado'
+                                                : item.status === '3'
+                                                    ? 'Sin Carrier Disponible'
+                                                    : item.status}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.messageId}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.message}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </Box>
+
+                ) : selectedSmsOption === "Mensajes rechazados" ? (
+                    <Box
+                        ref={tableRef}
+                        sx={{
+                            background: '#FFFFFF',
+                            border: '1px solid #E6E4E4',
+                            borderRadius: '8px',
+                            width: '1180px',
+                            maxWidth: '100%',
+                            padding: '20px',
+                            marginTop: '5px',
+                            overflowX: 'auto',
+                            overflowY: 'auto',
+                            height: '360px',
+                            maxHeight: '100%',
+                        }}
+                    >
+                        <table style={{ width: '83%', borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #E6E4E4' }}>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Fecha</th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Teléfono</th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Usuario</th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Sala</th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Campaña</th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Resultado</th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Razón</th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        ID de mensaje</th>
+                                    <th style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontWeight: "500",
+                                        textAlign: 'left',
+                                        padding: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF'
+                                    }}>
+                                        Mensaje</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </Box>
+                            </thead>
+                            <tbody>
+                                {(filteredReportsSms !== null ? filteredReportsSms : reportDatasms ?? []).map((item, index) => (
+                                    <tr key={index} style={{ borderBottom: '1px solid #E6E4E4', height: '50px' }}>
+                                        <td style={cellStyle}>
+                                            {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.phoneNumber}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.userName}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.roomName}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.campaignName}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            Error
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.status === '4'
+                                                ? 'Fallo en envio de Carrier'
+                                                : item.status === '5'
+                                                    ? 'Excepción no controlada'
+                                                    : item.status}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.messageId}
+                                        </td>
+                                        <td style={cellStyle}>
+                                            {item.message}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </Box>
+                ) : (null)}
 
-            ) : selectedSmsOption === "Mensajes rechazados" ? (
-                <Box
-                    ref={tableRef}
-                    sx={{
-                        background: '#FFFFFF',
-                        border: '1px solid #E6E4E4',
-                        borderRadius: '8px',
-                        width: '1140px',
-                        maxWidth: '100%',
-                        padding: '20px',
-                        marginTop: '5px',
-                        overflowX: 'auto',
-                        overflowY: 'auto',
-                        height: '500px',
-                        maxHeight: '100%',
-                    }}
-                >
-                    <table style={{ width: '83%', borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid #E6E4E4' }}>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Fecha</th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Teléfono</th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Usuario</th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Sala</th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Campaña</th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Resultado</th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Razón</th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    ID de mensaje</th>
-                                <th style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontWeight: "500",
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF'
-                                }}>
-                                    Mensaje</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {(filteredReportsSms !== null ? filteredReportsSms : reportDatasms ?? []).map((item, index) => (
-                                <tr key={index} style={{ borderBottom: '1px solid #E6E4E4', height: '50px' }}>
-                                    <td style={cellStyle}>
-                                        {item.sentAt ? new Date(item.sentAt).toLocaleString() : ''}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.phoneNumber}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.userName}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.roomName}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.campaignName}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        Error
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.status === '4'
-                                            ? 'Fallo en envio de Carrier'
-                                            : item.status === '5'
-                                                ? 'Excepción no controlada'
-                                                : item.status}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.messageId}
-                                    </td>
-                                    <td style={cellStyle}>
-                                        {item.message}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </Box>
-            ) : (null)}
-
-
+            </Box>
 
             {/* Componente de selección de fechas */}
             <DatePicker

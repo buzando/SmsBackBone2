@@ -2106,7 +2106,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                 maxWidth={false}
                 disableGutters
                 sx={{
-                    width: '81.5%',
+                    width: '83.5%',
                     height: '100%',
                     overflowX: 'hidden',
                     overflowY: 'hidden',
