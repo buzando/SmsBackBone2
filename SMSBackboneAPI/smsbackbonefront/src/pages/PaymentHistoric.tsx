@@ -37,6 +37,8 @@ const PaymentHistoric: React.FC = () => {
     const [Historic, setHistoric] = useState<Historic | null | undefined>(undefined);
     const [selectedRecarga, setSelectedRecarga] = useState<number | null>(null);
     const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+    const [creatingInvoice, setCreatingInvoice] = useState(false);
+    const [showChipBarInvoice, setShowChipBarInvoice] = useState(false);
     const invoiceData = {
         name: "Nuxiba",
         rfc: "VECJ880326",
@@ -129,6 +131,40 @@ const PaymentHistoric: React.FC = () => {
             setLoading(false);
         }
     };
+
+
+    const handleCreateInvoice = async () => {
+        if (!selectedRecarga) return;
+
+        const userId =
+            Number(JSON.parse(localStorage.getItem('user') ?? '{}')?.id);
+
+        const url = import.meta.env.VITE_API_SEND_INVOICE;
+        const payload = {
+            IdCredit: Number(selectedRecarga),
+            IdUser: userId,
+        };
+
+        try {
+            setCreatingInvoice(true);
+
+            const { data, status } = await axios.post<boolean>(url, payload);
+
+            const ok = status === 200 && data === true;
+            if (ok) {
+                setIsInvoiceModalOpen(false);
+                setShowChipBarInvoice(true);
+            } else {
+                setIsErrorModalOpen(true);
+            }
+        } catch {
+            setIsErrorModalOpen(true);
+        } finally {
+            setCreatingInvoice(false);
+        }
+    };
+
+
 
     return (
         <div style={{ padding: '20px', maxWidth: '1140px', marginTop: '-70px', marginLeft: "40px", marginBottom: "40px" }}>
@@ -385,8 +421,8 @@ const PaymentHistoric: React.FC = () => {
 
                         {/* Datos */}
                         <tbody>
-                            {Historic.map((recarga, index) => (
-                                <tr key={index} style={{ borderBottom: '1px solid #E6E4E4' }}>
+                            {Historic.map((recarga) => (
+                                <tr key={recarga.id} style={{ borderBottom: '1px solid #E6E4E4' }}>
                                     <td style={{
                                         padding: '10px',
                                         fontFamily: 'Poppins, sans-serif',
@@ -553,12 +589,23 @@ const PaymentHistoric: React.FC = () => {
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
                         <SecondaryButton text='Cancelar' onClick={() => setIsInvoiceModalOpen(false)} />
-                        <MainButton text='Aceptar' disabled={true} onClick={() => {
-                            setIsInvoiceModalOpen(false); // Cierra el modal  
-                        }} />
+                        <MainButton
+                            text={creatingInvoice ? 'Generando…' : 'Aceptar'}
+                            onClick={handleCreateInvoice}
+                            disabled={creatingInvoice}
+                            isLoading={creatingInvoice}
+                        />
                     </Box>
                 </Box>
             </Modal>
+
+            {showChipBarInvoice && (
+                <Snackbar
+                    message="Factura generada correctamente"
+                    buttonText="Cerrar"
+                    onClose={() => setShowChipBarInvoice(false)}
+                />
+            )}
 
             <ModalError
                 isOpen={isErrorModalOpen}

@@ -29,6 +29,7 @@ using Microsoft.Data.SqlClient;
 using System.Data;
 using Azure;
 using DocumentFormat.OpenXml.InkML;
+using ClosedXML;
 namespace Business
 {
     public class UserManager
@@ -1086,6 +1087,35 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
             }
         }
 
+        public int VerifyAllPendingRecharges()
+        {
+            int procesados = 0;
+
+            using (var ctx = new Entities()) // tu DbContext real
+            {
+                var pendientes = ctx.CreditRechargeOpenPay
+                    .Where(x => x.Description == "En progreso" || x.Description == "Cargo pendiente")
+                    .Select(x => x.idopenpay)
+                    .ToList();
+
+                foreach (var id in pendientes)
+                {
+                    try
+                    {
+                        // Reusa tu método actual que ya actualiza estatus y créditos
+                        var result = VerifyRechargeStatus(id);
+                        if (result) procesados++;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Loguea error pero sigue con los demás
+                        Console.WriteLine($"Error verificando {id}: {ex.Message}");
+                    }
+                }
+            }
+
+            return procesados;
+        }
 
 
         public List<CreditHystoric> GetHistoricByUser(Datepickers credit)

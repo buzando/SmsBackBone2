@@ -49,7 +49,7 @@ namespace Modal
         public DbSet<TestMessage> TestMessage { get; set; }
         public DbSet<ShortNumberRequest> ShortNumberRequest { get; set; }
         public DbSet<LongNumberRequest> LongNumberRequest { get; set; }
-
+        public DbSet<FacturaResumen> FacturaResumen { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ClientRoomSummaryDTO>().HasNoKey();

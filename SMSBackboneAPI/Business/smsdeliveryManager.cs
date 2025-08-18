@@ -128,7 +128,13 @@ namespace Business
                 var campaigns = GetLightCampaigns(Campaigns);
                 var rnd = new Random();
 
-                var validCampaigns = campaigns.Where(c => c.ScheduleId != 0).ToList();
+                var now = DateTime.Now; 
+
+                var validCampaigns = campaigns
+                    .Where(c => c.ScheduleId != 0
+                             && c.StartDateTime <= now
+                             && c.EndDateTime > now)
+                    .ToList();
 
                 var throttler = new SemaphoreSlim(
 #if DEBUG

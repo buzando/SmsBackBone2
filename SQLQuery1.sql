@@ -766,3 +766,24 @@ BEGIN
  
     RETURN;
 END
+
+CREATE TABLE dbo.FacturaResumen (
+    Id              INT IDENTITY(1,1) PRIMARY KEY,
+    UUID            UNIQUEIDENTIFIER NOT NULL UNIQUE,
+    Serie           NVARCHAR(25) NULL,
+    Folio           NVARCHAR(40) NULL,
+    FechaEmision    DATETIME2(0) NOT NULL,
+    Subtotal        DECIMAL(18,6) NOT NULL,
+    IVA             DECIMAL(18,6) NULL,
+    Total           DECIMAL(18,6) NOT NULL,
+    UrlXml          NVARCHAR(500) NULL,
+    UrlPdf          NVARCHAR(500) NULL,
+    Origen          NVARCHAR(50) NULL DEFAULT 'Villanett',
+    FechaRegistro   DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
+
+    -- FK directa a CreditRecharge
+    RechargeId      INT NOT NULL FOREIGN KEY REFERENCES dbo.CreditRecharge(Id)
+);ñ
+GO
+CREATE INDEX IX_FacturaResumen_RechargeId ON dbo.FacturaResumen(RechargeId);
+CREATE INDEX IX_FacturaResumen_Fecha ON dbo.FacturaResumen(FechaEmision);

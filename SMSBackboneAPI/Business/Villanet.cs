@@ -8,11 +8,14 @@ using Modal.Model.Model;
 using Modal;
 using log4net;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System.IO.Pipelines;
+using System.Web;
 
 namespace Business
 {
     public class Villanet
     {
+        private static bool IsValidUrl(string u) => Uri.IsWellFormedUriString(u, UriKind.Absolute);
         private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public async Task<FacturaResult> GenerarFacturaAsync(int idRecarga, int idUsuario)
         {
@@ -65,7 +68,7 @@ namespace Business
 
                 string xmlArticulos = $@"
 <VILLANETT>
-  <articulo codigo=""{articuloxml.Codigo}"" 
+  <Articulo codigo=""{articuloxml.Codigo}"" 
             cantidad=""{recarga.quantityCredits}"" 
             precio=""{precioUnitario}"" 
             iva=""16"" 
@@ -135,21 +138,41 @@ namespace Business
                     colonia: user.Colony,
                     codigopostal: user.PostalCode,
                     email: useremail,
-                    usocfdi: usoCfdi,
-                    regimenfiscal: regimenFiscal,
+                    usocfdi: user.Cfdi,
+                    regimenfiscal: user.TaxRegime,
                     usuario: "tiendavirtual",
                     password: "Bkeg3fnwrO2vVcqEhMb43E7OvvKjPv41aDSvvrcboekM18vAf14KJn4nqufvvE3xvrTvLrHwxv4vvvCMCv"
                 );
 
                 string resultadoXml = response.Body.GenerarFacturaDirectaResult;
 
-                // Extraer URLs
-                var xmlDoc = new System.Xml.XmlDocument();
-                xmlDoc.LoadXml(resultadoXml);
-                var urlXml = xmlDoc.SelectSingleNode("//xml")?.InnerText;
-                var urlPdf = xmlDoc.SelectSingleNode("//pdf")?.InnerText;
+                if (string.IsNullOrWhiteSpace(resultadoXml))
+                    throw new ArgumentException("Cadena vacía.");
 
-                if (string.IsNullOrEmpty(urlXml) || string.IsNullOrEmpty(urlPdf))
+                var parts = resultadoXml.Split('|')
+                                .Select(p => p?.Trim())
+                                .Where(p => !string.IsNullOrWhiteSpace(p))
+                                .ToArray();
+                // Extraer URLs
+                if (parts.Length < 2)
+                    throw new InvalidOperationException("No se encontraron dos URLs separadas por pipe.");
+
+                // Identificar por query ?tip=
+                string xml = string.Empty, pdf = string.Empty;
+
+                foreach (var p in parts)
+                {
+                    if (!IsValidUrl(p)) continue;
+
+                    var uri = new Uri(p);
+                    var qs = HttpUtility.ParseQueryString(uri.Query);
+                    var tip = qs.Get("tip");
+
+                    if (tip == "7") xml = p;
+                    else if (tip == "8") pdf = p;
+                }
+
+                if (string.IsNullOrEmpty(xml) || string.IsNullOrEmpty(pdf))
                 {
                     result.Success = false;
                     result.ErrorMessage = "No se pudieron obtener las URLs de XML o PDF.";
@@ -158,11 +181,12 @@ namespace Business
 
                 using (var httpClient = new System.Net.Http.HttpClient())
                 {
-                    var xmlBytes = await httpClient.GetByteArrayAsync(urlXml);
-                    var pdfBytes = await httpClient.GetByteArrayAsync(urlPdf);
+                    var xmlBytes = await httpClient.GetByteArrayAsync(xml);
+                    var pdfBytes = await httpClient.GetByteArrayAsync(pdf);
 
                     result.XmlBase64 = Convert.ToBase64String(xmlBytes);
                     result.PdfBase64 = Convert.ToBase64String(pdfBytes);
+                    result.Success = true;
                 }
 
                 result.Success = true;
@@ -183,49 +207,59 @@ namespace Business
 
         public async Task FacturarRecargasPendientes()
         {
+            var recargas = new List<CreditRecharge>();
+            var usuario = new Modal.Model.Model.Users();
             using (var ctx = new Entities())
             {
-                var recargas = ctx.CreditRecharge
-                    .Where(x => x.Estatus.ToLower() == "exitoso" && (x.FacturaXML == null || x.FacturaPDF == null) && x.Id == 16007)
+                recargas = ctx.CreditRecharge
+                    .Where(x => x.Estatus.ToLower() == "exitoso" && (x.FacturaXML == null || x.FacturaPDF == null) && x.AutomaticInvoice == true)
                     .ToList();
-
-                foreach (var recarga in recargas)
+            }
+            foreach (var recarga in recargas)
+            {
+                using (var ctx = new Entities())
                 {
+
                     var billinginformation = ctx.BillingInformation.Where(x => x.userId == recarga.idUser).FirstOrDefault();
                     if (billinginformation == null)
                         continue;
 
-                    var usuario = ctx.Users.FirstOrDefault(u => u.Id == recarga.idUser);
+                    usuario = ctx.Users.FirstOrDefault(u => u.Id == recarga.idUser);
                     if (usuario == null) continue;
+                }
 
-                    var articulo = string.Empty;
-                    if (recarga.Chanel == "short_sms")
+                var articulo = string.Empty;
+                if (recarga.Chanel == "short_sms")
+                {
+                    articulo = "MENSAJES SMS CORTO";
+                }
+                if (recarga.Chanel == "long_sms")
+                {
+                    articulo = "MENSAJES SMS LARGO";
+                }
+
+                var articuloxml = ObtenerArticulos(articulo);
+
+                var resultado = await GenerarFacturaAsync(recarga.Id, usuario.Id);
+
+                if (resultado.Success)
+                {
+                    using (var ctx = new Entities())
                     {
-                        articulo = "MENSAJES SMS CORTO";
-                    }
-                    if (recarga.Chanel == "long_sms")
-                    {
-                        articulo = "MENSAJES SMS LARGO";
-                    }
-
-                    var articuloxml = ObtenerArticulos(articulo);
-
-                    var resultado = await GenerarFacturaAsync(recarga.Id, usuario.Id);
-
-                    if (resultado.Success)
-                    {
+                        var recargadocumentos = ctx.CreditRecharge.Where(x => x.Id == recarga.Id).FirstOrDefault();
                         recarga.FacturaPDF = resultado.PdfBase64;
                         recarga.FacturaXML = resultado.XmlBase64;
                         recarga.FechaFacturacion = DateTime.Now;
 
                         ctx.SaveChanges();
                     }
-                    else
-                    {
-                        _logger.Error($"Error facturando recarga {recarga.Id}: {resultado.ErrorMessage}");
-                    }
+                }
+                else
+                {
+                    _logger.Error($"Error facturando recarga {recarga.Id}: {resultado.ErrorMessage}");
                 }
             }
+
         }
 
         public ArticuloVillanet ObtenerArticulos(string descripcion)
@@ -236,7 +270,7 @@ namespace Business
             );
 
             var response = client.ObtenerArticulosMultipleAsync(
-                "", "", descripcion,"" , "", "", "", 0, 0, "0", 1000, 0, "tiendavirtual", "Bkeg3fnwrO2vVcqEhMb43E7OvvKjPv41aDSvvrcboekM18vAf14KJn4nqufvvE3xvrTvLrHwxv4vvvCMCv"
+                "", "", descripcion, "", "", "", "", 0, 0, "0", 1000, 0, "tiendavirtual", "Bkeg3fnwrO2vVcqEhMb43E7OvvKjPv41aDSvvrcboekM18vAf14KJn4nqufvvE3xvrTvLrHwxv4vvvCMCv"
             ).Result;
 
             var resultXmlString = System.Net.WebUtility.HtmlDecode(response.Body.ObtenerArticulosMultipleResult);

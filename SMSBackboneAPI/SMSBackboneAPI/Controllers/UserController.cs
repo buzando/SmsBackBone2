@@ -17,6 +17,7 @@ using log4net;
 using System.Threading.Tasks;
 using System.Security.Policy;
 using Openpay.Entities.Request;
+using Modal;
 
 namespace SMSBackboneAPI.Controllers
 {
@@ -1314,6 +1315,19 @@ namespace SMSBackboneAPI.Controllers
                 return BadRequest();
             }
         }
+        [Authorize]
+        [HttpPost("GenerateInvoice")]
+        public async Task<ActionResult<bool>> GenerateInvoice([FromBody] GenerateInvoice invoice)
+        {
+
+            var villanet = new Villanet();
+            var data = await villanet.GenerarFacturaAsync(invoice.IdCredit, invoice.IdUser);
+
+            if (!data.Success) return StatusCode(502, false);
+
+            return Ok(true);
+        }
+
 
     }
 }

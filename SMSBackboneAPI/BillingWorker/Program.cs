@@ -1,4 +1,4 @@
-using IFTWorkerService;
+using BillingWorker;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .UseWindowsService()
@@ -8,4 +8,4 @@ IHost host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-host.Run(); 
+host.Run();

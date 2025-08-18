@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Business;
 
-namespace IFTWorkerService
+namespace BillingWorker
 {
     public class Worker : BackgroundService
     {
@@ -37,30 +37,49 @@ namespace IFTWorkerService
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var minutosEjecucion = int.TryParse(Common.ConfigurationManagerJson("MinutosEjecucion"), out var d) ? d : 10;
+            var timer = new PeriodicTimer(TimeSpan.FromMinutes(minutosEjecucion));
+
+            _logger.Info($"[BillingWorker] Intervalo: {minutosEjecucion} minuto(s).");
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                var minutosEjecucion = int.TryParse(Common.ConfigurationManagerJson("MinutosEjecucion"), out int d) ? d : 10;
-                _logger.Info("¡Cargando Archivo!");
+                var inicio = DateTime.UtcNow;
 
-                //Agregamos la clase para ser ejecutada:
-                var PathCSV = Common.ConfigurationManagerJson("CarpetaCSV");
-                var files = Directory.GetFiles(PathCSV, "*.csv");
-                foreach (var file in files)
+                try
                 {
-                    var objRespuestas = new IFTManager().LoadFromCsv(file);
-                    if (objRespuestas)
-                        _logger.Info("");
-                    else
-                        _logger.Error($"");
+                    // 1) Verificar pagos pendientes de OpenPay
+                    _logger.Info("[BillingWorker] Verificando cargos OpenPay en progreso / pendientes...");
+                    var manager = new UserManager();
+                    var verificados = manager.VerifyAllPendingRecharges(); 
+                    _logger.Info($"[BillingWorker] Verificación terminada. Cargos revisados: {verificados}.");
 
-                    File.Delete(file);
+              
+                    _logger.Info("[BillingWorker] Iniciando facturación de recargas pagadas no facturadas...");
+                    await new Villanet().FacturarRecargasPendientes();
+                    _logger.Info("[BillingWorker] Facturación completada.");
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error("[BillingWorker] Error en el ciclo de trabajo.", ex);
+                }
+                finally
+                {
+                    var duracion = DateTime.UtcNow - inicio;
+                    _logger.Info($"[BillingWorker] Ciclo terminado en {duracion.TotalSeconds:F1}s. " +
+                                 $"Siguiente ejecución en {minutosEjecucion} minuto(s).");
                 }
 
-                _logger.Info($"Esperando {minutosEjecucion} minutos para la nueva ejecución del servicio Descarga Archivos Adjuntos...");
-                await Task.Delay(Timeout.Infinite);
-                //await Task.Delay(minutosEjecucion * 60000, stoppingToken);
+                if (!await timer.WaitForNextTickAsync(stoppingToken)) break;
             }
+
+            _logger.Info("[BillingWorker] Detenido.");
         }
+
         public override Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.Info($"Deteniendo Servicio Descarga Archivos Adjuntos...");
