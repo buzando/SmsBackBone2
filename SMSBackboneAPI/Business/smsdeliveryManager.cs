@@ -48,7 +48,7 @@ namespace Business
 
                         var param = cmd.Parameters.AddWithValue("@CampaignIds", campaignIdsTable);
                         param.SqlDbType = SqlDbType.Structured;
-                        param.TypeName = "dbo.IntList"; // asegúrate que este tipo existe
+                        param.TypeName = "dbo.IntList"; 
 
                         cmd.Parameters.AddWithValue("@TopContacts",
                             string.IsNullOrWhiteSpace(topcontacts) ? (object)DBNull.Value : int.Parse(topcontacts));

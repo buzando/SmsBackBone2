@@ -38,7 +38,7 @@ const Use: React.FC = () => {
     const [selectedOption, setSelectedOption] = useState("corto");
     const [loading, setLoading] = useState(false);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        if (!datePickerOpen) { // Solo permite abrirlo si el DatePicker está cerrado
+        if (!datePickerOpen) {
             setAnchorEl(anchorEl ? null : event.currentTarget);
         }
     };
@@ -48,12 +48,12 @@ const Use: React.FC = () => {
     const [data, setData] = useState(false); // Nueva variable para simular datos disponibles
     const [searchingData, setSearchingData] = useState(true);
     const handleDateClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget); // Asegurar que el anchor es el botón de fecha
+        setAnchorEl(event.currentTarget);
         setDatePickerOpen(true);
     };
 
     const handleCancelDatePicker = () => {
-        setDatePickerOpen(false); // Cierra el DatePicker
+        setDatePickerOpen(false);
     };
     const [campaignMenuOpen, setCampaignMenuOpen] = useState(false);
     const [anchorElC, setAnchorElC] = useState<HTMLElement | null>(null);
@@ -71,12 +71,14 @@ const Use: React.FC = () => {
     const [campaigns, setCampaigns] = useState<{ id: number; name: string }[]>([]);
     const [shouldFetch, setShouldFetch] = useState(false);
     const handleUserClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setCampaignMenuOpen(false);
+        setDatePickerOpen(false);
         if (userMenuOpen) {
-            setUserMenuOpen(false);     // Cierra si ya está abierto
-            setUserAnchorEl(null);      // Limpia el ancla
+            setUserMenuOpen(false);
+            setUserAnchorEl(null);
         } else {
             setUserAnchorEl(event.currentTarget);
-            setUserMenuOpen(true);      // Abre si estaba cerrado
+            setUserMenuOpen(true);
         }
     };
     const navigate = useNavigate();
