@@ -2424,20 +2424,22 @@ const buttonStyle = {
     border: '1px solid #C6BFC2',
     borderRadius: '18px',
     padding: '8px 16px',
-    fontWeight: '500',
+    fontWeight: 500,
     letterSpacing: "1.12px",
     height: "36px",
     fontFamily: 'Poppins',
-    color: '#8F4D63',
+    color: '#330F1B',
     opacity: 1,
     textTransform: 'none',
     '&:hover': {
-        background: '#F2E9EC',
-        border: '1px solid #BE93A066',
+        background: '#F8F8F8',
+        border: '1px solid #8F4E63CC',
+        color: '#8F4E63'
     },
     '&:active': {
-        background: '#E6C2CD',
-        border: '1px solid #BE93A0',
+        background: '#F8F8F8',
+        border: '1px solid #8F4E63CC',
+        color: '#8F4E63'
     }
 };
 

@@ -7,6 +7,7 @@ import { es } from 'date-fns/locale';
 import MainButton from '../components/commons/MainButton'
 import SecondaryButton from '../components/commons/SecondaryButton'
 import DatePicker from '../components/commons/DatePicker';
+import CloseIcon from '@mui/icons-material/Close';
 import { format } from 'date-fns';
 import boxclose from '../assets/Nousers.svg'
 import axios from "../components/commons/AxiosInstance";
@@ -131,20 +132,10 @@ const PaymentHistoric: React.FC = () => {
     };
 
     return (
-        <div style={{ padding: '20px', maxWidth: '1140px', marginTop: '-70px', marginLeft: "40px", marginBottom: "40px" }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
                 <IconButton
-                    onClick={() => navigate('/')}
-                    sx={{
-                        p: 0,
-                        mr: 1,
-                        display: 'flex',
-                        ml: '-28px',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
+                    onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
                     <img
                         src={ArrowBackIosNewIcon}
                         alt="Regresar"
@@ -165,348 +156,398 @@ const PaymentHistoric: React.FC = () => {
                     Historial de pago
                 </Typography>
             </Box>
-            <Divider sx={{ marginBottom: "17px", marginTop: "16px", backgroundColor: '#E6E4E4' }} />
-            <Button
-                variant="outlined"
-                sx={{
-                    ...buttonStyle,
-                    width: selectedDates ? 'auto' : '90px',
-                    height: '36px',
-                    minWidth: '90px',
-                    ...(selectedDates && {
-                        border: '1px solid #8F4E63',
-                        color: '#8F4E63',
-                        background: '#FFFFFF',
-                    }),
-                    ...(datePickerOpen && {
-                        border: '1px solid #8F4E63',
-                        color: '#8F4E63',
-                        background: '#FFFFFF',
-                    }),
-                }}
-                onClick={handleDateClick}
-            >
-                {formatDateRange()}
-            </Button>
-            <DatePicker
-                open={datePickerOpen}
-                anchorEl={anchorEl}
-                placement="bottom-start"
-                onApply={handleDateSelectionApply}
-                onClose={() => setAnchorEl(null)}
-            />
-
-            <Divider sx={{ marginBottom: "17px", marginTop: "16px", backgroundColor: '#E6E4E4' }} />
-
-            {/* Lógica para mostrar el contenido correcto */}
-            {loading ? (
-                <Box
+            <Box sx={{ marginLeft: "32px", }}>
+                <Divider sx={{ marginBottom: "17px", marginTop: "16px", backgroundColor: '#E6E4E4' }} />
+                <Button
+                    variant="outlined"
                     sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '512px'
+                        ...buttonStyle,
+                        width: selectedDates ? 'auto' : '90px',
+                        height: '36px',
+                        minWidth: '90px',
+                        ...(selectedDates && {
+                            border: '1px solid #8F4E63',
+                            color: '#8F4E63',
+                            background: '#FFFFFF',
+                        }),
+                        ...(datePickerOpen && {
+                            border: '1px solid #8F4E63',
+                            color: '#8F4E63',
+                            background: '#FFFFFF',
+                        }),
                     }}
+                    onClick={handleDateClick}
                 >
-                    <CircularProgress sx={{ color: '#7B354D' }} size={60} />
-                </Box>
-            ) : Historic === undefined ? (
+                    {formatDateRange()}
+                </Button>
+                <DatePicker
+                    open={datePickerOpen}
+                    anchorEl={anchorEl}
+                    placement="bottom-start"
+                    onApply={handleDateSelectionApply}
+                    onClose={() => setAnchorEl(null)}
+                />
 
-                <Box
-                    sx={{
-                        background: '#FFFFFF',
-                        border: '1px solid #E6E4E4',
-                        borderRadius: '8px',
-                        maxWidth: "1140px",
-                        height: '468px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop: '20px'
-                    }}
-                >
-                    <img src={boxclose} alt="No data" style={{ width: '240px', height: '190px' }} />
-                    <Typography
+                <Divider sx={{ marginBottom: "17px", marginTop: "16px", backgroundColor: '#E6E4E4' }} />
+
+                {/* Lógica para mostrar el contenido correcto */}
+                {loading ? (
+                    <Box
                         sx={{
-                            textAlign: 'center',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            lineHeight: '18px',
-                            color: '#7B354D',
-                            marginTop: '15px'
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            height: '512px'
                         }}
                     >
-                        Seleccione un período para comenzar.
-                    </Typography>
-                </Box>
-            ) : Historic === null ? (
-                // Imagen de caja abierta cuando NO se encuentran resultados
-                <Box
-                    sx={{
-                        background: '#FFFFFF',
-                        border: '1px solid #E6E4E4',
-                        borderRadius: '8px',
-                        maxWidth: "1140px",
-                        height: '468px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop: '20px'
-                    }}
-                >
-                    <img src={boxopen} alt="No results" style={{ width: '240px', height: '190px' }} />
-                    <Typography
+                        <CircularProgress sx={{ color: '#7B354D' }} size={60} />
+                    </Box>
+                ) : Historic === undefined ? (
+
+                    <Box
                         sx={{
-                            textAlign: 'center',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            lineHeight: '18px',
-                            color: '#7B354D',
-                            marginTop: '10px'
+                            background: '#FFFFFF',
+                            border: '1px solid #E6E4E4',
+                            borderRadius: '8px',
+                            maxWidth: "1140px",
+                            height: '468px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: '20px'
                         }}
                     >
-                        No se encontraron resultados.
-                    </Typography>
-                </Box>
-            ) : (
-                <Box
-                    sx={{
-                        background: '#FFFFFF',
-                        border: '1px solid #E6E4E4',
-                        borderRadius: '8px',
-                        maxWidth: "1140px",
-                        height: '468px',
-                        padding: '20px',
-                        marginTop: '20px',
-                        overflowX: 'auto'
-                    }}
-                >
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        {/* Encabezados */}
-                        <thead>
-                            <tr style={{ borderBottom: '2px solid #E6E4E4' }}>
-                                <th style={{
-                                    width: '200px',
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-
+                        <img src={boxclose} alt="No data" style={{ width: '240px', height: '190px' }} />
+                        <Typography
+                            sx={{
+                                textAlign: 'center',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                lineHeight: '18px',
+                                color: '#7B354D',
+                                marginTop: '15px'
+                            }}
+                        >
+                            Seleccione un período para comenzar.
+                        </Typography>
+                    </Box>
+                ) : Historic === null ? (
+                    // Imagen de caja abierta cuando NO se encuentran resultados
+                    <Box
+                        sx={{
+                            background: '#FFFFFF',
+                            border: '1px solid #E6E4E4',
+                            borderRadius: '8px',
+                            maxWidth: "1140px",
+                            height: '468px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: '20px'
+                        }}
+                    >
+                        <img src={boxopen} alt="No results" style={{ width: '240px', height: '190px' }} />
+                        <Typography
+                            sx={{
+                                textAlign: 'center',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                lineHeight: '18px',
+                                color: '#7B354D',
+                                marginTop: '10px'
+                            }}
+                        >
+                            No se encontraron resultados.
+                        </Typography>
+                    </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            background: '#FFFFFF',
+                            border: '1px solid #E6E4E4',
+                            borderRadius: '8px',
+                            maxWidth: "1140px",
+                            height: '480px',
+                            padding: '8px 2px',
+                            marginTop: '20px',
+                            overflowX: 'auto'
+                        }}
+                    >
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            {/* Encabezados */}
+                            <thead>
+                                <tr style={{
+                                    textAlign: 'left', fontFamily: 'Poppins', fontSize: '13px',
+                                    color: '#330F1B', fontWeight: 500, borderBottom: '1px solid #E0E0E0',
+                                    height: "35px",
                                 }}>
-                                    Fecha
-                                </th>
-                                <th style={{
-                                    width: '200px',
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                }}>
-                                    Cliente
-                                </th>
-                                <th style={{
-                                    width: '150px',
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                }}>
-                                    ID de pago
-                                </th>
-                                <th style={{
-                                    width: '150px',
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                }}>
-                                    Cantidad
-                                </th>
-                                <th style={{
-                                    width: '250px',
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                }}>
-                                    Métodos de pago
-                                </th>
-                                <th style={{
-                                    width: '150px',
-                                    textAlign: 'left',
-                                    padding: '10px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    letterSpacing: '0px',
-                                    color: '#330F1B',
-                                    fontSize: '13px',
-                                    backgroundColor: '#FFFFFF',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                }}>
-                                    Estatus
-                                </th>
-                            </tr>
-                        </thead>
-
-                        {/* Datos */}
-                        <tbody>
-                            {Historic.map((recarga, index) => (
-                                <tr key={index} style={{ borderBottom: '1px solid #E6E4E4' }}>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
+                                    <th style={{
+                                        width: '200px',
                                         textAlign: 'left',
+                                        padding: '0 14px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF',
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
+                                        textOverflow: 'ellipsis', fontWeight: 500
                                     }}>
-                                        {new Date(recarga.rechargeDate).toLocaleString()}
-                                    </td>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
+                                        Fecha
+                                    </th>
+                                    <th style={{
+                                        width: '200px',
                                         textAlign: 'left',
+                                        padding: '0 0px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF',
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
+                                        textOverflow: 'ellipsis', fontWeight: 500
                                     }}>
-                                        {recarga.client}
-                                    </td>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
+                                        Cliente
+                                    </th>
+                                    <th style={{
+                                        width: '150px',
                                         textAlign: 'left',
+                                        padding: '0 0px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF',
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
+                                        textOverflow: 'ellipsis', fontWeight: 500
                                     }}>
-                                        {recarga.id}
-                                    </td>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
+                                        ID de pago
+                                    </th>
+                                    <th style={{
+                                        width: '150px',
                                         textAlign: 'left',
+                                        padding: '0 0px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF',
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
+                                        textOverflow: 'ellipsis', fontWeight: 500
                                     }}>
-                                        ${recarga.quantityMoney.toLocaleString()}
-                                    </td>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
+                                        Cantidad
+                                    </th>
+                                    <th style={{
+                                        width: '250px',
                                         textAlign: 'left',
+                                        padding: '0 0px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF',
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
+                                        textOverflow: 'ellipsis', fontWeight: 500
                                     }}>
-                                        <Tooltip title={recarga.paymentMethod} arrow>
-                                            <span style={truncatedStyle}>
-                                                {recarga.paymentMethod.split('-')[0]} - ...
-                                            </span>
-                                        </Tooltip>
-                                    </td>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
+                                        Métodos de pago
+                                    </th>
+                                    <th style={{
+                                        width: '150px',
                                         textAlign: 'left',
+                                        padding: '0 0px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        letterSpacing: '0px',
+                                        color: '#330F1B',
+                                        fontSize: '13px',
+                                        backgroundColor: '#FFFFFF',
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
+                                        textOverflow: 'ellipsis', fontWeight: 500
                                     }}>
-                                        {recarga.estatus}
-                                    </td>
-                                    <td style={{ padding: '10px', textAlign: 'right' }}>
-                                        <IconButton onClick={(event) => handleMenuClick(event, recarga.id, recarga.paymentMethod)}>
-                                            <MoreVertIcon />
-                                        </IconButton>
+                                        Estatus
+                                    </th>
+                                    <td style={{
+                                        position: 'sticky', textAlign: "center",
+                                        right: -2,
+                                        background: '#fff',
+                                        padding: '3.5px', width: '75px', height: "30px", whiteSpace: 'nowrap', overflow: 'hidden',
+                                        textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F",
+                                    }}>
+                                        <Divider sx={{
+                                            marginTop: "-51px", marginLeft: "14px",
+                                            position: "absolute",
+                                            height: '90px',
+                                            width: "0px",
+                                            borderLeft: "1px solid #E0E0E0"
+                                        }} />
                                     </td>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {/* Menú de opciones */}
-                    <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
-                        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                    >
-                        <MenuItem style={menuItemStyle} onClick={() => {
-                            setIsInvoiceModalOpen(true);
-                            handleClose();
-                        }} >
-                            <img src={billingicon} alt="billing" style={iconStyle} />
+                            </thead>
 
-                            Generar Factura
-                        </MenuItem>
-                        <MenuItem onClick={() => { handleAsyncAction('Consultar'); handleClose(); }} style={menuItemStyle} disabled>
-                            <img src={EyeIcon} alt="Consultar" style={iconStyle} />
-                            Consultar Factura
-                        </MenuItem>
-                        <MenuItem onClick={() => { handleAsyncAction('Descargar'); handleClose(); }} style={menuItemStyle} disabled>
-                            <img src={DownloadIcon} alt="Descargar" style={iconStyle} />
-                            Descargar Factura
-                        </MenuItem>
+                            {/* Datos */}
+                            <tbody>
+                                {Historic.map((recarga, index) => (
+                                    <tr key={index} style={{ borderBottom: '1px solid #E6E4E4' }}>
+                                        <td style={{
+                                            padding: '0 14px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#574B4F',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontWeight: 500,
+                                        }}>
+                                            {new Date(recarga.rechargeDate).toLocaleString()}
+                                        </td>
+                                        <td style={{
+                                            padding: '0 0px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#574B4F',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            {recarga.client}
+                                        </td>
+                                        <td style={{
+                                            padding: '0 0px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#574B4F',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            {recarga.id}
+                                        </td>
+                                        <td style={{
+                                            padding: '0 0px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#574B4F',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            ${recarga.quantityMoney.toLocaleString()}
+                                        </td>
+                                        <td style={{
+                                            padding: '0 0px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#574B4F',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            <Tooltip title={recarga.paymentMethod} arrow>
+                                                <span style={truncatedStyle}>
+                                                    {recarga.paymentMethod.split('-')[0]} - ...
+                                                </span>
+                                            </Tooltip>
+                                        </td>
+                                        <td style={{
+                                            padding: '0 0px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#574B4F',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            {recarga.estatus}
+                                        </td>
+                                        <td style={{ padding: '4px', textAlign: 'right' }}>
+                                            <IconButton onClick={(event) => handleMenuClick(event, recarga.id, recarga.paymentMethod)}>
+                                                <MoreVertIcon />
+                                            </IconButton>
+                                            <Divider sx={{
+                                                marginTop: "-45px", marginLeft: "14px",
+                                                position: "absolute",
+                                                height: '50px',
+                                                width: "0px",
+                                                borderLeft: "1px solid #E0E0E0"
+                                            }} />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {/* Menú de opciones */}
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        >
+                            <MenuItem style={menuItemStyle} onClick={() => {
+                                setIsInvoiceModalOpen(true);
+                                handleClose();
+                            }}
+                                sx={{
+                                    fontFamily: 'Poppins',
+                                    fontSize: '14px', color: "#675C60",
+                                    '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}
+                            >
+                                <img src={billingicon} alt="billing" style={iconStyle} />
 
-                    </Menu>
-                </Box>
-            )}
+                                Generar Factura
+                            </MenuItem>
+                            <MenuItem onClick={() => { handleAsyncAction('Consultar'); handleClose(); }} style={menuItemStyle} disabled
+                                sx={{
+                                    fontFamily: 'Poppins',
+                                    fontSize: '14px',
+                                    '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}
+                            >
+                                <img src={EyeIcon} alt="Consultar" style={iconStyle} />
+                                Consultar Factura
+                            </MenuItem>
+                            <MenuItem onClick={() => { handleAsyncAction('Descargar'); handleClose(); }} style={menuItemStyle} disabled
+                                sx={{
+                                    fontFamily: 'Poppins',
+                                    fontSize: '14px',
+                                    '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}
+                            >
+                                <img src={DownloadIcon} alt="Descargar" style={iconStyle} />
+                                Descargar Factura
+                            </MenuItem>
 
+                        </Menu>
+                    </Box>
+                )}
+            </Box>
 
             <Modal open={isInvoiceModalOpen} onClose={() => setIsInvoiceModalOpen(false)}>
                 <Box sx={{
                     position: 'absolute',
-                    top: '130px',
-                    left: '415px',
+                    top: '20%',
+                    left: '35%',
                     width: '556px',
                     height: '520px',
                     backgroundColor: 'white',
@@ -524,8 +565,19 @@ const PaymentHistoric: React.FC = () => {
                         color: '#574B4F',
                         opacity: 1,
                     }}>
-                        Datos de Factura
+                        Consultar factura
                     </Typography>
+                    <IconButton
+                        onClick={() => setIsInvoiceModalOpen(false)}
+                        sx={{
+                            position: 'absolute',
+                            marginTop: '-68px',
+                            marginLeft: '492px',
+                            zIndex: 10
+                        }}
+                    >
+                        <CloseIcon sx={{ color: '#A6A6A6' }} />
+                    </IconButton>
                     <Divider sx={{ margin: '10px 0' }} />
 
                     <Box sx={{
@@ -567,7 +619,7 @@ const PaymentHistoric: React.FC = () => {
                 buttonText="Cerrar"
                 onClose={() => setIsErrorModalOpen(false)}
             />
-        </div>
+        </Box>
     );
 };
 
@@ -577,7 +629,7 @@ const buttonStyle = {
     border: '1px solid #C6BFC2',
     borderRadius: '18px',
     letterSpacing: "1.12px",
-    fontWeight: 600,
+    fontWeight: 500,
     color: '#330F1B',
     textTransform: 'none',
     '&:hover': {
@@ -613,23 +665,23 @@ const tdStyle = {
 };
 
 const menuItemStyle = {
-    fontFamily: 'Poppins, sans-serif', // ✅ Aplica la fuente correcta
-    fontSize: '14px', // ✅ Tamaño de fuente 14px
-    color: '#675C60' // ✅ Color del texto
+    fontFamily: 'Poppins, sans-serif',
+    fontSize: '14px',
+    color: '#675C60'
 };
 
 const truncatedStyle = {
     display: 'inline-block',
-    maxWidth: '200px', // ✅ Ajusta el ancho según sea necesario
+    maxWidth: '200px',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     cursor: 'pointer'
 };
 const iconStyle = {
-    width: '18px',
-    height: '18px',
-    marginRight: '10px' // Para que haya espacio entre el icono y el texto
+    width: '20px',
+    height: '20px',
+    marginRight: '10px'
 };
 
 

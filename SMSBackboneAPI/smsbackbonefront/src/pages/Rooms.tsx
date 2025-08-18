@@ -35,6 +35,7 @@ import { useNavigate } from "react-router-dom";
 import seachicon from '../assets/icon-lupa.svg';
 import Iconseachred from "../assets/Iconseachred.svg";
 import iconclose from '../assets/icon-close.svg';
+import MainButton from "../components/commons/MainButton";
 
 type Room = {
     id: string | number;
@@ -307,14 +308,15 @@ const Rooms: React.FC = () => {
                 </Typography>
             </Box>
             <Box sx={{ pl: 5 }}>
-                <Divider sx={{ mb: 3 }} />
+                <Divider sx={{ width: 'calc(100% + 80px)', mb: 3 }} />
                 <Box display="flex" alignItems="center" justifyContent="flex-start" mb={2}>
                     {/* Botón de Añadir Sala */}
                     <Button
                         variant="contained"
                         startIcon={<AddIcon />}
                         sx={{
-                            backgroundColor: "#A05B71",
+                            backgroundColor: "#833A53",
+                            border: "1px solid #60293C",
                             width: "170px",
                             height: "100%",
                             marginRight: "16px",
@@ -401,10 +403,10 @@ const Rooms: React.FC = () => {
                                         src={NoResult}
                                         alt="No hay resultados"
                                         style={{
-                                            marginTop: 90,
-                                            marginLeft: 500,
-                                            width: "242px",
-                                            height: "168px",
+                                            marginTop: 80,
+                                            marginLeft: 650,
+                                            width: "280px",
+                                            height: "200px",
                                             marginBottom: "16px",
                                         }}
                                     />
@@ -413,7 +415,7 @@ const Rooms: React.FC = () => {
                                         sx={{
                                             position: "absolute",
                                             marginTop: 40,
-                                            marginLeft: 64,
+                                            marginLeft: 82,
                                             textAlign: "center",
                                             color: "#7B354D",
                                             fontWeight: 500,
@@ -436,7 +438,7 @@ const Rooms: React.FC = () => {
                                     flexWrap: 'wrap',
                                     flexDirection: 'row',
                                     alignContent: 'flex-start',
-                                    gap: '18px 16px',
+                                    gap: '24px 50px',
                                 }}
                             >
                                 {rooms
@@ -531,7 +533,6 @@ const Rooms: React.FC = () => {
                                                             PaperProps={{
                                                                 sx: {
                                                                     borderRadius: '8px',
-                                                                    boxShadow: '0px 8px 16px #00131F3D',
                                                                 },
                                                             }}
                                                         >
@@ -845,10 +846,10 @@ const Rooms: React.FC = () => {
                                 disabled={!newRoom.name || !newRoom.description}
                                 sx={{
                                     width: "106px",
-                                    backgroundColor: "#A05B71",
+                                    backgroundColor: "#833A53",
                                     color: "#fff",
                                     "&:hover": {
-                                        backgroundColor: "#8B4D61",
+                                        backgroundColor: "#60293C",
                                     },
                                     height: "100%",
                                     marginLeft: "8px",
@@ -906,7 +907,7 @@ const Rooms: React.FC = () => {
                                 opacity: 1,
                                 fontSize: "20px",
                                 marginBottom: "16px",
-                                marginTop: "-5px"
+                                marginTop: "-10px", marginLeft: "-5px"
                             }}
                         >
                             Editar sala
@@ -915,7 +916,7 @@ const Rooms: React.FC = () => {
                             onClick={handleCloseEditModal}
                             sx={{
                                 position: 'absolute',
-                                marginTop: '-68px',
+                                marginTop: '-64px',
                                 marginLeft: '474px',
                                 zIndex: 10
                             }}
@@ -1116,8 +1117,8 @@ const Rooms: React.FC = () => {
                                 }}
                             />
                         </Box>
-                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 2, mt: 2 }} />
-                        <Box display="flex" justifyContent="space-between">
+                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 2, mt: 3 }} />
+                        <Box display="flex" gap={24.1} >
                             <SecondaryButton onClick={handleCloseEditModal}
                                 text='Cancelar'
                             />
@@ -1129,10 +1130,10 @@ const Rooms: React.FC = () => {
                                     !newRoom.name || !newRoom.description || errors.name || errors.description
                                 }
                                 sx={{
-                                    backgroundColor: "#A05B71",
+                                    backgroundColor: "#833A53",
                                     color: "#fff",
                                     "&:hover": {
-                                        backgroundColor: "#8B4D61",
+                                        backgroundColor: "#60293C",
                                     },
                                     height: "100%",
                                     marginLeft: "8px",
@@ -1170,24 +1171,23 @@ const Rooms: React.FC = () => {
                             top: "50%",
                             left: "50%",
                             transform: "translate(-50%, -50%)",
-                            width: 450,
-                            height: 280,
-                            bgcolor: "background.paper",
+                            width: "480px",
+                            height: "228px",
+                            backgroundColor: "#FFFFFF",
                             boxShadow: 24,
                             p: 4,
-                            borderRadius: "12px",
+                            borderRadius: "8px",
                         }}
                     >
                         <Typography
                             variant="h6"
                             sx={{
                                 textAlign: "left",
-                                font: "normal normal 600 20px/54px Poppins",
+                                fontFamily: "Poppins",
                                 letterSpacing: "0px",
                                 color: "#574B4F",
                                 opacity: 1,
-                                fontSize: "20px", // Aplicación del tamaño de fuente específico
-                                mb: 2, // Margen inferior opcional para espaciar el título del contenido
+                                fontSize: "20px", mt: -1, mb: 3, fontWeight: 600
                             }}
                         >
                             Eliminar sala
@@ -1197,116 +1197,48 @@ const Rooms: React.FC = () => {
                             variant="body2"
                             sx={{
                                 textAlign: "left",
-                                font: "normal normal normal 16px/22px Poppins",
+                                fontFamily: "Poppins",
                                 letterSpacing: "0px",
                                 color: "#574B4F",
                                 opacity: 1,
-                                fontSize: "16px", // Aplicación del tamaño de fuente específico
-                                mb: 3, // Margen inferior opcional para espaciar del contenido posterior
+                                fontSize: "16px",
+                                mb: 3,
                             }}
                         >
                             ¿Está seguro de que desea eliminar la sala? Esta acción no puede ser revertida.
                         </Typography>
-                        <Box
-                            sx={{
-                                position: "absolute",
-                                top: "50%",
-                                left: "50%",
-                                transform: "translate(-50%, -50%)",
-                                width: 450,
-                                height: 300,
-                                bgcolor: "background.paper",
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "12px",
-                                display: "flex", // Contenedor flexible
-                                flexDirection: "column", // Dirección de los elementos
-                                justifyContent: "space-between", // Espaciado entre contenido y botones
-                            }}
-                        >
-                            <Box>
-                                <Typography
-                                    variant="h6"
-                                    sx={{
-                                        textAlign: "left",
-                                        font: "normal normal 600 20px/54px Poppins",
-                                        letterSpacing: "0px",
-                                        color: "#574B4F",
-                                        opacity: 1,
-                                        fontSize: "20px",
-                                        mb: 2,
-                                    }}
-                                >
-                                    Eliminar sala
+
+                        <Box mt={4} display="flex" gap={2.5} justifyContent={"flex-end"} >
+
+                            <Button onClick={handleCloseDeleteModal}
+                                sx={{
+                                    width: "112px", height: "32px", borderRadius: "4px", border: "transparent",
+                                    backgroundColor: "#FFFFFF",
+                                    "&:hover": {
+                                        backgroundColor: "#F2E9EC",
+                                    },
+                                }}
+                            >
+                                <Typography sx={{ fontFamily: "Poppins", color: "#833A53", fontSize: "14px", fontWeight: 600, letterSpacing: "1.12px" }}>
+                                    CANCELAR
                                 </Typography>
+                            </Button>
 
-                                <Typography
-                                    variant="body2"
-                                    sx={{
-                                        textAlign: "left",
-                                        font: "normal normal normal 16px/22px Poppins",
-                                        letterSpacing: "0px",
-                                        color: "#574B4F",
-                                        opacity: 1,
-                                        fontSize: "16px",
-                                        mb: 3,
-                                    }}
-                                >
-                                    ¿Está seguro de que desea eliminar la sala? Esta acción no puede ser revertida.
+                            <Button onClick={handleDeleteRoom}
+                                sx={{
+                                    width: "92px", height: "32px", borderRadius: "4px", border: "transparent",
+                                    backgroundColor: "#FFFFFF",
+                                    "&:hover": {
+                                        backgroundColor: "#F2E9EC",
+                                    },
+                                }}
+                            >
+                                <Typography sx={{ fontFamily: "Poppins", color: "#833A53", fontSize: "14px", fontWeight: 600, letterSpacing: "1.12px" }}>
+                                    ELIMINAR
                                 </Typography>
-                            </Box>
-
-                            <Box display="flex" justifyContent="flex-end" gap={2}>
-                                <Button
-                                    variant="outlined"
-                                    onClick={handleCloseDeleteModal}
-                                    sx={{
-                                        font: "normal normal 600 12px/16px Poppins",
-                                        letterSpacing: "1.12px",
-                                        color: "#833A53",
-                                        textTransform: "uppercase",
-                                        opacity: 1,
-                                        borderColor: "#833A53",
-                                        padding: "0 12px",
-                                        height: "50px",
-                                        width: "100px",
-                                        minWidth: "80px",
-                                        lineHeight: "16px",
-                                        fontSize: "12px",
-                                        "&:hover": {
-                                            backgroundColor: "#f9f4f5",
-                                        },
-                                    }}
-                                >
-                                    Cancelar
-                                </Button>
-
-                                <Button
-                                    variant="contained"
-                                    color="error"
-                                    onClick={handleDeleteRoom}
-                                    sx={{
-                                        font: "normal normal 600 12px/16px Poppins",
-                                        letterSpacing: "1.12px",
-                                        color: "#fff",
-                                        textTransform: "uppercase",
-                                        opacity: 1,
-                                        backgroundColor: "#833A53",
-                                        padding: "0 12px",
-                                        height: "50px",
-                                        width: "100px",
-                                        minWidth: "80px",
-                                        lineHeight: "16px",
-                                        fontSize: "12px",
-                                        "&:hover": {
-                                            backgroundColor: "#A54261",
-                                        },
-                                    }}
-                                >
-                                    Eliminar
-                                </Button>
-                            </Box>
+                            </Button>
                         </Box>
+
 
 
                     </Box>

@@ -29,6 +29,9 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import HomeIcon from "@mui/icons-material/Home";
+import NoResult from '../assets/NoResultados.svg';
+import Iconseachred from "../assets/Iconseachred.svg";
+import seachicon from '../assets/icon-lupa.svg';
 import { useNavigate } from "react-router-dom";
 import usrAdmin from "../assets/usrAdmin.svg";
 import usrSup from "../assets/usrSup.svg";
@@ -39,7 +42,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import infoicon from '../assets/Icon-info.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import iconclose from '../assets/icon-close.svg';
 import Thrashicon from '../assets/Icon-trash-Card.svg'
 import ChipBar from "../components/commons/ChipBar";
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
@@ -82,6 +85,7 @@ type FormData = {
 
 
 const ManageAccounts: React.FC = () => {
+    const [searchTerm, setSearchTerm] = useState('');
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
@@ -107,6 +111,10 @@ const ManageAccounts: React.FC = () => {
         profile: "",
         rooms: "",
     });
+
+    const filteredAccounts = accounts.filter((account) =>
+        account.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const [showErrors, setShowErrors] = useState({
         email: false,
@@ -271,14 +279,14 @@ const ManageAccounts: React.FC = () => {
 
             if (isEditing) {
 
-                const apiEndpoint = `${import.meta.env.VITE_API_UPDATE_USERS}`; 
+                const apiEndpoint = `${import.meta.env.VITE_API_UPDATE_USERS}`;
                 const response = await axios.post(apiEndpoint, data, { headers });
 
                 if (response.status === 200) {
-                    setshowChipBarAdd(true); 
+                    setshowChipBarAdd(true);
                     setTimeout(() => setshowChipBarAdd(false), 3000);
                     fetchAccounts();
-                    setOpenAddUserModal(false); 
+                    setOpenAddUserModal(false);
                     setIsEditing(false);
                 }
             } else {
@@ -307,24 +315,24 @@ const ManageAccounts: React.FC = () => {
 
 
         } catch (error) {
-                const errorCode = error.response.data?.code;
+            const errorCode = error.response.data?.code;
 
-                if (errorCode === "DuplicateUserName") {
-                    setErrorMessage(
-                        "Email Registrado previamente."
-                    );
-                }
-                if (errorCode === "ConfirmationUnsent") {
-                    setErrorMessage(
-                        "No se pudo enviar el mail de confirmacion"
-                    );
-                }
-                if (errorCode === "agregarusuario") {
-                    setErrorMessage(
-                        "Error al Agregar un usuario. por favor intente más tarde"
-                    );
-                }
-            
+            if (errorCode === "DuplicateUserName") {
+                setErrorMessage(
+                    "Email Registrado previamente."
+                );
+            }
+            if (errorCode === "ConfirmationUnsent") {
+                setErrorMessage(
+                    "No se pudo enviar el mail de confirmacion"
+                );
+            }
+            if (errorCode === "agregarusuario") {
+                setErrorMessage(
+                    "Error al Agregar un usuario. por favor intente más tarde"
+                );
+            }
+
 
             setErrorModalOpen(true);
         }
@@ -494,272 +502,354 @@ const ManageAccounts: React.FC = () => {
 
             <Box sx={{ marginLeft: "32px", }}>
                 <Divider sx={{ marginBottom: "24px", marginTop: "18px" }} />
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    sx={{ mb: 3, backgroundColor: "#A05B71", fontFamily: "Poppins" }}
-                    onClick={handleOpenModal}
-                >
-                    Añadir usuario
-                </Button>
-                <TableContainer component={Paper}
-                    sx={{
-                        width: "1050px", height: "415px",
-                        marginLeft: "-200 auto",
-                        overflowX: "auto", overflowY: "hidden",
-                    }}
-                >
-                    <Table
-                        sx={{
-                            maxWidth: 1750,
-                            tableLayout: "auto"
-                        }}
-                        aria-label="tabla de usuarios"
+                <Box sx={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        sx={{ mb: 3, backgroundColor: "#833A53", fontFamily: "Poppins", border: "1px solid #60293C", }}
+                        onClick={handleOpenModal}
                     >
-                        {accounts.length > 0 && (
-                            <TableHead>
-                                <TableRow sx={{}}>
-                                    <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins", }}>Nombre</TableCell>
-                                    <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Correo Electrónico</TableCell>
-                                    <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Rol</TableCell>
-                                    <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Ícono</TableCell>
-                                    <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Salas</TableCell>
-                                    <TableCell align="right"></TableCell>
-                                </TableRow>
-                            </TableHead>
-                        )}
+                        Añadir usuario
+                    </Button>
 
-                        <TableBody>
-                            {accounts.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={6} align="center">
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                py: 4,
-                                                width: "100%",
-                                                height: "415px"
+                    <Box sx={{ position: 'relative', width: '220px', mt: "-25px" }}>
+                        <Box
+                            display="flex"
+                            alignItems="center"
+                            sx={{
+                                backgroundColor: "#FFFFFF",
+                                border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
+                                borderRadius: "4px",
+                                px: 2,
+                                py: 1,
+                                width: "100%",
+                                height: "40px"
+                            }}
+                        >
+                            <img
+                                src={searchTerm ? Iconseachred : seachicon}
+                                alt="Buscar"
+                                style={{ marginRight: 8, width: 24 }}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Buscar"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{
+                                    border: "none",
+                                    outline: "none",
+                                    width: "100%",
+                                    fontSize: "16px",
+                                    fontFamily: "Poppins",
+                                    color: searchTerm ? "#7B354D" : "#9B9295",
+                                    backgroundColor: "transparent",
+                                }}
+                            />
+                            {searchTerm && (
+                                <img
+                                    src={iconclose}
+                                    alt="Limpiar búsqueda"
+                                    onClick={() => {
+                                        setSearchTerm('');
+                                    }}
+                                    style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
+                                />
 
-                                            }}
-                                        >
-                                            <img src={Nousers} alt="Sin usuarios" style={{
-                                                maxWidth: "250px",
-                                                width: "auto",
-                                                height: "auto",
-                                                objectFit: "contain",
-                                            }} />
-                                            <Typography
-                                                variant="h6"
+                            )}
+                        </Box>
+                    </Box>
+                </Box>
+                {searchTerm && accounts.length > 0 && filteredAccounts.length === 0 && (
+                    <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        sx={{
+                            width: '100%',
+                            minHeight: '450px',
+                            backgroundColor: '#F9F9F9',
+                            padding: 4,
+                            borderRadius: '12px',
+                            border: '1px solid #E0E0E0',
+                            mt: 1,
+                        }}
+                    >
+                        <img src={NoResult} alt="No resultados" style={{ width: '240px', marginBottom: '16px' }} />
+                        <Typography
+                            sx={{
+                                fontFamily: 'Poppins',
+                                fontSize: '16px',
+                                color: '#7B354D',
+                                fontWeight: 500,
+                            }}
+                        >
+                            No se encontraron resultados.
+                        </Typography>
+                    </Box>
+                )}
+
+                {!(searchTerm && accounts.length > 0 && filteredAccounts.length === 0) && (
+                    <TableContainer component={Paper}
+                        sx={{
+                            width: "100%", height: "450px",
+                            marginLeft: "-200 auto",
+                            overflowX: "auto", overflowY: "hidden", marginTop: "8px", borderRadius: "8px"
+                        }}
+                    >
+                        <Table
+                            sx={{
+                                maxWidth: 1750,
+                                tableLayout: "auto"
+                            }}
+                            aria-label="tabla de usuarios"
+                        >
+                            {accounts.length > 0 && (
+                                <TableHead>
+                                    <TableRow sx={{}}>
+                                        <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins", }}>Nombre</TableCell>
+                                        <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Correo Electrónico</TableCell>
+                                        <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Rol</TableCell>
+                                        <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Ícono</TableCell>
+                                        <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Salas</TableCell>
+                                        <TableCell align="right" sx={{ borderLeft: "2px solid #F2F2F2" }}></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                            )}
+
+                            <TableBody>
+                                {accounts.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} align="center">
+                                            <Box
                                                 sx={{
-                                                    fontFamily: "Poppins",
-                                                    color: "#7B354D",
-                                                    fontSize: "14px",
-                                                    mt: 2,
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    py: 4,
+                                                    width: "100%",
+                                                    height: "415px"
+
                                                 }}
                                             >
-                                                Añade un usuario para comenzar
-                                            </Typography>
-                                        </Box>
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                accounts.map((account) => (
-                                    <TableRow key={account.id} sx={{}}>
-                                        <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "13px" }}>{account.name} </Typography></TableCell>
-                                        <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "13px" }}>{account.email} </Typography></TableCell>
-                                        <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "13px" }}>{account.role} </Typography></TableCell>
-                                        {/* Ícono condicional */}
-                                        <TableCell>
-                                            {account.role === "Administrador" && (
-                                                <img src={usrAdmin} alt="Administrador" width="32" height="32" />
-                                            )}
-                                            {account.role === "Supervisor" && (
-                                                <img src={usrSup} alt="Supervisor" width="32" height="32" />
-                                            )}
-                                            {account.role === "Monitor" && (
-                                                <img src={usrMon} alt="Monitor" width="32" height="32" />
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {account.rooms.length > 30 ? (
-                                                <Tooltip
-                                                    title={account.rooms}
-                                                    placement="top"
-                                                    arrow
-                                                    componentsProps={{
-                                                        tooltip: {
-                                                            sx: {
-                                                                backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                                                color: "#DEDADA",
-                                                                fontFamily: "Poppins, sans-serif",
-                                                                fontSize: "12px",
-                                                                padding: "6px 8px",
-                                                                borderRadius: "8px",
-                                                                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                                                            }
-                                                        },
-                                                        arrow: {
-                                                            sx: {
-                                                                color: "rgba(0, 0, 0, 0.8)"
-                                                            }
-                                                        }
-                                                    }}
-                                                    PopperProps={{
-                                                        modifiers: [
-                                                            {
-                                                                name: 'offset',
-                                                                options: {
-                                                                    offset: [0, -5]
-                                                                }
-                                                            }
-                                                        ]
-                                                    }}
-                                                >
-                                                    <Typography
-                                                        noWrap
-                                                        sx={{
-                                                            maxWidth: "200px",
-                                                            overflow: "hidden",
-                                                            textOverflow: "ellipsis",
-                                                            whiteSpace: "nowrap",
-                                                            cursor: "pointer",
-                                                            fontFamily: "Poppins", fontSize: "13px", color: "#574B4F"
-                                                        }}
-                                                    >
-                                                        {account.rooms}
-                                                    </Typography>
-                                                </Tooltip>
-                                            ) : (
-                                                <Tooltip
-                                                    title={account.rooms}
-                                                    placement="top"
-                                                    arrow
-                                                    componentsProps={{
-                                                        tooltip: {
-                                                            sx: {
-                                                                backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                                                color: "#DEDADA",
-                                                                fontFamily: "Poppins, sans-serif",
-                                                                fontSize: "12px",
-                                                                padding: "6px 8px",
-                                                                borderRadius: "8px",
-                                                                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                                                            }
-                                                        },
-                                                        arrow: {
-                                                            sx: {
-                                                                color: "rgba(0, 0, 0, 0.8)"
-                                                            }
-                                                        }
-                                                    }}
-                                                    PopperProps={{
-                                                        modifiers: [
-                                                            {
-                                                                name: 'offset',
-                                                                options: {
-                                                                    offset: [0, -5]
-                                                                }
-                                                            }
-                                                        ]
-                                                    }}
-                                                >
-                                                    <Typography
-                                                        noWrap
-                                                        sx={{
-                                                            maxWidth: "200px",
-                                                            overflow: "hidden",
-                                                            textOverflow: "ellipsis",
-                                                            whiteSpace: "nowrap",
-                                                            fontFamily: "Poppins",
-                                                            color: "#574B4F", fontSize: "13px"
-                                                        }}
-                                                    >
-                                                        {account.rooms}
-                                                    </Typography>
-                                                </Tooltip>
-                                            )}
-                                        </TableCell>
-
-                                        <TableCell
-                                            align="center"
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                position: "relative",
-                                                borderLeft: "2px solid #F2F2F2"
-                                            }}
-                                        >
-
-                                            <IconButton
-                                                onClick={(e) => handleMenuOpen(e, account)}
-                                                aria-label="more"
-                                            >
-                                                <MoreVertIcon />
-                                            </IconButton>
-                                            <Menu
-                                                anchorEl={menuAnchorEl}
-                                                open={Boolean(menuAnchorEl)}
-                                                onClose={handleMenuClose}
-                                                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                                                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                                sx={{}}
-                                            >
-                                                <MenuItem
-                                                    onClick={() => {
-                                                        handleEditClick(selectedAccount!);
-                                                        handleMenuClose();
-                                                    }}
+                                                <img src={Nousers} alt="Sin usuarios" style={{
+                                                    maxWidth: "250px",
+                                                    width: "auto",
+                                                    height: "auto",
+                                                    objectFit: "contain",
+                                                }} />
+                                                <Typography
+                                                    variant="h6"
                                                     sx={{
-                                                        width: "184px", height: "40px",
-                                                        fontFamily: 'Poppins',
-                                                        fontSize: '14px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#F2EBED'
-                                                        }
+                                                        fontFamily: "Poppins",
+                                                        color: "#7B354D",
+                                                        fontSize: "14px",
+                                                        mt: 2,
                                                     }}
                                                 >
-                                                    <EditIcon fontSize="small" sx={{ mr: 1, color: '#5F5064', width: 24, height: 24 }} />
-                                                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#583B43" }}>
-
-                                                        Editar
-                                                    </Typography>
-                                                </MenuItem>
-                                                <MenuItem
-                                                    onClick={() => {
-                                                        setOpenDeleteModal(true);
-                                                        handleMenuClose();
-                                                    }}
-                                                    sx={{
-                                                        fontFamily: 'Poppins',
-                                                        fontSize: '14px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#F2EBED'
-                                                        }
-                                                    }}
-                                                >
-                                                    <Box display="flex" alignItems="center" gap={1}>
-                                                        <img
-                                                            src={Thrashicon}
-                                                            alt="Eliminar"
-                                                            style={{ width: 24, height: 24, color: '#5F5064' }}
-                                                        />
-                                                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F" }}>
-                                                            Eliminar
-                                                        </Typography>
-                                                    </Box>
-                                                </MenuItem>
-                                            </Menu>
+                                                    Añade un usuario para comenzar
+                                                </Typography>
+                                            </Box>
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                                ) : (
+                                    filteredAccounts.map((account) => (
+                                        <TableRow key={account.id} sx={{}}>
+                                            <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "13px" }}>{account.name} </Typography></TableCell>
+                                            <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "13px" }}>{account.email} </Typography></TableCell>
+                                            <TableCell><Typography sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "13px" }}>{account.role} </Typography></TableCell>
+                                            {/* Ícono condicional */}
+                                            <TableCell>
+                                                {account.role === "Administrador" && (
+                                                    <img src={usrAdmin} alt="Administrador" width="32" height="32" />
+                                                )}
+                                                {account.role === "Supervisor" && (
+                                                    <img src={usrSup} alt="Supervisor" width="32" height="32" />
+                                                )}
+                                                {account.role === "Monitor" && (
+                                                    <img src={usrMon} alt="Monitor" width="32" height="32" />
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {account.rooms.length > 30 ? (
+                                                    <Tooltip
+                                                        title={account.rooms}
+                                                        placement="top"
+                                                        arrow
+                                                        componentsProps={{
+                                                            tooltip: {
+                                                                sx: {
+                                                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                    color: "#DEDADA",
+                                                                    fontFamily: "Poppins, sans-serif",
+                                                                    fontSize: "12px",
+                                                                    padding: "6px 8px",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                                }
+                                                            },
+                                                            arrow: {
+                                                                sx: {
+                                                                    color: "rgba(0, 0, 0, 0.8)"
+                                                                }
+                                                            }
+                                                        }}
+                                                        PopperProps={{
+                                                            modifiers: [
+                                                                {
+                                                                    name: 'offset',
+                                                                    options: {
+                                                                        offset: [0, -5]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }}
+                                                    >
+                                                        <Typography
+                                                            noWrap
+                                                            sx={{
+                                                                maxWidth: "200px",
+                                                                overflow: "hidden",
+                                                                textOverflow: "ellipsis",
+                                                                whiteSpace: "nowrap",
+                                                                cursor: "pointer",
+                                                                fontFamily: "Poppins", fontSize: "13px", color: "#574B4F"
+                                                            }}
+                                                        >
+                                                            {account.rooms}
+                                                        </Typography>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip
+                                                        title={account.rooms}
+                                                        placement="top"
+                                                        arrow
+                                                        componentsProps={{
+                                                            tooltip: {
+                                                                sx: {
+                                                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                    color: "#DEDADA",
+                                                                    fontFamily: "Poppins, sans-serif",
+                                                                    fontSize: "12px",
+                                                                    padding: "6px 8px",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                                }
+                                                            },
+                                                            arrow: {
+                                                                sx: {
+                                                                    color: "rgba(0, 0, 0, 0.8)"
+                                                                }
+                                                            }
+                                                        }}
+                                                        PopperProps={{
+                                                            modifiers: [
+                                                                {
+                                                                    name: 'offset',
+                                                                    options: {
+                                                                        offset: [0, -5]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }}
+                                                    >
+                                                        <Typography
+                                                            noWrap
+                                                            sx={{
+                                                                maxWidth: "200px",
+                                                                overflow: "hidden",
+                                                                textOverflow: "ellipsis",
+                                                                whiteSpace: "nowrap",
+                                                                fontFamily: "Poppins",
+                                                                color: "#574B4F", fontSize: "13px"
+                                                            }}
+                                                        >
+                                                            {account.rooms}
+                                                        </Typography>
+                                                    </Tooltip>
+                                                )}
+                                            </TableCell>
+
+                                            <TableCell
+                                                align="center"
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    position: "relative",
+                                                    borderLeft: "2px solid #F2F2F2"
+                                                }}
+                                            >
+
+                                                <IconButton
+                                                    onClick={(e) => handleMenuOpen(e, account)}
+                                                    aria-label="more"
+                                                >
+                                                    <MoreVertIcon />
+                                                </IconButton>
+                                                <Menu
+                                                    anchorEl={menuAnchorEl}
+                                                    open={Boolean(menuAnchorEl)}
+                                                    onClose={handleMenuClose}
+                                                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                                                    sx={{}}
+                                                >
+                                                    <MenuItem
+                                                        onClick={() => {
+                                                            handleEditClick(selectedAccount!);
+                                                            handleMenuClose();
+                                                        }}
+                                                        sx={{
+                                                            width: "184px", height: "40px",
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '14px',
+                                                            '&:hover': {
+                                                                backgroundColor: '#F2EBED'
+                                                            }
+                                                        }}
+                                                    >
+                                                        <EditIcon fontSize="small" sx={{ mr: 1, color: '#5F5064', width: 24, height: 24 }} />
+                                                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#583B43" }}>
+
+                                                            Editar
+                                                        </Typography>
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        onClick={() => {
+                                                            setOpenDeleteModal(true);
+                                                            handleMenuClose();
+                                                        }}
+                                                        sx={{
+                                                            fontFamily: 'Poppins',
+                                                            fontSize: '14px',
+                                                            '&:hover': {
+                                                                backgroundColor: '#F2EBED'
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Box display="flex" alignItems="center" gap={1}>
+                                                            <img
+                                                                src={Thrashicon}
+                                                                alt="Eliminar"
+                                                                style={{ width: 24, height: 24, color: '#5F5064' }}
+                                                            />
+                                                            <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F" }}>
+                                                                Eliminar
+                                                            </Typography>
+                                                        </Box>
+                                                    </MenuItem>
+                                                </Menu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
             </Box>
             <Modal open={openAddUserModal} onClose={handleCloseModal}>
                 <Box
@@ -810,7 +900,7 @@ const ManageAccounts: React.FC = () => {
                     </Typography>
                     <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', my: 2 }} />
 
-                    <Box sx={{ overflowX: "hidden", overflowY: "auto", mt: -1, pt: 4, pr: 4, pb: 4, pl: 0, flexGrow: 1 }}>
+                    <Box sx={{ overflowX: "hidden", overflowY: "auto", mt: -1, pt: 4, pr: 4, pb: 4, pl: 0, flexGrow: 1, width: "755px" }}>
                         <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
 
                             <Box gridColumn="span 6">
@@ -1263,7 +1353,7 @@ const ManageAccounts: React.FC = () => {
                                                                     padding: "8px 12px",
                                                                     fontSize: "14px",
                                                                     fontFamily: "Poppins",
-                                                                    color: "#574B4F",
+                                                                    color: "#DEDADA",
                                                                     whiteSpace: "pre-line",
                                                                     transform: "translate(-10px, -22px)",
                                                                     borderColor: "#00131F3D",
@@ -1400,10 +1490,10 @@ const ManageAccounts: React.FC = () => {
                                         }}
                                     />
                                     <img src={usrMon} alt="Monitor" width="50" height="50" />
-                                    <Typography fontWeight="bold" color="#9963C3" mt={1} sx={{ fontFamily: "Poppins", }}>
+                                    <Typography fontWeight="bold" color="#9963C3" mt={1} sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 1 }}>
                                         Monitor
                                     </Typography>
-                                    <Typography variant="body2" color="textSecondary" sx={{ fontFamily: "Poppins", }}>
+                                    <Typography variant="body2" color="textSecondary" sx={{ fontFamily: "Poppins", fontSize: "10px", textAlign: "left", marginLeft: "20px" }}>
                                         - Iniciar/detener campañas <br />
                                         - Consultar reportes
                                     </Typography>
@@ -1433,13 +1523,14 @@ const ManageAccounts: React.FC = () => {
                                         }}
                                     />
                                     <img src={usrSup} alt="Supervisor" width="50" height="50" />
-                                    <Typography fontWeight="bold" color="#FB8C00" mt={1} sx={{ fontFamily: "Poppins", }}>
+                                    <Typography fontWeight="bold" color="#FB8C00" mt={1} sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 1 }}>
                                         Supervisor
                                     </Typography>
-                                    <Typography variant="body2" color="textSecondary" sx={{ fontFamily: "Poppins", }}>
+                                    <Typography variant="body2" color="textSecondary" sx={{ fontFamily: "Poppins", fontSize: "10px", textAlign: "left", marginLeft: "20px" }}>
                                         - Iniciar/detener campañas <br />
                                         - Consultar reportes <br />
-                                        - Crear/eliminar campañas
+                                        - Crear/eliminar campañas <br />
+                                        - Crear/eliminar listas negras
                                     </Typography>
                                 </Box>
                                 <Box
@@ -1467,12 +1558,15 @@ const ManageAccounts: React.FC = () => {
                                         }}
                                     />
                                     <img src={usrAdmin} alt="Administrador" width="50" height="50" />
-                                    <Typography fontWeight="bold" color="#F06292" mt={1} sx={{ fontFamily: "Poppins", }}>
+                                    <Typography fontWeight="bold" color="#F06292" mt={1} sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 1 }}>
                                         Administrador
                                     </Typography>
-                                    <Typography variant="body2" color="textSecondary" sx={{ fontFamily: "Poppins", }}>
+                                    <Typography variant="body2" color="textSecondary" sx={{ fontFamily: "Poppins", fontSize: "10px", textAlign: "left", marginLeft: "19px" }}>
                                         - Iniciar/detener campañas <br />
                                         - Consultar reportes <br />
+                                        - Crear/eliminar campañas <br />
+                                        - Crear/eliminar listas negras <br />
+                                        - Administrar saldo <br />
                                         - Crear usuarios
                                     </Typography>
                                 </Box>
@@ -1633,7 +1727,7 @@ const ManageAccounts: React.FC = () => {
                                                 </Box>
                                             }
                                         />
-                                        <Paper
+                                        <Box
                                             sx={{
                                                 display: "flex",
                                                 marginLeft: "15px",
@@ -1689,7 +1783,7 @@ const ManageAccounts: React.FC = () => {
                                                     </Typography>
                                                 </Grid>
                                             </Grid>
-                                        </Paper>
+                                        </Box>
                                     </Box>
                                 ))}
 
@@ -1700,10 +1794,10 @@ const ManageAccounts: React.FC = () => {
                     <Box
                         sx={{
                             display: "flex",
-                            justifyContent: "space-between",
                             alignItems: "center",
+                            gap: 64,
                             mt: 1,
-                            mb: -2
+                            mb: -2, marginLeft: "-12px"
 
                         }}
                     >
@@ -1726,58 +1820,66 @@ const ManageAccounts: React.FC = () => {
                         top: "50%",
                         left: "50%",
                         transform: "translate(-50%, -50%)",
-                        width: 400,
-                        bgcolor: "background.paper",
-                        borderRadius: 2,
+                        width: "480px",
+                        height: "210px",
+                        backgroundColor: "#FFFFFF",
                         boxShadow: 24,
                         p: 4,
+                        borderRadius: "8px",
                     }}
                 >
-                    <Typography variant="h6" component="h2">
+                    <Typography variant="h6"
+                        sx={{
+                            textAlign: "left",
+                            fontFamily: "Poppins",
+                            letterSpacing: "0px",
+                            color: "#574B4F",
+                            opacity: 1,
+                            fontSize: "20px", mt: -0.5, mb: 3.5, fontWeight: 600
+                        }}
+                    >
                         Eliminar cuenta
                     </Typography>
-                    <Typography sx={{ mt: 2 }}>
+                    <Typography
+                        sx={{
+                            textAlign: "left",
+                            fontFamily: "Poppins",
+                            letterSpacing: "0px",
+                            color: "#574B4F",
+                            opacity: 1,
+                            fontSize: "16px",
+                            mb: 3,
+                        }}
+                    >
                         ¿Está seguro de que desea eliminar la cuenta?
                     </Typography>
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-                        <Button
-                            onClick={() => setOpenDeleteModal(false)}
+
+                    <Box mt={4} display="flex" gap={2.5} justifyContent={"flex-end"} >
+                        <Button onClick={() => setOpenDeleteModal(false)}
                             sx={{
-                                color: "#8F4D63", // Color del texto
-                                fontWeight: "bold", // Negrita
-                                backgroundColor: "transparent", // Fondo transparente
-                                border: "none", // Sin bordes
-                                fontSize: "16px", // Tamaño del texto
-                                letterSpacing: "2px", // Espaciado entre letras
-                                textTransform: "uppercase", // Texto en mayúsculas
-                                boxShadow: "none", // Sin sombra
-                                '&:hover': {
-                                    backgroundColor: "transparent", // Fondo transparente en hover
-                                    textDecoration: "underline", // Subrayado en hover
+                                width: "112px", height: "32px", borderRadius: "4px", border: "transparent",
+                                backgroundColor: "#FFFFFF",
+                                "&:hover": {
+                                    backgroundColor: "#F2E9EC",
                                 },
                             }}
                         >
-                            Cancelar
+                            <Typography sx={{ fontFamily: "Poppins", color: "#833A53", fontSize: "14px", fontWeight: 600, letterSpacing: "1.12px" }}>
+                                CANCELAR
+                            </Typography>
                         </Button>
-                        <Button
-                            onClick={handleDeleteUser}
-                            variant="contained"
+                        <Button onClick={handleDeleteUser}
                             sx={{
-                                color: "#8F4D63", // Color del texto
-                                fontWeight: "bold", // Negrita
-                                backgroundColor: "transparent", // Fondo transparente
-                                border: "none", // Sin bordes
-                                fontSize: "16px", // Tamaño del texto
-                                letterSpacing: "2px", // Espaciado entre letras
-                                textTransform: "uppercase", // Texto en mayúsculas
-                                boxShadow: "none", // Sin sombra
-                                '&:hover': {
-                                    backgroundColor: "transparent", // Fondo transparente en hover
-                                    textDecoration: "underline", // Subrayado en hover
+                                width: "92px", height: "32px", borderRadius: "4px", border: "transparent",
+                                backgroundColor: "#FFFFFF",
+                                "&:hover": {
+                                    backgroundColor: "#F2E9EC",
                                 },
                             }}
                         >
-                            Eliminar
+                            <Typography sx={{ fontFamily: "Poppins", color: "#833A53", fontSize: "14px", fontWeight: 600, letterSpacing: "1.12px" }}>
+                                ELIMINAR
+                            </Typography>
                         </Button>
                     </Box>
                 </Box>
