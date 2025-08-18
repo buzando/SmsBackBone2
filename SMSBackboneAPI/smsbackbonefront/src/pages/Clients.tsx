@@ -1158,7 +1158,7 @@ const Clients: React.FC = () => {
                             padding: '8px 2px',
                             boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                             overflowX: 'auto',
-                            maxHeight: "465px"
+                            maxHeight: "472px"
                         }}
                     >
                         <table style={{ minWidth: '1180px', borderCollapse: 'collapse', }}>
@@ -1397,7 +1397,6 @@ const Clients: React.FC = () => {
                         src={IconSuS} alt="Recarga"
                         style={{
                             width: '24px', height: '24px', marginRight: "9px", color: "#574B4F"
-
                         }}
                     />
                     <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4FE6" }}>
