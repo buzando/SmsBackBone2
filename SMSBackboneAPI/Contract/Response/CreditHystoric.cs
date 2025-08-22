@@ -14,6 +14,7 @@ namespace Contract.Response
         public DateTime RechargeDate { get; set; }
         public string PaymentMethod { get; set; }
         public string Estatus { get; set; }
+        public bool FacturadaPreviamente { get; set; }
 
     }
 }

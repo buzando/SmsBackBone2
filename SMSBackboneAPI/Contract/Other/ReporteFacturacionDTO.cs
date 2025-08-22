@@ -13,7 +13,7 @@ namespace Contract.Other
         public string Concepto { get; set; }
         public string RazonSocial { get; set; }
         public DateTime FechaRecarga { get; set; }
-        public int FolioFactura { get; set; }
+        public string FolioFactura { get; set; }
         public decimal Subtotal { get; set; }
         public decimal IVA { get; set; }
         public decimal Total { get; set; }

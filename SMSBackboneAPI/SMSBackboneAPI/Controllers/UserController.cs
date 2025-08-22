@@ -1327,7 +1327,31 @@ namespace SMSBackboneAPI.Controllers
 
             return Ok(true);
         }
+        
+        [Authorize]
+        [HttpPost("CheckInvoice")]
+        public async Task<ActionResult<bool>> CheckInvoice([FromBody] GenerateInvoice invoice)
+        {
 
+            var villanet = new Villanet();
+            var data = villanet.ObtenerFacturaResumenPorRecarga(invoice.IdCredit);
+
+            if (data == null) return StatusCode(502, false);
+
+            return Ok(data);
+        }
+        [Authorize]
+        [HttpPost("DownloadInovice")]
+        public async Task<ActionResult<bool>> DownloadInovice([FromBody] GenerateInvoice invoice)
+        {
+
+            var villanet = new Villanet();
+            var data = villanet.Getbase64xml(invoice.IdCredit);
+
+            if (data == null) return StatusCode(502, false);
+
+            return Ok(data);
+        }
 
     }
 }

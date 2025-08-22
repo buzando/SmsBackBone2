@@ -10,6 +10,10 @@ using log4net;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.IO.Pipelines;
 using System.Web;
+using System.Xml.Linq;
+using System.Globalization;
+using System.Data.SqlTypes;
+using Microsoft.EntityFrameworkCore;
 
 namespace Business
 {
@@ -187,6 +191,21 @@ namespace Business
                     result.XmlBase64 = Convert.ToBase64String(xmlBytes);
                     result.PdfBase64 = Convert.ToBase64String(pdfBytes);
                     result.Success = true;
+
+                    var entidadFactura = ParseFacturaResumenFromXml(xmlBytes, recarga.Id, result.XmlBase64, result.PdfBase64);
+                    UpsertFacturaResumen(entidadFactura);
+                }
+
+                if (true)
+                {
+                    using (var ctx = new Entities())
+                    {
+                        var recargafinal = ctx.CreditRecharge.Where(x => x.Id == idRecarga).FirstOrDefault();
+                        recargafinal.FacturaXML = result.XmlBase64;
+                        recargafinal.FacturaPDF = result.PdfBase64;
+                        recargafinal.RechargeDate = DateTime.Now;
+                        ctx.SaveChanges();
+                    }
                 }
 
                 result.Success = true;
@@ -203,6 +222,35 @@ namespace Business
             }
         }
 
+        public FacturaResumen ObtenerFacturaResumenPorRecarga(int rechargeId)
+        {
+            using (var ctx = new Entities())
+            {
+                return ctx.FacturaResumen
+                          .AsNoTracking()
+                          .FirstOrDefault(fr => fr.RechargeId == rechargeId);
+            }
+        }
+        public FacturaResumen ObtenerFacturaResumenPorUuid(Guid uuid)
+        {
+            using (var ctx = new Entities())
+            {
+                return ctx.FacturaResumen
+                          .AsNoTracking()
+                          .FirstOrDefault(fr => fr.UUID == uuid);
+            }
+        }
+
+        public string Getbase64xml(int idrechargue)
+        {
+            using (var ctx = new Entities())
+            {
+                return ctx.CreditRecharge
+                          .Where(fr => fr.Id == idrechargue)
+                                                    .Select(x => x.FacturaXML)
+                          .FirstOrDefault();
+            }
+        }
 
 
         public async Task FacturarRecargasPendientes()
@@ -247,12 +295,13 @@ namespace Business
                     using (var ctx = new Entities())
                     {
                         var recargadocumentos = ctx.CreditRecharge.Where(x => x.Id == recarga.Id).FirstOrDefault();
-                        recarga.FacturaPDF = resultado.PdfBase64;
-                        recarga.FacturaXML = resultado.XmlBase64;
-                        recarga.FechaFacturacion = DateTime.Now;
+                        recargadocumentos.FacturaPDF = resultado.PdfBase64;
+                        recargadocumentos.FacturaXML = resultado.XmlBase64;
+                        recargadocumentos.FechaFacturacion = DateTime.Now;
 
                         ctx.SaveChanges();
                     }
+
                 }
                 else
                 {
@@ -261,7 +310,157 @@ namespace Business
             }
 
         }
+        private static byte[] FromBase64Clean(string base64)
+        {
+            if (string.IsNullOrWhiteSpace(base64)) return Array.Empty<byte[]>().FirstOrDefault();
 
+            // elimina prefijos tipo data:...;base64,
+            var idx = base64.IndexOf("base64,", StringComparison.OrdinalIgnoreCase);
+            if (idx >= 0) base64 = base64.Substring(idx + "base64,".Length);
+
+            return Convert.FromBase64String(base64);
+        }
+
+        private FacturaResumen ParseFacturaResumenFromXml(byte[] xmlBytes, int rechargeId, string urlXml, string urlPdf)
+        {
+            var xmlText = System.Text.Encoding.UTF8.GetString(xmlBytes);
+            var doc = XDocument.Parse(xmlText);
+
+            // Toma por local-name para funcionar con CFDI 3.3 o 4.0
+            var comprobante = doc.Descendants().FirstOrDefault(e => e.Name.LocalName == "Comprobante")
+                             ?? throw new InvalidOperationException("No se encontró el nodo Comprobante en el CFDI.");
+            var tfd = doc.Descendants().FirstOrDefault(e => e.Name.LocalName == "TimbreFiscalDigital")
+                      ?? throw new InvalidOperationException("No se encontró TimbreFiscalDigital en el CFDI.");
+
+            string uuidStr = (string)tfd.Attribute("UUID")
+                           ?? throw new InvalidOperationException("El CFDI no contiene UUID.");
+
+            // Atributos del Comprobante
+            string serie = (string)comprobante.Attribute("Serie");
+            string folio = (string)comprobante.Attribute("Folio");
+            string fechaStr = (string)comprobante.Attribute("Fecha")
+                           ?? (string)comprobante.Attribute("Fecha") /* fallback innecesario, pero deja claro */;
+
+            // Números con InvariantCulture
+            decimal subtotal = ParseDec((string)comprobante.Attribute("SubTotal"));
+            decimal total = ParseDec((string)comprobante.Attribute("Total"));
+
+            // IVA: toma TotalImpuestosTrasladados o suma de Traslado/Importe
+            decimal? iva = null;
+            var impuestos = doc.Descendants().FirstOrDefault(e => e.Name.LocalName == "Impuestos");
+            if (impuestos != null)
+            {
+                var totTras = (string)impuestos.Attribute("TotalImpuestosTrasladados");
+                if (!string.IsNullOrWhiteSpace(totTras))
+                {
+                    iva = ParseDec(totTras);
+                }
+                else
+                {
+                    var sum = impuestos.Descendants().Where(e => e.Name.LocalName == "Traslado")
+                                  .Select(x => ParseDec((string)x.Attribute("Importe")))
+                                  .Sum();
+                    // si no hay traslados, sum = 0
+                    iva = sum;
+                }
+            }
+
+
+            var fecha = ParseFechaOrDefault(fechaStr, useUtcNow: true);
+
+            var entity = new FacturaResumen
+            {
+                UUID = Guid.Parse(uuidStr),
+                Serie = serie,
+                Folio = folio,
+                FechaEmision = fecha,
+                Subtotal = subtotal,
+                IVA = iva,
+                Total = total,
+                UrlXml = urlXml,
+                UrlPdf = urlPdf,
+                Origen = "Villanett",
+                FechaRegistro = DateTime.UtcNow,
+                RechargeId = rechargeId
+            };
+            return entity;
+
+            static decimal ParseDec(string? s)
+                => decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : 0m;
+        }
+        private DateTime ParseFechaOrDefault(string? fechaStr, bool useUtcNow = true)
+        {
+            // 1) Con offset/UTC si viene, o asume UTC si no viene zona
+            if (!string.IsNullOrWhiteSpace(fechaStr))
+            {
+                if (DateTimeOffset.TryParse(
+                        fechaStr,
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                        out var dto))
+                {
+                    return TrimToSeconds(dto.UtcDateTime);
+                }
+
+                // 2) Intento exacto ISO sin milisegundos (ej: 2025-08-13T12:04:14)
+                if (DateTime.TryParseExact(
+                        fechaStr,
+                        "yyyy-MM-dd'T'HH:mm:ss",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                        out var exact))
+                {
+                    return TrimToSeconds(DateTime.SpecifyKind(exact, DateTimeKind.Utc));
+                }
+
+                // 3) Último intento “libre” asumiendo UTC
+                if (DateTime.TryParse(
+                        fechaStr,
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                        out var parsed))
+                {
+                    return TrimToSeconds(parsed.ToUniversalTime());
+                }
+
+                // 4) Log y fallback
+                _logger.Warn($"Fecha CFDI inválida ('{fechaStr}'). Se usará {(useUtcNow ? "DateTime.UtcNow" : "DateTime.Now")}.");
+            }
+
+            return TrimToSeconds(useUtcNow ? DateTime.UtcNow : DateTime.Now);
+
+            static DateTime TrimToSeconds(DateTime dt)
+                => dt.AddTicks(-(dt.Ticks % TimeSpan.TicksPerSecond)); // DATETIME2(0) sin milisegundos
+        }
+
+        private void UpsertFacturaResumen(FacturaResumen factura)
+        {
+            using (var ctx = new Entities())
+            {
+                // Busca por clave única (UUID)
+                var existing = ctx.FacturaResumen.FirstOrDefault(x => x.UUID == factura.UUID);
+                if (existing == null)
+                {
+                    ctx.FacturaResumen.Add(factura);
+                }
+                else
+                {
+                    // Actualiza campos volátiles si ya existía
+                    existing.Serie = factura.Serie;
+                    existing.Folio = factura.Folio;
+                    existing.FechaEmision = factura.FechaEmision;
+                    existing.Subtotal = factura.Subtotal;
+                    existing.IVA = factura.IVA;
+                    existing.Total = factura.Total;
+                    existing.UrlXml = factura.UrlXml;
+                    existing.UrlPdf = factura.UrlPdf;
+                    existing.Origen = factura.Origen;
+                    existing.RechargeId = factura.RechargeId;
+                    existing.FechaRegistro = factura.FechaRegistro;
+                }
+                ctx.SaveChanges();
+            }
+        }
         public ArticuloVillanet ObtenerArticulos(string descripcion)
         {
             var client = new TiendaVirtualSoapClient(

@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { Button, Typography, Box, CircularProgress, IconButton, Menu, MenuItem, Tooltip, Modal, Divider } from "@mui/material";
+import { Button, Typography, Box, CircularProgress, IconButton, Menu, MenuItem, Tooltip, Modal, Divider, TableRow } from "@mui/material";
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import '../components/commons/CSS/DatePicker.css';
@@ -28,6 +28,23 @@ interface Historic {
     RechargeDate: Date,
     PaymentMethod: string,
     Estatus: string,
+    facturadaPreviamente: boolean
+}
+
+export interface FacturaResumen {
+    id: number;
+    uuid: string;
+    serie: string | null;
+    folio: string | null;
+    fechaEmision: string;
+    subtotal: number;
+    iva: number | null;
+    total: number;
+    urlXml: string | null;
+    urlPdf: string | null;
+    origen: string | null;
+    fechaRegistro: string;
+    rechargeId: number;
 }
 
 const PaymentHistoric: React.FC = () => {
@@ -54,7 +71,9 @@ const PaymentHistoric: React.FC = () => {
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const [TitleErrorModal, setTitleErrorModal] = useState('');
     const [BodyErrorModal, setBodyErrorModal] = useState('');
-
+    const [selectedRow, setSelectedRow] = useState<Historic | null>(null);
+    const [facturaResumen, setFacturaResumen] = React.useState<FacturaResumen | null>(null);
+    const [isFacturaResumenOpen, setFacturaResumenOpen] = useState(false);
     const formatDateRange = () => {
         if (!selectedDates) return 'FECHA'; // Muestra "FECHA" si no hay fechas seleccionadas
         return `${format(selectedDates.start, "dd MMM", { locale: es })}, ${String(selectedDates.startHour).padStart(2, '0')}:${String(selectedDates.startMinute).padStart(2, '0')} - ${format(selectedDates.end, "d MMM", { locale: es })} ${String(selectedDates.endHour).padStart(2, '0')}:${String(selectedDates.endMinute).padStart(2, '0')}`;
@@ -98,24 +117,66 @@ const PaymentHistoric: React.FC = () => {
 
     const handleClose = () => {
         setAnchorEl(null);
-        setSelectedRecarga(null);
+        //setSelectedRecarga(null);
     };
 
-    const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, id: number, paymentMethod: string) => {
+    const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, id: number, paymentMethod: string, row: Historic) => {
         setAnchorEl(event.currentTarget);
         setSelectedRecarga(id);
-        setSelectedPaymentMethod(paymentMethod); // Guarda el método de pago seleccionado
+        setSelectedPaymentMethod(paymentMethod);
+        setSelectedRow(row);
     };
 
     const handleAsyncAction = async (actionType: 'Consultar' | 'Descargar') => {
         try {
+            const userId =
+                Number(JSON.parse(localStorage.getItem('userData') ?? '{}')?.id);
+
             setLoading(true); // Simula la carga
 
-            // Simular una llamada a la API con un retraso de 2 segundos
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            if (actionType == 'Consultar') {
+                const url = import.meta.env.VITE_API_CHECK_INVOICE;
+                const payload = {
+                    IdCredit: Number(selectedRecarga),
+                    IdUser: userId,
+                };
 
-            // Simular error para probar el modal
-            throw new Error(`Error al intentar ${actionType.toLowerCase()} la factura`);
+                const { data } = await axios.post<FacturaResumen>(url, payload);
+                setFacturaResumen(data);
+                setFacturaResumenOpen(true);
+            }
+            if (actionType === 'Descargar') {
+                try {
+                    setLoading(true);
+
+                    const userId = Number(JSON.parse(localStorage.getItem('userData') ?? '{}')?.id);
+                    const url = import.meta.env.VITE_API_DOWNLOAD_INVOICE; // endpoint que regresa base64 del XML
+                    const payload = { IdCredit: Number(selectedRecarga), IdUser: userId };
+
+                    // devuelve un string base64 del XML (posible con o sin "data:...;base64,")
+                    const { data } = await axios.post<string>(url, payload);
+
+                    const xmlBase64 = data?.includes('base64,') ? data.split('base64,')[1] : data;
+                    if (!xmlBase64) {
+                        setTitleErrorModal('Error al descargar factura');
+                        setBodyErrorModal('No se recibió contenido del XML.');
+                        setIsErrorModalOpen(true);
+                        return;
+                    }
+
+                    // helpers que ya tienes en el archivo:
+                    const blobUrl = base64ToBlobUrl(xmlBase64, 'application/xml');
+                    const nombreArchivo = `factura_${(facturaResumen?.folio || facturaResumen?.uuid || selectedRow?.id || 'xml')}.xml`;
+
+                    download(blobUrl, nombreArchivo);
+                } catch (err) {
+                    setTitleErrorModal('Error al descargar factura');
+                    setBodyErrorModal('La factura que desea descargar no existe o no está disponible.');
+                    setIsErrorModalOpen(true);
+                } finally {
+                    setLoading(false);
+                }
+            }
 
         } catch {
             if (actionType == 'Consultar') {
@@ -138,7 +199,7 @@ const PaymentHistoric: React.FC = () => {
         if (!selectedRecarga) return;
 
         const userId =
-            Number(JSON.parse(localStorage.getItem('user') ?? '{}')?.id);
+            Number(JSON.parse(localStorage.getItem('userData') ?? '{}')?.id);
 
         const url = import.meta.env.VITE_API_SEND_INVOICE;
         const payload = {
@@ -166,6 +227,15 @@ const PaymentHistoric: React.FC = () => {
     };
 
 
+
+    const norm = (s?: string) => (s ?? '').trim().toLowerCase();
+
+    const hasPrevInvoice = !!selectedRow?.facturadaPreviamente;
+    const statusOk = norm(selectedRow?.Estatus) === 'exitoso';
+
+    const canGenerate = !hasPrevInvoice && statusOk;   // ✅ no facturada y estatus exitoso
+    const canConsult = hasPrevInvoice;                // ✅ ya facturada
+    const canDownload = hasPrevInvoice;                // ✅ ya facturada
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
@@ -429,112 +499,112 @@ const PaymentHistoric: React.FC = () => {
                                 </tr>
                             </thead>
 
-                        {/* Datos */}
-                        <tbody>
-                            {Historic.map((recarga) => (
-                                <tr key={recarga.id} style={{ borderBottom: '1px solid #E6E4E4' }}>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
-                                        textAlign: 'left',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                    }}>
-                                        {new Date(recarga.rechargeDate).toLocaleString()}
-                                    </td>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
-                                        textAlign: 'left',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                    }}>
-                                        {recarga.client}
-                                    </td>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
-                                        textAlign: 'left',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                    }}>
-                                        {recarga.id}
-                                    </td>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
-                                        textAlign: 'left',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                    }}>
-                                        ${recarga.quantityMoney.toLocaleString()}
-                                    </td>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
-                                        textAlign: 'left',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                    }}>
-                                        <Tooltip title={recarga.paymentMethod} arrow>
-                                            <span style={truncatedStyle}>
-                                                {recarga.paymentMethod.split('-')[0]} - ...
-                                            </span>
-                                        </Tooltip>
-                                    </td>
-                                    <td style={{
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontSize: '13px',
-                                        color: '#000000',
-                                        textAlign: 'left',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                    }}>
-                                        {recarga.estatus}
-                                    </td>
-                                    <td style={{ padding: '10px', textAlign: 'right' }}>
-                                        <IconButton onClick={(event) => handleMenuClick(event, recarga.id, recarga.paymentMethod)}>
-                                            <MoreVertIcon />
-                                        </IconButton>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {/* Menú de opciones */}
-                    <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
-                        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                    >
-                        <MenuItem style={menuItemStyle} onClick={() => {
-                            setIsInvoiceModalOpen(true);
-                            handleClose();
-                        }} >
-                            <img src={billingicon} alt="billing" style={iconStyle} />
+                            {/* Datos */}
+                            <tbody>
+                                {Historic.map((recarga) => (
+                                    <tr key={recarga.id} style={{ borderBottom: '1px solid #E6E4E4' }}>
+                                        <td style={{
+                                            padding: '10px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#000000',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            {new Date(recarga.rechargeDate).toLocaleString()}
+                                        </td>
+                                        <td style={{
+                                            padding: '10px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#000000',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            {recarga.client}
+                                        </td>
+                                        <td style={{
+                                            padding: '10px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#000000',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            {recarga.id}
+                                        </td>
+                                        <td style={{
+                                            padding: '10px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#000000',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            ${recarga.quantityMoney.toLocaleString()}
+                                        </td>
+                                        <td style={{
+                                            padding: '10px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#000000',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            <Tooltip title={recarga.paymentMethod} arrow>
+                                                <span style={truncatedStyle}>
+                                                    {recarga.paymentMethod.split('-')[0]} - ...
+                                                </span>
+                                            </Tooltip>
+                                        </td>
+                                        <td style={{
+                                            padding: '10px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '13px',
+                                            color: '#000000',
+                                            textAlign: 'left',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>
+                                            {recarga.estatus}
+                                        </td>
+                                        <td style={{ padding: '10px', textAlign: 'right' }}>
+                                            <IconButton onClick={(event) => handleMenuClick(event, recarga.id, recarga.paymentMethod, recarga)}>
+                                                <MoreVertIcon />
+                                            </IconButton>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {/* Menú de opciones */}
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        >
+                            <MenuItem disabled={selectedRow?.facturadaPreviamente} style={menuItemStyle} onClick={() => {
+                                setIsInvoiceModalOpen(true);
+                                handleClose();
+                            }} >
+                                <img src={billingicon} alt="billing" style={iconStyle} />
 
                                 Generar Factura
                             </MenuItem>
-                            <MenuItem onClick={() => { handleAsyncAction('Consultar'); handleClose(); }} style={menuItemStyle} disabled
+                            <MenuItem disabled={!canConsult} onClick={() => { handleAsyncAction('Consultar'); handleClose(); }} style={menuItemStyle}
                                 sx={{
                                     fontFamily: 'Poppins',
                                     fontSize: '14px',
@@ -546,7 +616,7 @@ const PaymentHistoric: React.FC = () => {
                                 <img src={EyeIcon} alt="Consultar" style={iconStyle} />
                                 Consultar Factura
                             </MenuItem>
-                            <MenuItem onClick={() => { handleAsyncAction('Descargar'); handleClose(); }} style={menuItemStyle} disabled
+                            <MenuItem disabled={!canDownload} onClick={() => { handleAsyncAction('Descargar'); handleClose(); }} style={menuItemStyle}
                                 sx={{
                                     fontFamily: 'Poppins',
                                     fontSize: '14px',
@@ -635,6 +705,28 @@ const PaymentHistoric: React.FC = () => {
                     </Box>
                 </Box>
             </Modal>
+            <Modal open={isFacturaResumenOpen} onClose={() => setFacturaResumenOpen(false)}>
+                <Box sx={{ position: 'absolute', top: '20%', left: '35%', width: 556, height: 520, bgcolor: 'white', p: 2, borderRadius: 2, boxShadow: 24 }}>
+                    <Typography sx={{ textAlign: 'left', fontFamily: 'Poppins', fontWeight: 600, fontSize: 20, lineHeight: '54px', color: '#574B4F' }}>
+                        Resumen de factura
+                    </Typography>
+
+                    <IconButton onClick={() => setFacturaResumenOpen(false)}
+                        sx={{ position: 'absolute', mt: '-68px', ml: '492px', zIndex: 10 }}>
+                        <CloseIcon sx={{ color: '#A6A6A6' }} />
+                    </IconButton>
+
+                    <FacturaResumenContent
+                        facturaResumen={facturaResumen}
+                        selectedPaymentMethod={selectedPaymentMethod}
+                        onClose={() => setFacturaResumenOpen(false)}
+                    />
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                        <SecondaryButton text='Cerrar' onClick={() => setFacturaResumenOpen(false)} />
+                    </Box>
+                </Box>
+            </Modal>
 
             {showChipBarInvoice && (
                 <Snackbar
@@ -714,6 +806,139 @@ const iconStyle = {
     width: '20px',
     height: '20px',
     marginRight: '10px'
+};
+
+type FacturaResumenProps = {
+    facturaResumen: FacturaResumen | null;
+    selectedPaymentMethod?: string | null;
+    onClose: () => void;
+};
+
+const money = (n?: number | null) =>
+    typeof n === 'number'
+        ? n.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })
+        : '—';
+
+const fmtDate = (s?: string | null) =>
+    s ? new Date(s).toLocaleString('es-MX') : '—';
+
+// ¿parece base64 (con o sin data:...;base64,)?
+const looksBase64 = (s?: string | null) => {
+    if (!s) return false;
+    if (/^data:.*;base64,/.test(s)) return true;
+    return /^[A-Za-z0-9+/=\s]+$/.test(s) && s.length > 100;
+};
+
+const base64ToBlobUrl = (b64: string, mime: string) => {
+    const clean = b64.includes('base64,') ? b64.split('base64,')[1] : b64;
+    const bin = atob(clean);
+    const len = bin.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+    const blob = new Blob([bytes], { type: mime });
+    return URL.createObjectURL(blob);
+};
+
+const download = (href: string, filename: string) => {
+    const a = document.createElement('a');
+    a.href = href;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    URL.revokeObjectURL(a.href);
+    a.remove();
+};
+
+const FacturaResumenContent: React.FC<FacturaResumenProps> = ({
+    facturaResumen,
+    selectedPaymentMethod,
+    onClose,
+}) => {
+    const serie = facturaResumen?.serie ?? '—';
+    const folio = facturaResumen?.folio ?? '—';
+    const uuid = facturaResumen?.uuid ?? '—';
+
+    const subtotal = money(facturaResumen?.subtotal);
+    const iva = money(facturaResumen?.iva ?? null);
+    const total = money(facturaResumen?.total);
+    const fechaEmision = fmtDate(facturaResumen?.fechaEmision);
+    const origen = facturaResumen?.origen ?? '—';
+
+    const canPdf = !!facturaResumen?.urlPdf;
+    const canXml = !!facturaResumen?.urlXml;
+
+    const handleDownloadPdf = () => {
+        const src = facturaResumen?.urlPdf;
+        if (!src) return;
+        if (looksBase64(src)) {
+            const url = base64ToBlobUrl(src, 'application/pdf');
+            download(url, `factura_${folio || uuid}.pdf`);
+        } else {
+            window.open(src, '_blank');
+        }
+    };
+
+    const handleDownloadXml = () => {
+        const src = facturaResumen?.urlXml;
+        if (!src) return;
+        if (looksBase64(src)) {
+            const url = base64ToBlobUrl(src, 'application/xml');
+            download(url, `factura_${folio || uuid}.xml`);
+        } else {
+            window.open(src, '_blank');
+        }
+    };
+
+    const copyUuid = async () => {
+        if (!uuid || uuid === '—') return;
+        try {
+            await navigator.clipboard.writeText(uuid);
+            // TODO: muestra tu toast si quieres
+        } catch { }
+    };
+
+    return (
+        <Box sx={{ bgcolor: '#F5F4F4', p: 2, borderRadius: 1, color: '#6a6a6a' }}>
+            <Typography sx={{ mb: 1, fontFamily: 'Poppins', fontSize: 16 }}>
+                <strong>Serie/Folio:</strong> {serie}/{folio}
+            </Typography>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Typography sx={{ fontFamily: 'Poppins', fontSize: 16 }}>
+                    <strong>UUID:</strong> {uuid}
+                </Typography>
+            </Box>
+
+            <Typography sx={{ mb: 1, fontFamily: 'Poppins', fontSize: 16 }}>
+                <strong>Fecha de emisión:</strong> {fechaEmision}
+            </Typography>
+
+            <Typography sx={{ mb: 1, fontFamily: 'Poppins', fontSize: 16 }}>
+                <strong>Subtotal:</strong> {subtotal}
+            </Typography>
+
+            <Typography sx={{ mb: 1, fontFamily: 'Poppins', fontSize: 16 }}>
+                <strong>IVA:</strong> {iva}
+            </Typography>
+
+            <Typography sx={{ mb: 1, fontFamily: 'Poppins', fontSize: 16 }}>
+                <strong>Total:</strong> {total}
+            </Typography>
+
+            <Typography sx={{ mb: 1, fontFamily: 'Poppins', fontSize: 16 }}>
+                <strong>Método de pago:</strong> {selectedPaymentMethod ?? 'No disponible'}
+            </Typography>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <MainButton onClick={handleDownloadPdf} disabled={!canPdf} text='DescargarPDF' />
+
+                <MainButton onClick={handleDownloadXml} disabled={!canXml} text='DescargaXML' />
+
+            </Box>
+        </Box>
+    );
 };
 
 

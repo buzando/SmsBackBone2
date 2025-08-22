@@ -1138,7 +1138,9 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                                     quantityMoney = cr.quantityMoney,
                                     RechargeDate = cr.RechargeDate,
                                     Estatus = cr.Estatus,
-                                    PaymentMethod = $"{cc.Type} •••• {cc.card_number.Substring(cc.card_number.Length - 4)} - {cc.card_name}"
+                                    PaymentMethod = $"{cc.Type} •••• {cc.card_number.Substring(cc.card_number.Length - 4)} - {cc.card_name}",
+
+                                    FacturadaPreviamente = ctx.FacturaResumen.Any(fr => fr.RechargeId == cr.Id)
                                 }).ToList();
 
                 }

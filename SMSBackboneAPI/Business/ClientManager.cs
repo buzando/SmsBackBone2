@@ -757,35 +757,41 @@ namespace Business
 
 
 
-        public (List<ReporteFacturacionDTO> Items, int Total) GetReporteFacturacion(DateTime fechaInicio, DateTime fechaFin, List<int> clientIds, int page, int pageSize)
+        public (List<ReporteFacturacionDTO> Items, int Total) GetReporteFacturacion(
+      DateTime fechaInicio, DateTime fechaFin, List<int> clientIds, int page, int pageSize)
         {
             if (clientIds == null)
             {
                 clientIds = new List<int>();
             }
+
             using (var ctx = new Entities())
             {
-                var query = from recarga in ctx.CreditRecharge
-                            join user in ctx.Users on recarga.idUser equals user.Id
-                            join cliente in ctx.clients on user.IdCliente equals cliente.id
-                            join billing in ctx.BillingInformation on user.Id equals billing.userId into billingGroup
-                            from billing in billingGroup.DefaultIfEmpty()
-                            where recarga.RechargeDate >= fechaInicio && recarga.RechargeDate <= fechaFin
-                                  && (clientIds == null || clientIds.Contains(cliente.id))
-                            select new ReporteFacturacionDTO
-                            {
-                                FechaFacturacion = DateTime.Now,
-                                Cliente = cliente.nombrecliente,
-                                Concepto = "SMS",
-                                RazonSocial = billing.BusinessName ?? "Sin razón social",
-                                FechaRecarga = recarga.RechargeDate,
-                                FolioFactura = 123,
-                                Subtotal = recarga.quantityMoney,
-                                IVA = Math.Round(recarga.quantityMoney * 0.16m, 2),
-                                Total = Math.Round(recarga.quantityMoney * 1.16m, 2)
-                            };
+                var query =
+                    from recarga in ctx.CreditRecharge
+                    join user in ctx.Users on recarga.idUser equals user.Id
+                    join cliente in ctx.clients on user.IdCliente equals cliente.id
+                    join billing in ctx.BillingInformation on user.Id equals billing.userId into billingGroup
+                    from billing in billingGroup.DefaultIfEmpty()
+                    join factura in ctx.FacturaResumen on recarga.Id equals factura.RechargeId
+                    where recarga.RechargeDate >= fechaInicio
+                       && recarga.RechargeDate <= fechaFin
+                       && (clientIds == null || clientIds.Contains(cliente.id))
+                    select new ReporteFacturacionDTO
+                    {
+                        FechaFacturacion = DateTime.Now,
+                        Cliente = cliente.nombrecliente,
+                        Concepto = "SMS",
+                        RazonSocial = billing.BusinessName ?? "Sin razón social",
+                        FechaRecarga = recarga.RechargeDate,
+                        FolioFactura = $"{factura.Serie}-{factura.Folio}",
+                        Subtotal = recarga.quantityMoney,
+                        IVA = Math.Round(recarga.quantityMoney * 0.16m, 2),
+                        Total = Math.Round(recarga.quantityMoney * 1.16m, 2)
+                    };
 
                 int total = query.Count();
+
                 var items = (page <= 0)
                     ? query.OrderByDescending(x => x.FechaRecarga).ToList()
                     : query.OrderByDescending(x => x.FechaRecarga)
@@ -796,6 +802,7 @@ namespace Business
                 return (items, total);
             }
         }
+
 
 
         public (List<ReporteConsumoSistemaDto> Items, int Total) GetReporteConsumoSistema(DateTime fechaInicio, DateTime fechaFin, List<int> clientIds, int page, int pageSize)
