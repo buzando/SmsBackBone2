@@ -1358,7 +1358,7 @@ const Campains: React.FC = () => {
 
   return (
 
-    <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+    <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1360px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
       {loadingPage && (
         <Box sx={{
           position: 'fixed',
@@ -1520,7 +1520,7 @@ const Campains: React.FC = () => {
                       value={Serchterm}
                       onChange={handleSearch2}
                       autoFocus
-                      onKeyDown={(e) => e.stopPropagation()} // Evita la navegación automática
+                      onKeyDown={(e) => e.stopPropagation()}
                       style={{
                         border: "none",
                         outline: "none",

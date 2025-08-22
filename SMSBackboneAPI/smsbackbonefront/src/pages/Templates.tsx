@@ -20,6 +20,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '../assets/Icon-trash-Card.svg'
 import SmsIcon from '@mui/icons-material/Sms';
+import Iconseachred from "../assets/Iconseachred.svg";
 import Emptybox from '../assets/NoResultados.svg';
 import MainModal from "../components/commons/MainModal"
 import ChipBar from "../components/commons/ChipBar";
@@ -442,19 +443,10 @@ const Templates = () => {
 
 
     return (
-        <div style={{ padding: '20px', marginTop: '-70px', marginLeft: '40px', maxWidth: '1140px' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
-                    onClick={() => navigate('/')}
-                    sx={{
-                        p: 0,
-                        mr: 1,
-                        ml: '-28px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
+                    onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
                     <img
                         src={ArrowBackIosNewIcon}
                         alt="Regresar"
@@ -480,436 +472,432 @@ const Templates = () => {
                 </Typography>
             </Box>
 
-            <Divider sx={{ marginBottom: '17px', marginTop: '16px' }} />
+            <Box sx={{ marginLeft: "32px", }}>
+                <Divider sx={{ marginBottom: '17px', marginTop: '16px' }} />
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '25px', marginBottom: '20px' }}>
-                <MainIcon
-                    text="Nueva plantilla"
-                    isLoading={false}
-                    onClick={handleOpenModal}
-                    width="218px"
-                >
-                    <span className="flex items-center">
-                        <span className="mr-2">+</span> Nueva Plantilla
-                    </span>
-                </MainIcon>
-
-                <div style={{ position: 'relative', width: '220px' }}>
-                    <Box
-                        display="flex"
-                        alignItems="center"
-                        sx={{
-                            backgroundColor: '#FFFFFF',
-                            border: searchTerm ? '1px solid #7B354D' : '1px solid #9B9295',
-                            borderRadius: '4px',
-                            padding: '8px 12px',
-                            width: '218px',
-                            height: '40px',
-                            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                        }}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '25px', marginBottom: '20px' }}>
+                    <MainIcon
+                        text="Nueva plantilla"
+                        isLoading={false}
+                        onClick={handleOpenModal}
+                        width="218px"
                     >
-                        <img
-                            src={seachicon}
-                            alt="Buscar"
-                            style={{
-                                marginRight: '8px',
-                                width: '18px',
-                                height: '18px',
-                                filter: searchTerm ? 'invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)' : 'none',
+                        <span className="flex items-center">
+                            <span className="mr-2">+</span> Nueva Plantilla
+                        </span>
+                    </MainIcon>
+
+                    <div style={{ position: 'relative', width: '220px' }}>
+                        <Box
+                            display="flex"
+                            alignItems="center"
+                            sx={{
+                                backgroundColor: '#FFFFFF',
+                                border: searchTerm ? '1px solid #7B354D' : '1px solid #9B9295',
+                                borderRadius: '4px',
+                                padding: '8px 12px',
+                                width: '218px',
+                                height: '40px',
+                                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
                             }}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Buscar"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            style={{
-                                border: 'none',
-                                outline: 'none',
-                                width: '100%',
-                                fontSize: '16px',
-                                fontFamily: 'Poppins, sans-serif',
-                                color: searchTerm ? '#7B354D' : '#9B9295',
-                                backgroundColor: 'transparent',
-                            }}
-                        />
-                        {searchTerm && (
+                        >
                             <img
-                                src={iconclose}
-                                alt="Limpiar"
-                                style={{ marginLeft: '8px', width: '16px', height: '16px', cursor: 'pointer' }}
-                                onClick={() => setSearchTerm('')}
+                                src={searchTerm ? Iconseachred : seachicon}
+                                alt="Buscar"
+                                style={{ marginRight: 8, width: 24 }}
                             />
-                        )}
-                    </Box>
+                            <input
+                                type="text"
+                                placeholder="Buscar"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{
+                                    border: 'none',
+                                    outline: 'none',
+                                    width: '100%',
+                                    fontSize: '16px',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    color: searchTerm ? '#7B354D' : '#9B9295',
+                                    backgroundColor: 'transparent',
+                                }}
+                            />
+                            {searchTerm && (
+                                <img
+                                    src={iconclose}
+                                    alt="Limpiar"
+                                    style={{ marginLeft: '8px', width: '24px', height: '24px', cursor: 'pointer' }}
+                                    onClick={() => setSearchTerm('')}
+                                />
+                            )}
+                        </Box>
+                    </div>
                 </div>
-            </div>
 
-            {templates.length > 0 && (
-                <Box sx={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', marginTop: '-46px',
-                }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, marginLeft: "10px" }}>
-                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#574B4F', minWidth: '120px' }}>
-                            {startItem}–{endItem} de {totalItems}
-                        </Typography>
-                        <Box sx={{ marginLeft: "-25px" }}>
-                            {/* Ir al inicio */}
-                            <IconButton
-                                onClick={() => setCurrentPage(1)}
-                                disabled={currentPage === 1}
-                                sx={{ p: 0 }}
-                            >
-                                <img
-                                    src={currentPage === 1 ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(0deg)', width: 22 }}
-                                    alt="Primera página"
-                                />
-                                <img
-                                    src={currentPage === 1 ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(0deg)', width: 22, marginLeft: '-16px' }}
-                                    alt=""
-                                />
-                            </IconButton>
+                {templates.length > 0 && (
+                    <Box sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', marginTop: '-46px',
+                    }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, marginLeft: "10px" }}>
+                            <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#574B4F', minWidth: '120px' }}>
+                                {startItem}–{endItem} de {totalItems}
+                            </Typography>
+                            <Box sx={{ marginLeft: "-25px" }}>
+                                {/* Ir al inicio */}
+                                <IconButton
+                                    onClick={() => setCurrentPage(1)}
+                                    disabled={currentPage === 1}
+                                    sx={{ p: 0 }}
+                                >
+                                    <img
+                                        src={currentPage === 1 ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(0deg)', width: 22 }}
+                                        alt="Primera página"
+                                    />
+                                    <img
+                                        src={currentPage === 1 ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(0deg)', width: 22, marginLeft: '-16px' }}
+                                        alt=""
+                                    />
+                                </IconButton>
 
-                            {/* Anterior */}
-                            <IconButton
-                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                disabled={currentPage === 1}
-                                sx={{ p: 0 }}
-                            >
-                                <img
-                                    src={currentPage === 1 ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(0deg)', width: 22 }}
-                                    alt="Anterior"
-                                />
-                            </IconButton>
+                                {/* Anterior */}
+                                <IconButton
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                    sx={{ p: 0 }}
+                                >
+                                    <img
+                                        src={currentPage === 1 ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(0deg)', width: 22 }}
+                                        alt="Anterior"
+                                    />
+                                </IconButton>
 
-                            {/* Siguiente */}
-                            <IconButton
-                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                disabled={currentPage === totalPages}
-                                sx={{ p: 0 }}
-                            >
-                                <img
-                                    src={currentPage === totalPages ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(180deg)', width: 22 }}
-                                    alt="Siguiente"
-                                />
-                            </IconButton>
+                                {/* Siguiente */}
+                                <IconButton
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                    sx={{ p: 0 }}
+                                >
+                                    <img
+                                        src={currentPage === totalPages ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(180deg)', width: 22 }}
+                                        alt="Siguiente"
+                                    />
+                                </IconButton>
 
-                            {/* Ir al final */}
-                            <IconButton
-                                onClick={() => setCurrentPage(totalPages)}
-                                disabled={currentPage === totalPages}
-                                sx={{ p: 0 }}
-                            >
-                                <img
-                                    src={currentPage === totalPages ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(180deg)', width: 22 }}
-                                    alt="Última página"
-                                />
-                                <img
-                                    src={currentPage === totalPages ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(180deg)', width: 22, marginLeft: '-16px' }}
-                                    alt=""
-                                />
-                            </IconButton>
+                                {/* Ir al final */}
+                                <IconButton
+                                    onClick={() => setCurrentPage(totalPages)}
+                                    disabled={currentPage === totalPages}
+                                    sx={{ p: 0 }}
+                                >
+                                    <img
+                                        src={currentPage === totalPages ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(180deg)', width: 22 }}
+                                        alt="Última página"
+                                    />
+                                    <img
+                                        src={currentPage === totalPages ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(180deg)', width: 22, marginLeft: '-16px' }}
+                                        alt=""
+                                    />
+                                </IconButton>
+                            </Box>
                         </Box>
                     </Box>
-                </Box>
-            )}
+                )}
 
-            {templates.length === 0 ? (
-                <Box
-                    sx={{
-                        width: '100%',
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '8px',
-                        padding: '60px 0',
-                        height: '450px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                        mt: 3,
-                    }}
-                >
-                    <img src={BoxEmpty}
-                        alt="Caja vacía"
-                        style={{ width: '176px', height: "149px", marginBottom: '16px' }} />
-                    <Typography
+                {templates.length === 0 ? (
+                    <Box
                         sx={{
-                            fontFamily: 'Poppins',
-                            fontSize: '14px',
-                            color: '#7B354D',
-                            fontWeight: 500,
+                            width: '100%',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '8px',
+                            padding: '60px 0',
+                            height: '450px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            mt: 3,
                         }}
                     >
-                        Crea una plantilla para comenzar.
-                    </Typography>
-                </Box>
-            ) : (
-                <Box
-                    sx={{
-                        backgroundColor: '#fff',
-                        borderRadius: '8px',
-                        boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                        overflowX: 'auto',
-                        height: "450px",
-                        mt: 3.6
-                    }}
-                >
-                    <table style={{
-                        width: '100%', minWidth: '1080px',
-                        borderCollapse: 'collapse',
-                        fontFamily: 'Poppins',
-                    }}>
-                        <thead>
-                            {selectedTemplates.length === 0 ? (
-                                <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', }}>
-                                    <th style={{ padding: '5px' }}>
-                                        <Box sx={{ marginLeft: "6px" }}>
-                                            <Checkbox
-                                                checked={selectedTemplates.length === templates.length && templates.length > 0}
-                                                indeterminate={selectedTemplates.length > 0 && selectedTemplates.length < templates.length}
-                                                onChange={handleSelectAllTemplates}
-                                                sx={{
-                                                    color: '#574861',
-                                                    '&.Mui-checked': {
-                                                        color: '#7B354D'
-                                                    },
-                                                    '&.MuiCheckbox-indeterminate': {
-                                                        color: '#7B354D'
-                                                    }
-                                                }}
-                                            />
-                                        </Box>
-                                    </th><th style={{ padding: '00px', fontWeight: 500 }}>Fecha de creación</th>
-                                    <th style={{ padding: '0px', fontWeight: 500 }}>Nombre</th>
-                                    <th style={{ padding: '0px', fontWeight: 500, borderRight: "1px solid #E6E4E4" }}>Contenido</th>
-                                    <th style={{ padding: '0px', fontWeight: 500 }}></th>
-                                </tr>
-                            ) : (
-                                <tr style={{
-                                    backgroundColor: '#FFFFFF',
-                                    textAlign: 'left', width: '100%'
-                                }}>
-                                    <th colSpan={6} style={{ minWidth: "967px" }}>
-
-                                        <Box display="flex" alignItems="center" gap={1} pl={2} marginTop={"6px"} marginLeft={"-7px"} marginBottom={"8px"}>
-                                            {/*Checkbox para tablas*/}
-                                            <Box sx={{ marginBottom: "0px", marginTop: "2px" }}>
+                        <img src={BoxEmpty}
+                            alt="Caja vacía"
+                            style={{ width: '176px', height: "149px", marginBottom: '16px' }} />
+                        <Typography
+                            sx={{
+                                fontFamily: 'Poppins',
+                                fontSize: '14px',
+                                color: '#7B354D',
+                                fontWeight: 500,
+                            }}
+                        >
+                            Crea una plantilla para comenzar.
+                        </Typography>
+                    </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            backgroundColor: '#fff',
+                            borderRadius: '8px',
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            overflowX: 'auto',
+                            height: "450px",
+                            mt: 3.6
+                        }}
+                    >
+                        <table style={{
+                            width: '100%', minWidth: '1080px',
+                            borderCollapse: 'collapse',
+                            fontFamily: 'Poppins',
+                        }}>
+                            <thead>
+                                {selectedTemplates.length === 0 ? (
+                                    <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', }}>
+                                        <th style={{ padding: '5px' }}>
+                                            <Box sx={{ marginLeft: "6px" }}>
                                                 <Checkbox
-                                                    checked={selectedTemplates.length === templates.length}
+                                                    checked={selectedTemplates.length === templates.length && templates.length > 0}
                                                     indeterminate={selectedTemplates.length > 0 && selectedTemplates.length < templates.length}
                                                     onChange={handleSelectAllTemplates}
-                                                    icon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                            }}
-                                                        />
-                                                    }
-                                                    checkedIcon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                                position: 'relative',
-                                                                marginTop: '1px',
-                                                                marginLeft: '10px',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={IconCheckBox1}
-                                                                alt="Seleccionado"
-                                                                style={{ width: '24px', height: '24px' }}
-                                                            />
-                                                        </Box>
-                                                    }
-                                                    indeterminateIcon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                                position: 'relative',
-                                                                marginTop: '1px',
-                                                                marginLeft: '10px',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={IconCheckBox2}
-                                                                alt="Indeterminado"
-                                                                style={{ width: '24px', height: '24px' }}
-                                                            />
-                                                        </Box>
-                                                    }
-                                                    sx={{ padding: 0 }}
-                                                />
-                                            </Box>
-                                            <Tooltip title="Eliminar" arrow placement="top"
-                                                componentsProps={{
-                                                    tooltip: {
-                                                        sx: {
-                                                            backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                                            color: "#CCC3C3",
-                                                            fontFamily: "Poppins, sans-serif",
-                                                            fontSize: "12px",
-                                                            padding: "6px 8px",
-                                                            borderRadius: "8px",
-                                                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                                                        }
-                                                    },
-                                                    arrow: {
-                                                        sx: {
-                                                            color: "rgba(0, 0, 0, 0.8)"
-                                                        }
-                                                    }
-                                                }}
-                                                PopperProps={{
-                                                    modifiers: [
-                                                        {
-                                                            name: 'offset',
-                                                            options: {
-                                                                offset: [0, -10] // [horizontal, vertical] — aquí movemos 3px hacia abajo
-                                                            }
-                                                        }
-                                                    ]
-                                                }}
-                                            >
-                                                <IconButton onClick={handleOpenDeleteSelectedTemplates}>
-                                                    <img src={DeleteIcon} alt="Eliminar" style={{ width: 20, height: 20 }} />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </Box>
-                                    </th>
-                                </tr>
-                            )}
-                        </thead>
-
-                        <tbody>
-                            {filteredTemplates.length === 0 ? (
-                                <Box
-                                    sx={{
-                                        width: '100%',
-                                        backgroundColor: '#FFFFFF',
-                                        borderRadius: '8px',
-                                        padding: '60px 0',
-                                        height: '332px',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                                        mt: 3,
-                                    }}
-                                >
-                                    <img src={Emptybox} alt="Caja vacía" style={{
-                                        width: '240px',
-                                        marginTop: '-56px',
-                                        marginLeft: '620px',
-                                        position: 'absolute',
-                                    }} />
-                                    <Typography
-                                        sx={{
-                                            fontFamily: 'Poppins',
-                                            position: 'absolute',
-                                            fontSize: '14px',
-                                            color: '#7B354D',
-                                            fontWeight: 500,
-                                            marginTop: '158px',
-                                            marginLeft: '629px',
-                                        }}
-                                    >
-                                        No se encontraron resultados.
-                                    </Typography>
-                                </Box>
-                            ) : (
-                                currentItems.map((template) => (
-                                    <tr key={template.id} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0' }}>
-                                        <td style={{ padding: '0px', width: "60px" }}>
-                                            <Box sx={{ marginLeft: "10px" }}>
-                                                <Checkbox
-                                                    checked={selectedTemplates.some((t) => t.id === template.id)}
-                                                    onChange={() => handleSelectTemplate(template)}
-                                                    checkedIcon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={IconCheckBox1}
-                                                                alt="Seleccionado"
-                                                                style={{ width: '24px', height: '24px' }}
-                                                            />
-                                                        </Box>
-                                                    }
                                                     sx={{
                                                         color: '#574861',
+                                                        '&.Mui-checked': {
+                                                            color: '#7B354D'
+                                                        },
                                                         '&.MuiCheckbox-indeterminate': {
                                                             color: '#7B354D'
                                                         }
                                                     }}
                                                 />
                                             </Box>
-                                        </td>
+                                        </th><th style={{ padding: '00px', fontWeight: 500 }}>Fecha de creación</th>
+                                        <th style={{ padding: '0px', fontWeight: 500 }}>Nombre</th>
+                                        <th style={{ padding: '0px', fontWeight: 500, borderRight: "1px solid #E6E4E4" }}>Contenido</th>
+                                        <th style={{ padding: '0px', fontWeight: 500 }}></th>
+                                    </tr>
+                                ) : (
+                                    <tr style={{
+                                        backgroundColor: '#FFFFFF',
+                                        textAlign: 'left', width: '100%'
+                                    }}>
+                                        <th colSpan={6} style={{ minWidth: "967px" }}>
 
-                                        {/* Fecha */}
-                                        <td style={{
-                                            padding: '0px', width: '200px', whiteSpace: 'nowrap', overflow: 'hidden',
-                                            textOverflow: 'ellipsis', textAlign: "left",
-                                            fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins',
-                                        }}>
-                                            {new Date(template.creationDate).toLocaleDateString('es-MX')}
-                                        </td>
-
-                                        {/* Nombre con Tooltip */}
-                                        <td style={{
-                                            padding: '0px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
-                                        }}>
-                                            {template.name.length > 15 ? (
-                                                <Tooltip title={template.name} arrow>
-                                                    <span>{template.name.slice(0, 15) + '...'}</span>
+                                            <Box display="flex" alignItems="center" gap={1} pl={2} marginTop={"6px"} marginLeft={"-7px"} marginBottom={"8px"}>
+                                                {/*Checkbox para tablas*/}
+                                                <Box sx={{ marginBottom: "0px", marginTop: "2px" }}>
+                                                    <Checkbox
+                                                        checked={selectedTemplates.length === templates.length}
+                                                        indeterminate={selectedTemplates.length > 0 && selectedTemplates.length < templates.length}
+                                                        onChange={handleSelectAllTemplates}
+                                                        icon={
+                                                            <Box
+                                                                sx={{
+                                                                    width: '24px',
+                                                                    height: '24px',
+                                                                }}
+                                                            />
+                                                        }
+                                                        checkedIcon={
+                                                            <Box
+                                                                sx={{
+                                                                    width: '24px',
+                                                                    height: '24px',
+                                                                    position: 'relative',
+                                                                    marginTop: '1px',
+                                                                    marginLeft: '10px',
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={IconCheckBox1}
+                                                                    alt="Seleccionado"
+                                                                    style={{ width: '24px', height: '24px' }}
+                                                                />
+                                                            </Box>
+                                                        }
+                                                        indeterminateIcon={
+                                                            <Box
+                                                                sx={{
+                                                                    width: '24px',
+                                                                    height: '24px',
+                                                                    position: 'relative',
+                                                                    marginTop: '1px',
+                                                                    marginLeft: '10px',
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={IconCheckBox2}
+                                                                    alt="Indeterminado"
+                                                                    style={{ width: '24px', height: '24px' }}
+                                                                />
+                                                            </Box>
+                                                        }
+                                                        sx={{ padding: 0 }}
+                                                    />
+                                                </Box>
+                                                <Tooltip title="Eliminar" arrow placement="top"
+                                                    componentsProps={{
+                                                        tooltip: {
+                                                            sx: {
+                                                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                color: "#CCC3C3",
+                                                                fontFamily: "Poppins, sans-serif",
+                                                                fontSize: "12px",
+                                                                padding: "6px 8px",
+                                                                borderRadius: "8px",
+                                                                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                            }
+                                                        },
+                                                        arrow: {
+                                                            sx: {
+                                                                color: "rgba(0, 0, 0, 0.8)"
+                                                            }
+                                                        }
+                                                    }}
+                                                    PopperProps={{
+                                                        modifiers: [
+                                                            {
+                                                                name: 'offset',
+                                                                options: {
+                                                                    offset: [0, -10] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                }
+                                                            }
+                                                        ]
+                                                    }}
+                                                >
+                                                    <IconButton onClick={handleOpenDeleteSelectedTemplates}>
+                                                        <img src={DeleteIcon} alt="Eliminar" style={{ width: 20, height: 20 }} />
+                                                    </IconButton>
                                                 </Tooltip>
-                                            ) : (
-                                                template.name
-                                            )}
-                                        </td>
+                                            </Box>
+                                        </th>
+                                    </tr>
+                                )}
+                            </thead>
 
-                                        {/* Contenido */}
-                                        <td style={{
-                                            padding: '0px', width: '480px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
-                                            textOverflow: 'ellipsis', fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins'
-                                        }}>{template.message}</td>
-
-                                        {/* Menú de acciones */}
-                                        <td
-                                            style={{
-                                                padding: '0px', width: '50px',
-                                                borderLeft: '1px solid #E0E0E0',
-                                                textAlign: 'center',
+                            <tbody>
+                                {filteredTemplates.length === 0 ? (
+                                    <Box
+                                        sx={{
+                                            width: '100%',
+                                            backgroundColor: '#FFFFFF',
+                                            borderRadius: '8px',
+                                            padding: '60px 0',
+                                            height: '332px',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                                            mt: 3,
+                                        }}
+                                    >
+                                        <img src={Emptybox} alt="Caja vacía" style={{
+                                            width: '240px',
+                                            marginTop: '-56px',
+                                            marginLeft: '620px',
+                                            position: 'absolute',
+                                        }} />
+                                        <Typography
+                                            sx={{
+                                                fontFamily: 'Poppins',
+                                                position: 'absolute',
+                                                fontSize: '14px',
+                                                color: '#7B354D',
+                                                fontWeight: 500,
+                                                marginTop: '158px',
+                                                marginLeft: '629px',
                                             }}
                                         >
-                                            <IconButton onClick={(e) => handleMenuClick(e, template)}>
-                                                <MoreVertIcon sx={{ color: '#7B354D' }} />
-                                            </IconButton>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
+                                            No se encontraron resultados.
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    currentItems.map((template) => (
+                                        <tr key={template.id} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0' }}>
+                                            <td style={{ padding: '0px', width: "60px" }}>
+                                                <Box sx={{ marginLeft: "10px" }}>
+                                                    <Checkbox
+                                                        checked={selectedTemplates.some((t) => t.id === template.id)}
+                                                        onChange={() => handleSelectTemplate(template)}
+                                                        checkedIcon={
+                                                            <Box
+                                                                sx={{
+                                                                    width: '24px',
+                                                                    height: '24px',
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={IconCheckBox1}
+                                                                    alt="Seleccionado"
+                                                                    style={{ width: '24px', height: '24px' }}
+                                                                />
+                                                            </Box>
+                                                        }
+                                                        sx={{
+                                                            color: '#574861',
+                                                            '&.MuiCheckbox-indeterminate': {
+                                                                color: '#7B354D'
+                                                            }
+                                                        }}
+                                                    />
+                                                </Box>
+                                            </td>
 
-                        </tbody>
+                                            {/* Fecha */}
+                                            <td style={{
+                                                padding: '0px', width: '200px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                                textOverflow: 'ellipsis', textAlign: "left",
+                                                fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins',
+                                            }}>
+                                                {new Date(template.creationDate).toLocaleDateString('es-MX')}
+                                            </td>
 
-                    </table>
-                </Box>
-            )}
+                                            {/* Nombre con Tooltip */}
+                                            <td style={{
+                                                padding: '0px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                                textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                            }}>
+                                                {template.name.length > 15 ? (
+                                                    <Tooltip title={template.name} arrow>
+                                                        <span>{template.name.slice(0, 15) + '...'}</span>
+                                                    </Tooltip>
+                                                ) : (
+                                                    template.name
+                                                )}
+                                            </td>
 
+                                            {/* Contenido */}
+                                            <td style={{
+                                                padding: '0px', width: '480px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                                textOverflow: 'ellipsis', fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins'
+                                            }}>{template.message}</td>
+
+                                            {/* Menú de acciones */}
+                                            <td
+                                                style={{
+                                                    padding: '0px', width: '50px',
+                                                    borderLeft: '1px solid #E0E0E0',
+                                                    textAlign: 'center',
+                                                }}
+                                            >
+                                                <IconButton onClick={(e) => handleMenuClick(e, template)}>
+                                                    <MoreVertIcon sx={{ color: '#7B354D' }} />
+                                                </IconButton>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+
+                            </tbody>
+
+                        </table>
+                    </Box>
+                )}
+            </Box>
 
 
             <Modal open={openModal} onClose={handleCloseModal}>
@@ -1236,9 +1224,11 @@ const Templates = () => {
                         <Typography sx={{ fontFamily: 'Poppins', fontSize: '20px', fontWeight: 600, color: '#330F1B', mt: -1.2, ml: -0.4 }}>
                             Inspeccionar plantilla
                         </Typography>
-                        <IconButton onClick={() => setIsInspectModalOpen(false)}>
-                            <CloseIcon sx={{ color: '#A6A6A6', marginTop: '-34px', marginRight: '-24px' }} />
-                        </IconButton>
+                        <Box sx={{ marginTop: '-34px', marginRight: '-24px' }}>
+                            <IconButton onClick={() => setIsInspectModalOpen(false)}>
+                                <CloseIcon sx={{ color: '#A6A6A6' }} />
+                            </IconButton>
+                        </Box>
                     </Box>
 
                     <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1, mt: 1 }} />
@@ -1303,8 +1293,11 @@ const Templates = () => {
                             </Box>
 
                             <Box display="flex" alignItems="center" sx={{ backgroundColor: '#FFFFFF', border: campaignSearch ? '1px solid #7B354D' : '1px solid #9B9295', borderRadius: '4px', padding: '6px 10px', width: '220px', height: '40px' }}>
-                                <img src={seachicon} alt="Buscar" style={{ marginRight: '8px', width: '24px', height: '24px', filter: campaignSearch ? 'invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)' : 'none' }} />
-                                <input
+                                <img
+                                    src={campaignSearch ? Iconseachred : seachicon}
+                                    alt="Buscar"
+                                    style={{ marginRight: 8, width: 24 }}
+                                />                                <input
                                     type="text"
                                     placeholder="Buscar"
                                     value={campaignSearch}
@@ -1389,7 +1382,7 @@ const Templates = () => {
                     />
                 )
             }
-        </div >
+        </Box>
     );
 };
 

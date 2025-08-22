@@ -190,27 +190,28 @@ namespace Business
                         using (var ctx = new Entities())
                         {
                             var notif = ctx.AmountNotification.FirstOrDefault(x => x.IdRoom == campaign.RoomId);
+                            var actualrooms = ctx.Rooms.FirstOrDefault(x => x.id == campaign.RoomId);
                             if (notif != null)
                             {
-                                //bool isShort = campaign.NumberType == 1;
-                                //decimal currentBalance = isShort ? Convert.ToDecimal(notif.short_sms) : Convert.ToDecimal(notif.long_sms);
+                                bool isShort = campaign.NumberType == 1;
+                                decimal currentBalance = isShort ? Convert.ToDecimal(actualrooms.long_sms) : Convert.ToDecimal(actualrooms.long_sms);
 
-                                //if (currentBalance <= notif.AmountValue)
-                                //{
-                                //    string tipoSms = isShort ? "SMS cortos" : "SMS largos";
-                                //    string mensaje = $"⚠️ La sala {campaign.RoomName} (ID: {campaign.RoomId}) tiene saldo bajo de {tipoSms}: {currentBalance} créditos.";
+                                if (currentBalance <= notif.AmountValue)
+                                {
+                                    string tipoSms = isShort ? "SMS cortos" : "SMS largos";
+                                    string mensaje = $"⚠️ La sala {campaign.RoomName} tiene saldo bajo de {tipoSms}: {currentBalance} créditos.";
 
-                                //    var usersToNotify = (from anu in ctx.AmountNotificationUser
-                                //                         join user in ctx.Users on anu.UserId equals user.Id
-                                //                         where anu.NotificationId == notif.id
-                                //                         select user.email).ToList();
+                                    var usersToNotify = (from anu in ctx.AmountNotificationUser
+                                                         join user in ctx.Users on anu.UserId equals user.Id
+                                                         where anu.NotificationId == notif.id
+                                                         select user.email).ToList();
 
-                                //    foreach (var email in usersToNotify)
-                                //    {
-                                //        MailManager.SendEmail(email, $"⚠️ Alerta de saldo bajo en sala {campaign.RoomName}", mensaje);
-                                //    }
-                                //    return;
-                                //}
+                                    foreach (var email in usersToNotify)
+                                    {
+                                        MailManager.SendEmail(email, $"⚠️ Alerta de saldo bajo en sala {campaign.RoomName}", mensaje);
+                                    }
+                                    return;
+                                }
                             }
                             var chuncks = int.TryParse(Common.ConfigurationManagerJson("CantidadDeChunks"), out int c) ? c : 50;
                             var chunks = campaign.Contacts.Chunk(chuncks);

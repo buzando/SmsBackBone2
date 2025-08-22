@@ -96,7 +96,7 @@ export default function TestSMS() {
     try {
       const payload = {
         From: fromNumber,
-        To: [toNumber], 
+        To: [toNumber],
         Message: message || null,
         TemplateId: selectedTemplateId || null,
         ClientID: clientId.idCliente || null,
@@ -118,7 +118,7 @@ export default function TestSMS() {
 
 
   return (
-    <div style={{ padding: '14px', marginTop: '-70px', marginLeft: "40px", maxWidth: "1180px", height: "715px" }}>
+    <div style={{ padding: '14px', marginTop: '-70px', marginLeft: "40px", maxWidth: "1280px", height: "715px" }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
         <IconButton
           onClick={() => navigate('/')}
@@ -441,11 +441,11 @@ export default function TestSMS() {
 
                 const template = templates.find((t) => t.id === Number(selectedTemplateId));
 
-                console.log("Plantilla seleccionada:", template); // ⬅️ Agrega esto
+                console.log("Plantilla seleccionada:", template);
 
                 if (template) {
                   setSelectedTemplate(template);
-                  setTimeout(() => setIsPreviewOpen(true), 0); // ⬅️ Esto también ayuda a que se renderice bien
+                  setTimeout(() => setIsPreviewOpen(true), 0);
                 }
               }}
               disabled={!isViewButtonEnabled}
@@ -474,7 +474,7 @@ export default function TestSMS() {
                     {
                       name: 'offset',
                       options: {
-                        offset: [0, -12] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                        offset: [0, -12]
                       }
                     }
                   ]
@@ -491,28 +491,28 @@ export default function TestSMS() {
 
       </Box>
       <Box display="flex" justifyContent="flex-end" mt={-8} gap={3} marginRight={"310px"} >
-          <SecondaryButton
-            text={t('pages.testSMS.clear')}
-            onClick={() => {
-              setFromNumber('');
-              setToNumber('');
-              setSelectedTemplateId('');
-              setMessage('');
-              setMessageError(false);
-              setToNumberError(false);
-            }}
-          />
-          <MainButton
-            text={t('pages.testSMS.send')}
-            onClick={() => {
+        <SecondaryButton
+          text={t('pages.testSMS.clear')}
+          onClick={() => {
+            setFromNumber('');
+            setToNumber('');
+            setSelectedTemplateId('');
+            setMessage('');
+            setMessageError(false);
+            setToNumberError(false);
+          }}
+        />
+        <MainButton
+          text={t('pages.testSMS.send')}
+          onClick={() => {
             handleSend();
-            }}
-            isLoading={Loading}
-            disabled={
-              toNumberError || messageError || message.length === 0
-            }
-          />
-        </Box>
+          }}
+          isLoading={Loading}
+          disabled={
+            toNumberError || messageError || message.length === 0
+          }
+        />
+      </Box>
       <Modal open={isPreviewOpen} onClose={() => setIsPreviewOpen(false)}>
         <Box
           sx={{

@@ -286,11 +286,11 @@ const Rooms: React.FC = () => {
     };
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1140px", height: 'calc(100vh - 64px)', }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1260px", height: 'calc(100vh - 64px)', }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
-                    sx={{ color: "#5A2836", mr: 1 }}
+                    sx={{ p: 0, mr: 1 }}
                 >
                     <img
                         src={ArrowBackIosNewIcon}
@@ -307,7 +307,7 @@ const Rooms: React.FC = () => {
                     Salas
                 </Typography>
             </Box>
-            <Box sx={{ pl: 5 }}>
+            <Box sx={{ marginLeft: "32px", }}>
                 <Divider sx={{ width: 'calc(100% + 80px)', mb: 3 }} />
                 <Box display="flex" alignItems="center" justifyContent="flex-start" mb={2}>
                     {/* Botón de Añadir Sala */}
@@ -431,7 +431,7 @@ const Rooms: React.FC = () => {
                         ) : (
                             <Box
                                 sx={{
-                                    width: "1140px",
+                                    width: "1260px",
                                     maxHeight: '465px',
                                     overflowY: 'auto',
                                     display: 'flex',
@@ -449,7 +449,7 @@ const Rooms: React.FC = () => {
                                     })
                                     .map((room) => (
                                         <Grid item xs={12} sm={6} md={6} display="flex" justifyContent="flex-start"
-                                            width={"430px"} height={"101px"}
+                                            width={"530px"} height={"101px"}
                                         >
                                             <Box
                                                 sx={{

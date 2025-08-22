@@ -468,7 +468,7 @@ const ManageAccounts: React.FC = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1360px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             <Backdrop
                 open={loading}
                 sx={{

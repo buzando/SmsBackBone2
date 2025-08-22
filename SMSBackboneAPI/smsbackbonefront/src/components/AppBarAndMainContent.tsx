@@ -624,7 +624,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                         )}
                     </Box>
 
-                    {/* Selector de salas
+
                     <Box
                         display="flex"
                         alignItems="center"
@@ -644,7 +644,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                         }}
                     >
                         <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-                            {/* Ícono de la casa 
+
                             <img
                                 src={HouseIcon}
                                 alt="Room Icon"
@@ -654,7 +654,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                 }}
                             />
                             <Box sx={{ marginLeft: '10px' }}>
-                                {/* Nombre y Descripción de la sala
+
                                 <Typography
                                     variant="body1"
                                     color="inherit"
@@ -687,50 +687,50 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                             </Box>
                         </Box>
 
-                        {/* Ícono del menú 
-                    <IconButton
-                        color="inherit"
-                        onClick={handleMenuOpen}
-                        sx={{
-                            color: 'black',
-                            transform: anchorEl ? 'rotate(180deg)' : 'rotate(0deg)',
-                            transition: 'transform 0.3s ease-in-out',
-                        }}
-                    >
 
-                        <img src={DropDownIcon} alt="dropdown" width="24" height="24" />
-                    </IconButton>
+                        <IconButton
+                            color="inherit"
+                            onClick={handleMenuOpen}
+                            sx={{
+                                color: 'black',
+                                transform: anchorEl ? 'rotate(180deg)' : 'rotate(0deg)',
+                                transition: 'transform 0.3s ease-in-out',
+                            }}
+                        >
 
-                    {/* Usamos Popper para controlar el posicionamiento 
-                    <Popper
-                        open={Boolean(anchorEl)}
-                        anchorEl={anchorEl}
-                        placement="bottom"
-                        modifiers={[
-                            {
-                                name: 'offset',
-                                options: {
-                                    offset: [-120, 8],
+                            <img src={DropDownIcon} alt="dropdown" width="24" height="24" />
+                        </IconButton>
+
+
+                        <Popper
+                            open={Boolean(anchorEl)}
+                            anchorEl={anchorEl}
+                            placement="bottom"
+                            modifiers={[
+                                {
+                                    name: 'offset',
+                                    options: {
+                                        offset: [-120, 8],
+                                    },
                                 },
-                            },
-                            {
-                                name: 'preventOverflow',
-                                options: {
-                                    boundary: 'window',
+                                {
+                                    name: 'preventOverflow',
+                                    options: {
+                                        boundary: 'window',
+                                    },
                                 },
-                            },
-                        ]}
-                        sx={{
-                            zIndex: 1300,
-                            backgroundColor: 'white',
-                            boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.2)',
-                            borderRadius: '8px',
-                            width: '100%',
-                            maxWidth: '300px',
-                            marginTop: '8px',
-                        }}
-                    >
-                        {/* Buscador 
+                            ]}
+                            sx={{
+                                zIndex: 1300,
+                                backgroundColor: 'white',
+                                boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.2)',
+                                borderRadius: '8px',
+                                width: '100%',
+                                maxWidth: '300px',
+                                marginTop: '8px',
+                            }}
+                        >
+
                             <Box sx={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
                                 <TextField
 
@@ -776,64 +776,64 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                         },
                                     }}
                                 />
-                            </Box>*/}
+                            </Box>
 
-                    {/* Resultados de la lista de salas 
-                    <MenuList sx={{ paddingLeft: 0 }}>
-                        {rooms
-                            .filter((room) =>
-                                room.name.toLowerCase().includes(searchTerm2.toLowerCase())
-                            )
-                            .map((room, index) => (
-                                <MenuItem
-                                    key={index}
-                                    onClick={() => handleRoomChange(room)}
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        padding: '8px 16px',
-                                    }}
-                                >
-                                    <img
-                                        src={HouseIcon}
-                                        alt="Room Icon"
-                                        style={{
-                                            width: '32px',
-                                            height: '32px',
-                                            marginRight: '10px',
-                                            color: '#574B4F',
-                                        }}
-                                    />
-                                    <Box sx={{ textAlign: 'left' }}>
-                                        <Typography
-                                            variant="body1"
+
+                            <MenuList sx={{ paddingLeft: 0 }}>
+                                {rooms
+                                    .filter((room) =>
+                                        room.name.toLowerCase().includes(searchTerm2.toLowerCase())
+                                    )
+                                    .map((room, index) => (
+                                        <MenuItem
+                                            key={index}
+                                            onClick={() => handleRoomChange(room)}
                                             sx={{
-                                                fontSize: '12px',
-                                                color: '#000',
-                                                fontFamily: 'Poppins, sans-serif',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                padding: '8px 16px',
                                             }}
                                         >
-                                            {room.name}
-                                        </Typography>
-                                        <Typography
-                                            variant="body2"
-                                            sx={{
-                                                fontSize: '9px',
-                                                color: '#574B4F',
-                                                fontFamily: 'Poppins, sans-serif',
-                                            }}
-                                        >
-                                            {room.description}
-                                        </Typography>
-                                    </Box>
-                                </MenuItem>
-                            ))}
-                    </MenuList>
-                </Popper>
+                                            <img
+                                                src={HouseIcon}
+                                                alt="Room Icon"
+                                                style={{
+                                                    width: '32px',
+                                                    height: '32px',
+                                                    marginRight: '10px',
+                                                    color: '#574B4F',
+                                                }}
+                                            />
+                                            <Box sx={{ textAlign: 'left' }}>
+                                                <Typography
+                                                    variant="body1"
+                                                    sx={{
+                                                        fontSize: '12px',
+                                                        color: '#000',
+                                                        fontFamily: 'Poppins, sans-serif',
+                                                    }}
+                                                >
+                                                    {room.name}
+                                                </Typography>
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={{
+                                                        fontSize: '9px',
+                                                        color: '#574B4F',
+                                                        fontFamily: 'Poppins, sans-serif',
+                                                    }}
+                                                >
+                                                    {room.description}
+                                                </Typography>
+                                            </Box>
+                                        </MenuItem>
+                                    ))}
+                            </MenuList>
+                        </Popper>
 
 
-            </Box>
-*/}
+                    </Box>
+
 
                     {/* Usuario */}
                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, ml: 2 }}>
