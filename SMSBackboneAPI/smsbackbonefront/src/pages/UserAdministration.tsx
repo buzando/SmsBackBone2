@@ -264,12 +264,14 @@ const ManageAccounts: React.FC = () => {
                 FutureRooms: formData.allAndFuture,
                 Profile: formData.profile,
                 PhoneNumber: formData.phone,
-                Password: !isEditing ? formData.password : '123', // Solo enviar si no es edición
+                Password: !isEditing ? formData.password : '123',
                 Rooms: selectedRooms.join(","),
                 IdCliente: clientId,
                 IdUsuario: parsedUserData.id,
             };
-
+            if (isEditing) {
+                data.IdUsuario = selectedAccount?.id;
+            }
             // Make POST request
             const headers = {
                 'Content-Type': 'application/json',
@@ -370,7 +372,7 @@ const ManageAccounts: React.FC = () => {
             setErrorModalOpen(true);
         }
         finally {
-            setLoading(false); // Desactiva el estado de carga
+            setLoading(false);
         }
     };
     const fetchRooms = async () => {

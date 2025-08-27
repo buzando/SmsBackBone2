@@ -783,7 +783,12 @@ CREATE TABLE dbo.FacturaResumen (
 
     -- FK directa a CreditRecharge
     RechargeId      INT NOT NULL FOREIGN KEY REFERENCES dbo.CreditRecharge(Id)
-);ñ
+);
 GO
 CREATE INDEX IX_FacturaResumen_RechargeId ON dbo.FacturaResumen(RechargeId);
 CREATE INDEX IX_FacturaResumen_Fecha ON dbo.FacturaResumen(FechaEmision);
+
+select * from CreditRecharge
+
+
+exec sp_getCampaignsReadyToSend 10
