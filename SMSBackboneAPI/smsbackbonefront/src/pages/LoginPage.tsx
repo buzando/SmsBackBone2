@@ -571,19 +571,40 @@ const Login: React.FC = () => {
                                     <Collapse in={openAlert}>
                                         <Alert
                                             severity="error"
+                                            sx={{
+                                                mb: 2,
+                                                "&, .MuiAlert-message, .MuiAlert-action, .MuiAlertTitle-root": {
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: 500,
+                                                    letterSpacing: "0.2px",
+                                                },
+                                                "& .MuiAlert-action": { alignItems: "center" },
+                                            }}
                                             action={
-                                                <Box>
+                                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                                                     {UnconfirmedEmail.isUnconfirmed && (
-                                                        <Tooltip
-                                                            title={`Reenviar correo de confirmación a ${UnconfirmedEmail.email}`}
-                                                        >
+                                                        <Tooltip title={`Reenviar correo de confirmación a ${UnconfirmedEmail.email}`}>
                                                             {UnconfirmedEmail.sending ? (
-                                                                <CircularProgress size={20}></CircularProgress>
+                                                                <CircularProgress size={20} />
                                                             ) : (
                                                                 <Button
-                                                                    color="inherit"
-                                                                    size="small"
                                                                     onClick={onTryToSendEmailConfirmation}
+                                                                    sx={{
+                                                                        fontFamily: "Poppins",
+                                                                        fontWeight: 600,
+                                                                        letterSpacing: "0.4px",
+                                                                        textTransform: "uppercase",
+                                                                        px: 2.25, // padding horizontal (~18px)
+                                                                        py: 0.5,  // padding vertical (~4px)
+                                                                        borderRadius: "10px",
+                                                                        bgcolor: "transparent",
+                                                                        color: "#833A53",
+                                                                        "&:hover": {
+                                                                            bgcolor: "#F2E9EC",
+                                                                            color: "#833A53",
+                                                                        },
+                                                                        transition: "background-color 120ms ease, color 120ms ease",
+                                                                    }}
                                                                 >
                                                                     REENVIAR
                                                                 </Button>
@@ -594,24 +615,30 @@ const Login: React.FC = () => {
                                                         aria-label="close"
                                                         color="inherit"
                                                         size="small"
-                                                        onClick={() => {
-                                                            setOpenAlert(false);
-                                                        }}
+                                                        onClick={() => setOpenAlert(false)}
                                                     >
                                                         <CloseIcon fontSize="inherit" />
                                                     </IconButton>
                                                 </Box>
                                             }
-                                            sx={{ mb: 2 }}
                                         >
                                             {messageAlert}
                                         </Alert>
                                     </Collapse>
+
                                 </Box>
                                 <Box sx={{ marginTop: 0 }}>
                                     <Collapse in={UnconfirmedEmail.isMailSent}>
                                         <Alert
                                             severity="success"
+                                            sx={{
+                                                mb: 2,
+                                                "&, .MuiAlert-message, .MuiAlert-action, .MuiAlertTitle-root": {
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: 500,
+                                                    letterSpacing: "0.2px",
+                                                },
+                                            }}
                                             sx={{ mb: 2 }}
                                             action={
                                                 <IconButton

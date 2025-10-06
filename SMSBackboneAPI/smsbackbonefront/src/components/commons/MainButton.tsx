@@ -17,13 +17,15 @@ const MainButton: React.FC<MainButtonProps> = ({ text, onClick, isLoading = fals
             onClick={onClick}
             disabled={disabled}
             style={{
-                width: width ?? 'auto',     
-                minWidth: width ? undefined : '124px',  
-                minHeight: '36px',       
+                width: width ?? 'auto',
+                minWidth: width ? undefined : '124px',
+                minHeight: '36px',
             }}
         >
             {isLoading ? (
-                <CircularProgress size={20} thickness={8} style={{ color: '#FFFFFF' }} />
+                <div className="spinner-overlay">
+                    <CircularProgress size={20} thickness={8} style={{ color: '#FFFFFF' }} />
+                </div>
             ) : (
                 text.toUpperCase()
             )}

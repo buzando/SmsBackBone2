@@ -59,15 +59,15 @@ const Autentification: React.FC = () => {
 
                 if (now < lockoutEnd) {
                     setLockoutEndTime(lockoutEnd);
-                    setStep(3); 
+                    setStep(3);
                 } else {
-                    
+
                     const userObj = { ...obj };
                     try {
                         userObj.lockoutEnabled = false;
                         const data = {
-                            Id: userObj.id, 
-                            email: userObj.email, 
+                            Id: userObj.id,
+                            email: userObj.email,
                             lockoutEnabled: userObj.lockoutEnabled,
                             lockoutEndDateUtc: lockoutEnd.toISOString(),
                         };
@@ -80,7 +80,7 @@ const Autentification: React.FC = () => {
                             "Access-Control-Allow-Origin": "*",
                         };
 
-                        const apiEndpoint = `${import.meta.env.VITE_API_LOCKOUT_USER}`; 
+                        const apiEndpoint = `${import.meta.env.VITE_API_LOCKOUT_USER}`;
                         await axios.post(apiEndpoint, data, {
                             headers
                         });
@@ -186,9 +186,9 @@ const Autentification: React.FC = () => {
 
                     const data = {
                         Id: userObj.id,
-                        email: userObj.email, 
-                        lockoutEnabled: userObj.lockoutEnabled, 
-                        lockoutEndDateUtc: lockoutEnd.toISOString(), 
+                        email: userObj.email,
+                        lockoutEnabled: userObj.lockoutEnabled,
+                        lockoutEndDateUtc: lockoutEnd.toISOString(),
                     };
 
                     // Definir encabezados
@@ -198,7 +198,7 @@ const Autentification: React.FC = () => {
                         "Access-Control-Allow-Origin": "*",
                     };
 
-                    const apiEndpoint = `${import.meta.env.VITE_API_LOCKOUT_USER}`; 
+                    const apiEndpoint = `${import.meta.env.VITE_API_LOCKOUT_USER}`;
                     await axios.post(apiEndpoint, data, {
                         headers
                     });
@@ -237,6 +237,7 @@ const Autentification: React.FC = () => {
                 if (response.status === 200) {
                     settoken(response.data);
                     setStep(2); setStartTime(Date.now());
+                    setCodeExpired(false);
                     setCountdownTime(60000);
                     setResendAttempts(resendAttempts + 1);
                 }
@@ -347,22 +348,21 @@ const Autentification: React.FC = () => {
                                             fontFamily: "Poppins",
                                             color: "#833A53",
                                             "&.Mui-checked": {
-                                                color: "#833A53"
-
+                                                color: "#833A53",
                                             },
                                         }}
                                     />
                                 }
-
                                 label="SMS"
                                 sx={{
                                     fontFamily: "Poppins",
                                     textAlign: "left",
-                                    color: SendType === "SMS" ? "#8F4D63" : "#574B4F", // Cambia el color del texto
-                                    fontWeight: SendType === "SMS" ? "bold" : "normal", // Opcional: hacer negrita la opción seleccionada
-                                    transition: "color 0.3s ease", // Suaviza la transición del color
+                                    color: SendType === "SMS" ? "#8F4D63" : "#574B4F",
+                                    fontWeight: SendType === "SMS" ? "bold" : "normal",
+                                    transition: "color 0.3s ease",
                                 }}
                             />
+
                             <FormControlLabel
                                 value="EMAIL"
                                 control={
@@ -377,15 +377,15 @@ const Autentification: React.FC = () => {
                                     />
                                 }
                                 label="Correo electrónico"
-
                                 sx={{
                                     fontFamily: "Poppins",
                                     textAlign: "right",
-                                    color: SendType === "SMS" ? "#8F4D63" : "#574B4F", // Cambia el color del texto
-                                    fontWeight: SendType === "SMS" ? "bold" : "normal", // Opcional: hacer negrita la opción seleccionada
-                                    transition: "color 0.3s ease", // Suaviza la transición del color
+                                    color: SendType === "EMAIL" ? "#8F4D63" : "#574B4F",
+                                    fontWeight: SendType === "EMAIL" ? "bold" : "normal",
+                                    transition: "color 0.3s ease",
                                 }}
                             />
+
                         </RadioGroup>
 
 
@@ -395,10 +395,6 @@ const Autentification: React.FC = () => {
                             isLoading={loading}
                             disabled={loading || SendType === ""}
                             onClick={handleSubmit}
-
-
-
-
                         />
 
 
@@ -501,6 +497,7 @@ const Autentification: React.FC = () => {
                                 }}
                             >
                                 <Countdown
+                                    key={startTime}  // 👈 fuerza a que el Countdown se remonte al cambiar startTime
                                     date={startTime + countdownTime}
                                     renderer={({ minutes, seconds }) => (
                                         <span>

@@ -59,7 +59,7 @@ import IconUserArrow from '../assets/CHEVRON_USER.svg';
 import CloseSession from '../assets/Icon-CerrarSesion.svg';
 import facturicone from '../assets/facturicone.svg';
 import Iconhelpu from '../assets/Iconhelpu.svg';
-import logorq from '../assets/Logo-RQ_2.svg';
+import logorq from '../assets/quantum-logov25.svg';
 import PrivacityIcon from '../assets/Icon_privacidad.svg'
 import api from '../assets/api.svg'
 import apihover from '../assets/apihover.svg'
@@ -465,9 +465,30 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                             color="inherit"
                             aria-label="menu"
                             onClick={() => navigate("/")}
+                            disableRipple
+                            sx={{
+                                p: 0,
+                                mr: 2,
+                                "&:hover": {
+                                    backgroundColor: "transparent", // 👈 quita el hover gris/oscuro
+                                },
+                            }}
                         >
-                            <img src={logorq} alt="App Icon" width="170" />
+                            <Box
+                                component="img"
+                                src={logorq}
+                                alt="Quantum"
+                                sx={{
+                                    display: "block",
+                                    height: { xs: 38, sm: 42, md: 46 }, // 👈 aumentado
+                                    width: "auto",
+                                    objectFit: "contain",
+                                    filter: "brightness(0) invert(1)", // Si tu logo es oscuro
+                                }}
+                            />
                         </IconButton>
+
+
                     </Box>
                     <Box
                         sx={{

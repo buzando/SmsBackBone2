@@ -455,12 +455,19 @@ const Chooseroom: React.FC = () => {
                             disabled={!dontAskAgain}
                             sx={{
                                 background: "#833A53",
-                                border: "1px solid #CCCFD2",
+                                border: "1px solid #60293C", // 👈 aquí el nuevo borde
                                 borderRadius: "4px",
                                 color: "#FFFFFF",
                                 opacity: !dontAskAgain ? 0.4 : 1,
                                 "&:hover": {
                                     backgroundColor: dontAskAgain ? "#a54261" : "#833A53",
+                                    borderColor: "#60293C",   // 👈 hover igual que base
+                                },
+                                "&:active": {
+                                    borderColor: "#6F1E3A",   // 👈 pressed
+                                },
+                                "&:focus": {
+                                    borderColor: "#60293C",   // 👈 focused
                                 },
                             }}
                         >

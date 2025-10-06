@@ -10,22 +10,24 @@
     padding: 8px 16px;
     height: 36px;
     /* Alto del bot�n */
+    position: relative;
     background: #833A53;
     border: 1px solid #60293C;
     border-radius: 4px;
     color: #ffffff;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     letter-spacing: 1.12px;
+    box-shadow: 0px 2px 4px rgba(255, 255, 255, 0.5);
 }
 
 /* Hover: Cambia el color, sombra y opacidad */
 .main-button:hover {
     background: #90455F 0% 0% no-repeat padding-box;
-    box-shadow: 0px 0px 12px #C17D91;
+    box-shadow: none;
     border: 1px solid #60293C;
     opacity: 0.85;
 }
@@ -41,7 +43,7 @@
 /* Focus: Cambia el color, sombra y opacidad */
 .main-button:focus {
     background: #833A53 0% 0% no-repeat padding-box;
-    box-shadow: 0px 0px 8px #E6C2CD;
+    box-shadow: none;
     border: 1px solid #60293C;
     border-radius: 4px;
     opacity: 0.9;
@@ -56,6 +58,7 @@
     color: #7a7a7a;
     cursor: not-allowed;
     opacity: 0.7;
+      box-shadow: none; 
 }
 
 /* Spinner dentro del botón */
@@ -115,6 +118,7 @@
 /* Hover state */
 .secondary-button:hover {
     background: #F2E9EC 0% 0% no-repeat padding-box;
+     border: 1px solid rgba(190, 147, 160, 0.4);
     opacity: 1;
 }
 
@@ -236,4 +240,27 @@
     border: 1px solid #BE93A0;
     border-radius: 4px;
     opacity: 1;
+}
+
+.main-button:disabled:hover {
+    background: #d3d3d3;
+    border: 1px solid #b3b3b3;
+    color: #7a7a7a;
+    box-shadow: none;
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.spinner-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.4);
+    /* Fondo blanco 40% */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
 }

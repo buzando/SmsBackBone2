@@ -255,6 +255,7 @@ namespace Business
                         if (numero != null)
                         {
                             ctx.MyNumbers.Remove(numero);
+                            ctx.SaveChanges();
                         }
                     }
                     if (number.operation == "deactivate")

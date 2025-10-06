@@ -19,6 +19,8 @@ using Modal;
 using AutoMapper.Execution;
 using Azure.Core;
 using DocumentFormat.OpenXml.Office2016.Excel;
+using System;                  // agregado para Guid
+using System.Diagnostics;      // agregado para Stopwatch
 
 namespace SMSBackboneAPI.Controllers
 {
@@ -27,6 +29,8 @@ namespace SMSBackboneAPI.Controllers
     [Authorize]
     public class CampaignsController : Controller
     {
+        private static readonly ILog _log = LogManager.GetLogger(typeof(CampaignsController));
+
         public IActionResult Index()
         {
             return View();
@@ -35,140 +39,287 @@ namespace SMSBackboneAPI.Controllers
         [HttpPost("AddTmpContacts")]
         public async Task<IActionResult> AddTmpContacts(CampainContacttpmrequest contacts)
         {
-            var templateManager = new TpmCampaignContactsManager();
-            var result = templateManager.InsertBatchFromExcel(contacts);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest(new GeneralErrorResponseDto() { code = "ErrorAddingContactos", description = "Error al cargar registros." });
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                _log.Info($"[{rid}] AddTmpContacts start");
+
+                var templateManager = new TpmCampaignContactsManager();
+                var result = templateManager.InsertBatchFromExcel(contacts);
+
+                if (result != null)
+                {
+                    sw.Stop();
+                    _log.Info($"[{rid}] AddTmpContacts ok ms={sw.ElapsedMilliseconds}");
+                    return Ok(result);
+                }
+                else
+                {
+                    sw.Stop();
+                    _log.Warn($"[{rid}] AddTmpContacts result null ms={sw.ElapsedMilliseconds}");
+                    return BadRequest(new GeneralErrorResponseDto() { code = "ErrorAddingContactos", description = "Error al cargar registros." });
+                }
+            }
+            catch (Exception ex)
+            {
+                sw.Stop();
+                _log.Error($"[{rid}] AddTmpContacts error ms={sw.ElapsedMilliseconds}", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { code = "ServerError", description = "Ocurrió un error." });
+            }
         }
 
         [HttpPost("CreateCampaign")]
         public async Task<IActionResult> CreateCampaign(CampaignSaveRequest campaigns)
         {
-            var manager = new CampaignManager();
-            var campaign = campaigns.Campaigns;
-            campaign.CreatedDate = DateTime.Now;
-
-            var campaignSaved = manager.CreateCampaign(campaign, campaigns.SaveAsTemplate, campaigns.TemplateName);
-            if (!campaignSaved)
-                return BadRequest(new { code = "ErrorSavingCampaign", description = "No se pudo guardar la campaña." });
-
-            int campaignId = campaign.Id;
-
-            // 3. Guardar los horarios
-            foreach (var schedule in campaigns.CampaignSchedules)
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+            var sw = Stopwatch.StartNew();
+            try
             {
-                schedule.CampaignId = campaignId;
-                manager.AddCampaignSchedule(schedule);
-            }
+                _log.Info($"[{rid}] CreateCampaign start template={campaigns?.SaveAsTemplate} name='{campaigns?.TemplateName ?? ""}'");
 
-            if (campaigns.CampaignRecycleSetting != null)
-            {
-                campaigns.CampaignRecycleSetting.CampaignId = campaignId;
-                manager.AddRecycleSetting(campaigns.CampaignRecycleSetting);
-            }
+                var manager = new CampaignManager();
+                var campaign = campaigns.Campaigns;
+                campaign.CreatedDate = DateTime.Now;
 
-            foreach (var blacklistId in campaigns.BlacklistIds)
-            {
-                manager.AddBlacklistCampaign(new blacklistcampains
+                var campaignSaved = manager.CreateCampaign(campaign, campaigns.SaveAsTemplate, campaigns.TemplateName);
+                if (!campaignSaved)
                 {
-                    idblacklist = blacklistId,
-                    idcampains = campaignId
-                });
+                    sw.Stop();
+                    _log.Warn($"[{rid}] CreateCampaign not saved ms={sw.ElapsedMilliseconds}");
+                    return BadRequest(new { code = "ErrorSavingCampaign", description = "No se pudo guardar la campaña." });
+                }
+
+                int campaignId = campaign.Id;
+
+                // 3. Guardar los horarios
+                foreach (var schedule in campaigns.CampaignSchedules)
+                {
+                    schedule.CampaignId = campaignId;
+                    manager.AddCampaignSchedule(schedule);
+                }
+
+                if (campaigns.CampaignRecycleSetting != null)
+                {
+                    campaigns.CampaignRecycleSetting.CampaignId = campaignId;
+                    manager.AddRecycleSetting(campaigns.CampaignRecycleSetting);
+                }
+
+                foreach (var blacklistId in campaigns.BlacklistIds)
+                {
+                    manager.AddBlacklistCampaign(new blacklistcampains
+                    {
+                        idblacklist = blacklistId,
+                        idcampains = campaignId
+                    });
+                }
+
+                bool contactosInsertados = manager.InsertBatchFromSession(campaigns.SessionId, campaignId);
+
+                if (!contactosInsertados)
+                {
+                    sw.Stop();
+                    _log.Warn($"[{rid}] CreateCampaign contacts not inserted id={campaignId} ms={sw.ElapsedMilliseconds}");
+                    return BadRequest(new { code = "ErrorAddingContactos", description = "Error al cargar registros de contactos." });
+                }
+
+                sw.Stop();
+                _log.Info($"[{rid}] CreateCampaign ok id={campaignId} ms={sw.ElapsedMilliseconds}");
+                return Ok(new { message = "Campaña creada correctamente", id = campaignId });
             }
-
-            bool contactosInsertados = manager.InsertBatchFromSession(campaigns.SessionId, campaignId);
-
-            if (!contactosInsertados)
-                return BadRequest(new { code = "ErrorAddingContactos", description = "Error al cargar registros de contactos." });
-
-            return Ok(new { message = "Campaña creada correctamente", id = campaignId });
-
+            catch (Exception ex)
+            {
+                sw.Stop();
+                _log.Error($"[{rid}] CreateCampaign error ms={sw.ElapsedMilliseconds}", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { code = "ServerError", description = "Ocurrió un error." });
+            }
         }
-
 
         [HttpGet("GetCampaignsByRoom")]
         public async Task<IActionResult> GetCampaignsByRoom(int IdRoom)
         {
-            var manager = new CampaignManager();
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                _log.Info($"[{rid}] GetCampaignsByRoom start room={IdRoom}");
 
-            var respuesta = manager.GetCampaignFullResponseByRoom(IdRoom);
+                var manager = new CampaignManager();
+                var respuesta = manager.GetCampaignFullResponseByRoom(IdRoom);
 
-            if (respuesta == null)
-                return BadRequest(new { code = "ErrorGettingCampaigns", description = "Error al traer registros de campañas." });
+                if (respuesta == null)
+                {
+                    sw.Stop();
+                    _log.Warn($"[{rid}] GetCampaignsByRoom null response room={IdRoom} ms={sw.ElapsedMilliseconds}");
+                    return BadRequest(new { code = "ErrorGettingCampaigns", description = "Error al traer registros de campañas." });
+                }
 
-            return Ok(respuesta);
-
+                sw.Stop();
+                _log.Info($"[{rid}] GetCampaignsByRoom ok room={IdRoom} ms={sw.ElapsedMilliseconds}");
+                return Ok(respuesta);
+            }
+            catch (Exception ex)
+            {
+                sw.Stop();
+                _log.Error($"[{rid}] GetCampaignsByRoom error room={IdRoom} ms={sw.ElapsedMilliseconds}", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { code = "ServerError", description = "Ocurrió un error." });
+            }
         }
 
         [HttpGet("StartCampaign")]
         public async Task<IActionResult> StartCampaign(int IdCampaign)
         {
-            var manager = new CampaignManager();
-            var start = manager.StartCampaign(IdCampaign);
-            if (start)
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+            var sw = Stopwatch.StartNew();
+            try
             {
-                return Ok(true);
+                _log.Info($"[{rid}] StartCampaign start id={IdCampaign}");
+
+                var manager = new CampaignManager();
+                var start = manager.StartCampaign(IdCampaign);
+
+                sw.Stop();
+                if (start)
+                {
+                    _log.Info($"[{rid}] StartCampaign ok id={IdCampaign} ms={sw.ElapsedMilliseconds}");
+                    return Ok(true);
+                }
+                else
+                {
+                    _log.Warn($"[{rid}] StartCampaign badrequest id={IdCampaign} ms={sw.ElapsedMilliseconds}");
+                    return BadRequest();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest();
+                sw.Stop();
+                _log.Error($"[{rid}] StartCampaign error id={IdCampaign} ms={sw.ElapsedMilliseconds}", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { code = "ServerError", description = "Ocurrió un error." });
             }
         }
 
         [HttpPost("DeleteCampaign")]
         public async Task<IActionResult> DeleteCampaign(List<int> ids)
         {
-            var manager = new CampaignManager();
-            var start = manager.DeleteCampaignsCascade(ids);
-            if (start)
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+            var sw = Stopwatch.StartNew();
+            try
             {
-                return Ok(true);
+                _log.Info($"[{rid}] DeleteCampaign start count={ids?.Count ?? 0}");
+
+                var manager = new CampaignManager();
+                var start = manager.DeleteCampaignsCascade(ids);
+
+                sw.Stop();
+                if (start)
+                {
+                    _log.Info($"[{rid}] DeleteCampaign ok count={ids?.Count ?? 0} ms={sw.ElapsedMilliseconds}");
+                    return Ok(true);
+                }
+                else
+                {
+                    _log.Warn($"[{rid}] DeleteCampaign badrequest count={ids?.Count ?? 0} ms={sw.ElapsedMilliseconds}");
+                    return BadRequest();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest();
+                sw.Stop();
+                _log.Error($"[{rid}] DeleteCampaign error count={ids?.Count ?? 0} ms={sw.ElapsedMilliseconds}", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { code = "ServerError", description = "Ocurrió un error." });
             }
         }
 
         [HttpPost("EditCampaign")]
         public async Task<IActionResult> EditCampaign(CampaignSaveRequest campaigns)
         {
-            var manager = new CampaignManager();
-            var result = manager.EditCampaign(campaigns);
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                _log.Info($"[{rid}] EditCampaign start id={campaigns?.Campaigns?.Id}");
 
-            if (!result)
-                return BadRequest(new { code = "ErrorUpdatingCampaign", description = "No se pudo actualizar la campaña." });
+                var manager = new CampaignManager();
+                var result = manager.EditCampaign(campaigns);
 
-            return Ok(new { message = "Campaña actualizada correctamente", id = campaigns.Campaigns.Id });
+                sw.Stop();
+                if (!result)
+                {
+                    _log.Warn($"[{rid}] EditCampaign not updated id={campaigns?.Campaigns?.Id} ms={sw.ElapsedMilliseconds}");
+                    return BadRequest(new { code = "ErrorUpdatingCampaign", description = "No se pudo actualizar la campaña." });
+                }
+
+                _log.Info($"[{rid}] EditCampaign ok id={campaigns?.Campaigns?.Id} ms={sw.ElapsedMilliseconds}");
+                return Ok(new { message = "Campaña actualizada correctamente", id = campaigns.Campaigns.Id });
+            }
+            catch (Exception ex)
+            {
+                sw.Stop();
+                _log.Error($"[{rid}] EditCampaign error id={campaigns?.Campaigns?.Id} ms={sw.ElapsedMilliseconds}", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { code = "ServerError", description = "Ocurrió un error." });
+            }
         }
 
         [HttpPost("CloneCampaign")]
         public async Task<IActionResult> CloneCampaign(CloneCampaignRequest request)
         {
-            var manager = new CampaignManager();
-            var result = manager.CloneFullCampaign(request);
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                _log.Info($"[{rid}] CloneCampaign start");
 
-            if (result == null)
-                return BadRequest(new { code = "ErrorCloningCampaign", description = "No se pudo clonar la campaña." });
+                var manager = new CampaignManager();
+                var result = manager.CloneFullCampaign(request);
 
-            return Ok(new { message = "Campaña clonada correctamente", id = result.Id });
+                if (result == null)
+                {
+                    sw.Stop();
+                    _log.Warn($"[{rid}] CloneCampaign null result ms={sw.ElapsedMilliseconds}");
+                    return BadRequest(new { code = "ErrorCloningCampaign", description = "No se pudo clonar la campaña." });
+                }
+
+                sw.Stop();
+                _log.Info($"[{rid}] CloneCampaign ok newId={result.Id} ms={sw.ElapsedMilliseconds}");
+                return Ok(new { message = "Campaña clonada correctamente", id = result.Id });
+            }
+            catch (Exception ex)
+            {
+                sw.Stop();
+                _log.Error($"[{rid}] CloneCampaign error ms={sw.ElapsedMilliseconds}", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { code = "ServerError", description = "Ocurrió un error." });
+            }
         }
+
         [HttpGet("UpdateDataCampaign")]
         public async Task<IActionResult> UpdateDataCampaign(int IdCampaign)
         {
-            var manager = new CampaignManager();
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                _log.Info($"[{rid}] UpdateDataCampaign start id={IdCampaign}");
 
-            var respuesta = manager.FullResponseUpdateCampaignInfo(IdCampaign);
+                var manager = new CampaignManager();
+                var respuesta = manager.FullResponseUpdateCampaignInfo(IdCampaign);
 
-            if (respuesta == null)
-                return BadRequest(new { code = "ErrorGettingCampaigns", description = "Error al traer registros de campañas." });
+                if (respuesta == null)
+                {
+                    sw.Stop();
+                    _log.Warn($"[{rid}] UpdateDataCampaign null response id={IdCampaign} ms={sw.ElapsedMilliseconds}");
+                    return BadRequest(new { code = "ErrorGettingCampaigns", description = "Error al traer registros de campañas." });
+                }
 
-            return Ok(respuesta);
-
+                sw.Stop();
+                _log.Info($"[{rid}] UpdateDataCampaign ok id={IdCampaign} ms={sw.ElapsedMilliseconds}");
+                return Ok(respuesta);
+            }
+            catch (Exception ex)
+            {
+                sw.Stop();
+                _log.Error($"[{rid}] UpdateDataCampaign error id={IdCampaign} ms={sw.ElapsedMilliseconds}", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { code = "ServerError", description = "Ocurrió un error." });
+            }
         }
     }
-
-
 }
