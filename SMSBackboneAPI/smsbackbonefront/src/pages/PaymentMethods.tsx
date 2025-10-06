@@ -416,31 +416,12 @@ const PaymentMethods: React.FC = () => {
 
 
     return (
-        <div style={{ padding: '20px', marginTop: '-70px', marginLeft: "40px", maxWidth: "1140px", height: "680px" }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
-                    onClick={() => navigate('/')}
-                    sx={{
-                        p: 0,
-                        mr: 1,
-                        ml: '-28px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <img
-                        src={ArrowBackIosNewIcon}
-                        alt="Regresar"
-                        style={{
-                            width: 24,
-                            height: 24,
-                            transform: 'rotate(270deg)',
-                            display: 'block'
-                        }}
-                    />
+                    onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
+                    <img src={ArrowBackIosNewIcon} alt="Regresar" style={{ width: 24, transform: 'rotate(270deg)' }} />
                 </IconButton>
-
                 <Typography
                     variant="h4"
                     sx={{
@@ -453,206 +434,208 @@ const PaymentMethods: React.FC = () => {
                     Métodos de pago
                 </Typography>
             </Box>
-            <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
-            <p
-                className="mb-4"
-                style={{
-                    textAlign: "left",
-                    fontFamily: 'Poppins',
-                    letterSpacing: "0px",
-                    color: "#330F1B",
-                    opacity: 1,
-                    fontSize: "18px",
-                    marginBottom: "24px"
-                }}
-            >
-                Ingrese un método de pago o seleccione alguno existente.
-            </p>
-            <Box sx={{
-                width: "408px", height: "102px",
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between', mb: 3
-            }}>
-                <Typography sx={{
-                    fontFamily: "Poppins",
-                    fontSize: "14px",
-                    color: "#330F1B",
-                    fontWeight: 500,
-                    mb: 2, mt: -1
-                }}
+            <Box sx={{ marginLeft: "32px", }}>
+                <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
+                <p
+                    className="mb-4"
+                    style={{
+                        textAlign: "left",
+                        fontFamily: 'Poppins',
+                        letterSpacing: "0px",
+                        color: "#330F1B",
+                        opacity: 1,
+                        fontSize: "18px",
+                        marginBottom: "24px"
+                    }}
                 >
-                    Métodos disponibles
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                    {[visa, mastercard, amex, spei].map((imgSrc, index) => (
-                        <Box
-                            key={index}
-                            sx={{
-                                border: '1px solid #9B929566',
-                                borderRadius: '6px',
-                                padding: '10px',
-                                backgroundColor: '#F7F7F7',
-                                width: '85px',
-                                height: '76px',
+                    Ingrese un método de pago o seleccione alguno existente.
+                </p>
+                <Box sx={{
+                    width: "408px", height: "102px",
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between', mb: 3
+                }}>
+                    <Typography sx={{
+                        fontFamily: "Poppins",
+                        fontSize: "14px",
+                        color: "#330F1B",
+                        fontWeight: 500,
+                        mb: 2, mt: -1
+                    }}
+                    >
+                        Métodos disponibles
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        {[visa, mastercard, amex, spei].map((imgSrc, index) => (
+                            <Box
+                                key={index}
+                                sx={{
+                                    border: '1px solid #9B929566',
+                                    borderRadius: '6px',
+                                    padding: '10px',
+                                    backgroundColor: '#F7F7F7',
+                                    width: '85px',
+                                    height: '76px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <img
+                                    src={imgSrc}
+                                    alt={`Método ${index}`}
+                                    style={{ maxHeight: '38px', objectFit: 'contain' }}
+                                />
+                            </Box>
+                        ))}
+                    </Box>
+                </Box>
+                <MainIcon
+                    text="Agregar Tarjeta"
+                    isLoading={Loading}
+                    onClick={() => setIsAddCardModalOpen(true)}
+                    width="210px"
+                >
+                    <span className="flex items-center">
+                        <span className="mr-2">+</span> Add Card
+                    </span>
+                </MainIcon>
+                <div style={{ display: 'flex', gap: '20px', margin: '20px 0', flexWrap: 'wrap' }}>
+                    {creditCards.map((card) => (
+                        <div
+                            key={card.id}
+                            style={{
+                                border: selectedCard?.id === card.id ? '1px solid rgba(112, 112, 112, 0.2)' : '1px solid #dcdcdc',
+                                borderRadius: '8px',
+                                padding: '15px',
+                                width: '360px',
+                                height: '172px',
+                                position: 'relative',
+                                backgroundColor: selectedCard?.id === card.id ? 'rgba(237, 196, 209, 0.2)' : '#FFFFFF',
+                            }}
+                        >
+                            {/* Barra lateral de color */}
+                            {selectedCard?.id === card.id && (
+                                <div style={{
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 0,
+                                    height: '100%',
+                                    width: '8px',
+                                    backgroundColor: '#8F4D63',
+                                    borderTopLeftRadius: '8px',
+                                    borderBottomLeftRadius: '8px',
+                                }}></div>
+                            )}
+                            {/* Marca de la tarjeta */}
+                            <div style={{
+                                marginBottom: '10px',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <img
-                                src={imgSrc}
-                                alt={`Método ${index}`}
-                                style={{ maxHeight: '38px', objectFit: 'contain' }}
-                            />
-                        </Box>
-                    ))}
-                </Box>
-            </Box>
-            <MainIcon
-                text="Agregar Tarjeta"
-                isLoading={Loading}
-                onClick={() => setIsAddCardModalOpen(true)}
-                width="210px"
-            >
-                <span className="flex items-center">
-                    <span className="mr-2">+</span> Add Card
-                </span>
-            </MainIcon>
-            <div style={{ display: 'flex', gap: '20px', margin: '20px 0', flexWrap: 'wrap' }}>
-                {creditCards.map((card) => (
-                    <div
-                        key={card.id}
-                        style={{
-                            border: selectedCard?.id === card.id ? '1px solid rgba(112, 112, 112, 0.2)' : '1px solid #dcdcdc',
-                            borderRadius: '8px',
-                            padding: '15px',
-                            width: '360px',
-                            height: '172px',
-                            position: 'relative',
-                            backgroundColor: selectedCard?.id === card.id ? 'rgba(237, 196, 209, 0.2)' : '#FFFFFF',
-                        }}
-                    >
-                        {/* Barra lateral de color */}
-                        {selectedCard?.id === card.id && (
-                            <div style={{
-                                position: 'absolute',
-                                left: 0,
-                                top: 0,
-                                height: '100%',
-                                width: '8px',
-                                backgroundColor: '#8F4D63',
-                                borderTopLeftRadius: '8px',
-                                borderBottomLeftRadius: '8px',
-                            }}></div>
-                        )}
-                        {/* Marca de la tarjeta */}
-                        <div style={{
-                            marginBottom: '10px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            textAlign: "left",
-                            fontFamily: "Poppins",
-                            letterSpacing: "0px",
-                            color: "#330F1B",
-                            opacity: 1,
-                            fontSize: "14px",
-                            marginLeft: "10px"
-                        }}>
-                            <div>
-                                {card.type}
-                            </div>
-                        </div>
-
-                        {/* Detalles */}
-
-                        <div
-                            style={{
-                                fontSize: '14px',
-                                fontFamily: "Poppins",
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '5px',
-                                lineHeight: '1.2',
-                                marginLeft: "10px",
-                            }}
-                        >
-                            <span style={{ margin: '0', padding: '2px' }}>{card.card_name}</span>
-                            <span style={{ margin: '0', padding: '2px' }}>Terminación: •••• {card.card_number.slice(-4)}</span>
-                            <span style={{ margin: '0', padding: '2px' }}>Vencimiento: {card.expiration_month.toString().padStart(2, '0')}/{card.expiration_year.toString().slice(-2)}</span>
-                        </div>
-
-
-                        {/* Radio para seleccionar */}
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '10px', cursor: 'pointer', marginTop: 1.5 }} onClick={() => handleSelectCard(card)} >
-                            <Radio
-                                checked={selectedCard?.id === card.id}
-                                readOnly
-                                sx={{
-                                    color: '#8F4D63',
-                                    '&.Mui-checked': { color: '#8F4D63' },
-                                }}
-                            />
-                            <span style={{
+                                gap: '10px',
                                 textAlign: "left",
                                 fontFamily: "Poppins",
                                 letterSpacing: "0px",
-                                color: "#8F4D63",
+                                color: "#330F1B",
                                 opacity: 1,
                                 fontSize: "14px",
-                            }}>{selectedCard?.id === card.id ? 'Tarjeta seleccionada' : 'Seleccionar tarjeta'}</span>
+                                marginLeft: "10px"
+                            }}>
+                                <div>
+                                    {card.type}
+                                </div>
+                            </div>
 
-                        </label>
+                            {/* Detalles */}
 
-                        {/* Botón para eliminar */}
-                        <button
-                            onClick={() => openDeleteModal(card)}
-                            style={{
-                                position: 'absolute',
-                                marginTop: "-148px",
-                                marginLeft: "278px",
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            <Tooltip title="Eliminar" arrow placement="top"
-                                componentsProps={{
-                                    tooltip: {
-                                        sx: {
-                                            backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                            color: "#CCC3C3",
-                                            fontFamily: "Poppins, sans-serif",
-                                            fontSize: "12px",
-                                            padding: "6px 8px",
-                                            borderRadius: "8px",
-                                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                                        }
-                                    },
-                                    arrow: {
-                                        sx: {
-                                            color: "rgba(0, 0, 0, 0.8)"
-                                        }
-                                    }
-                                }}
-                                PopperProps={{
-                                    modifiers: [
-                                        {
-                                            name: 'offset',
-                                            options: {
-                                                offset: [0, -7]
-                                            }
-                                        }
-                                    ]
+                            <div
+                                style={{
+                                    fontSize: '14px',
+                                    fontFamily: "Poppins",
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '5px',
+                                    lineHeight: '1.2',
+                                    marginLeft: "10px",
                                 }}
                             >
-                                <img src={trash} width='24px' height='24px' />
-                            </Tooltip>
-                        </button>
-                    </div>
-                ))}
-            </div>
+                                <span style={{ margin: '0', padding: '2px' }}>{card.card_name}</span>
+                                <span style={{ margin: '0', padding: '2px' }}>Terminación: •••• {card.card_number.slice(-4)}</span>
+                                <span style={{ margin: '0', padding: '2px' }}>Vencimiento: {card.expiration_month.toString().padStart(2, '0')}/{card.expiration_year.toString().slice(-2)}</span>
+                            </div>
+
+
+                            {/* Radio para seleccionar */}
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '10px', cursor: 'pointer', marginTop: 1.5 }} onClick={() => handleSelectCard(card)} >
+                                <Radio
+                                    checked={selectedCard?.id === card.id}
+                                    readOnly
+                                    sx={{
+                                        color: '#8F4D63',
+                                        '&.Mui-checked': { color: '#8F4D63' },
+                                    }}
+                                />
+                                <span style={{
+                                    textAlign: "left",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    color: "#8F4D63",
+                                    opacity: 1,
+                                    fontSize: "14px",
+                                }}>{selectedCard?.id === card.id ? 'Tarjeta seleccionada' : 'Seleccionar tarjeta'}</span>
+
+                            </label>
+
+                            {/* Botón para eliminar */}
+                            <button
+                                onClick={() => openDeleteModal(card)}
+                                style={{
+                                    position: 'absolute',
+                                    marginTop: "-148px",
+                                    marginLeft: "278px",
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                <Tooltip title="Eliminar" arrow placement="top"
+                                    componentsProps={{
+                                        tooltip: {
+                                            sx: {
+                                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                color: "#CCC3C3",
+                                                fontFamily: "Poppins, sans-serif",
+                                                fontSize: "12px",
+                                                padding: "6px 8px",
+                                                borderRadius: "8px",
+                                                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                            }
+                                        },
+                                        arrow: {
+                                            sx: {
+                                                color: "rgba(0, 0, 0, 0.8)"
+                                            }
+                                        }
+                                    }}
+                                    PopperProps={{
+                                        modifiers: [
+                                            {
+                                                name: 'offset',
+                                                options: {
+                                                    offset: [0, -7]
+                                                }
+                                            }
+                                        ]
+                                    }}
+                                >
+                                    <img src={trash} width='24px' height='24px' />
+                                </Tooltip>
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </Box>
             <ModalError
                 isOpen={isErrorModalOpen}
                 title={TitleErrorModal}
@@ -727,6 +710,7 @@ const PaymentMethods: React.FC = () => {
                                 fontWeight: 600,
                                 fontSize: '20px',
                                 color: '#574B4F',
+                                mt: "8px", mb: "5px"
                             }}
                         >
                             Agregar tarjeta
@@ -1310,22 +1294,22 @@ const PaymentMethods: React.FC = () => {
                         </Box>
 
 
-                        <div style={{ display: 'flex', gap: '20px', gridColumn: 'span 2' }}>
-                            <div style={{ flex: 1 }}>
+                        <Box sx={{ display: 'flex', gap: 10 }}>
+                            <Box sx={{ flex: 1 }}>
                                 <SecondaryButton
                                     onClick={() => handleCloseAddCardModal()}
-                                    text="Cancelar"// 🔥 Se asegura que no se expanda
+                                    text="Cancelar"
                                 />
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mr: -5.5 }}>
                                 <MainButton
                                     text="Agregar"
                                     isLoading={Loading}
                                     onClick={() => addCreditCard()}
                                     disabled={!areRequiredFieldsFilled()}
                                 />
-                            </div>
-                        </div>
+                            </Box>
+                        </Box>
 
 
 
@@ -1333,7 +1317,7 @@ const PaymentMethods: React.FC = () => {
                     </Box>
                 </Box>
             </Modal>
-        </div>
+        </Box>
     );
 };
 
