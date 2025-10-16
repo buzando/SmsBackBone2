@@ -679,7 +679,7 @@ const Login: React.FC = () => {
                                         letterSpacing: '0px',
                                         color: '#8F4D63',
                                     }}>
-                                        Registrate
+                                        Regístrate
                                     </Link>
                                 </Box>
 

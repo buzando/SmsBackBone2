@@ -762,7 +762,7 @@ const Templates = () => {
                                                             {
                                                                 name: 'offset',
                                                                 options: {
-                                                                    offset: [0, -10] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                    offset: [0, -10]
                                                                 }
                                                             }
                                                         ]
@@ -1297,7 +1297,8 @@ const Templates = () => {
                                     src={campaignSearch ? Iconseachred : seachicon}
                                     alt="Buscar"
                                     style={{ marginRight: 8, width: 24 }}
-                                />                                <input
+                                />
+                                <input
                                     type="text"
                                     placeholder="Buscar"
                                     value={campaignSearch}

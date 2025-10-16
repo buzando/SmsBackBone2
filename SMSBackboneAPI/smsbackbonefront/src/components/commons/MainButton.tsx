@@ -20,6 +20,7 @@ const MainButton: React.FC<MainButtonProps> = ({ text, onClick, isLoading = fals
                 width: width ?? 'auto',
                 minWidth: width ? undefined : '124px',
                 minHeight: '36px',
+                whiteSpace: 'nowrap',
             }}
         >
             {isLoading ? (

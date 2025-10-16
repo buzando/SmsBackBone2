@@ -1529,7 +1529,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                     pl: 4,
                                                     position: 'relative',
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#290013',
                                                         color: '#FFFFFF',
                                                         '&::before': {
                                                             content: '""',
@@ -1537,8 +1536,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                             left: 0,
                                                             top: 0,
                                                             bottom: 0,
-                                                            width: '4px',
-                                                            backgroundColor: '#FFFFFF',
                                                         },
                                                     },
                                                 }}

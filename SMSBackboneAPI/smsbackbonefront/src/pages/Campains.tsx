@@ -1981,12 +1981,12 @@ const Campains: React.FC = () => {
                         fontSize: "12px",
                         padding: "6px 8px",
                         borderRadius: "8px",
-                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)" // Sombra opcional
+                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
                       }
                     },
                     arrow: {
                       sx: {
-                        color: "rgba(0, 0, 0, 0.8)" // Flecha negra con transparencia
+                        color: "rgba(0, 0, 0, 0.8)"
                       }
                     }
                   }}
