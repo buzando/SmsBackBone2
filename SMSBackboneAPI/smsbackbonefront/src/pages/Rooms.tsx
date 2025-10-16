@@ -145,7 +145,11 @@ const Rooms: React.FC = () => {
         GetRooms();
     }, []);
 
-    const handleOpenModal = () => setModalOpen(true);
+    const handleOpenModal = () => {
+        setNewRoom({ name: "", description: "" });
+        setErrors({ name: false, description: false });
+        setModalOpen(true);
+    };
     const handleCloseModal = () => {
         setModalOpen(false);
         setNewRoom({ name: "", description: "" });
@@ -843,7 +847,12 @@ const Rooms: React.FC = () => {
                                 variant="contained"
                                 color="primary"
                                 onClick={handleCreateRoom}
-                                disabled={!newRoom.name || !newRoom.description}
+                                disabled={
+                                    !newRoom.name ||
+                                    !newRoom.description ||
+                                    errors.name ||
+                                    errors.description
+                                }
                                 sx={{
                                     width: "106px",
                                     backgroundColor: "#833A53",

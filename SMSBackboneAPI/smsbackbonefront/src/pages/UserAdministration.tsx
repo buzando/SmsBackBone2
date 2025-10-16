@@ -85,6 +85,7 @@ type FormData = {
 
 
 const ManageAccounts: React.FC = () => {
+    const [initialFormData, setInitialFormData] = useState<FormData | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -130,7 +131,10 @@ const ManageAccounts: React.FC = () => {
         return passwordRegex.test(password);
     };
 
-
+    const hasFormChanged = (): boolean => {
+        if (!initialFormData) return false;
+        return JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    };
 
 
     const handleCheckboxChange = (id: number) => {
@@ -440,7 +444,18 @@ const ManageAccounts: React.FC = () => {
             rooms: selectedRoomIds.join(","),
         });
 
-
+        setInitialFormData({
+            name: account.name || "",
+            email: account.email || "",
+            confirmEmail: account.email || "",
+            phone: account.phoneNumber || "",
+            useRecoveryEmail: false,
+            password: "",
+            confirmPassword: "",
+            allAndFuture: false,
+            profile: account.role || "",
+            rooms: selectedRoomIds.join(","),
+        });
 
 
         setIsEditing(true);
@@ -1086,6 +1101,7 @@ const ManageAccounts: React.FC = () => {
                                     onChange={handleInputChange}
                                     error={showErrors.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)}
                                     helperText={showErrors.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && "Ingrese un correo válido."}
+                                    disabled={isEditing}
                                     sx={{
                                         fontFamily: "Poppins",
                                         "& .MuiInputBase-input": {
@@ -1156,7 +1172,7 @@ const ManageAccounts: React.FC = () => {
                                         marginBottom: "8px",
                                     }}
                                 >
-                                    Confirmar Correo electronico<span style={{ color: "red" }}>*</span>
+                                    Confirmar Correo Electrónico<span style={{ color: "red" }}>*</span>
                                 </Typography>
                                 <TextField
                                     fullWidth
@@ -1167,6 +1183,7 @@ const ManageAccounts: React.FC = () => {
                                     helperText={
                                         formData.email !== formData.confirmEmail && "Los correos electrónicos no coinciden."
                                     }
+                                    disabled={isEditing}
                                     sx={{
                                         fontFamily: "Poppins",
                                         "& .MuiInputBase-input": {
@@ -1355,7 +1372,7 @@ const ManageAccounts: React.FC = () => {
                                                                     padding: "8px 12px",
                                                                     fontSize: "14px",
                                                                     fontFamily: "Poppins",
-                                                                    color: "#DEDADA",
+                                                                    color: "#574B4F",
                                                                     whiteSpace: "pre-line",
                                                                     transform: "translate(-10px, -22px)",
                                                                     borderColor: "#00131F3D",
@@ -1804,8 +1821,13 @@ const ManageAccounts: React.FC = () => {
                         }}
                     >
                         <SecondaryButton onClick={handleCloseModal} text="Cancelar" />
-                        <MainButton onClick={handleAddUser} text={isEditing ? "Actualizar" : "Guardar"}
-                            disabled={!isFormValid()} />
+                        <MainButton
+                            onClick={handleAddUser}
+                            text={isEditing ? "Actualizar" : "Guardar"}
+                            disabled={
+                                !isFormValid() || (isEditing && !hasFormChanged())
+                            }
+                        />
 
 
                     </Box>

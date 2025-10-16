@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, Divider, IconButton, Checkbox, TextField, InputAdornment, Tooltip, CircularProgress, FormControl, Paper, List, ListItemButton } from '@mui/material';
 import { Modal, Tabs, Tab, Button, Select, Switch, FormControlLabel, ToggleButtonGroup, ToggleButton, InputLabel, Grid, Popper, ClickAwayListener } from '@mui/material';
-import MainIcon from '../components/commons/MainButtonIcon';
+import MainIcon from '../components/commons/MainButonIcon2';
 import seachicon from '../assets/icon-lupa.svg';
 import iconclose from '../assets/icon-close.svg';
 import BoxEmpty from '../assets/Nousers.svg';
@@ -21,6 +21,7 @@ import IconSEye from "../assets/IconSEye.svg";
 import ListItemText from '@mui/material/ListItemText';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import Iconseachred from "../assets/Iconseachred.svg";
 import DeleteIcon from '@mui/icons-material/Delete';
 import MainButton from '../components/commons/MainButton'
 import SecondaryButton from '../components/commons/SecondaryButton'
@@ -150,6 +151,7 @@ const NumbersDids: React.FC = () => {
     const [showModalNumber, setshowModalNumber] = useState(false);
     const [selectedAction, setSelectedAction] = useState<'delete' | 'deactivate' | null>(null);
     const [ShowSnackBar, setShowSnackBar] = useState(false);
+    const [ShowSnackBar2, setShowSnackBar2] = useState(false);
     const [uploadSummary, setUploadSummary] = useState<{
         success: number;
         failed: number;
@@ -210,6 +212,36 @@ const NumbersDids: React.FC = () => {
         </Box>
     );
 
+    const handleOpenManageModal = () => {
+        setFormData({
+            Name: '',
+            Phones: [''],
+            ExpirationDate: null,
+            File: '',
+        });
+
+        setIndividualPhones(['']);
+        setSelectedClient(null);
+        setSelectedChannel('');
+        setManageOperation('agregar');
+        setSourceType('file');
+        setManageByIndividual(false);
+        setManageByList(false);
+        setUploadedFile(null);
+        setUploadedFileBase64('');
+        setSheetNames([]);
+        setColumns([]);
+        setExcelData([]);
+        setSelectedSheet('');
+        setSelectedDatoCol('');
+        setSelectedTelefonoCol('');
+        setBase64File('');
+        setFileError(false);
+        setFileSuccess(false);
+        setSelectedFileName('');
+
+        setShowModal(true);
+    };
 
     const GetNumbers = async () => {
         setLoading(true);
@@ -431,11 +463,13 @@ const NumbersDids: React.FC = () => {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+
             }
         } catch (error) {
             setErrorModal(true);
         } finally {
             onComplete?.();
+            setShowSnackBar2(true);
         }
     };
 
@@ -580,7 +614,7 @@ const NumbersDids: React.FC = () => {
     const handleNumberOperation = async (operation: 'delete' | 'deactivate', numberId: number) => {
         const payload = {
             "operation": operation,
-            "id": numberId, // suponiendo que mandas el ID o el número directamente como array
+            "id": numberId,
         };
 
         try {
@@ -687,7 +721,8 @@ const NumbersDids: React.FC = () => {
 
                     {/* Botón y buscador */}
                     <Box sx={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
-                        <MainIcon text="Gestionar números" width="228px" onClick={() => setShowModal(true)} />
+                        <MainIcon text="Gestionar números" width="228px" onClick={handleOpenManageModal}
+                        />
                         <Box sx={{ position: 'relative', width: '220px' }}>
                             <Box
                                 display="flex"
@@ -702,7 +737,11 @@ const NumbersDids: React.FC = () => {
                                     height: "40px"
                                 }}
                             >
-                                <img src={seachicon} alt="Buscar" style={{ marginRight: 8, width: 24 }} />
+                                <img
+                                    src={searchTerm ? Iconseachred : seachicon}
+                                    alt="Buscar"
+                                    style={{ marginRight: 8, width: 24 }}
+                                />
                                 <input
                                     type="text"
                                     placeholder="Buscar"
@@ -781,7 +820,8 @@ const NumbersDids: React.FC = () => {
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Siguiente página">
-                                <IconButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+                                <IconButton onClick={handleNextPage}
+                                    disabled={currentPage === totalPages || paginatedData.length === 0}>
                                     <img src={backarrow} style={{
                                         width: 24, transform: 'rotate(180deg)', marginRight: "-28px", marginLeft: "-28px",
                                         opacity: currentPage === totalPages ? 0.3 : 1
@@ -993,11 +1033,15 @@ const NumbersDids: React.FC = () => {
                             borderRadius: '8px',
                             padding: '8px 2px',
                             boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                            overflowX: 'hidden',
-                            height: "410px"
+                            overflowX: 'auto',
+                            height: "414px"
                         }}
                     >
-                        <table style={{ minWidth: '1180px', borderCollapse: 'collapse', }}>
+                        <table style={{
+                            width: '100%', minWidth: '1080px',
+                            borderCollapse: 'collapse',
+                            fontFamily: 'Poppins',
+                        }}>
                             <thead>
                                 <tr style={{
                                     textAlign: 'left', fontFamily: 'Poppins', fontSize: '13px',
@@ -1027,17 +1071,46 @@ const NumbersDids: React.FC = () => {
                                         padding: '6px', textAlign: 'left',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Estatus</th>
+
+                                    <th style={{
+                                        padding: '6px', textAlign: 'left',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Fecha de compra</th>
+
+                                    <th style={{
+                                        padding: '6px', textAlign: 'left',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Cliente</th>
+
+                                    <th style={{
+                                        padding: '6px', textAlign: 'left', whiteSpace: 'nowrap',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Fecha de baja</th>
+
+                                    <th style={{
+                                        padding: '6px', textAlign: 'left', whiteSpace: 'nowrap',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Motivo de baja</th>
+
+                                    <th style={{
+                                        padding: '6px', textAlign: 'left', whiteSpace: 'nowrap',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Fecha de eliminación</th>
+
                                     <td style={{
-                                        position: 'sticky',
-                                        right: -30,
-                                        background: '#fff', borderLeft: '1px solid #E0E0E0',
-                                        boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
-                                        zIndex: 2,
-                                        padding: '6px', width: '35px', whiteSpace: 'nowrap', overflow: 'hidden',
-                                        textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
-
+                                        position: 'sticky', textAlign: "center",
+                                        right: -2,
+                                        background: '#fff',
+                                        padding: '3.5px', width: '75px', height: "30px", whiteSpace: 'nowrap', overflow: 'hidden',
+                                        textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F",
                                     }}>
-
+                                        <Divider sx={{
+                                            marginTop: "-51px", marginLeft: "-3px",
+                                            position: "absolute",
+                                            height: '90px',
+                                            width: "0px",
+                                            borderLeft: "1px solid #E0E0E0"
+                                        }} />
                                     </td>
                                 </tr>
                             </thead>
@@ -1071,22 +1144,57 @@ const NumbersDids: React.FC = () => {
                                         <td style={{
                                             padding: '6px', width: '150px', whiteSpace: 'nowrap', overflow: 'hidden',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
-                                            , borderRight: '1px solid #E0E0E0',
 
                                         }}>{number.Estatus}</td>
+
                                         <td style={{
-                                            position: 'sticky',
-                                            right: -30,
-                                            background: '#fff', borderLeft: '1px solid #E0E0E0',
-                                            boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
-                                            zIndex: 2,
-                                            padding: '6px', width: '35px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            padding: '6px', width: '150px', whiteSpace: 'nowrap', overflow: 'hidden',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
 
+                                        }}> dd/mm/yyyy 00:00:00 a.m.</td>
+
+                                        <td style={{
+                                            padding: '6px', width: '150px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+
+                                        }}> cliente tal</td>
+
+                                        <td style={{
+                                            padding: '6px', width: '150px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+
+                                        }}> N/A </td>
+
+                                        <td style={{
+                                            padding: '6px', width: '150px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+
+                                        }}> N/A </td>
+
+                                        <td style={{
+                                            padding: '6px', width: '150px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+
+
+                                        }}> N/A </td>
+
+                                        <td style={{
+                                            position: 'sticky', textAlign: "center",
+                                            right: -2,
+                                            background: '#fff',
+                                            padding: '3.5px', width: '75px', height: "51px", whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
                                         }}>
                                             <IconButton onClick={(event) => handleMenuOpen(event, number)}>
                                                 <MoreVertIcon />
                                             </IconButton>
+                                            <Divider sx={{
+                                                marginTop: "-51px", marginLeft: "-3px",
+                                                position: "absolute",
+                                                height: '60px',
+                                                width: "0px",
+                                                borderLeft: "1px solid #E0E0E0"
+                                            }} />
                                         </td>
                                     </tr>
                                 ))}
@@ -1471,7 +1579,14 @@ const NumbersDids: React.FC = () => {
                     />
                 </Box>
             </Menu>
-            <Modal open={ShowModal} onClose={handleCloseModal}>
+            <Modal
+                open={ShowModal}
+                onClose={(_, reason) => {
+                    if (reason !== 'backdropClick') {
+                        handleCloseModal();
+                    }
+                }}
+            >
                 <Box sx={{
                     width: '580px',
                     height: '592px',
@@ -1853,12 +1968,9 @@ const NumbersDids: React.FC = () => {
                                                         startAdornment: (
                                                             <InputAdornment position="start">
                                                                 <img
-                                                                    src={seachicon}
+                                                                    src={clientSearch2 ? Iconseachred : seachicon}
                                                                     alt="Buscar"
-                                                                    style={{
-                                                                        width: 24,
-                                                                        filter: clientSearch2 ? 'invert(14%) sepia(58%) saturate(1253%) hue-rotate(316deg) brightness(90%) contrast(95%)' : 'none'
-                                                                    }}
+                                                                    style={{ marginRight: 4, width: 24 }}
                                                                 />
                                                             </InputAdornment>
                                                         ),
@@ -1996,7 +2108,7 @@ const NumbersDids: React.FC = () => {
                                 }}
                             >
                                 <Typography fontWeight="500" fontSize="18px" mb={1} fontFamily={"Poppins"}
-                                    marginLeft={'-10px'} marginTop={'-10px'}>Seleccionar fuente de registros</Typography>
+                                    marginLeft={'-10px'} marginTop={'16px'}>Seleccionar fuente de registros</Typography>
 
                                 <Box
                                     sx={{
@@ -2893,7 +3005,7 @@ const NumbersDids: React.FC = () => {
                                                     <TextField
                                                         value={phone}
                                                         onChange={(e) => {
-                                                            const numericValue = e.target.value.replace(/\D/g, '');
+                                                            const numericValue = e.target.value.replace(/\D/g, '').substring(0, 10);
                                                             handleIndividualPhoneChange(index, numericValue);
                                                         }}
                                                         placeholder="5255..."
@@ -2925,15 +3037,16 @@ const NumbersDids: React.FC = () => {
                                                                                     fontFamily: "Poppins",
                                                                                     color: "#000000",
                                                                                     whiteSpace: "pre-line",
-                                                                                    transform: "translate(2px, -15px)",
+                                                                                    transform: "translate(-2px, -10px)",
                                                                                     borderColor: "#00131F3D",
                                                                                     borderStyle: "solid",
-
+                                                                                    borderWidth: "1px"
 
                                                                                 }}
                                                                             >
                                                                                 <>
-                                                                                    Teléfono válido de 10 dígitos
+                                                                                    • Teléfono válido de 10 dígitos<br />
+                                                                                    • Solo caracteres numéricos
                                                                                 </>
                                                                             </Box>
                                                                         }
@@ -2980,7 +3093,7 @@ const NumbersDids: React.FC = () => {
                                                                     {
                                                                         name: 'offset',
                                                                         options: {
-                                                                            offset: [-20, -7] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                            offset: [-20, -7]
                                                                         }
                                                                     }
                                                                 ]
@@ -2991,7 +3104,7 @@ const NumbersDids: React.FC = () => {
                                                                     width: 21,
                                                                     height: 21,
                                                                     backgroundColor: "#6F565E",
-                                                                    borderRadius: "50%", // 🔥 clave para hacerlo circular
+                                                                    borderRadius: "50%",
                                                                     display: "flex",
                                                                     alignItems: "center",
                                                                     justifyContent: "center"
@@ -3955,11 +4068,22 @@ const NumbersDids: React.FC = () => {
                     <SnackBar
                         message={
                             selectedAction === 'delete'
-                                ? `Numero Eliminado Correctamente`
-                                : `Numero dado de baja correctamente`
+                                ? `Número Eliminado Correctamente`
+                                : `Número dado de baja correctamente`
                         }
                         buttonText="Cerrar"
                         onClose={() => setShowSnackBar(false)}
+                    />
+                )
+            }
+            {
+                ShowSnackBar2 && (
+                    <SnackBar
+                        message={
+                            'Archivo descargado correctamente'
+                        }
+                        buttonText="Cerrar"
+                        onClose={() => setShowSnackBar2(false)}
                     />
                 )
             }

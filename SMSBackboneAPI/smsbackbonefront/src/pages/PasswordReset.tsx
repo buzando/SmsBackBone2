@@ -848,7 +848,7 @@ const TermsAndConditions: React.FC = () => {
                                                 label="SMS"
                                                 sx={{
                                                     fontFamily: "Poppins",
-                                                    color: SendType === "SMS" ? "#8F4D63" : "#807D7E",
+                                                    color: SendType === "SMS" ? "#8F4D63" : "#574B4F",
                                                     fontWeight: SendType === "SMS" ? "bold" : "normal",
                                                     transition: "color 0.3s ease",
                                                 }}
@@ -872,7 +872,7 @@ const TermsAndConditions: React.FC = () => {
                                                 label="Correo electrónico"
                                                 sx={{
                                                     fontFamily: "Poppins",
-                                                    color: SendType === "EMAIL" ? "#8F4D63" : "#807D7E",
+                                                    color: SendType === "EMAIL" ? "#8F4D63" : "#574B4F",
                                                     fontWeight: SendType === "EMAIL" ? "bold" : "normal",
                                                     transition: "color 0.3s ease",
                                                 }}
@@ -1492,7 +1492,7 @@ const TermsAndConditions: React.FC = () => {
                                                                 height: '24px',
                                                                 position: 'relative',
                                                                 marginTop: '0px',
-                                                                marginLeft: '0px',
+                                                                marginLeft: '0px', borderColor: "#574B4F",
                                                             }}
                                                         >
                                                             <img
@@ -1509,7 +1509,7 @@ const TermsAndConditions: React.FC = () => {
                                                 '& .MuiFormControlLabel-label': {
                                                     fontFamily: 'Poppins, sans-serif',
                                                     fontSize: '14px',
-                                                    color: enableTwoFactor ? '#8F4D63' : '#574B4FCC',
+                                                    color: enableTwoFactor ? '#8F4D63' : '#574B4F', opacity: 0.8
                                                 },
                                             }}
                                         />

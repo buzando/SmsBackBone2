@@ -13,6 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import { Divider, Modal, Fade, Backdrop } from '@mui/material';
 import PublicLayout from '../components/PublicLayout';
 import Checkbox from '@mui/material/Checkbox';
+import SecondaryButton from '../components/commons/SecondaryButton'
 import InputAdornment from '@mui/material/InputAdornment';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Tooltip from '@mui/material/Tooltip';
@@ -272,11 +273,15 @@ const Register: React.FC = () => {
                         </Typography>
 
                         <Divider sx={{ marginBottom: 3 }} />
-                        <Paper elevation={3} sx={{ padding: 4, borderRadius: "12px", display: "flex", flexDirection: "column", height: "auto" }}>
+                        <Paper elevation={3}
+                            sx={{
+                                padding: 4, borderRadius: "12px", display: "flex", flexDirection: "column", height: "auto"
+                            }}>
                             <Typography
                                 sx={{
                                     position: "absolute",
-                                    marginLeft: "470px",
+                                    marginLeft: "452px",
+                                    marginTop: "-23px",
                                     fontStyle: "normal",
                                     fontVariant: "normal",
                                     fontWeight: "398",
@@ -286,7 +291,7 @@ const Register: React.FC = () => {
                                     letterSpacing: "0px",
                                     color: "#330F1B",
                                     opacity: 0.7,
-                                    marginBottom: 3,
+                                    marginBottom: 2,
                                 }}
                             >
                                 *El asterisco indica los campos obligatorios.
@@ -306,7 +311,7 @@ const Register: React.FC = () => {
 
 
                                 {/* Client - Solo en la parte superior */}
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={6} mb={-1}>
 
                                     <Typography
                                         sx={{
@@ -346,6 +351,10 @@ const Register: React.FC = () => {
                                             fontFamily: "Poppins",
                                             "& .MuiInputBase-input": {
                                                 fontFamily: "Poppins",
+                                            },
+                                            "& .MuiFormHelperText-root": {
+                                                fontFamily: "Poppins",
+                                                fontSize: "12px", position: "absolute", marginTop: "59px"
                                             },
                                         }}
                                         InputProps={{
@@ -417,7 +426,7 @@ const Register: React.FC = () => {
 
                                 <Grid item xs={12} />
 
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={6} mb={1}>
                                     <Typography
                                         sx={{
                                             textAlign: "left",
@@ -450,6 +459,10 @@ const Register: React.FC = () => {
                                             fontFamily: "Poppins",
                                             "& .MuiInputBase-input": {
                                                 fontFamily: "Poppins",
+                                            },
+                                            "& .MuiFormHelperText-root": {
+                                                fontFamily: "Poppins",
+                                                fontSize: "12px", position: "absolute", marginTop: "59px"
                                             },
                                         }}
                                         InputProps={{
@@ -552,6 +565,10 @@ const Register: React.FC = () => {
                                             "& .MuiInputBase-input": {
                                                 fontFamily: "Poppins",
                                             },
+                                            "& .MuiFormHelperText-root": {
+                                                fontFamily: "Poppins",
+                                                fontSize: "12px", position: "absolute", marginTop: "59px"
+                                            },
                                         }}
                                         InputProps={{
                                             endAdornment: (
@@ -618,7 +635,7 @@ const Register: React.FC = () => {
                                     />
                                 </Grid>
 
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={6} mb={0}>
                                     <Typography
                                         sx={{
                                             textAlign: "left",
@@ -647,6 +664,10 @@ const Register: React.FC = () => {
                                             fontFamily: "Poppins",
                                             "& .MuiInputBase-input": {
                                                 fontFamily: "Poppins",
+                                            },
+                                            "& .MuiFormHelperText-root": {
+                                                fontFamily: "Poppins",
+                                                fontSize: "12px", position: "absolute", marginTop: "59px"
                                             },
                                         }}
                                         InputProps={{
@@ -708,7 +729,7 @@ const Register: React.FC = () => {
                                     />
                                 </Grid>
 
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={6} mb={1}>
                                     <Typography
                                         sx={{
                                             textAlign: "left",
@@ -743,6 +764,10 @@ const Register: React.FC = () => {
                                             fontFamily: "Poppins",
                                             "& .MuiInputBase-input": {
                                                 fontFamily: "Poppins",
+                                            },
+                                            "& .MuiFormHelperText-root": {
+                                                fontFamily: "Poppins",
+                                                fontSize: "12px", position: "absolute", marginTop: "59px"
                                             },
                                         }}
                                         InputProps={{
@@ -835,12 +860,16 @@ const Register: React.FC = () => {
                                         fullWidth
                                         required
                                         error={errors.email}
-                                        helperText={errors.email ? "Fomarto inválido" : ""}
+                                        helperText={errors.email ? "Formato inválido" : ""}
 
                                         sx={{
                                             fontFamily: "Poppins",
                                             "& .MuiInputBase-input": {
                                                 fontFamily: "Poppins",
+                                            },
+                                            "& .MuiFormHelperText-root": {
+                                                fontFamily: "Poppins",
+                                                fontSize: "12px", position: "absolute", marginTop: "59px"
                                             },
                                         }}
                                         InputProps={{
@@ -898,7 +927,7 @@ const Register: React.FC = () => {
                                     />
                                 </Grid>
 
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={6} mb={1}>
                                     <Typography
                                         sx={{
                                             textAlign: "left",
@@ -927,6 +956,10 @@ const Register: React.FC = () => {
                                             fontFamily: "Poppins",
                                             "& .MuiInputBase-input": {
                                                 fontFamily: "Poppins",
+                                            },
+                                            "& .MuiFormHelperText-root": {
+                                                fontFamily: "Poppins",
+                                                fontSize: "12px", position: "absolute", marginTop: "59px"
                                             },
                                         }}
                                         InputProps={{
@@ -1011,22 +1044,22 @@ const Register: React.FC = () => {
                                             hasPasswordInput && (
                                                 <>
                                                     {!passwordErrors.minLength && (
-                                                        <Typography variant="caption" color="error">
+                                                        <Typography variant="caption" color="error" sx={{ fontFamily: "Poppins", fontSize: "11px" }}>
                                                             • La contraseña debe tener al menos 8 caracteres.
                                                         </Typography>
                                                     )}
                                                     {!passwordErrors.uppercase && (
-                                                        <Typography variant="caption" color="error">
+                                                        <Typography variant="caption" color="error" sx={{ fontFamily: "Poppins", fontSize: "11px" }}>
                                                             <br />• Debe contener al menos una letra mayúscula.
                                                         </Typography>
                                                     )}
                                                     {!passwordErrors.lowercase && (
-                                                        <Typography variant="caption" color="error">
+                                                        <Typography variant="caption" color="error" sx={{ fontFamily: "Poppins", fontSize: "11px" }}>
                                                             <br />• Debe contener al menos una letra minúscula.
                                                         </Typography>
                                                     )}
                                                     {!passwordErrors.number && (
-                                                        <Typography variant="caption" color="error">
+                                                        <Typography variant="caption" color="error" sx={{ fontFamily: "Poppins", fontSize: "11px" }}>
                                                             <br />• Debe contener al menos un número.
                                                         </Typography>
                                                     )}
@@ -1171,7 +1204,7 @@ const Register: React.FC = () => {
 
                                 <Grid item xs={12}>
                                     {password && confirmPassword && !arePasswordsValid() && (
-                                        <Typography variant="caption" color="#D01247" sx={{ marginBottom: 2 }}>
+                                        <Typography variant="caption" color="#D01247" sx={{ marginBottom: 2, fontFamily: "Poppins", fontSize: "12px" }}>
                                             Asegúrate de cumplir con los requisitos de contraseña y que coincidan.
                                         </Typography>
                                     )}
@@ -1537,42 +1570,13 @@ const Register: React.FC = () => {
                                         EL CLIENTE será responsable totalmente de la gestión de las contraseñas y acceso al sistema donde se utiliza el servicio de SMS. CENTERNEXT quedará exento de cualquier uso inapropiado o indebido realizado por cuentas que gestionan el SMS.
                                     </Typography>
                                 </Box>
-                                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mt: 2 }} />
+                                <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mt: 1, mb: -1.5 }} />
                                 <Box display="flex" justifyContent="space-between" mt={3.8}
                                     sx={{
-                                        marginBottom: "-6px"
+                                        marginBottom: "-12px"
 
                                     }}>
-                                    <Button variant="outlined" onClick={handleModalClose}
-                                        sx={{
-                                            border: "1px solid #CCCFD2",
-                                            borderRadius: "4px",
-                                            color: "#833A53",
-                                            backgroundColor: "transparent",
-                                            fontVariant: "normal",
-                                            letterSpacing: "1.12px",
-                                            fontWeight: "600",
-                                            fontSize: "14px",
-                                            fontFamily: "Poppins",
-                                            height: "36px",
-                                            width: "116px",
-                                            opacity: 1,
-                                            marginRight: "20px",
-                                            marginTop: "-5px",
-                                            "&:hover": {
-                                                backgroundColor: "#f3e6eb",
-                                                fontStyle: "normal",
-                                                fontVariant: "normal",
-                                                fontWeight: "600",
-                                                fontSize: "14px",
-                                                fontFamily: "Poppins",
-                                                color: "#833A53",
-                                                letterSpacing: "1.12px",
-                                                opacity: 1,
-                                            },
-                                        }}>
-                                        Cancelar
-                                    </Button>
+                                    <SecondaryButton text='Cancelar' onClick={handleModalClose} />
                                     <MainButton
                                         text='Aceptar'
                                         onClick={handleSubmit}
