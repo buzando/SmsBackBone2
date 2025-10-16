@@ -48,6 +48,10 @@ const Autentification: React.FC = () => {
                 navigate('/');
                 return;
             }
+            if(obj.rol == 'Mesa'){
+                navigate('/ClientRoomPicker');
+                return;
+            }
             if (obj.twoFactorAuthentication) {
                 navigate('/chooseroom');
             }

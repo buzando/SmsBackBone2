@@ -8,6 +8,7 @@ namespace Contract.Response
 {
     public class RoomAdminResponse
     {
+        public int IdRoom { get; set; }
         public DateTime? fechaAlta { get; set; }
         public string nombrecliente { get; set; }
         public string nombreSala { get; set; }

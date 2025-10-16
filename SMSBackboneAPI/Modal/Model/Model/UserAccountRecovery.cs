@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Modal.Model.Model
 {
-    public class UserAccounRecovery
+    public class UserAccountRecovery
     {
         [Key]
         public int id { get; set; }
@@ -15,6 +15,6 @@ namespace Modal.Model.Model
         public string token { get; set; }
         public DateTime Expiration { get; set; }
 
-        public int type { get; set; } 
+        public string type { get; set; } 
     }
 }

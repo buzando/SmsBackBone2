@@ -21,6 +21,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using Newtonsoft.Json.Linq;
+using System.Transactions;
 
 namespace Business
 {
@@ -229,7 +230,127 @@ namespace Business
         }
 
 
+        public (UserDto usuario, int? clientId) RegisterUserAtomic(RegisterUser register)
+        {
+            if (register == null) throw new ArgumentNullException(nameof(register));
+            if (string.IsNullOrWhiteSpace(register.email) || string.IsNullOrWhiteSpace(register.client))
+                throw new ArgumentException("Email y client son obligatorios.");
 
+            var yaExiste = new UserManager().FindEmail(register.email) != null;
+            if (yaExiste) throw new InvalidOperationException("DuplicateUserName");
+
+            using (var scope = new TransactionScope(
+                TransactionScopeOption.Required,
+                new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted },
+                TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var clientMgr = new ClientManager();
+                var cliente = clientMgr.ObtenerClienteporNombre(register.client);
+                if (cliente == null)
+                {
+                    var ok = clientMgr.AgregarCliente(new clientDTO { nombrecliente = register.client });
+                    if (!ok) throw new Exception("Error al guardar cliente, intente más tarde");
+                    cliente = clientMgr.ObtenerClienteporNombre(register.client);
+                    if (cliente == null) throw new Exception("Cliente no disponible tras crear");
+                }
+
+                UserDto usuarioCreado;
+                {
+                    var password = SecurityHelper.GenerarPasswordHash(register.Password);
+                    var entity = new Modal.Model.Model.Users
+                    {
+                        accessFailedCount = 0,
+                        Call = register.llamada,
+                        clauseAccepted = false,
+                        createDate = DateTime.Now,
+                        email = register.email,
+                        emailConfirmed = false,
+                        firstName = register.firstName,
+                        lastName = register.lastName,
+                        lastPasswordChangeDate = DateTime.Now,
+                        lockoutEnabled = false,
+                        passwordHash = password,
+                        phonenumber = register.phone,
+                        SMS = register.sms,
+                        userName = register.email,
+                        lockoutEndDateUtc = null,
+                        TwoFactorAuthentication = false,
+                        status = true,
+                        SecondaryEmail = register.emailConfirmation,
+                        futurerooms = false,
+                        IdCliente = cliente.id
+                    };
+
+                    using (var ctx = new Entities())
+                    {
+                        var idrole = ctx.Roles.Where(x => x.Role.ToLower() == "administrador")
+                                              .Select(x => x.id).FirstOrDefault();
+                        entity.idRole = idrole;
+
+                        var dup = ctx.Users.Any(u => u.email == entity.email);
+                        if (dup) throw new InvalidOperationException("DuplicateUserName");
+
+                        ctx.Users.Add(entity);
+                        ctx.SaveChanges();
+
+                        var config = new MapperConfiguration(cfg => cfg.CreateMap<Modal.Model.Model.Users, UserDto>());
+                        var mapper = new Mapper(config);
+                        usuarioCreado = mapper.Map<UserDto>(entity);
+                        usuarioCreado.rol = ctx.Roles.Where(x => x.id == entity.idRole).Select(x => x.Role).FirstOrDefault();
+                        usuarioCreado.Client = ctx.clients.Where(x => x.id == entity.IdCliente).Select(x => x.nombrecliente).FirstOrDefault();
+                    }
+                }
+
+                var roomOk = new roomsManager().addroomByNewUser(usuarioCreado.Id, usuarioCreado.IdCliente);
+                if (!roomOk) throw new Exception("Error al crear Room, intente más tarde");
+\
+                var passwordBB = GenerarPasswordTemporalBackBone(16);
+
+                var adminTokenTask = new ApiBackBoneManager().LoginResponse(
+                    Common.ConfigurationManagerJson("USRBACKBONE"),
+                    Common.ConfigurationManagerJson("PSSBACKBONE")
+                );
+                var adminToken = adminTokenTask.Result;
+                if (adminToken == null || string.IsNullOrWhiteSpace(adminToken.token))
+                    throw new Exception("No se pudo autenticar en Backbone.");
+
+                var createTask = new ApiBackBoneManager().CreateUser(
+                    adminToken.token,
+                    usuarioCreado.Client,
+                    passwordBB,
+                    usuarioCreado.email,
+                    3,
+                    ""
+                );
+                var userBackboneJson = createTask.GetAwaiter().GetResult();
+                var idBackbone = JObject.Parse(userBackboneJson)["id"].Value<int>();
+
+                var passEncrypt = ClientAccessManager.Encrypt(passwordBB);
+                using (var ctx = new Entities())
+                {
+                    var clientAccess = new ClientAccess
+                    {
+                        client_id = cliente.id,
+                        password = passEncrypt,
+                        username = usuarioCreado.Client,
+                        status = true,
+                        created_at = DateTime.Now,
+                        id_backbone = idBackbone
+                    };
+                    ctx.Client_Access.Add(clientAccess);
+                    ctx.SaveChanges();
+                }
+
+                    var addCreditResp = new ApiBackBoneManager()
+    .AddCredit(adminToken.token, idBackbone, 100)
+    .GetAwaiter()
+    .GetResult();
+
+
+                scope.Complete();
+                return (usuarioCreado, cliente.id);
+            }
+        }
 
         public bool CreateClient(ClientRequestDto dto)
         {
@@ -303,9 +424,9 @@ namespace Business
                             {
                                 name = roomName,
                                 calls = 0,
-                                credits = 0,
+                                credits = 100,
                                 description = $"Room de {roomName}",
-                                long_sms = 0,
+                                long_sms = 100,
                                 short_sms = 0
                             };
 
@@ -326,27 +447,36 @@ namespace Business
                         {
 
 
-                            //var password = GenerarPasswordTemporalBackBone(16);
+                            var password = GenerarPasswordTemporalBackBone(16);
 
-                            //var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
-                            //var userbackbone = new ApiBackBoneManager()
-                            //    .CreateUser(admintoken.Result.token, dto.NombreCliente, password, dto.Email, 3, "")
-                            //    .GetAwaiter()
-                            //    .GetResult();
-                            //int id = JObject.Parse(userbackbone)["id"].Value<int>();
-                            //var passencrypt = ClientAccessManager.Encrypt(password);
+                            var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
+                            var userbackbone = new ApiBackBoneManager()
+                                .CreateUser(admintoken.Result.token, dto.NombreCliente, password, dto.Email, 3, "")
+                                .GetAwaiter()
+                                .GetResult();
+                            int id = JObject.Parse(userbackbone)["id"].Value<int>();
+                            var passencrypt = ClientAccessManager.Encrypt(password);
 
-                            //var clientacces = new ClientAccess
-                            //{
-                            //    client_id = client.id,
-                            //    password = passencrypt,
-                            //    username = dto.NombreCliente,
-                            //    status = true,
-                            //    created_at = DateTime.Now,
-                            //    id_backbone = id
-                            //};
-                            //ctx.Client_Access.Add(clientacces);
-                            //ctx.SaveChanges();
+                            var clientacces = new ClientAccess
+                            {
+                                client_id = client.id,
+                                password = passencrypt,
+                                username = dto.NombreCliente,
+                                status = true,
+                                created_at = DateTime.Now,
+                                id_backbone = id
+                            };
+                            ctx.Client_Access.Add(clientacces);
+                            ctx.SaveChanges();
+
+
+                            var addCreditResp = new ApiBackBoneManager()
+     .AddCredit(admintoken.Result.token, id, 100)
+     .GetAwaiter()
+     .GetResult();
+
+
+
                             transaction.Commit();
 
                             string sitioFront = Common.ConfigurationManagerJson("UrlSitio");
@@ -437,9 +567,9 @@ namespace Business
 
                             client.LongRateQty = dto.LongRateQty;
                         }
-                       
-                      
-           
+
+
+
 
                         ctx.SaveChanges();
 
@@ -576,27 +706,56 @@ namespace Business
             try
             {
                 using (var ctx = new Entities())
+                using (var tx = ctx.Database.BeginTransaction())
                 {
-                    if (credit.SmsType.ToLower() == "largo")
+                    // Normaliza SmsType → canal interno
+                    string channel = credit.SmsType?.Trim().ToLower() switch
                     {
-                        credit.SmsType = "long_sms";
-                    }
-                    if (credit.SmsType.ToLower() == "corto")
-                    {
-                        credit.SmsType = "short_sms";
-                    }
-                    foreach (var item in credit.Rooms)
-                    {
-                        var roomId = (from c in ctx.clients
-                                      join u in ctx.Users on c.id equals u.IdCliente
-                                      join ru in ctx.roomsbyuser on u.Id equals ru.idUser
-                                      join r in ctx.Rooms on ru.idRoom equals r.id
-                                      where r.name == item && c.id == credit.ClientId
-                                      select r.id).FirstOrDefault();
+                        "largo" => "long_sms",
+                        "corto" => "short_sms",
+                        "long_sms" => "long_sms",
+                        "short_sms" => "short_sms",
+                        _ => "short_sms"
+                    };
 
-                        var recharge = new CreditRecharge
+                    // Rooms solicitadas (limpias y únicas)
+                    var roomNames = (credit.Rooms ?? Enumerable.Empty<string>())
+                                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                                    .Select(s => s.Trim())
+                                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                                    .ToList();
+                    if (roomNames.Count == 0)
+                    {
+                        log.Warn("No se recibieron rooms en la solicitud.");
+                        return false;
+                    }
+
+                    // 1) Resuelve roomIds por CLIENTE + NOMBRE (criterio único)
+                    var roomIdsByName = (
+                        from c in ctx.clients
+                        join u in ctx.Users on c.id equals u.IdCliente
+                        join ru in ctx.roomsbyuser on u.Id equals ru.idUser
+                        join r in ctx.Rooms on ru.idRoom equals r.id
+                        where c.id == credit.ClientId && roomNames.Contains(r.name)
+                        select new { r.name, r.id }
+                    )
+                    .ToList()
+                    .GroupBy(x => x.name, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.First().id, StringComparer.OrdinalIgnoreCase);
+
+                    // 2) Inserta recargas y junta los ids a actualizar
+                    var idsToUpdate = new HashSet<int>();
+                    foreach (var name in roomNames)
+                    {
+                        if (!roomIdsByName.TryGetValue(name, out var roomId))
                         {
-                            Chanel = credit.SmsType,
+                            log.Warn($"Room '{name}' no está ligada al cliente {credit.ClientId}; se omite recarga.");
+                            continue;
+                        }
+
+                        ctx.CreditRecharge.Add(new CreditRecharge
+                        {
+                            Chanel = channel,
                             idCreditCard = null,
                             quantityCredits = credit.Amount,
                             quantityMoney = credit.Total,
@@ -605,36 +764,42 @@ namespace Business
                             AutomaticInvoice = false,
                             Estatus = credit.PaymentType,
                             idRoom = roomId
-                        };
+                        });
 
-                        ctx.CreditRecharge.Add(recharge);
-                        ctx.SaveChanges();
-                    }
-
-                    foreach (var roomName in credit.Rooms)
-                    {
-                        var room = (from r in ctx.Rooms
-                                    join rbu in ctx.roomsbyuser on r.id equals rbu.idRoom
-                                    where r.name == roomName && rbu.idUser == credit.IdUser
-                                    select r).FirstOrDefault();
-
-                        if (room != null)
-                        {
-                            if (credit.SmsType?.ToLower() == "short_sms")
-                            {
-                                room.short_sms += credit.Amount;
-                                room.credits += credit.Amount;
-                            }
-                            else if (credit.SmsType?.ToLower() == "long_sms")
-                            {
-                                room.long_sms += credit.Amount;
-                                room.credits += credit.Amount;
-                            }
-                        }
+                        idsToUpdate.Add(roomId);
                     }
 
                     ctx.SaveChanges();
 
+                    if (idsToUpdate.Count == 0)
+                    {
+                        log.Warn("No hay rooms válidas para actualizar.");
+                        tx.Rollback();
+                        return false;
+                    }
+
+                    // 3) Actualiza EXACTAMENTE esas rooms por id
+                    var roomsToUpdate = ctx.Rooms.Where(r => idsToUpdate.Contains(r.id)).ToList();
+
+                    double amount = Convert.ToDouble(credit.Amount);
+
+                    foreach (var room in roomsToUpdate)
+                    {
+                        room.credits += amount;
+
+                        if (channel == "short_sms")
+                            room.short_sms += amount;
+                        else
+                            room.long_sms += amount;
+
+                        // Opcional si confías en el tracking:
+                        // ctx.Entry(room).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                    }
+
+                    ctx.SaveChanges();
+                    tx.Commit();
+
+                    log.Info($"Recarga directa finalizada. Rooms actualizadas: {roomsToUpdate.Count}.");
                     return true;
                 }
             }
@@ -642,6 +807,42 @@ namespace Business
             {
                 log.Error("Error en RechargeUserDirect", ex);
                 return false;
+            }
+        }
+
+
+
+        public List<RoomAdminResponse> GetRoomsByClient(string client)
+        {
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    var query = from r in ctx.Rooms
+                                join rbu in ctx.roomsbyuser on r.id equals rbu.idRoom
+                                join u in ctx.Users on rbu.idUser equals u.Id
+                                join c in ctx.clients on u.IdCliente equals c.id
+                                where c.nombrecliente.Trim().ToLower() == client.Trim().ToLower()
+                                select new RoomAdminResponse
+                                {
+                                    IdRoom = r.id,
+                                    fechaAlta = c.CreationDate,
+                                    nombrecliente = c.nombrecliente,
+                                    nombreSala = r.name,
+                                    creditosGlobales = r.credits,
+                                    creditosSmsCortos = r.short_sms,
+                                    creditosSmsLargos = r.long_sms,
+
+                                    CanBeDeleted = !ctx.Campaigns.Any(cam => cam.RoomId == r.id)
+                                };
+
+                    return query.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error en GetRoomsAdmin", ex);
+                return new List<RoomAdminResponse>();
             }
         }
 

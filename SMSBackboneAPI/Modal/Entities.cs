@@ -19,7 +19,7 @@ namespace Modal
             base.OnConfiguring(optionsBuilder);
         }
         public DbSet<Users> Users { get; set; }
-        public DbSet<UserAccounRecovery> UserAccounRecovery { get; set; }
+        public DbSet<UserAccountRecovery> UserAccountRecovery { get; set; }
         public DbSet<rooms> Rooms { get; set; }
         public DbSet<clients> clients { get; set; }
         public DbSet<Roles> Roles { get; set; }

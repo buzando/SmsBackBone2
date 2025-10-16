@@ -281,6 +281,38 @@ namespace SMSBackboneAPI.Controllers
             }
         }
 
+
+
+        [HttpGet("GetRoomsByClient")]
+        public IActionResult GetRoomsByClient(string client)
+        {
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                log.Info($"[{rid}] GetRoomsAdmin start");
+
+                var manager = new ClientManager();
+                var result = manager.GetRoomsByClient(client);
+
+                sw.Stop();
+                if (result.Count() > 0)
+                {
+                    log.Info($"[{rid}] GetRoomsAdmin ok count={result.Count()} ms={sw.ElapsedMilliseconds}");
+                    return Ok(result);
+                }
+
+                log.Warn($"[{rid}] GetRoomsAdmin empty ms={sw.ElapsedMilliseconds}");
+                return BadRequest(new { message = "No se pudo procesar la recarga." });
+            }
+            catch (Exception ex)
+            {
+                sw.Stop();
+                log.Error($"[{rid}] GetRoomsAdmin error ms={sw.ElapsedMilliseconds}", ex);
+                return StatusCode(500, new { message = "Error en el servidor", detail = ex.Message });
+            }
+        }
+
         [HttpPost("GetReportsAdmin")]
         public IActionResult GetReportsAdmin(ReportsAdminRequest request)
         {

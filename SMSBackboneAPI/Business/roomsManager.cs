@@ -19,7 +19,7 @@ namespace Business
             {
                 using (var ctx = new Entities())
                 {
-                    var room = new Modal.Model.Model.rooms { name = "Default", calls = 0, credits = 0, description = "Room default", long_sms = 0, short_sms = 0 };
+                    var room = new Modal.Model.Model.rooms { name = "Default", calls = 0, credits = 100, description = "Room default", long_sms = 100, short_sms = 0 };
                     ctx.Rooms.Add(room);
                     ctx.SaveChanges();
 

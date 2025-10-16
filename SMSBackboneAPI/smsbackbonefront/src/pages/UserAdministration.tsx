@@ -51,6 +51,17 @@ import IconHouse from "../assets/IconHouse.svg";
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import SecondaryButton from "../components/commons/SecondaryButton";
 import MainButton from "../components/commons/MainButton";
+
+const INITIAL_FORM_DATA: FormData = {
+    name: "", email: "", confirmEmail: "", phone: "",
+    useRecoveryEmail: false, password: "", confirmPassword: "",
+    allAndFuture: false, profile: "", rooms: "",
+};
+
+const INITIAL_SHOW_ERRORS = {
+    email: false, confirmEmail: false, phone: false, password: false, confirmPassword: false,
+};
+
 type Account = {
     id: number;
     name: string;
@@ -186,6 +197,14 @@ const ManageAccounts: React.FC = () => {
         setOpenAddUserModal(true);
     };
 
+    const resetAddUserForm = () => {
+        setFormData(INITIAL_FORM_DATA);
+        setShowErrors(INITIAL_SHOW_ERRORS);
+        setSelectedRooms([]);
+        setConfirmationEmail("");
+        setIsEditing(false);
+    };
+
     const handleCloseModal = () => {
         setOpenAddUserModal(false);
         setIsEditing(false);
@@ -201,6 +220,7 @@ const ManageAccounts: React.FC = () => {
             profile: "",
             rooms: "",
         });
+        resetAddUserForm();
     };
 
 
@@ -288,6 +308,7 @@ const ManageAccounts: React.FC = () => {
                     setshowChipBarAdd(true);
                     setTimeout(() => setshowChipBarAdd(false), 3000);
                     fetchAccounts();
+                    resetAddUserForm();
                     setOpenAddUserModal(false);
                     setIsEditing(false);
                 }
@@ -299,6 +320,7 @@ const ManageAccounts: React.FC = () => {
 
                 if (response.status === 200) {
                     fetchAccounts();
+                    resetAddUserForm();
                     setFormData({
                         name: "",
                         email: "",

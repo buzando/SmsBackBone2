@@ -65,6 +65,8 @@ import api from '../assets/api.svg'
 import apihover from '../assets/apihover.svg'
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+
 const drawerWidth = 278;
 
 type Page = {
@@ -383,7 +385,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
         const userDataString = localStorage.getItem('userData');
         if (userDataString) {
             const user = JSON.parse(userDataString);
-            setUserMenu(user.idRole);
+            setUserMenu(user.rol);
         }
     }, []);
 
@@ -1021,7 +1023,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
             <Drawer variant="permanent" open={true} PaperProps={{ sx: { background: 'transparent linear-gradient(311deg, #0B0029 0%, #B9A0A8 100%) 0% 0% no-repeat padding-box;', color: 'white', } }}>
                 <DrawerHeader />
-                {(userMenu === 3 || userMenu === 4 || userMenu === 5) && (
+                {(userMenu === 'Administrador' || userMenu === 'Supervisor' || userMenu === 'Monitor' || userMenu === 'Mesa') && (
 
                     <Box
                         sx={{
@@ -1362,7 +1364,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                         backgroundColor: "#5A4A63CC",
                     }}>
 
-                    {userMenu === 1 ? (
+                    {userMenu === 'Root' ? (
 
                         <List component="nav">
                             {/* Menú de Administración */}
@@ -1498,7 +1500,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                             </ListItem>
                         </List>
                     ) : (
-                        userMenu === 2 ? (
+                        userMenu === 'Telco' ? (
                             <List component="nav">
                                 {/* Menú de Administración */}
                                 <ListItem disablePadding>
@@ -2121,6 +2123,39 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                     {/* Final del fondo para opciones */}
                 </Box>
+                {location.pathname !== '/ClientRoomPicker' && (
+                    <Box
+                        sx={{
+                            position: 'fixed',
+                            left: 16,
+                            bottom: { xs: 112, sm: 96, md: 88 }, // ⬅️ Responsivo según tamaño de pantalla
+                            zIndex: 1300,
+                        }}
+                    >
+                        <Button
+                            variant="contained"
+                            startIcon={<ArrowBackIosNewIcon />}
+                            onClick={() => navigate('/ClientRoomPicker')}
+                            sx={{
+                                background: '#FFFFFF',
+                                color: '#833A53',
+                                border: '1px solid #DDD8DA',
+                                boxShadow: '0px 4px 10px rgba(0,0,0,0.1)',
+                                borderRadius: '8px',
+                                textTransform: 'none',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontWeight: 600,
+                                fontSize: '14px',
+                                padding: '8px 16px',
+                                '&:hover': { background: '#F2E9EC', borderColor: '#D9C5CB' },
+                                '&:active': { background: '#E6C2CD', borderColor: '#BE93A0' },
+                            }}
+                        >
+                            Volver a clientes
+                        </Button>
+                    </Box>
+                )}
+
             </Drawer >
             <Container
 
