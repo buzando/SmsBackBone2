@@ -547,7 +547,7 @@ const HomePage: React.FC = () => {
                 </Popper>
 
                 {!!enableButtons && (
-                    <Box sx={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', position: "absolute", marginLeft: "1000px" }}>
+                    <Box sx={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', position: "absolute", marginLeft: "1085px" }}>
                         <Button
                             onClick={() => navigate('/Use')}
                             variant="outlined"
@@ -704,12 +704,12 @@ const HomePage: React.FC = () => {
                     gap: "126px",
                     marginLeft: "15px",
                     backgroundColor: "#F2F2F2",
-                    width: "1180px",
+                    width: "1278px",
                     minHeight: "800px",
                 }}>
 
                     {dataOptions.map((item, index) => (
-                        <Box key={index} sx={{ display: "flex", width: "200px", height: "100px", justifyContent: 'left', mt: -3 }}>
+                        <Box key={index} sx={{ display: "flex", width: "225px", height: "100px", justifyContent: 'left', mt: -3 }}>
                             <Box
                                 sx={{
                                     marginLeft: "0px",
@@ -717,7 +717,7 @@ const HomePage: React.FC = () => {
                                     borderRadius: "8px",
                                     textAlign: "center",
                                     backgroundColor: "#FFFFFF",
-                                    width: "219px", height: "95px", mt: 1
+                                    width: "219px", height: "95px", mt: 2
                                 }}
                             >
                                 <Typography
@@ -739,7 +739,7 @@ const HomePage: React.FC = () => {
                             borderRadius: '8px',
                             width: '100%',
                             marginLeft: '0px',
-                            backgroundColor: "#FFFFFF", mt: "-170px", height: "165px"
+                            backgroundColor: "#FFFFFF", mt: "-140px", height: "165px"
                         }}>
                             <Box sx={{ display: "flex" }}>
                                 <Typography
@@ -767,9 +767,9 @@ const HomePage: React.FC = () => {
                                             }
                                         })
                                     }
-                                    sx={{ marginLeft: "1110px", marginTop: "-10px", position: "absolute" }}>
+                                    sx={{ marginLeft: "1210px", marginTop: "-10px", position: "absolute" }}>
 
-                                    <CloseIcon sx={{ color: '#A6A6A6', }} />
+                                    <CloseIcon sx={{ color: '#A6A6A6' }} />
                                 </IconButton>
                             </Box>
                             <Box
@@ -946,11 +946,11 @@ const HomePage: React.FC = () => {
                                 minHeight: "250px",
                                 display: "flex",
                                 flexDirection: "column",
-                                justifyContent: "space-between", mb: "50px", mt: "-180px"
+                                justifyContent: "space-between", mb: "50px", mt: "-150px"
                             }}
                         >
                             {/* Título */}
-                            <Box sx={{ display: "flex" }}>
+                            <Box sx={{ display: "flex", }}>
                                 <Typography
                                     variant="h6"
                                     sx={{
@@ -975,7 +975,7 @@ const HomePage: React.FC = () => {
                                             }
                                         })
                                     }
-                                    sx={{ marginLeft: "1110px", marginTop: "-10px", position: "absolute" }}>
+                                    sx={{ marginLeft: "1210px", marginTop: "-10px", position: "absolute" }}>
                                     <CloseIcon sx={{ color: '#A6A6A6', }} />
                                 </IconButton>
                             </Box>

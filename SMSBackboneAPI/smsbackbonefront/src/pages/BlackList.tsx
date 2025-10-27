@@ -1947,7 +1947,7 @@ const BlackList: React.FC = () => {
                                                             {
                                                                 name: 'offset',
                                                                 options: {
-                                                                    offset: [-20, -7] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                    offset: [-20, -7]
                                                                 }
                                                             }
                                                         ]
@@ -1957,14 +1957,20 @@ const BlackList: React.FC = () => {
                                                         sx={{
                                                             width: 21,
                                                             height: 21,
-                                                            backgroundColor: "#6F565E",
-                                                            borderRadius: "50%", // 🔥 clave para hacerlo circular
+                                                            backgroundColor: phone.length >= 10 ? "#6F565E" : "#D0CDCD",
+                                                            borderRadius: "50%",
                                                             display: "flex",
                                                             alignItems: "center",
-                                                            justifyContent: "center"
+                                                            justifyContent: "center",
+                                                            opacity: phone.length >= 10 ? 1 : 0.5,
+                                                            pointerEvents: phone.length >= 10 ? "auto" : "none"
                                                         }}
                                                     >
-                                                        <IconButton onClick={handleAddPhone}>
+                                                        <IconButton
+                                                            onClick={handleAddPhone}
+                                                            disabled={phone.length < 10}
+                                                            sx={{ p: 0 }}
+                                                        >
                                                             <img
                                                                 src={IconPlus2}
                                                                 alt="Agregar teléfono"
@@ -1975,7 +1981,7 @@ const BlackList: React.FC = () => {
                                                 </Tooltip>
                                             )}
 
-                                            {index > 0 && (
+                                            {(formData.Phones.length > 1) && (
                                                 <Tooltip title="Eliminar teléfono" arrow placement="top"
                                                     componentsProps={{
                                                         tooltip: {
@@ -2000,7 +2006,7 @@ const BlackList: React.FC = () => {
                                                             {
                                                                 name: 'offset',
                                                                 options: {
-                                                                    offset: [-24, -9] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                    offset: [-24, -9]
                                                                 }
                                                             }
                                                         ]
@@ -2090,7 +2096,7 @@ const BlackList: React.FC = () => {
                                 disabled={
                                     !formData.Name.trim() ||
                                     isNameInvalid ||
-                                    (!formData.File && !formData.Phones.some(p => p.trim() !== '')) // ni archivo ni teléfonos
+                                    (!formData.File && !formData.Phones.some(p => p.trim() !== ''))
                                 }
                             />
 
@@ -2132,9 +2138,11 @@ const BlackList: React.FC = () => {
                         }}>
                             Editar lista negra
                         </Typography>
-                        <IconButton onClick={() => setIsEditModalOpen(false)}>
-                            <CloseIcon sx={{ color: '#A6A6A6', marginTop: "-26px", marginLeft: "30px" }} />
-                        </IconButton>
+                        <Box sx={{ marginTop: "-26px", marginLeft: "30px" }}>
+                            <IconButton onClick={() => setIsEditModalOpen(false)}>
+                                <CloseIcon sx={{ color: '#A6A6A6' }} />
+                            </IconButton>
+                        </Box>
                     </Box>
 
                     <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px' }} />
@@ -4664,7 +4672,7 @@ const BlackList: React.FC = () => {
                                                                 {
                                                                     name: 'offset',
                                                                     options: {
-                                                                        offset: [-20, -7] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                        offset: [-20, -7]
                                                                     }
                                                                 }
                                                             ]
@@ -4675,7 +4683,7 @@ const BlackList: React.FC = () => {
                                                                 width: 21,
                                                                 height: 21,
                                                                 backgroundColor: "#6F565E",
-                                                                borderRadius: "50%", // 🔥 clave para hacerlo circular
+                                                                borderRadius: "50%",
                                                                 display: "flex",
                                                                 alignItems: "center",
                                                                 justifyContent: "center"
@@ -4693,7 +4701,7 @@ const BlackList: React.FC = () => {
 
                                                 )}
 
-                                                {index > 0 && (
+                                                {(formData.Phones.length > 1) && (
                                                     <Tooltip title="Eliminar teléfono">
                                                         <IconButton onClick={() => handleRemoveIndividualPhone(index)}>
                                                             <img src={Thrashicon} alt="Eliminar" style={{ width: 24, height: 24 }} />

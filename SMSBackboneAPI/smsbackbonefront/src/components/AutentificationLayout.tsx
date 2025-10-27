@@ -117,14 +117,20 @@ const AutentificationLayout: React.FC<Props> = (props) => {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                <MenuItem id="1" onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">Perfil</Typography>
-                                </MenuItem>
-                                <MenuItem id="2" onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">Cuenta</Typography>
-                                </MenuItem>
+
                                 <MenuItem id="3" onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">Cerrar sesión</Typography>
+                                    <Typography
+                                        sx={{
+                                            textAlign: 'center',
+                                            fontFamily: 'Poppins',
+                                            fontSize: "14px",
+                                            letterSpacing: '0px',
+                                            color: '#574B4F',
+                                            opacity: 1,
+                                        }}
+                                    >
+                                        Cerrar Sesión
+                                    </Typography>
                                 </MenuItem>
                             </Menu>
                         </Box>

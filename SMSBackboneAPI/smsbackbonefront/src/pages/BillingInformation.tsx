@@ -40,6 +40,10 @@ const BillingInformation: React.FC = () => {
         cfdi: false,
         postalCode: false,
     });
+
+    const [originalData, setOriginalData] = useState<any>(null);
+
+
     const [showChipBarAdd, setshowChipBarAdd] = useState(false);
     const handleSave = async () => {
         const usuario = localStorage.getItem("userData");
@@ -98,19 +102,39 @@ const BillingInformation: React.FC = () => {
                 // Supongamos que la respuesta tiene la información en response.data
                 const billingData = response.data;
                 if (billingData) {
-                    setPersonType(billingData.personType || "");
-                    setBusinessName(billingData.businessName || "");
-                    setRfc(billingData.taxId || "");
-                    setTaxRegime(billingData.taxRegime || "");
-                    setCfdi(billingData.cfdi || "");
-                    setPostalCode(billingData.postalCode || "");
-                    setStreet(billingData.street || "");
-                    setExtNumber(billingData.extNumber || "");
-                    setIntNumber(billingData.intNumber || "");
-                    setColony(billingData.colony || "");
-                    setCity(billingData.city || "");
-                    setState(billingData.state || "");
+                    const normalized = {
+                        personType: billingData.personType || "",
+                        businessName: billingData.businessName || "",
+                        taxId: billingData.taxId || "",
+                        taxRegime: billingData.taxRegime || "",
+                        cfdi: billingData.cfdi || "",
+                        postalCode: billingData.postalCode || "",
+                        street: billingData.street || "",
+                        extNumber: billingData.extNumber || "",
+                        intNumber: billingData.intNumber || "",
+                        colony: billingData.colony || "",
+                        city: billingData.city || "",
+                        state: billingData.state || "",
+                    };
+
+                    // Carga los datos en los inputs
+                    setPersonType(normalized.personType);
+                    setBusinessName(normalized.businessName);
+                    setRfc(normalized.taxId);
+                    setTaxRegime(normalized.taxRegime);
+                    setCfdi(normalized.cfdi);
+                    setPostalCode(normalized.postalCode);
+                    setStreet(normalized.street);
+                    setExtNumber(normalized.extNumber);
+                    setIntNumber(normalized.intNumber);
+                    setColony(normalized.colony);
+                    setCity(normalized.city);
+                    setState(normalized.state);
+
+                    // Guarda los valores originales
+                    setOriginalData(normalized);
                 }
+
 
             } catch (error) {
                 console.error("Error al traer los datos de facturación", error);
@@ -119,6 +143,32 @@ const BillingInformation: React.FC = () => {
 
         fetchBillingData();
     }, []);
+
+    const hasChanges = () => {
+        // Si aún no cargan datos del server, habilita si hay algo escrito
+        if (!originalData) {
+            return [
+                personType, businessName, rfc, taxRegime, cfdi,
+                postalCode, street, extNumber, intNumber, colony, city, state
+            ].some(v => (v ?? '').trim() !== '');
+        }
+
+        return (
+            personType !== originalData.personType ||
+            businessName !== originalData.businessName ||
+            rfc !== originalData.taxId ||
+            taxRegime !== originalData.taxRegime ||
+            cfdi !== originalData.cfdi ||
+            postalCode !== originalData.postalCode ||
+            street !== originalData.street ||
+            extNumber !== originalData.extNumber ||
+            intNumber !== originalData.intNumber ||
+            colony !== originalData.colony ||
+            city !== originalData.city ||
+            state !== originalData.state
+        );
+    };
+
 
 
     const handleCancel = () => {
@@ -856,12 +906,19 @@ const BillingInformation: React.FC = () => {
                         width: '100%',
                         marginLeft: 'auto',
                         marginRight: 'auto',
-                        paddingLeft: '20px', // 💥 Alineación con el contenido del Paper
+                        paddingLeft: '20px',
                         boxSizing: 'border-box',
                     }}
                 >
                     <SecondaryButton onClick={() => setModal(true)} text="CANCELAR" />
-                    <MainButton onClick={handleSave} text="GUARDAR" />
+                    <MainButton
+                        onClick={handleSave}
+                        text="GUARDAR"
+                        disabled={!hasChanges()}
+                    />
+
+
+
                 </div>
 
                 {showChipBarAdd && (

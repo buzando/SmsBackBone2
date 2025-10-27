@@ -94,6 +94,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Chipbar from '../components/commons/ChipBar'
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
+import IconCheckBox2 from "../assets/IconCheckBox2.svg";
 import DynamicCampaignEditText from '../components/commons/DynamicCampaignEditText';
 interface Horario {
   titulo: string;
@@ -1714,24 +1715,17 @@ setCampaignName('');
                               width: "20px",
                               height: "20px",
                               borderRadius: "4px",
-                              backgroundColor: "#8F4D63",
                               border: "2px solid #8F4D63",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
                             }}
                           >
-                            <Box
-                              component="span"
-                              sx={{
-                                color: "#FFFFFF",
-                                fontSize: "13px",
-                                fontWeight: "bold",
-                                fontFamily: "Poppins, sans-serif",
-                              }}
-                            >
-                              ✓
-                            </Box>
+                            <img
+                              src={IconCheckBox1}
+                              alt="Seleccionado"
+                              style={{ width: '24px', height: '24px' }}
+                            />
                           </Box>
                         }
                         indeterminateIcon={
@@ -1740,80 +1734,20 @@ setCampaignName('');
                               width: "20px",
                               height: "20px",
                               borderRadius: "4px",
-                              backgroundColor: "#8F4D63",
                               border: "2px solid #8F4D63",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
                             }}
                           >
-                            <Box
-                              component="span"
-                              sx={{
-                                color: "#FFFFFF",
-                                fontSize: "20px",
-                                fontWeight: "bold",
-                                fontFamily: "Poppins, sans-serif",
-                                lineHeight: "1",
-                              }}
-                            >
-                              −
-                            </Box>
+                            <img
+                              src={IconCheckBox2}
+                              alt="Indeterminado"
+                              style={{ width: '24px', height: '24px' }}
+                            />
                           </Box>
                         }
                       />
-
-
-                      <Tooltip title="Eliminar" arrow placement="top"
-                        componentsProps={{
-                          tooltip: {
-                            sx: {
-                              backgroundColor: "rgba(0, 0, 0, 0.8)",
-                              color: "#DEDADA",
-                              fontFamily: "Poppins, sans-serif",
-                              fontSize: "12px",
-                              padding: "6px 8px",
-                              borderRadius: "8px",
-                            }
-                          },
-                          arrow: {
-                            sx: {
-                              color: "rgba(0, 0, 0, 0.8)"
-                            }
-                          }
-                        }}
-                        PopperProps={{
-                          modifiers: [
-                            {
-                              name: 'offset',
-                              options: {
-                                offset: [0, -7]
-                              }
-                            }
-                          ]
-                        }}
-                      >
-                        <IconButton
-                          onClick={() => {
-                            const algunaEncendida = selectedCampaigns.some(
-                              index => filteredCampaigns[index]?.autoStart
-                            );
-
-                            if (algunaEncendida) {
-                              setTitleErrorModal("Error al eliminar campaña");
-                              setMessageErrorModal("No ha sido posible eliminar una o más campañas debido a que se encuentran encendidas.");
-                              setIsErrorModalOpen(true);
-                            } else {
-                              setOpenDeleteModal(true); // Abre modal de confirmación múltiple
-                            }
-                          }}
-                          sx={{ padding: 0 }}
-                        >
-                          <Box component="img" src={IconTrash} alt="Eliminar"
-                            sx={{ width: "24px", height: "24px", cursor: "pointer" }}
-                          />
-                        </IconButton>
-                      </Tooltip>
                     </Box>
 
                   )}
@@ -1890,25 +1824,17 @@ setCampaignName('');
                                           width: "20px",
                                           height: "20px",
                                           borderRadius: "4px",
-                                          backgroundColor: "#8F4D63",
                                           border: "2px solid #8F4D63",
                                           display: "flex",
                                           alignItems: "center",
                                           justifyContent: "center",
                                         }}
                                       >
-                                        <Box
-                                          component="span"
-                                          sx={{
-                                            color: "#FFFFFF",
-                                            fontSize: "13px",
-                                            fontWeight: "bold",
-                                            lineHeight: "1",
-                                            fontFamily: "Poppins, sans-serif",
-                                          }}
-                                        >
-                                          ✓
-                                        </Box>
+                                        <img
+                                          src={IconCheckBox1}
+                                          alt="Seleccionado"
+                                          style={{ width: '24px', height: '24px' }}
+                                        />
                                       </Box>
                                     }
                                     sx={{
@@ -2444,54 +2370,42 @@ setCampaignName('');
                                 endAdornment: (
                                   <InputAdornment position="end">
                                     <Tooltip
-                                      placement="bottom-start"
-                                      arrow
+                                      title={
+                                        <Box
+                                          sx={{
+                                            backgroundColor: "#FFFFFF",
+                                            borderRadius: "8px",
+                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                            padding: "8px 12px",
+                                            fontSize: "14px",
+                                            fontFamily: "Poppins",
+                                            color: "#574B4F",
+                                            whiteSpace: "pre-line",
+                                            transform: "translate(2px, -15px)",
+                                            borderColor: "#00131F3D",
+                                            borderStyle: "solid",
+                                            borderWidth: "1px"
+                                          }}
+                                        >
+                                          <>
+                                            • Solo caracteres numéricos<br />
+                                            • El teléfono debe incluir<br />
+                                            el código del país
+                                          </>
+                                        </Box>
+                                      }
+                                      placement="bottom-end"
                                       componentsProps={{
                                         tooltip: {
                                           sx: {
-                                            backgroundColor: "#FFFFFF",
-                                            color: "#574B4F",
-                                            fontFamily: "Poppins, sans-serif",
-                                            fontSize: "13px",
-                                            padding: "8px 12px",
-                                            borderRadius: "10px",
-                                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-                                            maxWidth: 220,
-                                            border: "1px solid #9B9295" // 🔥 borde nuevo
-                                          }
+                                            backgroundColor: "transparent",
+                                            padding: 0,
+
+                                          },
                                         },
-                                        arrow: {
-                                          sx: {
-                                            color: "#FFFFFF", opacity: 0.0
-                                          }
-                                        }
                                       }}
-                                      PopperProps={{
-                                        modifiers: [
-                                          {
-                                            name: 'offset',
-                                            options: {
-                                              offset: [-200, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
-                                            }
-                                          }
-                                        ]
-                                      }}
-                                      title={
-                                        <Box>
-                                          <Typography component="div" sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
-                                            Solo caracteres numéricos
-                                          </Typography>
-                                          <Typography component="div" sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
-                                            El teléfono debe incluir el número del país
-                                          </Typography>
-                                        </Box>
-                                      }
                                     >
-                                      <img
-                                        src={error ? infoiconerror : infoicon}
-                                        alt="Info"
-                                        style={{ width: "24px", height: "24px", cursor: "pointer" }}
-                                      />
+                                      <img src={infoicon} alt="info" style={{ width: 24, height: 24 }} />
                                     </Tooltip>
                                   </InputAdornment>
 
@@ -2516,10 +2430,11 @@ setCampaignName('');
                           <Box sx={{ marginTop: "38px" }}>
                             <MainButton
                               text="Enviar"
-                              onClick={() => console.log("Enviar")}
-                              disabled={error || phone.length === 0}
+                              onClick={handleSend}
+                              disabled={!phone || error}
                             />
                           </Box>
+
                         </Box>
                       </Box>
                     </Paper>
@@ -4496,7 +4411,35 @@ setCampaignName('');
                                       }}
                                     >
                                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Checkbox checked onChange={toggleValue} sx={{ '&.Mui-checked': { color: '#7B354D' } }} />
+                                        <Checkbox checked onChange={toggleValue}
+                                          icon={
+                                            <Box
+                                              sx={{
+                                                width: 24,
+                                                height: 24,
+                                                border: '2px solid #8F4E63',
+                                                borderRadius: '2px',
+                                              }}
+                                            />
+                                          }
+                                          checkedIcon={
+                                            <Box
+                                              sx={{
+                                                width: '24px',
+                                                height: '24px',
+                                                position: 'relative',
+                                                marginTop: '0px',
+                                                marginLeft: '0px',
+                                              }}
+                                            >
+                                              <img
+                                                src={IconCheckBox1}
+                                                alt="Seleccionado"
+                                                style={{ width: '24px', height: '24px' }}
+                                              />
+                                            </Box>
+                                          }
+                                          sx={{ '&.Mui-checked': { color: '#7B354D' } }} />
                                         <Typography sx={{
                                           fontFamily: 'Poppins', fontSize: '16px', color: "#8F4D63"
 
@@ -5027,7 +4970,8 @@ setCampaignName('');
                           fontFamily: "Poppins", fontSize: "16px", fontWeight: 600,
                           color: "#330F1B", ml: 2
                         }}>
-                          Datos seleccionados</Typography>
+                          Datos seleccionados
+                        </Typography>
                       </Box>
 
                       <Box sx={{
@@ -5072,7 +5016,35 @@ setCampaignName('');
                                 }}
                               >
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: -1 }}>
-                                  <Checkbox checked={true} sx={{ '&.Mui-checked': { color: '#7B354D' } }} />
+                                  <Checkbox checked={true}
+                                    icon={
+                                      <Box
+                                        sx={{
+                                          width: 24,
+                                          height: 24,
+                                          border: '2px solid #8F4E63',
+                                          borderRadius: '2px',
+                                        }}
+                                      />
+                                    }
+                                    checkedIcon={
+                                      <Box
+                                        sx={{
+                                          width: '24px',
+                                          height: '24px',
+                                          position: 'relative',
+                                          marginTop: '0px',
+                                          marginLeft: '0px',
+                                        }}
+                                      >
+                                        <img
+                                          src={IconCheckBox1}
+                                          alt="Seleccionado"
+                                          style={{ width: '24px', height: '24px' }}
+                                        />
+                                      </Box>
+                                    }
+                                    sx={{ '&.Mui-checked': { color: '#7B354D' } }} />
                                   <Typography
                                     sx={{
                                       fontFamily: 'Poppins',
@@ -5123,7 +5095,35 @@ setCampaignName('');
                                 }}
                               >
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: -1 }}>
-                                  <Checkbox checked={true} sx={{ '&.Mui-checked': { color: '#7B354D' } }} />
+                                  <Checkbox checked={true}
+                                    icon={
+                                      <Box
+                                        sx={{
+                                          width: 24,
+                                          height: 24,
+                                          border: '2px solid #8F4E63',
+                                          borderRadius: '2px',
+                                        }}
+                                      />
+                                    }
+                                    checkedIcon={
+                                      <Box
+                                        sx={{
+                                          width: '24px',
+                                          height: '24px',
+                                          position: 'relative',
+                                          marginTop: '0px',
+                                          marginLeft: '0px',
+                                        }}
+                                      >
+                                        <img
+                                          src={IconCheckBox1}
+                                          alt="Seleccionado"
+                                          style={{ width: '24px', height: '24px' }}
+                                        />
+                                      </Box>
+                                    }
+                                    sx={{ '&.Mui-checked': { color: '#7B354D' } }} />
                                   <Typography
                                     sx={{
                                       fontFamily: 'Poppins',
@@ -5258,6 +5258,23 @@ setCampaignName('');
                           <Checkbox
                             checked={allowConcatenation}
                             onChange={(e) => setAllowConcatenation(e.target.checked)}
+                            checkedIcon={
+                              <Box
+                                sx={{
+                                  width: '24px',
+                                  height: '24px',
+                                  position: 'relative',
+                                  marginTop: '0px',
+                                  marginLeft: '0px',
+                                }}
+                              >
+                                <img
+                                  src={IconCheckBox1}
+                                  alt="Seleccionado"
+                                  style={{ width: '24px', height: '24px' }}
+                                />
+                              </Box>
+                            }
                             sx={{
                               color: "#786F72",
                               '&.Mui-checked': {
@@ -5272,10 +5289,10 @@ setCampaignName('');
                           '& .MuiFormControlLabel-label': {
                             fontFamily: "Poppins",
                             fontSize: "14px",
-                            color: "#786F72", // color texto cuando no está marcado
+                            color: "#786F72",
                           },
                           '& .Mui-checked + .MuiFormControlLabel-label': {
-                            color: "#8F4D63", // color texto cuando está marcado
+                            color: "#8F4D63",
                           },
                         }}
                       />
@@ -5283,10 +5300,27 @@ setCampaignName('');
                       <FormControlLabel
                         control={
                           <Checkbox
+                            checkedIcon={
+                              <Box
+                                sx={{
+                                  width: '24px',
+                                  height: '24px',
+                                  position: 'relative',
+                                  marginTop: '0px',
+                                  marginLeft: '0px',
+                                }}
+                              >
+                                <img
+                                  src={IconCheckBox1}
+                                  alt="Seleccionado"
+                                  style={{ width: '24px', height: '24px' }}
+                                />
+                              </Box>
+                            }
                             sx={{
-                              color: "#786F72", // color cuando está desmarcado
+                              color: "#786F72",
                               '&.Mui-checked': {
-                                color: "#8F4D63", // color cuando está marcado
+                                color: "#8F4D63",
                               },
                             }}
                           />
@@ -5297,10 +5331,10 @@ setCampaignName('');
                           '& .MuiFormControlLabel-label': {
                             fontFamily: "Poppins",
                             fontSize: "14px",
-                            color: "#786F72", // color texto cuando no está marcado
+                            color: "#786F72",
                           },
                           '& .Mui-checked + .MuiFormControlLabel-label': {
-                            color: "#8F4D63", // color texto cuando está marcado
+                            color: "#8F4D63",
                           },
                         }}
                       />
@@ -5308,10 +5342,27 @@ setCampaignName('');
                       <FormControlLabel
                         control={
                           <Checkbox
+                            checkedIcon={
+                              <Box
+                                sx={{
+                                  width: '24px',
+                                  height: '24px',
+                                  position: 'relative',
+                                  marginTop: '0px',
+                                  marginLeft: '0px',
+                                }}
+                              >
+                                <img
+                                  src={IconCheckBox1}
+                                  alt="Seleccionado"
+                                  style={{ width: '24px', height: '24px' }}
+                                />
+                              </Box>
+                            }
                             sx={{
-                              color: "#786F72", // color cuando está desmarcado
+                              color: "#786F72",
                               '&.Mui-checked': {
-                                color: "#8F4D63", // color cuando está marcado
+                                color: "#8F4D63",
                               },
                             }}
                             checked={saveAsTemplate}
@@ -5324,10 +5375,10 @@ setCampaignName('');
                           '& .MuiFormControlLabel-label': {
                             fontFamily: "Poppins",
                             fontSize: "14px",
-                            color: "#786F72", // color texto cuando no está marcado
+                            color: "#786F72",
                           },
                           '& .Mui-checked + .MuiFormControlLabel-label': {
-                            color: "#8F4D63", // color texto cuando está marcado
+                            color: "#8F4D63",
                           },
                         }}
                       />
@@ -5344,19 +5395,63 @@ setCampaignName('');
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <img src={infoicon} alt="info" style={{ width: 20, height: 20 }} />
+                            <Tooltip
+                              title={
+                                <Box
+                                  sx={{
+                                    backgroundColor: "#FFFFFF",
+                                    borderRadius: "8px",
+                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                    padding: "8px 12px",
+                                    fontSize: "14px",
+                                    fontFamily: "Poppins",
+                                    color: "#574B4F",
+                                    whiteSpace: "pre-line",
+                                    transform: "translate(2px, -15px)",
+                                    borderColor: "#00131F3D",
+                                    borderStyle: "solid",
+                                    borderWidth: "1px"
+                                  }}
+                                >
+                                  <>
+                                    • Solo caracteres alfabéticos<br />
+                                    • Longitud máxima de 40<br />
+                                    caracteres
+                                  </>
+                                </Box>
+                              }
+                              placement="bottom-end"
+                              componentsProps={{
+                                tooltip: {
+                                  sx: {
+                                    backgroundColor: "transparent",
+                                    padding: 0,
+
+                                  },
+                                },
+                              }}
+                            >
+                              <img src={infoicon} alt="info" style={{ width: 24, height: 24 }} />
+                            </Tooltip>
                           </InputAdornment>
                         ),
                       }}
                       onChange={(e) => setTemplateName(e.target.value)}
                       sx={{
                         width: "500px",
-                        fontFamily: "Poppins",
                         backgroundColor: "#FFFFFF",
                         borderRadius: "8px",
                         '& .MuiOutlinedInput-root': {
                           fontSize: "14px",
                           paddingRight: "8px",
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          fontFamily: 'Poppins, sans-serif',
+                          '&::placeholder': {
+                            fontFamily: 'Poppins, sans-serif',
+                            color: '#A1A1A1',
+                            opacity: 1,
+                          },
                         },
                       }}
                     />
@@ -8603,11 +8698,10 @@ setCampaignName('');
                   icon={
                     <Box
                       sx={{
-                        ml: 2.5, mt: -1,
-                        width: "20px",
-                        height: "20px",
-                        borderRadius: "4px",
-                        border: "2px solid #8F4D63",
+                        width: 20,
+                        height: 20,
+                        border: '2px solid #8F4E63',
+                        borderRadius: '2px',
                       }}
                     />
                   }
@@ -8642,13 +8736,13 @@ setCampaignName('');
                     fontFamily: "Poppins",
                     fontSize: "16px",
                     color: "#8F4D63",
-                    whiteSpace: "nowrap", ml: 1.5, mt: -1
+                    whiteSpace: "nowrap", ml: 2, mt: 0
                   }}
                 >
                   Iniciar campaña automáticamente
                 </Typography>
               }
-              sx={{ marginTop: 2 }}
+              sx={{ marginTop: 1, ml: 1 }}
             />
           </DialogContent>
 
@@ -8663,7 +8757,11 @@ setCampaignName('');
             }}
           >
             <SecondaryButton onClick={() => setOpenDuplicateModal(false)} text='Cancelar' />
-            <MainButton onClick={handleConfirmDuplicateCampaign} text='Duplicar' disabled={!canDuplicate} />
+            <MainButton
+              onClick={handleConfirmDuplicateCampaign}
+              text='Duplicar'
+              disabled={!duplicateName || isDuplicateNameInvalid}
+            />
           </DialogActions>
         </Box>
       </Dialog>

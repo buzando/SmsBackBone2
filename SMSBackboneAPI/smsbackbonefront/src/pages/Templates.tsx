@@ -30,6 +30,7 @@ import backarrowD from '../assets/MoveTabledesactivated.svg';
 import IconSMS from '../assets/IconSMS.svg';
 import infoiconerror from '../assets/Icon-infoerror.svg';
 import DynamicMessageEditText from '../components/commons/DynamicMessageEditText'; // ajusta el path si está en otra carpeta
+import { position } from 'html2canvas/dist/types/css/property-descriptors/position';
 
 interface CampañaAsignada {
     chanel: string;
@@ -1033,14 +1034,63 @@ const Templates = () => {
                         />
 
                     )}
+                    <Box position={'absolute'} marginLeft={'542px'} marginTop={'-210px'}>
+                        <Tooltip
+                            title={
+                                <Box
+                                    sx={{
+                                        backgroundColor: "#FFFFFF",
+                                        borderRadius: "8px",
+                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                        padding: "8px 12px",
+                                        fontFamily: "Poppins",
+                                        fontSize: "14px",
+                                        color: "#574B4F",
+                                        whiteSpace: "pre-line",
+                                        transform: "translate(-10px, -22px)",
+                                        borderColor: "#00131F3D",
+                                        borderStyle: "solid",
+                                        borderWidth: "1px",
+                                    }}
+                                >
+                                    <>
+                                        • Máximo 7 variables.<br />
+                                        • No se aceptan caracteres<br />
+                                        especiales, excepto:<br />
+                                        numeros, punto (.), coma<br />
+                                        (,) y símbolo de dinero ($).
+                                    </>
+                                </Box>
+                            }
+                            placement="bottom-end"
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        backgroundColor: "transparent",
+                                        padding: 0,
 
-
+                                    },
+                                },
+                            }}
+                        >
+                            <IconButton
+                                size="small"
+                                sx={{ position: 'absolute', marginLeft: "-50px", marginTop: "11px" }}
+                            >
+                                <img
+                                    src={isTemplateNameInvalid ? infoiconerror : infoicon}
+                                    alt={isTemplateNameInvalid ? "error" : "info"}
+                                    style={{ width: 24, height: 24 }}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
 
                     <Box
                         sx={{
                             display: 'flex',
                             justifyContent: 'flex-end',
-                            mt: 2,
+                            mt: 1, mb: -1,
                             whiteSpace: 'nowrap',
                             fontFamily: 'Poppins',
                             fontWeight: 500
@@ -1074,7 +1124,7 @@ const Templates = () => {
 
                     </Box>
 
-                    <Divider sx={{ width: 'calc(100% + 49px)', marginLeft: '-24px', mb: 2, mt: 3 }} />
+                    <Divider sx={{ width: 'calc(100% + 49px)', marginLeft: '-24px', mb: 3, mt: 3 }} />
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <SecondaryButton text='Cancelar' onClick={handleCloseModal} />
@@ -1086,7 +1136,7 @@ const Templates = () => {
                         />
                     </Box>
                 </Box>
-            </Modal>
+            </Modal >
 
             <Modal open={openPreviewModal} onClose={() => setOpenPreviewModal(false)}>
                 <Box
@@ -1383,7 +1433,7 @@ const Templates = () => {
                     />
                 )
             }
-        </Box>
+        </Box >
     );
 };
 

@@ -54,6 +54,7 @@ const Autentification: React.FC = () => {
             }
             if (obj.twoFactorAuthentication) {
                 navigate('/chooseroom');
+                return;
             }
 
             if (obj.lockoutEnabled) {
@@ -337,9 +338,9 @@ const Autentification: React.FC = () => {
                                 marginTop: "20px",
                                 padding: "0 20px",
                                 "& .MuiFormControlLabel-root": {
-                                    color: "#330F1B", // Color por defecto del texto
+                                    color: "#330F1B",
                                     "& .MuiRadio-root.Mui-checked + span": {
-                                        color: "#833A53", // Cambia el color del texto al seleccionar
+                                        color: "#833A53",
                                     },
                                 },
                             }}
@@ -350,9 +351,9 @@ const Autentification: React.FC = () => {
                                     <Radio
                                         sx={{
                                             fontFamily: "Poppins",
-                                            color: "#833A53",
+                                            color: "#574B4F",
                                             "&.Mui-checked": {
-                                                color: "#833A53",
+                                                color: "#8F4D63",
                                             },
                                         }}
                                     />
@@ -365,6 +366,13 @@ const Autentification: React.FC = () => {
                                     fontWeight: SendType === "SMS" ? "bold" : "normal",
                                     transition: "color 0.3s ease",
                                 }}
+                                componentsProps={{
+                                    typography: {
+                                        sx: {
+                                            fontFamily: "Poppins",
+                                        },
+                                    },
+                                }}
                             />
 
                             <FormControlLabel
@@ -373,9 +381,9 @@ const Autentification: React.FC = () => {
                                     <Radio
                                         sx={{
                                             fontFamily: "Poppins",
-                                            color: "#833A53",
+                                            color: "#574B4F",
                                             "&.Mui-checked": {
-                                                color: "#833A53",
+                                                color: "#8F4D63",
                                             },
                                         }}
                                     />
@@ -387,6 +395,13 @@ const Autentification: React.FC = () => {
                                     color: SendType === "EMAIL" ? "#8F4D63" : "#574B4F",
                                     fontWeight: SendType === "EMAIL" ? "bold" : "normal",
                                     transition: "color 0.3s ease",
+                                }}
+                                componentsProps={{
+                                    typography: {
+                                        sx: {
+                                            fontFamily: "Poppins",
+                                        },
+                                    },
                                 }}
                             />
 

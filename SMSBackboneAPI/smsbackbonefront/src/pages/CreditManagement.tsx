@@ -27,6 +27,7 @@ import axios from "../components/commons/AxiosInstance";
 import TrashIcon from "../assets/Icon-trash.svg";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import seachicon from '../assets/icon-lupa.svg'
+import Iconseachred from "../assets/Iconseachred.svg";
 import NoResult from '../assets/NoResultados.svg'
 import ChipBar from "../components/commons/ChipBar";
 import HouseIcon from "../assets/IconRooms.svg"
@@ -269,37 +270,32 @@ const CreditManagement: React.FC = () => {
                             alignItems="center"
                             sx={{
                                 backgroundColor: "#FFFFFF",
-                                border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295", // Cambia el color del borde si hay texto
+                                border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
                                 borderRadius: "4px",
-                                padding: "8px 12px",
+                                px: 2,
+                                py: 1,
                                 width: "218px",
-                                height: "40px",
-                                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                                height: "40px"
                             }}
                         >
                             <img
-                                src={seachicon}
+                                src={searchTerm ? Iconseachred : seachicon}
                                 alt="Buscar"
-                                style={{
-                                    marginRight: "8px",
-                                    width: "16px",
-                                    height: "16px",
-                                    filter: searchTerm ? "invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)" : "none", // Ajusta el color si hay texto
-                                }}
+                                style={{ marginRight: 8, width: 24 }}
                             />
                             <input
                                 type="text"
                                 placeholder="Buscar"
-                                value={searchTerm} // Variable de estado para el valor del input
-                                onChange={handleSearch} // Función que maneja el cambio en el input
+                                value={searchTerm}
+                                onChange={handleSearch}
                                 style={{
-                                    border: "none", // Sin borde
-                                    outline: "none", // Sin borde al enfocar
-                                    width: "100%", // Ocupa todo el espacio restante
-                                    fontSize: "16px", // Tamaño de la fuente
-                                    fontFamily: "Poppins, sans-serif", // Fuente según especificación
-                                    color: searchTerm ? "#7B354D" : "#9B9295", // Cambia el color del texto si hay texto
-                                    backgroundColor: "transparent", // Fondo transparente para evitar interferencias
+                                    border: "none",
+                                    outline: "none",
+                                    width: "100%",
+                                    fontSize: "16px",
+                                    fontFamily: "Poppins, sans-serif",
+                                    color: searchTerm ? "#7B354D" : "#9B9295",
+                                    backgroundColor: "transparent",
                                 }}
                             />
                             {/* Ícono de cerrar cuando hay texto */}
@@ -307,13 +303,8 @@ const CreditManagement: React.FC = () => {
                                 <img
                                     src={iconclose}
                                     alt="Limpiar búsqueda"
-                                    style={{
-                                        marginLeft: "8px",
-                                        width: "16px",
-                                        height: "16px",
-                                        cursor: "pointer",
-                                    }}
-                                    onClick={() => setSearchTerm("")} // Borra el texto al hacer clic
+                                    style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
+                                    onClick={() => setSearchTerm("")}
                                 />
                             )}
                         </Box>
@@ -327,10 +318,10 @@ const CreditManagement: React.FC = () => {
                 ) : (
                     <Box
                         sx={{
-                            display: 'grid', // Cambiamos el diseño a grid
-                            gap: '10px', // Espaciado entre los recuadros
-                            gridTemplateColumns: '430px 430px', // Dos columnas con ancho fijo
-                            columnGap: '10px', // Espacio horizontal entre columnas
+                            display: 'grid',
+                            gap: '10px',
+                            gridTemplateColumns: '430px 430px',
+                            columnGap: '10px',
                         }}
                     >
                         {rooms.filter((rooms) => {
@@ -353,7 +344,6 @@ const CreditManagement: React.FC = () => {
                                         src={NoResult}
                                         alt="Sin resultados"
                                         style={{
-                                            // Ajusta el tamaño a tu gusto
                                             width: "300px",
                                             marginBottom: "16px",
                                         }}
@@ -405,7 +395,7 @@ const CreditManagement: React.FC = () => {
                                                     src={HouseIcon}
                                                     alt="Rooms Icon"
                                                     style={{
-                                                        width: '46px', // Ajustado al tamaño del icono anterior
+                                                        width: '46px',
                                                         height: '46px',
                                                         marginRight: '16px',
                                                     }}
@@ -436,12 +426,13 @@ const CreditManagement: React.FC = () => {
                                                             color: '#574B4F',
                                                             opacity: 1,
                                                             fontSize: '14px',
-                                                            whiteSpace: 'nowrap',
-                                                            maxWidth: '90%',
                                                         }}
                                                     >
-                                                        {room.description}
+                                                        {room.description.length > 25
+                                                            ? `${room.description.slice(0, 20)}...`
+                                                            : room.description}
                                                     </Typography>
+
 
                                                 </Box>
                                             </Box>
@@ -643,14 +634,14 @@ const CreditManagement: React.FC = () => {
                                             elevation={3}
                                             sx={{
                                                 position: "absolute",
-                                                top: "calc(100% + 4px)", // Ubícalo justo debajo del TextField
+                                                top: "calc(100% + 4px)",
                                                 left: 0,
-                                                width: "244px",         // Mismo ancho que el TextField
-                                                zIndex: 9999,           // Asegúrate de que se superponga
+                                                width: "244px",
+                                                zIndex: 9999,
                                                 maxHeight: 300,
                                                 overflowY: "auto",
                                                 borderRadius: "8px",
-                                                // Quita margin o padding extra para que no empuje nada
+
                                             }}
                                         >
                                             <Box
@@ -660,21 +651,20 @@ const CreditManagement: React.FC = () => {
                                                     backgroundColor: "#FFFFFF",
                                                     border: searchTerm3 ? "1px solid #7B354D" : "1px solid #9B9295",
                                                     borderRadius: "4px",
-                                                    padding: "8px 12px",
-                                                    width: "218px",         // O el ancho que quieras
-                                                    height: "40px",
-                                                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                                                    mb: 2,                  // Separación inferior para la lista
+                                                    px: 2,
+                                                    py: 1,
+                                                    width: "100%",
+                                                    height: "40px"
                                                 }}
                                             >
                                                 <img
-                                                    src={seachicon} // Tu ícono de lupa
+                                                    src={seachicon}
                                                     alt="Buscar"
                                                     style={{
                                                         marginRight: "8px",
                                                         width: "16px",
                                                         height: "16px",
-                                                        // Cambia el color del ícono si hay texto
+
                                                         filter: searchTerm3
                                                             ? "invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)"
                                                             : "none",
@@ -688,9 +678,9 @@ const CreditManagement: React.FC = () => {
                                                     style={{
                                                         border: "none",
                                                         outline: "none",
-                                                        width: "100%",        // Ocupa el espacio sobrante
+                                                        width: "100%",
                                                         fontSize: "16px",
-                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontFamily: "Poppins",
                                                         color: searchTerm3 ? "#7B354D" : "#9B9295",
                                                         backgroundColor: "transparent",
                                                     }}

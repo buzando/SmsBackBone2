@@ -195,6 +195,7 @@ const TermsAndConditions: React.FC = () => {
         return true;
     }
 
+    const allFilled = phoneDigits.every(d => d !== '')
 
     const SendToken = async (event?: React.FormEvent) => {
         event?.preventDefault();
@@ -378,19 +379,16 @@ const TermsAndConditions: React.FC = () => {
         }
     };
 
-    const handleValidatePhoneDigits = () => {
+    const handleValidatePhoneDigits = (): boolean => {
         const userData = JSON.parse(localStorage.getItem("userData") || "{}");
         const phoneNumber = userData?.phonenumber || "";
-
-        // Verificar si los 4 últimos dígitos coinciden
         const isValid = phoneDigits.join("") === phoneNumber.slice(-4);
 
         setIsPhoneDigitsValid(isValid);
         setHasAttemptedValidation(true);
 
-        if (isValid) {
-            setActiveStep(3); // Avanzar al Step 2 si es válido
-        }
+        if (isValid) setActiveStep(3);
+        return isValid;
     };
 
     const isPasswordValid = (password: string): boolean => {
@@ -840,13 +838,17 @@ const TermsAndConditions: React.FC = () => {
                                         >
                                             <FormControlLabel
                                                 value="SMS"
-                                                control={<Radio sx={{
-                                                    fontFamily: "Poppins",
-                                                    color: "#574B4F",
-                                                    "&.Mui-checked": {
-                                                        color: "#8F4D63",
-                                                    },
-                                                }} />}
+                                                control={
+                                                    <Radio
+                                                        sx={{
+                                                            fontFamily: "Poppins",
+                                                            color: "#574B4F",
+                                                            "&.Mui-checked": {
+                                                                color: "#8F4D63",
+                                                            },
+                                                        }}
+                                                    />
+                                                }
                                                 label="SMS"
                                                 sx={{
                                                     fontFamily: "Poppins",
@@ -958,7 +960,7 @@ const TermsAndConditions: React.FC = () => {
                                                 justifyContent: "center",
                                                 gap: "10px",
                                                 marginTop: "18px",
-                                                height: "75px",
+                                                height: "75px"
 
                                             }}
                                         >
@@ -998,8 +1000,9 @@ const TermsAndConditions: React.FC = () => {
                                         </Box>
 
                                         {hasAttemptedValidation && !isPhoneDigitsValid && (
-                                            <Typography variant="body2" color="error" sx={{ marginTop: 2, fontFamily: "Poppins", }}>
-                                                Los dígitos ingresados son incorrectos. Por favor, inténtalo nuevamente.
+                                            <Typography variant="body2" color="error"
+                                                sx={{ fontFamily: "Poppins", position: "absolute", marginLeft: "90px", }}>
+                                                Número inválido
                                             </Typography>
                                         )}
                                     </Box>
@@ -1032,15 +1035,11 @@ const TermsAndConditions: React.FC = () => {
                                         <Button
                                             variant="contained"
                                             onClick={() => {
-                                                handleValidatePhoneDigits();
-                                                SendToken();
+                                                if (handleValidatePhoneDigits()) {
+                                                    SendToken();
+                                                }
                                             }}
-                                            disabled={
-                                                phoneDigits.some(
-                                                    digit => digit === '' ||
-                                                        phoneDigits.join('') !== JSON.parse(localStorage.getItem('userData') || '{}')?.phonenumber?.slice(-4)
-                                                )
-                                            }
+                                            disabled={!allFilled}
                                             sx={{
                                                 background: '#833A53 0% 0% no-repeat padding-box',
                                                 border: '1px solid #D0CDCD',
