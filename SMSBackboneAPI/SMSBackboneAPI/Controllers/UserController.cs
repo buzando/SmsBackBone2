@@ -17,8 +17,7 @@ using System.Threading.Tasks;
 using System.Security.Policy;
 using Openpay.Entities.Request;
 using Modal;
-
-// 👇 agregados para logs/tiempos/linq
+using SMSBackboneAPI.Utils;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -300,28 +299,41 @@ namespace SMSBackboneAPI.Controllers
 
         [AllowAnonymous]
         [HttpGet("GetRooms")]
-        public IActionResult Roomsbyuser(string email)
+        public IActionResult GetRooms([FromQuery] string email)
         {
             var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
 
-            var errorResponse = new GeneralErrorResponseDto();
             try
             {
-                var emailDom = email?.Split('@').LastOrDefault();
-                log.Info($"[{rid}] GetRooms start emailDomain={emailDom}");
-
+                // 1) Si hay X-Client-Id en header, se usa y se ignora el email
+                var headerClientId = HttpContext.GetResolvedClientId(); // tu helper de headers
                 var userManager = new Business.UserManager();
-                var listrooms = userManager.roomsByUser(email);
-                if (listrooms.Count() > 0)
+                IEnumerable<RoomsDTO> rooms;
+
+                if (headerClientId.HasValue)
                 {
-                    log.Info($"[{rid}] GetRooms ok count={listrooms.Count()}");
-                    return Ok(listrooms);
+                    log.Info($"[{rid}] GetRooms by clientId={headerClientId.Value}");
+                    rooms = userManager.roomsByUser(headerClientId.Value);
                 }
                 else
                 {
-                    log.Warn($"[{rid}] GetRooms empty");
-                    return BadRequest(errorResponse);
+                    if (string.IsNullOrWhiteSpace(email))
+                        return BadRequest("Falta email (o mande X-Client-Id en headers).");
+
+                    var emailDom = email.Split('@').LastOrDefault();
+                    log.Info($"[{rid}] GetRooms by emailDomain={emailDom}");
+                    rooms = userManager.roomsByUser(email);
                 }
+
+                var list = rooms?.ToList() ?? new List<RoomsDTO>();
+                if (list.Any())
+                {
+                    log.Info($"[{rid}] GetRooms ok count={list.Count}");
+                    return Ok(list);
+                }
+
+                log.Warn($"[{rid}] GetRooms empty");
+                return BadRequest(new GeneralErrorResponseDto());
             }
             catch (Exception ex)
             {
@@ -329,6 +341,10 @@ namespace SMSBackboneAPI.Controllers
                 return StatusCode(500, new { message = "Error en el servidor" });
             }
         }
+
+
+
+
 
         [AllowAnonymous]
         [HttpGet("GetUserByEmail")]
@@ -475,7 +491,7 @@ namespace SMSBackboneAPI.Controllers
             {
                 log.Info($"[{rid}] RegisterUser start client='{user?.client}'");
 
-                // 1) Validaciones básicas
+                // Validaciones superficiales (rápidas)
                 if (string.IsNullOrWhiteSpace(user?.email) || string.IsNullOrWhiteSpace(user?.client))
                 {
                     sw.Stop();
@@ -483,56 +499,10 @@ namespace SMSBackboneAPI.Controllers
                     return BadRequest(new GeneralErrorResponseDto { code = "BadRequest", description = "Email y client son obligatorios." });
                 }
 
-                // 2) Correo ya existente
-                log.Info($"[{rid}] Verificando correo existente");
-                var existe = new UserManager().FindEmail(user.email);
-                if (existe != null)
-                {
-                    sw.Stop();
-                    log.Warn($"[{rid}] RegisterUser duplicate email ms={sw.ElapsedMilliseconds}");
-                    return BadRequest(new GeneralErrorResponseDto { code = "DuplicateUserName", description = "DuplicateUserName" });
-                }
+                // Lógica atómica en el MANAGER
+                var (usuario, clientId) = new Business.ClientManager().RegisterUserAtomic(user);
 
-                // 3) Cliente (crear si no existe)
-                var clientManager = new Business.ClientManager();
-                log.Info($"[{rid}] Buscando cliente por nombre");
-                var cliente = clientManager.ObtenerClienteporNombre(user.client);
-
-                if (cliente == null)
-                {
-                    log.Info($"[{rid}] Cliente no existe: creándolo");
-                    var addClientOk = clientManager.AgregarCliente(new clientDTO { nombrecliente = user.client });
-                    if (!addClientOk)
-                    {
-                        sw.Stop();
-                        log.Warn($"[{rid}] RegisterUser add client failed ms={sw.ElapsedMilliseconds}");
-                        return BadRequest(new GeneralErrorResponseDto { code = "agregarusuario", description = "Error al guardar cliente, intente más tarde" });
-                    }
-                    // Reintenta obtener el cliente (por si necesitas su Id)
-                    cliente = clientManager.ObtenerClienteporNombre(user.client);
-                }
-
-                // 4) Crear usuario
-                log.Info($"[{rid}] Creando usuario del registro");
-                var usuario = new UserManager().AddUserFromRegister(user);
-                if (usuario == null)
-                {
-                    sw.Stop();
-                    log.Warn($"[{rid}] RegisterUser add user failed ms={sw.ElapsedMilliseconds}");
-                    return BadRequest(new GeneralErrorResponseDto { code = "agregarusuario", description = "Error al guardar usuario, intente más tarde" });
-                }
-
-                // 5) Crear room por usuario nuevo
-                log.Info($"[{rid}] Creando room por usuario nuevo userId={usuario.Id}");
-                var roomOk = new roomsManager().addroomByNewUser(usuario.Id, usuario.IdCliente);
-                if (!roomOk)
-                {
-                    sw.Stop();
-                    log.Warn($"[{rid}] RegisterUser room create failed userId={usuario.Id} ms={sw.ElapsedMilliseconds}");
-                    return BadRequest(new GeneralErrorResponseDto { code = "agregarusuario", description = "Error al crear Room, intente más tarde" });
-                }
-
-                // 6) Emitir JWT CONSISTENTE (mismos claims que Authenticate)
+                // === JWT (mismos claims y expiración coherentes con Authenticate/NewPassword) ===
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var byteKey = Encoding.UTF8.GetBytes(configuration["SecretKey"]);
 
@@ -555,18 +525,30 @@ namespace SMSBackboneAPI.Controllers
                 };
 
                 var token = tokenHandler.CreateToken(tokenDescriptor);
-                var jwt = tokenHandler.WriteToken(token); 
+                var jwt = tokenHandler.WriteToken(token);
 
                 var respuesta = new ResponseDTO
                 {
                     user = usuario,
                     token = jwt,
-                    expiration = expiresUtc 
+                    expiration = expiresUtc
                 };
 
                 sw.Stop();
-                log.Info($"[{rid}] RegisterUser ok userId={usuario.Id} clientId={usuario.IdCliente} ms={sw.ElapsedMilliseconds}");
+                log.Info($"[{rid}] RegisterUser ok userId={usuario.Id} clientId={clientId} ms={sw.ElapsedMilliseconds}");
                 return Ok(respuesta);
+            }
+            catch (InvalidOperationException dup) when (dup.Message == "DuplicateUserName")
+            {
+                sw.Stop();
+                log.Warn($"[{rid}] RegisterUser duplicate email ms={sw.ElapsedMilliseconds}");
+                return BadRequest(new GeneralErrorResponseDto { code = "DuplicateUserName", description = "DuplicateUserName" });
+            }
+            catch (ArgumentException bad)
+            {
+                sw.Stop();
+                log.Warn($"[{rid}] RegisterUser badrequest ms={sw.ElapsedMilliseconds}");
+                return BadRequest(new GeneralErrorResponseDto { code = "BadRequest", description = bad.Message });
             }
             catch (Exception ex)
             {
@@ -577,29 +559,38 @@ namespace SMSBackboneAPI.Controllers
         }
 
 
+
         [Authorize]
         [HttpGet("GetUsersByClient")]
-        public IActionResult GetUsersByClient(int Client)
+        public IActionResult GetUsersByClient([FromQuery] int? Client)
         {
             var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
 
-            var errorResponse = new GeneralErrorResponseDto();
             try
             {
-                log.Info($"[{rid}] GetUsersByClient start clientId={Client}");
+                // Primero intentamos obtenerlo desde el header
+                var headerClientId = HttpContext.GetResolvedClientId();
+                var effectiveClientId = headerClientId ?? Client;
+
+                if (!effectiveClientId.HasValue)
+                {
+                    log.Warn($"[{rid}] GetUsersByClient: No se proporcionó clientId ni en header ni en query.");
+                    return BadRequest("Falta X-Client-Id o clientId en la URL.");
+                }
+
+                log.Info($"[{rid}] GetUsersByClient start clientId={effectiveClientId.Value}");
 
                 var userManager = new Business.UserManager();
-                var users = userManager.FindUsers(Client);
-                if (users.Count() > 0)
+                var users = userManager.FindUsers(effectiveClientId.Value);
+
+                if (users.Any())
                 {
                     log.Info($"[{rid}] GetUsersByClient ok count={users.Count()}");
                     return Ok(users);
                 }
-                else
-                {
-                    log.Warn($"[{rid}] GetUsersByClient empty");
-                    return BadRequest(errorResponse);
-                }
+
+                log.Warn($"[{rid}] GetUsersByClient empty for clientId={effectiveClientId.Value}");
+                return BadRequest(new GeneralErrorResponseDto());
             }
             catch (Exception ex)
             {
@@ -607,6 +598,8 @@ namespace SMSBackboneAPI.Controllers
                 return StatusCode(500, new { message = "Error en el servidor" });
             }
         }
+
+
 
         [Authorize]
         [HttpGet("DeleteUserByid")]
@@ -645,46 +638,75 @@ namespace SMSBackboneAPI.Controllers
         {
             var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
 
-            GeneralErrorResponseDto[] errorResponse = new GeneralErrorResponseDto[1];
             try
             {
-                log.Info($"[{rid}] AddUser start emailDomain={user?.Email?.Split('@').LastOrDefault()}");
+                // === 1) clientId: header (prioridad) o body (respaldo) ===
+                var headerClientId = HttpContext.GetResolvedClientId();
+                int? bodyClientId = (user?.IdCliente > 0) ? user.IdCliente : (int?)null;
+                var effectiveClientId = headerClientId ?? bodyClientId;
 
+                if (!effectiveClientId.HasValue)
+                    return BadRequest("Falta clientId (X-Client-Id o IdCliente).");
+
+                // Forzar clientId efectivo en el DTO
+                user.IdCliente = effectiveClientId.Value;
+
+                // Log de origen (útil para auditar MESA vs Cliente)
+                var clientSource = headerClientId.HasValue ? "header" : "body";
+                log.Info($"[{rid}] AddUser start clientId={user.IdCliente} (src={clientSource}) emailDomain={user?.Email?.Split('@').LastOrDefault()}");
+
+                // === 2) Validaciones básicas ===
+                if (string.IsNullOrWhiteSpace(user?.Email) ||
+                    string.IsNullOrWhiteSpace(user.FirstName) ||
+                    string.IsNullOrWhiteSpace(user.Profile))
+                {
+                    return BadRequest("Faltan campos obligatorios: FirstName, Email y Profile.");
+                }
+                if (string.IsNullOrWhiteSpace(user.Password))
+                {
+                    return BadRequest("Password es requerido para crear usuario.");
+                }
+
+                // Normalizaciones defensivas
+                user.Rooms = user.Rooms?.Trim() ?? string.Empty; // ManageroomBystring espera string (puede ser "")
+                user.ConfirmationEmail = string.IsNullOrWhiteSpace(user.ConfirmationEmail)
+                    ? user.Email
+                    : user.ConfirmationEmail.Trim();
+
+                // === 3) Reglas de negocio ===
                 var existe = new UserManager().FindEmail(user.Email);
                 if (existe != null)
                 {
-                    log.Warn($"[{rid}] AddUser duplicate email");
-                    return BadRequest(new GeneralErrorResponseDto() { code = "DuplicateUserName", description = "DuplicateUserName" });
+                    log.Warn($"[{rid}] AddUser duplicate email '{user.Email}'");
+                    return BadRequest(new GeneralErrorResponseDto { code = "DuplicateUserName", description = "DuplicateUserName" });
                 }
 
-                var usuario = new UserManager().AddUserFromManage(user);
-                if (usuario != 0)
-                {
-                    var room = new roomsManager().ManageroomBystring(user.Rooms, usuario);
-
-                    if (room)
-                    {
-                        var enviomail = await new UserManager().EnvioCodigo(user.Email, "EMAIL", "Register");
-                        if (string.IsNullOrEmpty(enviomail))
-                        {
-                            log.Warn($"[{rid}] AddUser confirmation unsent userId={usuario}");
-                            return BadRequest(new GeneralErrorResponseDto() { code = "ConfirmationUnsent", description = "ConfirmationUnsent" });
-                        }
-
-                        log.Info($"[{rid}] AddUser ok userId={usuario}");
-                        return Ok();
-                    }
-                    else
-                    {
-                        log.Warn($"[{rid}] AddUser room assign failed userId={usuario}");
-                        return BadRequest(new GeneralErrorResponseDto() { code = "agregarusuario", description = "Error al guardar usuario intente más tarde" });
-                    }
-                }
-                else
+                // Alta
+                var nuevoUserId = new UserManager().AddUserFromManage(user);
+                if (nuevoUserId == 0)
                 {
                     log.Warn($"[{rid}] AddUser add failed");
-                    return BadRequest(new GeneralErrorResponseDto() { code = "agregarusuario", description = "Error al guardar usuario intente más tarde" });
+                    return BadRequest(new GeneralErrorResponseDto { code = "agregarusuario", description = "Error al guardar usuario intente más tarde" });
                 }
+
+                // Rooms
+                var roomOk = new roomsManager().ManageroomBystring(user.Rooms, nuevoUserId);
+                if (!roomOk)
+                {
+                    log.Warn($"[{rid}] AddUser room assign failed userId={nuevoUserId}");
+                    return BadRequest(new GeneralErrorResponseDto { code = "agregarusuario", description = "Error al guardar usuario intente más tarde" });
+                }
+
+                // Correo de confirmación
+                var tokenMail = await new UserManager().EnvioCodigo(user.Email, "EMAIL", "Register");
+                if (string.IsNullOrEmpty(tokenMail))
+                {
+                    log.Warn($"[{rid}] AddUser confirmation unsent userId={nuevoUserId}");
+                    return BadRequest(new GeneralErrorResponseDto { code = "ConfirmationUnsent", description = "ConfirmationUnsent" });
+                }
+
+                log.Info($"[{rid}] AddUser ok userId={nuevoUserId}");
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -692,6 +714,7 @@ namespace SMSBackboneAPI.Controllers
                 return StatusCode(500, new { message = "Error en el servidor" });
             }
         }
+
 
         [Authorize]
         [HttpPost("UpdateUser")]

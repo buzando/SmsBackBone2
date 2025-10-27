@@ -526,8 +526,8 @@ const Clients: React.FC = () => {
             rateForLong: rateForLong?.toString(),
             shortRateType: shortRateType === 'personalizada' ? 1 : 0,
             longRateType: longRateType === 'personalizada' ? 1 : 0,
-            shortRateQty: shortRateType === 'estandar' ? shortStandardQty : null,
-            longRateQty: longRateType === 'estandar' ? longStandardQty : null,
+            shortRateQty: shortRateType === 'estandar' ? shortStandardQty : shortCustomQty,
+            longRateQty: longRateType === 'estandar' ? longStandardQty : longCustomQty,
             roomNames: newRooms.filter((r) => r.trim() !== ''),
         };
 
@@ -3347,6 +3347,7 @@ const Clients: React.FC = () => {
                     <Box sx={{ display: "flex", gap: 2 }}>
                         <Box sx={{ display: "flex", gap: 1.5 }}>
                             <MainButton
+                            isLoading={isSavingClient}
                                 text={
                                     step === 2 || (step === 1 && isEditClient)
                                         ? isEditClient ? 'Guardar cambios' : 'Guardar'
@@ -3377,7 +3378,7 @@ const Clients: React.FC = () => {
                             />
                             <Box sx={{ mt: -0.2 }}>
                                 {isEditClient && step == 0 && (
-                                    <SecondaryButton text="Guardar"
+                                    <SecondaryButton text="Guardar" disabled={isSavingClient}
                                         onClick={() => handleSubmit()}
                                     />
                                 )}
@@ -3386,7 +3387,8 @@ const Clients: React.FC = () => {
                         {/*Guardars*/}
                         <Box sx={{ mt: -0 }}>
                             {!isEditClient && step > 0 && step < 2 && (
-                                <MainButton
+                                <MainButton              
+                                isLoading={isSavingClient}
                                     text="Guardar"
                                     onClick={() => handleSubmit()}
                                 />

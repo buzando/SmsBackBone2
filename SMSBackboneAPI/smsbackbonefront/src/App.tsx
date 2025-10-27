@@ -7,6 +7,7 @@ import { ThemeProvider } from '@emotion/react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage'
 import AutentificationPage from './pages/AutentificationPage'
+import ClientRoomPicker from './pages/ClientRoomPicker'
 import Chooseroom from './pages/chooseroom'
 import PasswordReset from './pages/PasswordReset'
 import RegisterPage from './pages/RegisterPage'
@@ -91,6 +92,9 @@ function App() {
                            
                             <Route element={<AutentificationRoute />}>
                                 <Route path="/Autentification" element={<AutentificationPage />} />
+                            </Route>
+                             <Route element={<AutentificationRoute />}>
+                                <Route path="/ClientRoomPicker" element={<ClientRoomPicker />} />
                             </Route>
                             <Route element={<AutentificationRoute />} >
                                 <Route path="/chooseroom" element={<Chooseroom />} />

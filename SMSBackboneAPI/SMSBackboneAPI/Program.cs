@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using log4net;
@@ -7,19 +7,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
+// ★ usar el filtro
+using SMSBackboneAPI.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 var repo = LogManager.GetRepository(Assembly.GetEntryAssembly());
 var log4netPath = Path.Combine(AppContext.BaseDirectory, "log4net.config");
 XmlConfigurator.Configure(repo, new FileInfo(log4netPath));
 
-
 // Log de arranque
 var bootLog = LogManager.GetLogger(typeof(Program));
-bootLog.Info("API starting�");
-
+bootLog.Info("API starting…");
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -29,7 +28,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "SMSBackboneAPI",
         Version = "v1",
-        Description = "Documentaci�n de la API SMS"
+        Description = "Documentación de la API SMS"
     });
 
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -38,11 +37,18 @@ builder.Services.AddSwaggerGen(c =>
         c.IncludeXmlComments(xmlPath);
 });
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-    });
+// ★ (opcional) registra el filtro en DI por si necesita dependencias
+builder.Services.AddScoped<ResolveClientIdFilter>();
+
+builder.Services.AddControllers(options =>
+{
+    // ★ Registro GLOBAL del filtro → estará disponible en TODOS los controladores/acciones
+    options.Filters.Add<ResolveClientIdFilter>();
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 // Hosted services
 builder.Services.AddHostedService<ReportCleanupService>();
@@ -74,9 +80,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
 builder.Services.AddCors();
-
 
 var app = builder.Build();
 
@@ -86,14 +90,14 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "SMSBackboneAPI v1");
 });
 
-// HTTPS, est�ticos, CORS
+// HTTPS, estáticos, CORS
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader()
     .SetIsOriginAllowed(_ => true)
-    .AllowCredentials());      
+    .AllowCredentials());
 
 // AuthZ
 app.UseAuthentication();

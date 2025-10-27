@@ -1,8 +1,8 @@
-// axiosInstance.ts
+// src/components/commons/axiosInstance.ts
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL:  `${import.meta.env.VITE_SMS_API_URL}`, 
+  baseURL: `${import.meta.env.VITE_SMS_API_URL}`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -10,8 +10,8 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
+    // === 1️⃣ Token de autenticación ===
     const token = localStorage.getItem('token');
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       console.log('✅ Token agregado al header:', config.headers.Authorization);
@@ -19,8 +19,17 @@ instance.interceptors.request.use(
       console.warn('⚠️ No se encontró token en localStorage');
     }
 
-    // Puedes ver todos los headers si quieres
-    console.log('🧾 Headers finales del request:', config.headers);
+    try {
+      const client = JSON.parse(localStorage.getItem('selectedClient') || 'null');
+      if (client?.id) {
+        config.headers['X-Client-Id'] = client.id;
+        console.log('✅ X-Client-Id agregado al header:', client.id);
+      } else {
+        console.warn('⚠️ No se encontró selectedClient en localStorage');
+      }
+    } catch (e) {
+      console.warn('⚠️ Error al leer selectedClient del localStorage', e);
+    }
 
     return config;
   },

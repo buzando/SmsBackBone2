@@ -216,7 +216,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                 }
                 else
                 {
-                    var tokenexists = ctx.UserAccounRecovery.Where(x => x.iduser == user.Id && x.token == token && x.Expiration >= DateTime.Now).FirstOrDefault();
+                    var tokenexists = ctx.UserAccountRecovery.Where(x => x.iduser == user.Id && x.token.ToLower() == token.ToLower() && x.Expiration >= DateTime.Now).FirstOrDefault();
                     if (tokenexists == null)
                     {
                         return false;
@@ -243,8 +243,8 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
                 using (var ctx = new Entities())
                 {
-                    var recovery = new UserAccounRecovery { Expiration = DateTime.Now.AddDays(1), iduser = iduser, token = token, type = tipo };
-                    ctx.UserAccounRecovery.Add(recovery);
+                    var recovery = new UserAccountRecovery { Expiration = DateTime.Now.AddDays(1), iduser = iduser, token = token, type = tipo.ToString() };
+                    ctx.UserAccountRecovery.Add(recovery);
                     ctx.SaveChanges();
                 }
 
@@ -371,6 +371,42 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                 return rooms;
             }
         }
+        public List<RoomsDTO> roomsByUser(int clientId)
+        {
+            var rooms = new List<RoomsDTO>();
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    rooms = (
+                        from r in ctx.Rooms
+                        join rbu in ctx.roomsbyuser on r.id equals rbu.idRoom
+                        join u in ctx.Users on rbu.idUser equals u.Id
+                        join c in ctx.clients on u.IdCliente equals c.id
+                        where u.IdCliente == clientId
+                        select new RoomsDTO
+                        {
+                            id = r.id,
+                            iduser = u.Id,
+                            name = r.name,
+                            description = r.description,
+                            credits = r.credits,
+                            long_sms = r.long_sms,
+                            short_sms = r.short_sms,
+                            calls = r.calls,
+                            idClient = u.IdCliente,
+                            Cliente = c.nombrecliente
+                        }
+                    )
+                    .GroupBy(x => new { x.id, x.name })
+                    .Select(g => g.First())
+                    .ToList();
+                }
+                return rooms;
+            }
+            catch { return rooms; }
+        }
+
 
         public bool NewPassword(PasswordResetDTO pass)
         {
@@ -627,8 +663,8 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                     ctx.roomsbyuser.RemoveRange(roomforeign);
                     ctx.SaveChanges();
 
-                    var tokens = ctx.UserAccounRecovery.Where(x => x.iduser == id).ToList();
-                    ctx.UserAccounRecovery.RemoveRange(tokens);
+                    var tokens = ctx.UserAccountRecovery.Where(x => x.iduser == id).ToList();
+                    ctx.UserAccountRecovery.RemoveRange(tokens);
                     ctx.SaveChanges();
 
                     var users = ctx.Users.Where(x => x.Id == id).FirstOrDefault();
@@ -770,7 +806,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
         #endregion
 
         #region recharge
-        public string RechargeUser2(CreditRechargeRequest credit)
+        public string RechargeUser(CreditRechargeRequest credit)
         {
             log.Info("Comenzando proceso");
             var tarjeta = new creditcards();
@@ -903,7 +939,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
             }
         }
-        public string RechargeUser(CreditRechargeRequest credit)
+        public string RechargeUser2(CreditRechargeRequest credit)
         {
             log.Info("Comenzando proceso (modo simulado)");
             var room = new rooms();

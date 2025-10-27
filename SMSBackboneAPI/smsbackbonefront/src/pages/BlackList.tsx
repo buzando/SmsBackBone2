@@ -4735,12 +4735,12 @@ const BlackList: React.FC = () => {
                         <MainButton
                             onClick={handleSendToServer}
                             text='Guardar cambios'
-                            disabled={
-                                !(
-                                    (fileSuccess && selectedSheet !== '') ||
-                                    formData.Phones.some(p => p.trim().length === 10)
-                                )
-                            }
+                              disabled={
+    !(
+      (fileSuccess && selectedSheet !== '') ||
+      individualPhones.some(p => /^\d{10}$/.test(p.trim()))
+    )
+  }
                         />
 
 
