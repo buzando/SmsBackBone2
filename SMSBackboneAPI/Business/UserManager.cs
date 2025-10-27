@@ -276,16 +276,24 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                 }
                 if (tipo == "SMS")
                 {
-                    token = "123456";
-                    //Random random = new Random();
-                    //int randomNumber = random.Next(100000, 1000000);
 
-                    //token = randomNumber.ToString();
-                    //var usuario = Common.ConfigurationManagerJson("USRAUTENTIFICATION");
-                    //var PSS = Common.ConfigurationManagerJson("PSSAUTENTIFICATION");
-                    //var tokensesion = await new ApiBackBoneManager().LoginResponse(usuario, PSS);
+                    if (ApiBackBoneManager.UseBackbone())
+                    {
 
-                    //var envio = await new ApiBackBoneManager().SendCode(dato, token, tokensesion);
+                        Random random = new Random();
+                        int randomNumber = random.Next(100000, 1000000);
+
+                        token = randomNumber.ToString();
+                        var usuario = Common.ConfigurationManagerJson("USRAUTENTIFICATION");
+                        var PSS = Common.ConfigurationManagerJson("PSSAUTENTIFICATION");
+                        var tokensesion = await new ApiBackBoneManager().LoginResponse(usuario, PSS);
+
+                        var envio = await new ApiBackBoneManager().SendCode(dato, token, tokensesion);
+                    }
+                    else
+                    {
+                        token = "123456";
+                    }
                 }
             }
             catch (Exception e)
@@ -1099,9 +1107,12 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                                           where rbu.idRoom == creditRecharge.idRoom
                                           select ca).FirstOrDefault();
 
+                            if (ApiBackBoneManager.UseBackbone())
+                            {
 
-                            var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
-                            //var recarga = new ApiBackBoneManager().AddCredit(admintoken.Result.token,acceso.id_backbone, (int)(creditRecharge.quantityCredits));
+                                var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
+                                var recarga = new ApiBackBoneManager().AddCredit(admintoken.Result.token, acceso.id_backbone, (int)(creditRecharge.quantityCredits));
+                            }
 
                         }
 

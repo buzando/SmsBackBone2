@@ -9,7 +9,7 @@ import Iconarrow from '../../assets/icon-punta-flecha-bottom.svg';
 import MainButton from '../commons/MainButton';
 import SecondaryButton from '../commons/SecondaryButton';
 import { PopperProps } from '@mui/material/Popper';
-
+import { startOfDay } from 'date-fns'; 
 interface DatePickerProps {
     open: boolean;
     anchorEl: HTMLElement | null;
@@ -102,6 +102,7 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                         showMonthAndYearPickers={false}
                         shownDate={focusedDate}
                         onShownDateChange={(date) => setFocusedDate(date)}
+                         minDate={startOfDay(new Date())}   
                     />
                 </div>
 

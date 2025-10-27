@@ -178,8 +178,8 @@ export interface CampaignScheduleDto {
 }
 
 export interface DuplicateHorario {
-  start: Date;
-  end: Date;
+  start: Date | null;
+  end: Date | null;
   operationMode: number; // 1 = normal, 2 = reciclado
 };
 
@@ -253,8 +253,8 @@ const Campains: React.FC = () => {
   const [duplicateAutoStart, setDuplicateAutoStart] = useState(false);
   const [duplicateHorarios, setDuplicateHorarios] = useState<DuplicateHorario[]>([
     {
-      start: new Date(),
-      end: new Date(),
+      start: null,
+      end: null,
       operationMode: 1
     }
   ]); const [shouldConcatenate, setShouldConcatenate] = useState(true);
@@ -754,6 +754,7 @@ const Campains: React.FC = () => {
     if (blackLists.length === 0) {
       fetchBlackLists();
     }
+    resetUploadState();
     setOpenCreateCampaignModal(true);
   };
 
@@ -814,6 +815,31 @@ const Campains: React.FC = () => {
     ? Math.round((estadisticasCarga?.telefonosCargados || 0) * 100 / totalTelefonos)
     : 0;
 
+const resetUploadState = () => {
+  setUploadedFile(null);
+  setUploadedFileBase64('');
+  if (fileInputRef.current) fileInputRef.current.value = '';
+
+  setEstadisticasCarga(null);
+  setPostCargaActiva(false);
+  setFileError(false);
+  setFileSuccess(false);
+
+  setSelectedTelefonos([]);
+  setSelectedVariables([]);
+  setCheckedTelefonos([]);
+
+  setWorkbook(null);
+  setSheetNames([]);
+  setSelectedSheet('');
+  setColumns([]);
+  setExcelData([]);
+  setBase64File('');
+  setActiveStep(-1);
+setCampaignName('');
+};
+
+
   const handleCloseModalCampaña = () => {
     setTelefonos([]);
     setVariables([]);
@@ -861,6 +887,7 @@ const Campains: React.FC = () => {
     setBase64File('');
     setUploadedFileBase64('');
     setOpenCreateCampaignModal(false);
+    resetUploadState();
   };
 
   const handleRemoveUploadedFile = (e: React.MouseEvent) => {
@@ -1021,6 +1048,8 @@ const Campains: React.FC = () => {
     const reordered = [selected, ...campaigns.filter(c => c.id !== selected.id)];
     setCampaigns(reordered);
     setSelectedCampaign(selected);
+    setPhone('');
+    setError(false);
   };
 
   const handleCloseEditModal = () => {
@@ -1193,7 +1222,7 @@ const Campains: React.FC = () => {
   const handleOpenDuplicateModal = (campaign: CampaignFullResponse) => {
     setSelectedCampaign(campaign);
     setDuplicateAutoStart(campaign.autoStart);
-    setDuplicateHorarios([{ start: new Date(), end: new Date(), operationMode: 1 }]);
+    setDuplicateHorarios([{ start: null, end: null, operationMode: 1 }]);
 
     setOpenDuplicateModal(true);
   };
@@ -1203,8 +1232,8 @@ const Campains: React.FC = () => {
       setDuplicateHorarios(prev => [
         ...prev,
         {
-          start: new Date(),
-          end: new Date(),
+          start: null,
+          end: null,
           operationMode: 1
         }
       ]);
@@ -1354,6 +1383,41 @@ const Campains: React.FC = () => {
       setIsErrorModalOpen(true);
     }
   };
+
+  const nameRegex = /^[a-zA-ZÀ-ÿÑñ\s]{2,40}$/;
+
+  const isFormatInvalid =
+    duplicateName.trim().length > 0 &&
+    !nameRegex.test(duplicateName);
+
+  const isRequiredEmpty =
+    duplicateName.trim().length === 0 && duplicateName;
+
+
+  const canDuplicate =
+    !!duplicateName.trim() &&
+    duplicateHorarios.length >= 1 &&
+    !!duplicateHorarios[0].start &&
+    !!duplicateHorarios[0].end;
+
+  // 🔹 Función que evalúa si el botón "Siguiente" debe estar deshabilitado
+  const isNextDisabled = (() => {
+    switch (activeStep) {
+      // Paso 0: Nombre y horarios
+      case -1:
+        return (
+          campaignName.trim() === '' ||
+          !horarios.length ||
+          !horarios[0]?.start ||
+          !horarios[0]?.end ||
+          horarios[0].end <= horarios[0].start
+        );
+
+      default:
+        return false;
+    }
+  })();
+
 
 
   return (
@@ -2453,7 +2517,7 @@ const Campains: React.FC = () => {
                             <MainButton
                               text="Enviar"
                               onClick={() => console.log("Enviar")}
-                              disabled={error}
+                              disabled={error || phone.length === 0}
                             />
                           </Box>
                         </Box>
@@ -2541,6 +2605,7 @@ const Campains: React.FC = () => {
                               </TableCell>
                               <TableCell align="center" sx={{ fontFamily: "Poppins, sans-serif", padding: "2px 8px", opacity: 0.6 }}>
                                 <Tooltip title="Eliminar" arrow placement="top"
+                                  disableHoverListener={true}
                                   componentsProps={{
                                     tooltip: {
                                       sx: {
@@ -2569,7 +2634,7 @@ const Campains: React.FC = () => {
                                     ]
                                   }}
                                 >
-                                  <IconButton>
+                                  <IconButton >
                                     <Box component="img" src={IconTrash} alt="Eliminar" sx={{ width: "25px", height: "25px", cursor: "pointer", opacity: 0.6 }} />
                                   </IconButton>
                                 </Tooltip>
@@ -6094,10 +6159,7 @@ const Campains: React.FC = () => {
             <Button
               variant="contained"
               onClick={handleContinue}
-              disabled={
-                activeStep === -1 &&
-                (campaignName.trim() === '' || horarios.length === 0)
-              }
+              disabled={isNextDisabled}
               loading={loading}
               sx={{
                 width: "118px",
@@ -6130,36 +6192,27 @@ const Campains: React.FC = () => {
         offset={[100, -200]}
         onApply={(selectedDate, hour, minute) => {
           const fullDate = new Date(selectedDate);
-          fullDate.setHours(hour);
-          fullDate.setMinutes(minute);
-          fullDate.setSeconds(0);
-          fullDate.setMilliseconds(0);
+          fullDate.setHours(hour); fullDate.setMinutes(minute);
+          fullDate.setSeconds(0); fullDate.setMilliseconds(0);
 
           if (currentHorarioIndex !== null && calendarTarget) {
-            if (editActiveStep === -1) {
-              // 🟦 Modal de edición
-              setEditHorarios((prev) =>
-                prev.map((h, i) =>
-                  i === currentHorarioIndex ? { ...h, [calendarTarget]: fullDate } : h
-                )
+            if (openDuplicateModal) {
+              setDuplicateHorarios(prev =>
+                prev.map((h, i) => i === currentHorarioIndex ? { ...h, [calendarTarget]: fullDate } : h)
+              );
+            } else if (editActiveStep === -1) {
+              setEditHorarios(prev =>
+                prev.map((h, i) => i === currentHorarioIndex ? { ...h, [calendarTarget]: fullDate } : h)
               );
             } else {
-              // 🟩 Modal de creación
-              setHorarios((prev) =>
-                prev.map((h, i) =>
-                  i === currentHorarioIndex ? { ...h, [calendarTarget]: fullDate } : h
-                )
+              setHorarios(prev =>
+                prev.map((h, i) => i === currentHorarioIndex ? { ...h, [calendarTarget]: fullDate } : h)
               );
             }
           }
-
           setCalendarOpen(false);
         }}
       />
-
-
-
-
 
       <ModalError
         isOpen={isErrorModalOpen}
@@ -6189,9 +6242,9 @@ const Campains: React.FC = () => {
               <Box sx={{ flexGrow: 1 }}>
                 <MenuItem
                   onClick={() => {
-                    if (selectedCampaign?.autoStart) {
-                      handleOpenEditCampaignModal(selectedCampaign);
-                    }
+
+                    handleOpenEditCampaignModal(selectedCampaign);
+
                     handleMenuClose();
                   }}
                   disabled={menuIndex !== null && selectedCampaign?.autoStart}
@@ -8228,11 +8281,11 @@ const Campains: React.FC = () => {
               onChange={(e) => setDuplicateName(e.target.value)}
               error={isDuplicateNameInvalid}
               helperText={
-                duplicateName.length > 40
-                  ? "Máximo 40 caracteres"
-                  : !/^[a-zA-Z0-9ñÑ ]+$/.test(duplicateName)
-                    ? "Formato inválido"
-                    : ""
+                isRequiredEmpty
+                  ? 'Requerido'
+                  : duplicateName && isFormatInvalid
+                    ? 'Formato inválido'
+                    : ''
               }
               sx={{
                 '& .MuiOutlinedInput-root': {
@@ -8307,134 +8360,239 @@ const Campains: React.FC = () => {
                 backgroundColor: '#F9F4F6',
                 padding: '16px',
                 borderRadius: '8px',
-                mb: 2
+                mb: 2,
               }}
             >
               {duplicateHorarios.map((horario, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    mb: 2
-                  }}
-                >
-                  <TextField
-                    key={`start-duplicate-${index}`}
-                    variant="outlined"
-                    placeholder="Inicia"
-                    value={
-                      horario.start
-                        ? horario.start.toLocaleString('es-MX', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })
-                        : ''
-                    }
-                    onClick={(e) => {
-                      setCalendarAnchor(e.currentTarget);
-                      setCalendarOpen(true);
-                      setCalendarTarget('start');
-                      setCurrentHorarioIndex(index);
-                    }}
+                <Box key={index} sx={{ mb: 1.5 }}>
+                  {/* Etiqueta del horario */}
+                  <Typography
                     sx={{
-                      width: '262px', height: '56px', backgroundColor: '#FFFFFF',
-                      '& .MuiInputBase-input': {
-                        fontFamily: 'Poppins',
-                        fontSize: '14px',
-                      },
-
+                      fontFamily: 'Poppins',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#574B4F',
+                      mb: 1,
                     }}
-                    InputProps={{
-                      readOnly: true,
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            size="small"
-                            sx={{ padding: 0 }}
-                            onClick={(e) => {
-                              setCalendarAnchor(e.currentTarget);
-                              setCalendarOpen(true);
-                              setCalendarTarget('start');
-                              setCurrentHorarioIndex(index);
+                  >
+                    {`Horario ${index + 1}`}
+                  </Typography>
+
+                  {/* Modo de operación desde Horario 2 */}
+                  {index > 0 && (
+                    <Box sx={{ mt: -1, mb: 1 }}>
+                      <Typography
+                        sx={{
+                          fontFamily: 'Poppins',
+                          fontWeight: 500,
+                          fontSize: '18px',
+                          color: '#330F1B',
+                          mb: 1,
+                        }}
+                      >
+                        Modo de operación
+                      </Typography>
+
+                      <FormControl>
+                        <RadioGroup
+                          row
+                          value={horario.operationMode === 2 ? 'reciclar' : 'reanudar'}
+                          onChange={(e) => {
+                            const value = e.target.value === 'reciclar' ? 2 : 1;
+                            setDuplicateHorarios((prev) =>
+                              prev.map((h, i) =>
+                                i === index ? { ...h, operationMode: value } : h
+                              )
+                            );
+                          }}
+                        >
+                          <FormControlLabel
+                            value="reanudar"
+                            control={
+                              <Radio
+                                sx={{
+                                  color: '#574B4F',
+                                  '&.Mui-checked': { color: '#8F4D63' },
+                                }}
+                              />
+                            }
+                            label="Reanudar"
+                            sx={{
+                              '& .MuiFormControlLabel-label': {
+                                fontFamily: 'Poppins',
+                                fontSize: '16px',
+                                color:
+                                  horario.operationMode === 1 ? '#8F4D63' : '#574B4F',
+                              },
                             }}
-                          >
-                            <CalendarTodayIcon sx={{ width: 15, height: 15, color: '#8F4D63' }} />
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                  />
-
-                  <TextField
-                    key={`end-duplicate-${index}`}
-                    variant="outlined"
-                    placeholder="Termina"
-                    value={
-                      horario.end
-                        ? horario.end.toLocaleString('es-MX', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })
-                        : ''
-                    }
-                    onClick={(e) => {
-                      setCalendarAnchor(e.currentTarget);
-                      setCalendarOpen(true);
-                      setCalendarTarget('end');
-                      setCurrentHorarioIndex(index);
-                    }}
-                    sx={{
-                      width: '262px', height: '56px', backgroundColor: '#FFFFFF',
-                      '& .MuiInputBase-input': {
-                        fontFamily: 'Poppins',
-                        fontSize: '14px',
-                      },
-                    }}
-                    InputProps={{
-                      readOnly: true,
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            size="small"
-                            sx={{ padding: 0 }}
-                            onClick={(e) => {
-                              setCalendarAnchor(e.currentTarget);
-                              setCalendarOpen(true);
-                              setCalendarTarget('end');
-                              setCurrentHorarioIndex(index);
+                          />
+                          <FormControlLabel
+                            value="reciclar"
+                            control={
+                              <Radio
+                                sx={{
+                                  color: '#574B4F',
+                                  '&.Mui-checked': { color: '#8F4D63' },
+                                }}
+                              />
+                            }
+                            label="Reciclar"
+                            sx={{
+                              '& .MuiFormControlLabel-label': {
+                                fontFamily: 'Poppins',
+                                fontSize: '16px',
+                                color:
+                                  horario.operationMode === 2 ? '#8F4D63' : '#574B4F',
+                              },
                             }}
-                          >
-                            <CalendarTodayIcon sx={{ width: 15, height: 15, color: '#8F4D63' }} />
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                  />
-
-                  {/* Botón eliminar horario */}
-                  {duplicateHorarios.length > 1 && (
-                    <IconButton onClick={() => handleRemoveDuplicateHorario(index)}>
-                      <RemoveIcon sx={{ color: '#6C3A52', width: 20, height: 20, ml: -2, mr: -1.5 }} />
-                    </IconButton>
+                          />
+                        </RadioGroup>
+                      </FormControl>
+                    </Box>
                   )}
 
-                  {/* Botón añadir horario (solo en el último si hay menos de 5) */}
-                  {index === duplicateHorarios.length - 1 && duplicateHorarios.length < 5 && (
-                    <IconButton onClick={handleAddDuplicateHorario}>
-                      <AddIcon sx={{ color: '#6C3A52', width: 20, height: 20, ml: -1.5, mr: -1.5 }} />
-                    </IconButton>
-                  )}
+                  {/* Fila con los pickers y botones */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <TextField
+                      key={`start-duplicate-${index}`}
+                      variant="outlined"
+                      placeholder="Inicia"
+                      value={
+                        horario.start
+                          ? horario.start.toLocaleString('es-MX', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                          : ''
+                      }
+                      onClick={(e) => {
+                        setCalendarAnchor(e.currentTarget);
+                        setCalendarOpen(true);
+                        setCalendarTarget('start');
+                        setCurrentHorarioIndex(index);
+                      }}
+                      sx={{
+                        width: '262px',
+                        height: '56px',
+                        backgroundColor: '#FFFFFF',
+                        '& .MuiInputBase-input': {
+                          fontFamily: 'Poppins',
+                          fontSize: '14px',
+                        },
+                      }}
+                      InputProps={{
+                        readOnly: true,
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              size="small"
+                              sx={{ padding: 0 }}
+                              onClick={(e) => {
+                                setCalendarAnchor(e.currentTarget);
+                                setCalendarOpen(true);
+                                setCalendarTarget('start');
+                                setCurrentHorarioIndex(index);
+                              }}
+                            >
+                              <CalendarTodayIcon
+                                sx={{ width: 15, height: 15, color: '#8F4D63' }}
+                              />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+
+                    <TextField
+                      key={`end-duplicate-${index}`}
+                      variant="outlined"
+                      placeholder="Termina"
+                      value={
+                        horario.end
+                          ? horario.end.toLocaleString('es-MX', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                          : ''
+                      }
+                      onClick={(e) => {
+                        setCalendarAnchor(e.currentTarget);
+                        setCalendarOpen(true);
+                        setCalendarTarget('end');
+                        setCurrentHorarioIndex(index);
+                      }}
+                      sx={{
+                        width: '262px',
+                        height: '56px',
+                        backgroundColor: '#FFFFFF',
+                        '& .MuiInputBase-input': {
+                          fontFamily: 'Poppins',
+                          fontSize: '14px',
+                        },
+                      }}
+                      InputProps={{
+                        readOnly: true,
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              size="small"
+                              sx={{ padding: 0 }}
+                              onClick={(e) => {
+                                setCalendarAnchor(e.currentTarget);
+                                setCalendarOpen(true);
+                                setCalendarTarget('end');
+                                setCurrentHorarioIndex(index);
+                              }}
+                            >
+                              <CalendarTodayIcon
+                                sx={{ width: 15, height: 15, color: '#8F4D63' }}
+                              />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+
+                    {/* Eliminar horario */}
+                    {duplicateHorarios.length > 1 && (
+                      <IconButton onClick={() => handleRemoveDuplicateHorario(index)}>
+                        <RemoveIcon
+                          sx={{
+                            color: '#6C3A52',
+                            width: 20,
+                            height: 20,
+                            ml: -2,
+                            mr: -1.5,
+                          }}
+                        />
+                      </IconButton>
+                    )}
+
+                    {/* Agregar horario */}
+                    {index === duplicateHorarios.length - 1 &&
+                      duplicateHorarios.length < 5 && (
+                        <IconButton onClick={handleAddDuplicateHorario}>
+                          <Box
+                            component="img"
+                            src={IconCirclePlus}
+                            alt="Agregar Horario"
+                            sx={{ width: 24, height: 24, cursor: 'pointer' }}
+                          />
+                        </IconButton>
+                      )}
+                  </Box>
                 </Box>
               ))}
             </Box>
+
+
+
 
 
             <FormControlLabel
@@ -8505,7 +8663,7 @@ const Campains: React.FC = () => {
             }}
           >
             <SecondaryButton onClick={() => setOpenDuplicateModal(false)} text='Cancelar' />
-            <MainButton onClick={handleConfirmDuplicateCampaign} text='Duplicar' />
+            <MainButton onClick={handleConfirmDuplicateCampaign} text='Duplicar' disabled={!canDuplicate} />
           </DialogActions>
         </Box>
       </Dialog>

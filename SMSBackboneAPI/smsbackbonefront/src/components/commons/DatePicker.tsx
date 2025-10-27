@@ -8,6 +8,7 @@ import { es } from 'date-fns/locale';
 import Iconarrow from '../../assets/icon-punta-flecha-bottom.svg'
 import MainButton from '../commons/MainButton'
 import SecondaryButton from '../commons/SecondaryButton'
+import { startOfDay } from 'date-fns'; 
 interface DatePickerProps {
     open: boolean;
     anchorEl: HTMLElement | null;
@@ -126,6 +127,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ open, anchorEl, onApply, onClos
                     showMonthAndYearPickers={false}
                     shownDate={shownDate}
                     onShownDateChange={(date) => setShownDate(date)}
+                    minDate={startOfDay(new Date())}  
                 />
 
 

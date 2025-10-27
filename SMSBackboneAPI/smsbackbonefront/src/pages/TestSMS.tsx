@@ -106,13 +106,17 @@ export default function TestSMS() {
       const requestUrl = `${import.meta.env.VITE_API_MESSAGE_SEND}`;
       const response = await axios.post(requestUrl, payload);
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data) {
+
         setshowChipBar(true);
       } else {
         setIsErrorModalOpen(true);
       }
     } catch (error) {
       setIsErrorModalOpen(true);
+    }
+    finally {
+      setIsPreviewOpen(false);
     }
   };
 
@@ -324,12 +328,25 @@ export default function TestSMS() {
             rows={4}
             value={message}
             placeholder={t('pages.testSMS.writeMessageOrSelect')}
+            disabled={!!selectedTemplateId}
             onChange={(e) => {
-              const value = e.target.value;
+              let value = e.target.value;
+
+              value = value.replace(/[^a-zA-Z0-9\s]/g, '');
+
+              if (value.length > 160) {
+                value = value.slice(0, 160);
+              }
+
               setMessage(value);
-              setMessageError(value.length === 0 || value.length > 160); // 🔥 Error si está vacío o pasa 160 caracteres
+
+              setMessageError(value.trim().length === 0);
+
+              if (value.trim().length > 0) {
+                setSelectedTemplateId('');
+                setSelectedTemplate(null);
+              }
             }}
-            disabled={!!selectedTemplate}
             error={messageError}
             helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
             InputProps={{
@@ -408,15 +425,27 @@ export default function TestSMS() {
               width: "220px", height: "40px"
             }}>
               <Select defaultValue="" value={selectedTemplateId}
-                onChange={(e) => setSelectedTemplateId(e.target.value)}
+                onChange={(e) => {
+                  const id = e.target.value as string;
+                  setSelectedTemplateId(id);
+
+                  setMessage('');
+                  setMessageError(false);
+
+                  const t = templates.find(x => x.id === Number(id)) || null;
+                  setSelectedTemplate(t);
+                }}
+                disabled={message.trim().length > 0}
                 displayEmpty sx={{
                   color: "#786E71",
                   borderRadius: '8px',
                   fontFamily: 'Poppins',
                   fontSize: '14px', mt: "-8px",
+                  paddingRight: '32px !important',
                   '& .MuiSelect-select': {
                     display: 'flex',
                     alignItems: 'center',
+                    paddingRight: '32px !important'
                   },
                   '& fieldset': {
                     border: 'none',
@@ -494,6 +523,7 @@ export default function TestSMS() {
         <SecondaryButton
           text={t('pages.testSMS.clear')}
           onClick={() => {
+            setSelectedTemplate(null);
             setFromNumber('');
             setToNumber('');
             setSelectedTemplateId('');

@@ -86,35 +86,55 @@ namespace Business
 
 
 
-        public string AddCreditCard2(CreditCardRequest creditCard)
+        public string AddCreditCard(CreditCardRequest creditCard)
         {
             try
             {
+                string lastFour = "0000";
+                if (!string.IsNullOrEmpty(creditCard.card_number) && creditCard.card_number.Length >= 4)
+                    lastFour = creditCard.card_number[^4..];
+
                 var usuario = new Users();
                 using (var ctx = new Entities())
                 {
                     usuario = ctx.Users.Where(x => x.Id == creditCard.user_id).FirstOrDefault();
+
+                    bool yaExiste =
+ctx.creditcards.Any(cc =>
+cc.user_id == creditCard.user_id &&
+cc.card_number.EndsWith(lastFour) &&
+cc.expiration_year == creditCard.expiration_year
+
+);
+
+
+
+                    if (yaExiste)
+                        return "Existe";
+
                 }
                 if (usuario == null)
                 {
                     return "Error";
                 }
 
+
+
                 var token = CreateOpenPayCustomerAndCard(creditCard, usuario);
                 if (token.ToLower().Contains("error"))
                 {
                     return "Error";
                 }
-                string lastFour = "0000";
-                if (!string.IsNullOrEmpty(creditCard.card_number) && creditCard.card_number.Length >= 4)
-                    lastFour = creditCard.card_number[^4..];
+          
                 using (var ctx = new Entities())
                 {
+
+
                     var tokencard = token.Split("|")[1];
                     var tokencustomer = token.Split("|")[0];
                     var creditscard = ctx.creditcards
                         .Where(x => x.token_id == tokencard && x.user_id == creditCard.user_id)
-                        .FirstOrDefault(); 
+                        .FirstOrDefault();
                     if (creditscard != null)
                     {
                         return "Existe";
@@ -156,7 +176,7 @@ namespace Business
 
         }
 
-        public string AddCreditCard(CreditCardRequest creditCard)
+        public string AddCreditCard2(CreditCardRequest creditCard)
         {
             try
             {

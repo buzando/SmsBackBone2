@@ -20,6 +20,8 @@ import Tooltip from '@mui/material/Tooltip';
 import infoicon from '../assets/Icon-info.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
 import MainButton from '../components/commons/MainButton';
+import Iconeyeslash from '../assets/Iconeyeslash.svg';
+import Iconeyesopen from '../assets/Iconeyesopen.svg';
 
 type RegisterFormData = {
     client: string;
@@ -73,6 +75,10 @@ const Register: React.FC = () => {
     const [isButton, setIsButton] = useState(false);
     const [hasPasswordInput, setHasPasswordInput] = useState(false);
     const termsContainerRef = useRef<HTMLDivElement>(null);
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+
     const handleScroll = () => {
         const container = termsContainerRef.current;
         if (container) {
@@ -1033,33 +1039,50 @@ const Register: React.FC = () => {
                                     </Typography>
                                     <TextField
                                         name="password"
-                                        type="password"
+                                        label="Contraseña*"
+                                        type={showPassword ? "text" : "password"}
                                         value={password}
                                         onChange={handlePasswordChange}
                                         variant="outlined"
                                         fullWidth
                                         required
-                                        error={hasPasswordInput && !Object.values(passwordErrors).every((valid) => valid)}
+                                        error={hasPasswordInput && !Object.values(passwordErrors).every(Boolean)}
                                         helperText={
                                             hasPasswordInput && (
                                                 <>
                                                     {!passwordErrors.minLength && (
-                                                        <Typography variant="caption" color="error" sx={{ fontFamily: "Poppins", fontSize: "11px" }}>
+                                                        <Typography
+                                                            variant="caption"
+                                                            color="error"
+                                                            sx={{ fontFamily: "Poppins", fontSize: "11px" }}
+                                                        >
                                                             • La contraseña debe tener al menos 8 caracteres.
                                                         </Typography>
                                                     )}
                                                     {!passwordErrors.uppercase && (
-                                                        <Typography variant="caption" color="error" sx={{ fontFamily: "Poppins", fontSize: "11px" }}>
+                                                        <Typography
+                                                            variant="caption"
+                                                            color="error"
+                                                            sx={{ fontFamily: "Poppins", fontSize: "11px" }}
+                                                        >
                                                             <br />• Debe contener al menos una letra mayúscula.
                                                         </Typography>
                                                     )}
                                                     {!passwordErrors.lowercase && (
-                                                        <Typography variant="caption" color="error" sx={{ fontFamily: "Poppins", fontSize: "11px" }}>
+                                                        <Typography
+                                                            variant="caption"
+                                                            color="error"
+                                                            sx={{ fontFamily: "Poppins", fontSize: "11px" }}
+                                                        >
                                                             <br />• Debe contener al menos una letra minúscula.
                                                         </Typography>
                                                     )}
                                                     {!passwordErrors.number && (
-                                                        <Typography variant="caption" color="error" sx={{ fontFamily: "Poppins", fontSize: "11px" }}>
+                                                        <Typography
+                                                            variant="caption"
+                                                            color="error"
+                                                            sx={{ fontFamily: "Poppins", fontSize: "11px" }}
+                                                        >
                                                             <br />• Debe contener al menos un número.
                                                         </Typography>
                                                     )}
@@ -1068,41 +1091,34 @@ const Register: React.FC = () => {
                                         }
                                         InputProps={{
                                             endAdornment: (
-                                                <InputAdornment position="end">
+                                                <InputAdornment position="end" sx={{ gap: 1 }}>
+                                                    {/* 🔹 Botón de información con tooltip fijo */}
                                                     <Tooltip
                                                         title={
                                                             <Box
                                                                 sx={{
                                                                     backgroundColor: "#FFFFFF",
                                                                     borderRadius: "8px",
-                                                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                    padding: "8px 12px",
+                                                                    boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+                                                                    p: "8px 12px",
                                                                     fontSize: "14px",
                                                                     fontFamily: "Poppins",
                                                                     color: "#574B4F",
                                                                     whiteSpace: "pre-line",
                                                                     transform: "translate(-10px, -22px)",
-                                                                    borderColor: "#00131F3D",
-                                                                    borderStyle: "solid",
-                                                                    borderWidth: "1px"
+                                                                    border: "1px solid #00131F3D",
                                                                 }}
                                                             >
                                                                 • Mínimo 8 caracteres.
-                                                                <br />
-                                                                • Una letra mayúscula.
-                                                                <br />
-                                                                • Una letra minúscula.
-                                                                <br />
-                                                                • Un número.
+                                                                {"\n"}• Una letra mayúscula.
+                                                                {"\n"}• Una letra minúscula.
+                                                                {"\n"}• Un número.
                                                             </Box>
                                                         }
                                                         placement="bottom-end"
                                                         componentsProps={{
                                                             tooltip: {
-                                                                sx: {
-                                                                    backgroundColor: "transparent",
-                                                                    padding: 0,
-                                                                },
+                                                                sx: { backgroundColor: "transparent", p: 0 },
                                                             },
                                                         }}
                                                     >
@@ -1110,18 +1126,63 @@ const Register: React.FC = () => {
                                                             disableRipple
                                                             sx={{
                                                                 backgroundColor: "transparent !important",
-                                                                "&:hover": {
-                                                                    backgroundColor: "transparent !important",
-                                                                },
+                                                                "&:hover": { backgroundColor: "transparent !important" },
                                                             }}
                                                         >
-                                                            <img src={hasPasswordInput && !Object.values(passwordErrors).every((valid) => valid) ? infoiconerror : infoicon} alt="info-icon" style={{ width: 24, height: 24 }} />
+                                                            <img
+                                                                src={
+                                                                    hasPasswordInput &&
+                                                                        !Object.values(passwordErrors).every(Boolean)
+                                                                        ? infoiconerror
+                                                                        : infoicon
+                                                                }
+                                                                alt="info"
+                                                                style={{ width: 24, height: 24 }}
+                                                            />
+                                                        </IconButton>
+                                                    </Tooltip>
+
+                                                    {/* 👁️ Ojito de mostrar/ocultar */}
+                                                    <Tooltip
+                                                        title="Ver / Ocultar contraseña"
+                                                        placement="bottom-end"
+                                                        componentsProps={{
+                                                            tooltip: {
+                                                                sx: { backgroundColor: "transparent", p: 0 },
+                                                            },
+                                                        }}
+                                                    >
+                                                        <IconButton
+                                                            onClick={() => setShowPassword((v) => !v)}
+                                                            disableRipple
+                                                            sx={{
+                                                                backgroundColor: "transparent !important",
+                                                                "&:hover": { backgroundColor: "transparent !important" },
+                                                            }}
+                                                        >
+                                                            <img
+                                                                alt={!showPassword ? "ocultar" : "ver"}
+                                                                src={!showPassword ? Iconeyeslash : Iconeyesopen}
+                                                                style={{ width: 24, height: 24 }}
+                                                            />
                                                         </IconButton>
                                                     </Tooltip>
                                                 </InputAdornment>
                                             ),
                                         }}
+                                        sx={{
+                                            fontFamily: "Poppins",
+                                            "& .MuiInputBase-input": { fontFamily: "Poppins" },
+                                            "& .MuiFormHelperText-root": {
+                                                fontFamily: "Poppins",
+                                                fontSize: "12px",
+                                                position: "absolute",
+                                                mt: "59px",
+                                            },
+                                        }}
                                     />
+
+
                                 </Grid>
 
                                 <Grid item xs={12} md={6}>
@@ -1141,65 +1202,66 @@ const Register: React.FC = () => {
                                     </Typography>
                                     <TextField
                                         name="confirmPassword"
-                                        type="password"
+                                        type={showConfirm ? "text" : "password"}
                                         value={confirmPassword}
                                         onChange={handleConfirmPasswordChange}
                                         variant="outlined"
                                         fullWidth
                                         required
-                                        error={!!(confirmPassword && confirmPassword !== password)}
+                                        error={Boolean(confirmPassword && confirmPassword !== password)}
+                                        helperText={confirmPassword && confirmPassword !== password ? "Las contraseñas no coinciden" : ""}
                                         InputProps={{
                                             endAdornment: (
-                                                <InputAdornment position="end">
+                                                <InputAdornment position="end" sx={{ gap: 1 }}>
+                                                    {/* Tooltip fijo (no depende de si coincide o no) */}
                                                     <Tooltip
                                                         title={
-                                                            <Box
-                                                                sx={{
-                                                                    backgroundColor: "#FFFFFF",
-                                                                    borderRadius: "8px",
-                                                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                                    padding: "8px 12px",
-                                                                    fontSize: "14px",
-                                                                    fontFamily: "Poppins",
-                                                                    color: "#574B4F",
-                                                                    whiteSpace: "pre-line",
-                                                                    transform: "translate(-10px, -22px)",
-                                                                    borderColor: "#00131F3D",
-                                                                    borderStyle: "solid",
-                                                                    borderWidth: "1px"
-                                                                }}
-                                                            >
-                                                                {confirmPassword && confirmPassword !== password
-                                                                    ? "• Las contraseñas no coinciden"
-                                                                    : "• Las contraseñas coinciden"}
+                                                            <Box sx={{
+                                                                backgroundColor: "#FFFFFF",
+                                                                borderRadius: "8px",
+                                                                boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+                                                                p: "8px 12px",
+                                                                fontSize: "14px",
+                                                                fontFamily: "Poppins",
+                                                                color: "#574B4F",
+                                                                whiteSpace: "pre-line",
+                                                                transform: "translate(-10px, -22px)",
+                                                                border: "1px solid #00131F3D"
+                                                            }}>
+                                                                {/* texto estático para confirmación */}
+                                                                • Debe coincidir exactamente con la contraseña.
                                                             </Box>
                                                         }
                                                         placement="bottom-end"
-                                                        componentsProps={{
-                                                            tooltip: {
-                                                                sx: {
-                                                                    backgroundColor: "transparent",
-                                                                    padding: 0,
-                                                                },
-                                                            },
-                                                        }}
+                                                        componentsProps={{ tooltip: { sx: { backgroundColor: "transparent", p: 0 } } }}
                                                     >
-                                                        <IconButton
-                                                            disableRipple
-                                                            sx={{
-                                                                backgroundColor: "transparent !important",
-                                                                "&:hover": {
-                                                                    backgroundColor: "transparent !important",
-                                                                },
-                                                            }}
-                                                        >
-                                                            <img src={(confirmPassword && confirmPassword !== password) ? infoiconerror : infoicon} alt="info-icon" style={{ width: 24, height: 24 }} />
+                                                        <IconButton disableRipple sx={{ backgroundColor: "transparent !important", "&:hover": { backgroundColor: "transparent !important" } }}>
+                                                            <img
+                                                                src={confirmPassword && confirmPassword !== password ? infoiconerror : infoicon}
+                                                                alt="info"
+                                                                style={{ width: 24, height: 24 }}
+                                                            />
                                                         </IconButton>
                                                     </Tooltip>
+
+                                                    {/* Ojito mostrar/ocultar */}
+                                                    <IconButton onClick={() => setShowConfirm(v => !v)}>
+                                                        <img
+                                                            src={showConfirm ? Iconeyesopen : Iconeyeslash}
+                                                            alt="toggle confirm"
+                                                            style={{ width: 24, height: 24 }}
+                                                        />
+                                                    </IconButton>
                                                 </InputAdornment>
                                             ),
                                         }}
+                                        sx={{
+                                            fontFamily: "Poppins",
+                                            "& .MuiInputBase-input": { fontFamily: "Poppins" },
+                                            "& .MuiFormHelperText-root": { fontFamily: "Poppins", fontSize: "12px", position: "absolute", mt: "59px" },
+                                        }}
                                     />
+
                                 </Grid>
 
                                 <Grid item xs={12}>

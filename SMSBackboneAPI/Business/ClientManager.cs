@@ -303,51 +303,66 @@ namespace Business
 
                 var roomOk = new roomsManager().addroomByNewUser(usuarioCreado.Id, usuarioCreado.IdCliente);
                 if (!roomOk) throw new Exception("Error al crear Room, intente más tarde");
-\
-                var passwordBB = GenerarPasswordTemporalBackBone(16);
 
-                var adminTokenTask = new ApiBackBoneManager().LoginResponse(
+                if (ApiBackBoneManager.UseBackbone())
+                {
+                    var passwordBB = GenerarPasswordTemporalBackBone(16);
+                    var adminTokenTask = new ApiBackBoneManager().LoginResponse(
                     Common.ConfigurationManagerJson("USRBACKBONE"),
                     Common.ConfigurationManagerJson("PSSBACKBONE")
                 );
-                var adminToken = adminTokenTask.Result;
-                if (adminToken == null || string.IsNullOrWhiteSpace(adminToken.token))
-                    throw new Exception("No se pudo autenticar en Backbone.");
+                    var adminToken = adminTokenTask.Result;
+                    if (adminToken == null || string.IsNullOrWhiteSpace(adminToken.token))
+                        throw new Exception("No se pudo autenticar en Backbone.");
 
-                var createTask = new ApiBackBoneManager().CreateUser(
-                    adminToken.token,
-                    usuarioCreado.Client,
-                    passwordBB,
-                    usuarioCreado.email,
-                    3,
-                    ""
-                );
-                var userBackboneJson = createTask.GetAwaiter().GetResult();
-                var idBackbone = JObject.Parse(userBackboneJson)["id"].Value<int>();
+                    var createTask = new ApiBackBoneManager().CreateUser(
+                        adminToken.token,
+                        usuarioCreado.Client,
+                        passwordBB,
+                        usuarioCreado.email,
+                        3,
+                        ""
+                    );
+                    var userBackboneJson = createTask.GetAwaiter().GetResult();
+                    var idBackbone = JObject.Parse(userBackboneJson)["id"].Value<int>();
 
-                var passEncrypt = ClientAccessManager.Encrypt(passwordBB);
-                using (var ctx = new Entities())
-                {
-                    var clientAccess = new ClientAccess
+                    var passEncrypt = ClientAccessManager.Encrypt(passwordBB);
+                    using (var ctx = new Entities())
                     {
-                        client_id = cliente.id,
-                        password = passEncrypt,
-                        username = usuarioCreado.Client,
-                        status = true,
-                        created_at = DateTime.Now,
-                        id_backbone = idBackbone
-                    };
-                    ctx.Client_Access.Add(clientAccess);
-                    ctx.SaveChanges();
-                }
+                        var clientAccess = new ClientAccess
+                        {
+                            client_id = cliente.id,
+                            password = passEncrypt,
+                            username = usuarioCreado.Client,
+                            status = true,
+                            created_at = DateTime.Now,
+                            id_backbone = idBackbone
+                        };
+                        ctx.Client_Access.Add(clientAccess);
+                        ctx.SaveChanges();
+                    }
 
                     var addCreditResp = new ApiBackBoneManager()
     .AddCredit(adminToken.token, idBackbone, 100)
     .GetAwaiter()
     .GetResult();
-
-
+                }
+                else
+                {
+                    // Opcional: log informativo para saber que se omitió Backbone
+                    log.Info("BACKBONE_ENABLED=false: se omite creación de usuario/credit en Backbone.");
+                }
                 scope.Complete();
+                try
+                {
+                    string sitioFront = Common.ConfigurationManagerJson("UrlSitio");
+                    string mensaje = MailManager.GenerateMailMessage(usuarioCreado.email, null, sitioFront, "confirmation");
+                    MailManager.SendEmail(usuarioCreado.email, "Bienvenido a Red Quantum", mensaje);
+                }
+                catch (Exception exMail)
+                {
+                    log.Warn("No se pudo enviar el correo de registro.", exMail);
+                }
                 return (usuarioCreado, cliente.id);
             }
         }
@@ -446,37 +461,38 @@ namespace Business
                         if (dto.Id == null)
                         {
 
-
-                            var password = GenerarPasswordTemporalBackBone(16);
-
-                            var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
-                            var userbackbone = new ApiBackBoneManager()
-                                .CreateUser(admintoken.Result.token, dto.NombreCliente, password, dto.Email, 3, "")
-                                .GetAwaiter()
-                                .GetResult();
-                            int id = JObject.Parse(userbackbone)["id"].Value<int>();
-                            var passencrypt = ClientAccessManager.Encrypt(password);
-
-                            var clientacces = new ClientAccess
+                            if (ApiBackBoneManager.UseBackbone())
                             {
-                                client_id = client.id,
-                                password = passencrypt,
-                                username = dto.NombreCliente,
-                                status = true,
-                                created_at = DateTime.Now,
-                                id_backbone = id
-                            };
-                            ctx.Client_Access.Add(clientacces);
-                            ctx.SaveChanges();
+                                var password = GenerarPasswordTemporalBackBone(16);
+
+                                var admintoken = new ApiBackBoneManager().LoginResponse(Common.ConfigurationManagerJson("USRBACKBONE"), Common.ConfigurationManagerJson("PSSBACKBONE"));
+                                var userbackbone = new ApiBackBoneManager()
+                                    .CreateUser(admintoken.Result.token, dto.NombreCliente, password, dto.Email, 3, "")
+                                    .GetAwaiter()
+                                    .GetResult();
+                                int id = JObject.Parse(userbackbone)["id"].Value<int>();
+                                var passencrypt = ClientAccessManager.Encrypt(password);
+
+                                var clientacces = new ClientAccess
+                                {
+                                    client_id = client.id,
+                                    password = passencrypt,
+                                    username = dto.NombreCliente,
+                                    status = true,
+                                    created_at = DateTime.Now,
+                                    id_backbone = id
+                                };
+                                ctx.Client_Access.Add(clientacces);
+                                ctx.SaveChanges();
 
 
-                            var addCreditResp = new ApiBackBoneManager()
-     .AddCredit(admintoken.Result.token, id, 100)
-     .GetAwaiter()
-     .GetResult();
+                                var addCreditResp = new ApiBackBoneManager()
+         .AddCredit(admintoken.Result.token, id, 100)
+         .GetAwaiter()
+         .GetResult();
 
 
-
+                            }
                             transaction.Commit();
 
                             string sitioFront = Common.ConfigurationManagerJson("UrlSitio");
@@ -702,13 +718,11 @@ namespace Business
         public bool RechargeUserDirect(RechargeRequest credit)
         {
             log.Info("Iniciando recarga directa...");
-
             try
             {
                 using (var ctx = new Entities())
                 using (var tx = ctx.Database.BeginTransaction())
                 {
-                    // Normaliza SmsType → canal interno
                     string channel = credit.SmsType?.Trim().ToLower() switch
                     {
                         "largo" => "long_sms",
@@ -718,19 +732,18 @@ namespace Business
                         _ => "short_sms"
                     };
 
-                    // Rooms solicitadas (limpias y únicas)
                     var roomNames = (credit.Rooms ?? Enumerable.Empty<string>())
-                                    .Where(s => !string.IsNullOrWhiteSpace(s))
-                                    .Select(s => s.Trim())
-                                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                                    .ToList();
+                        .Where(s => !string.IsNullOrWhiteSpace(s))
+                        .Select(s => s.Trim())
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+
                     if (roomNames.Count == 0)
                     {
                         log.Warn("No se recibieron rooms en la solicitud.");
                         return false;
                     }
 
-                    // 1) Resuelve roomIds por CLIENTE + NOMBRE (criterio único)
                     var roomIdsByName = (
                         from c in ctx.clients
                         join u in ctx.Users on c.id equals u.IdCliente
@@ -743,7 +756,6 @@ namespace Business
                     .GroupBy(x => x.name, StringComparer.OrdinalIgnoreCase)
                     .ToDictionary(g => g.Key, g => g.First().id, StringComparer.OrdinalIgnoreCase);
 
-                    // 2) Inserta recargas y junta los ids a actualizar
                     var idsToUpdate = new HashSet<int>();
                     foreach (var name in roomNames)
                     {
@@ -778,28 +790,66 @@ namespace Business
                         return false;
                     }
 
-                    // 3) Actualiza EXACTAMENTE esas rooms por id
                     var roomsToUpdate = ctx.Rooms.Where(r => idsToUpdate.Contains(r.id)).ToList();
-
-                    double amount = Convert.ToDouble(credit.Amount);
 
                     foreach (var room in roomsToUpdate)
                     {
-                        room.credits += amount;
+                        double amount = Convert.ToDouble(credit.Amount) + room.credits;
+
+                        room.credits = amount;
 
                         if (channel == "short_sms")
-                            room.short_sms += amount;
+                            room.short_sms += credit.Amount;
                         else
-                            room.long_sms += amount;
-
-                        // Opcional si confías en el tracking:
-                        // ctx.Entry(room).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                            room.long_sms += credit.Amount;
                     }
 
                     ctx.SaveChanges();
                     tx.Commit();
 
                     log.Info($"Recarga directa finalizada. Rooms actualizadas: {roomsToUpdate.Count}.");
+
+                    try
+                    {
+                        var enabled = Common.ConfigurationManagerJson("BACKBONE_ENABLED");
+                        var useBB = enabled == "1" || string.Equals(enabled, "true", StringComparison.OrdinalIgnoreCase);
+                        if (useBB)
+                        {
+                            using (var ctx2 = new Entities())
+                            {
+                                var access = ctx2.Client_Access.FirstOrDefault(a => a.client_id == credit.ClientId && a.status == true);
+                                if (access != null && access.id_backbone > 0)
+                                {
+                                    var bb = new ApiBackBoneManager();
+                                    var token = bb.LoginResponse(
+                                        Common.ConfigurationManagerJson("USRBACKBONE"),
+                                        Common.ConfigurationManagerJson("PSSBACKBONE")
+                                    ).GetAwaiter().GetResult();
+
+                                    if (token != null && !string.IsNullOrWhiteSpace(token.token))
+                                    {
+                                        var resp = bb.AddCredit(token.token, access.id_backbone, credit.Amount)
+                                                     .GetAwaiter().GetResult();
+                                        log.Info($"Backbone AddCredit id_backbone={access.id_backbone}, credits={credit.Amount}. Resp: {resp}");
+                                    }
+                                    else
+                                    {
+                                        log.Warn("Backbone: login inválido, créditos no enviados.");
+                                    }
+                                }
+                                else
+                                {
+                                    log.Warn($"Backbone: cliente {credit.ClientId} sin Client_Access/id_backbone.");
+                                }
+                            }
+
+                        }
+                    }
+                    catch (Exception exBB)
+                    {
+                        log.Warn("Backbone: error al subir créditos (best-effort).", exBB);
+                    }
+
                     return true;
                 }
             }

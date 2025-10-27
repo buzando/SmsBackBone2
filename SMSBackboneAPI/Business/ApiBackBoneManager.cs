@@ -237,6 +237,10 @@ namespace Business
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
-
+        public static bool UseBackbone()
+        {
+            var enabled = Common.ConfigurationManagerJson("BACKBONE_ENABLED");
+            return enabled == "1" || enabled?.Equals("true", StringComparison.OrdinalIgnoreCase) == true;
+        }
     }
 }

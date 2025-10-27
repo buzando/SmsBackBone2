@@ -48,7 +48,7 @@ namespace Business
 
                         var param = cmd.Parameters.AddWithValue("@CampaignIds", campaignIdsTable);
                         param.SqlDbType = SqlDbType.Structured;
-                        param.TypeName = "dbo.IntList"; 
+                        param.TypeName = "dbo.IntList";
 
                         cmd.Parameters.AddWithValue("@TopContacts",
                             string.IsNullOrWhiteSpace(topcontacts) ? (object)DBNull.Value : int.Parse(topcontacts));
@@ -126,9 +126,13 @@ namespace Business
             try
             {
                 var campaigns = GetLightCampaigns(Campaigns);
+                campaigns = campaigns
+    .GroupBy(c => c.CampaignId)
+    .Select(g => g.First())
+    .ToList();
                 var rnd = new Random();
 
-                var now = DateTime.Now; 
+                var now = DateTime.Now;
 
                 var validCampaigns = campaigns
                     .Where(c => c.ScheduleId != 0
@@ -163,7 +167,8 @@ namespace Business
                                 _logger.Error($"❌ No se encontró acceso para el cliente con ID {campaign.ClientId} en campaña {campaign.CampaignId}.");
                                 return;
                             }
-                            var loginResult = await new ApiBackBoneManager().LoginResponse(clientacces.username, clientacces.password);
+                            var pssw = ClientAccessManager.Decrypt(clientacces.password);
+                            var loginResult = await new ApiBackBoneManager().LoginResponse(clientacces.username, pssw);
                             if (loginResult == null)
                             {
                                 _logger.Error($"❌ Login fallido para la campaña {campaign.Name}");
@@ -194,7 +199,9 @@ namespace Business
                             if (notif != null)
                             {
                                 bool isShort = campaign.NumberType == 1;
-                                decimal currentBalance = isShort ? Convert.ToDecimal(actualrooms.long_sms) : Convert.ToDecimal(actualrooms.long_sms);
+                                decimal currentBalance = isShort
+                                    ? Convert.ToDecimal(actualrooms.short_sms)  
+                                    : Convert.ToDecimal(actualrooms.long_sms);
 
                                 if (currentBalance <= notif.AmountValue)
                                 {
@@ -213,19 +220,45 @@ namespace Business
                                     return;
                                 }
                             }
+                            var sentIds = new HashSet<int>(
+    ctx.CampaignContactScheduleSend
+       .Where(s => s.CampaignId == campaign.CampaignId
+                && s.ScheduleId == campaign.ScheduleId)
+       .Select(s => s.ContactId)
+       .ToList()
+);
+                          
                             var chuncks = int.TryParse(Common.ConfigurationManagerJson("CantidadDeChunks"), out int c) ? c : 50;
+                            campaign.Contacts = campaign.Contacts
+                                .GroupBy(x => x.Id)
+                                .Select(g => g.First())
+                                .ToList();
+
+                            campaign.Contacts = campaign.Contacts
+                                .GroupBy(x => x.PhoneNumber)
+                                .Select(g => g.First())
+                                .ToList();
                             var chunks = campaign.Contacts.Chunk(chuncks);
 
                             foreach (var chunk in chunks)
                             {
+
                                 if (!IsWithinSchedule(campaign.StartDateTime, campaign.EndDateTime))
                                 {
                                     _logger.Error($"⏰ Fuera del horario para enviar mensajes de la campaña {campaign.Name}");
                                     break;
                                 }
                                 var messagesToSend = new List<MessageToSend>();
+                                var preparedContactIds = new HashSet<int>();
                                 foreach (var contact in chunk)
                                 {
+                                    if (sentIds.Contains(contact.Id))
+                                    {
+                                        _logger.Info($"↩️ [Skip] Ya registrado en send: Campaña {campaign.CampaignId} | ContactoId {contact.Id}");
+                                        continue;
+                                    }
+                                    if (!preparedContactIds.Add(contact.Id))
+                                        continue;
                                     var lada = "";
                                     var ladaRecord = new IFTLadas();
                                     string estado = "";
@@ -264,7 +297,7 @@ namespace Business
                                                 ResponseMessage = null,
                                                 State = estado
                                             });
-
+                                            sentIds.Add(contact.Id);
                                             continue;
                                         }
                                     }
@@ -296,14 +329,24 @@ namespace Business
                                     {
                                         FormatMessage = ShortenUrlsIfNeeded(FormatMessage, campaign.ShouldShortenUrls);
                                     }
+
+                                    // === Configuración de tipo de número y flash ===
+                                    // 1 = corto, 2 = largo (ajusta si tu tabla usa otro esquema)
+                                    string senderType = campaign.NumberType == 1 ? "shortcode" : "longcode";
+
+                                    // El flash solo aplica si es número corto
+                                    int encoding = (campaign.NumberType == 1 && campaign.FlashMessage) ? 1 : 0;
+
+
                                     messagesToSend.Add(new MessageToSend
                                     {
                                         phoneNumber = contact.PhoneNumber,
                                         text = FormatMessage,
-                                        registryClient = contact.Id.ToString()
+                                        registryClient = contact.Id.ToString(),
+                                        encoding = encoding,
+                                        senderType = senderType
                                     });
-                                    _logger.Info($"📝 [Preparado] Campaña: {campaign.CampaignId} | ContactoId: {contact.Id} | Tel: {contact.PhoneNumber} | Mensaje: {FormatMessage}");
-
+                                    _logger.Info($"📝 [Preparado] Campaña: {campaign.CampaignId} | ContactoId: {contact.Id} | Tel: {contact.PhoneNumber} | senderType:{senderType} | encoding:{encoding}");
                                 }
 
                                 List<ApiResponse> sendResult;
@@ -330,6 +373,9 @@ namespace Business
 
                                 }
                                 double creditosConsumidos = 0;
+
+                                if (messagesToSend.Count == 0)
+                                    continue;
                                 foreach (var message in sendResult)
                                 {
                                     var lada = message.phoneNumber.Substring(0, 2);
@@ -356,39 +402,41 @@ namespace Business
                                         State = estado
                                     });
 
-                                    //var room = ctx.Rooms.FirstOrDefault(r => r.id == campaign.RoomId);
-                                    //if (room != null)
-                                    //{
-                                    //    if (message.status == 1 || message.status == 2)
-                                    //    {
-                                    //        if (campaign.NumberType == 1)
-                                    //            room.short_sms = Math.Max(0, room.short_sms - creditosConsumidos); // no bajar de 0
-                                    //        else if (campaign.NumberType == 2)
-                                    //            room.long_sms = Math.Max(0, room.long_sms - creditosConsumidos);
-                                    //    }
-                                    //    if (notif != null)
-                                    //    {
-                                    //        bool isShort = campaign.NumberType == 1;
-                                    //        decimal newBalance = isShort ? Convert.ToDecimal(room.short_sms) : Convert.ToDecimal(room.long_sms);
+                                    var room = ctx.Rooms.FirstOrDefault(r => r.id == campaign.RoomId);
+                                    if (room != null)
+                                    {
+                                        if (message.status == 1 || message.status == 2)
+                                        {
+                                            if (campaign.NumberType == 1)
+                                                room.short_sms = Math.Max(0, room.short_sms - creditosConsumidos); // no bajar de 0
+                                            else if (campaign.NumberType == 2)
+                                                room.long_sms = Math.Max(0, room.long_sms - creditosConsumidos);
+                                        }
+                                        if (notif != null)
+                                        {
+                                            bool isShort = campaign.NumberType == 1;
+                                            decimal newBalance = isShort ? Convert.ToDecimal(room.short_sms) : Convert.ToDecimal(room.long_sms);
 
-                                    //        if (newBalance <= notif.AmountValue)
-                                    //        {
-                                    //            string tipoSms = isShort ? "SMS cortos" : "SMS largos";
-                                    //            string mensaje = $"⚠️ La sala {campaign.RoomName} (ID: {campaign.RoomId}) tiene saldo bajo de {tipoSms}: {newBalance} créditos.";
+                                            if (newBalance <= notif.AmountValue)
+                                            {
+                                                string tipoSms = isShort ? "SMS cortos" : "SMS largos";
+                                                string mensaje = $"⚠️ La sala {campaign.RoomName} (ID: {campaign.RoomId}) tiene saldo bajo de {tipoSms}: {newBalance} créditos.";
 
-                                    //            var usersToNotify = (from anu in ctx.AmountNotificationUser
-                                    //                                 join user in ctx.Users on anu.UserId equals user.Id
-                                    //                                 where anu.NotificationId == notif.id
-                                    //                                 select user.email).ToList();
+                                                var usersToNotify = (from anu in ctx.AmountNotificationUser
+                                                                     join user in ctx.Users on anu.UserId equals user.Id
+                                                                     where anu.NotificationId == notif.id
+                                                                     select user.email).ToList();
 
-                                    //            foreach (var email in usersToNotify)
-                                    //            {
-                                    //                MailManager.SendEmail(email, $"⚠️ Alerta de saldo bajo en sala {campaign.RoomName}", mensaje);
-                                    //            }
-                                    //        }
-                                    //    }
+                                                foreach (var email in usersToNotify)
+                                                {
+                                                    MailManager.SendEmail(email, $"⚠️ Alerta de saldo bajo en sala {campaign.RoomName}", mensaje);
+                                                }
+                                            }
+                                        }
 
-                                    //}
+                                    }
+                                    sentIds.Add(int.Parse(message.registryClient));
+
                                 }
                                 ctx.SaveChanges();
                             }
@@ -430,7 +478,7 @@ namespace Business
 
             if (!string.IsNullOrWhiteSpace(contact.Misc01))
             {
-                var pairs = contact.Misc01.Split('|');
+                var pairs = contact.Misc01.Split(' ');
 
                 foreach (var pair in pairs)
                 {

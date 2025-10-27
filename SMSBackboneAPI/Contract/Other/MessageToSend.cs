@@ -9,7 +9,10 @@ namespace Contract.Other
     public class MessageToSend
     {
         public string text { get; set; }
-        public string phoneNumber { get; set; }
-        public string registryClient { get; set; }
+        public string phoneNumber { get; set; }       
+        public string registryClient { get; set; }    
+        public int encoding { get; set; }             
+        public string senderType { get; set; }        
+                                                      
     }
 }

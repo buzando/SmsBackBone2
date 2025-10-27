@@ -45,7 +45,7 @@ namespace Business
 
                             ObtenerDatosDetallados(hoja, fila, headers, dto.DatoColumns, out string dato, out string datoId, out string misc01);
 
-                            var telefonos = phoneConcat.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                            var telefonos = phoneConcat.Split('|', StringSplitOptions.RemoveEmptyEntries);
                             int telefonosValidos = 0;
 
                             foreach (var telefono in telefonos)
@@ -115,7 +115,7 @@ namespace Business
     .Where(v => !string.IsNullOrWhiteSpace(v))
     .Distinct();
 
-            return string.Join(" ", valores);
+            return string.Join("|", valores);
         }
 
         private void ObtenerDatosDetallados(

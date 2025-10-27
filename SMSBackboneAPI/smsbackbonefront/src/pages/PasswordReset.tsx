@@ -28,6 +28,7 @@ import IconCheckedCircle2 from "../assets/IconCheckedCircle2.svg";
 import Iconeyeslash from '../assets/Iconeyeslash.svg';
 import Iconeyesopen from '../assets/Iconeyesopen.svg';
 import ModalError from "../components/commons/ModalError";
+import MainButton from "../components/commons/MainButton";
 
 const TermsAndConditions: React.FC = () => {
     const [ShowModalError, setShowModalError] = useState(false);
@@ -309,6 +310,7 @@ const TermsAndConditions: React.FC = () => {
             setErrorMessage(
                 "Ingresa un correo electrónico válido"
             );
+             setLoading(false);
         }
 
     }
@@ -916,29 +918,17 @@ const TermsAndConditions: React.FC = () => {
                                         >
                                             Cancelar
                                         </Button>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            disabled={loading}
+                                        <MainButton
+                                            text='Enviar'
+                                            isLoading={loading}
                                             onClick={SendToken}
-                                            sx={{
-                                                textAlign: "center",
-                                                fontFamily: "Poppins",
-                                                FontStyle: "normal",
-                                                fontVariant: "normal",
-                                                fontWeight: "500",
-                                                letterSpacing: "1.12px",
-                                                color: "#FFFFFF",
-                                                textTransform: "uppercase",
-                                                opacity: 1,
-                                                backgroundColor: "#833A53",
-                                                height: "40px",
-                                                padding: "0 20px",
-                                            }}
-                                        >
+                                            disabled={
+                                                loading ||
+                                                (Number(activeStep) === 0 && !email) ||
+                                                (Number(activeStep) === 1 && !SendType)
+                                            }
+                                        />
 
-                                            Enviar
-                                        </Button>
                                     </Box>
                                 </Box>
                             )}

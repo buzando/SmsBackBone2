@@ -776,7 +776,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                         startAdornment: (
                                             <SearchIcon sx={{ color: '#7B354D', marginRight: 1 }} />
                                         ),
-                                        endAdornment: searchTerm && (
+                                        endAdornment: searchTerm2 && (
                                             <InputAdornment position="end">
                                                 <IconButton
                                                     size="small"
@@ -803,54 +803,79 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
 
                             <MenuList sx={{ paddingLeft: 0 }}>
-                                {rooms
-                                    .filter((room) =>
-                                        room.name.toLowerCase().includes(searchTerm2.toLowerCase())
-                                    )
-                                    .map((room, index) => (
-                                        <MenuItem
-                                            key={index}
-                                            onClick={() => handleRoomChange(room)}
-                                            sx={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                padding: '8px 16px',
-                                            }}
-                                        >
-                                            <img
-                                                src={HouseIcon}
-                                                alt="Room Icon"
-                                                style={{
-                                                    width: '32px',
-                                                    height: '32px',
-                                                    marginRight: '10px',
-                                                    color: '#574B4F',
-                                                }}
-                                            />
-                                            <Box sx={{ textAlign: 'left' }}>
-                                                <Typography
-                                                    variant="body1"
+                                {/* Lista de salas o mensaje vacío */}
+                                {rooms.filter((room) =>
+                                    room.name.toLowerCase().includes(searchTerm2.toLowerCase())
+                                ).length > 0 ? (
+                                    <MenuList sx={{ paddingLeft: 0 }}>
+                                        {rooms
+                                            .filter((room) =>
+                                                room.name.toLowerCase().includes(searchTerm2.toLowerCase())
+                                            )
+                                            .map((room, index) => (
+                                                <MenuItem
+                                                    key={index}
+                                                    onClick={() => handleRoomChange(room)}
                                                     sx={{
-                                                        fontSize: '12px',
-                                                        color: '#000',
-                                                        fontFamily: 'Poppins, sans-serif',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        padding: '8px 16px',
                                                     }}
                                                 >
-                                                    {room.name}
-                                                </Typography>
-                                                <Typography
-                                                    variant="body2"
-                                                    sx={{
-                                                        fontSize: '9px',
-                                                        color: '#574B4F',
-                                                        fontFamily: 'Poppins, sans-serif',
-                                                    }}
-                                                >
-                                                    {room.description}
-                                                </Typography>
-                                            </Box>
-                                        </MenuItem>
-                                    ))}
+                                                    <img
+                                                        src={HouseIcon}
+                                                        alt="Room Icon"
+                                                        style={{
+                                                            width: '32px',
+                                                            height: '32px',
+                                                            marginRight: '10px',
+                                                            color: '#574B4F',
+                                                        }}
+                                                    />
+                                                    <Box sx={{ textAlign: 'left' }}>
+                                                        <Typography
+                                                            variant="body1"
+                                                            sx={{
+                                                                fontSize: '12px',
+                                                                color: '#000',
+                                                                fontFamily: 'Poppins, sans-serif',
+                                                            }}
+                                                        >
+                                                            {room.name}
+                                                        </Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                fontSize: '9px',
+                                                                color: '#574B4F',
+                                                                fontFamily: 'Poppins, sans-serif',
+                                                            }}
+                                                        >
+                                                            {room.description}
+                                                        </Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                            ))}
+                                    </MenuList>
+                                ) : (
+                                    <Typography
+                                        sx={{
+                                            textAlign: 'center',
+                                            fontFamily: 'Poppins',
+                                            fontWeight: 500, // "medium"
+                                            fontSize: '14px',
+                                            lineHeight: '18px',
+                                            letterSpacing: '0px',
+                                            color: '#7B354D',
+                                            opacity: 1,
+                                            px: 2,
+                                            py: 1.5,
+                                        }}
+                                    >
+                                        No se encontraron resultados
+                                    </Typography>
+                                )}
+
                             </MenuList>
                         </Popper>
 

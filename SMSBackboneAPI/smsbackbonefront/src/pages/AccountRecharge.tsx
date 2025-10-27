@@ -219,15 +219,36 @@ const AccountRecharge: React.FC = () => {
         },
     }));
 
+const resetAddCardForm = () => {
+  setCardDetails({
+    cardNumber: '',
+    cardName: '',
+    street: '',
+    exteriorNumber: '',
+    interiorNumber: '',
+    neighborhood: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    cvv: '',
+    month: '',
+    year: '',
+    isDefault: false,
+    type: '',
+  });
+  setErrors({});
+};
 
 
     // Funciones para abrir y cerrar el modal
     const handleOpenModal = () => {
+          resetAddCardForm();
         setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+          resetAddCardForm();
     };
 
     const handleChannelChange = (event: SelectChangeEvent<string>) => {
@@ -1613,13 +1634,13 @@ const AccountRecharge: React.FC = () => {
                                     >
                                         <MenuItem value="" disabled>Mes</MenuItem>
                                         {[...Array(12)].map((_, i) => (
-                                            <MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem> // 🔥 Convertimos a `string`
+                                            <MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem> 
                                         ))}
                                     </Select>
 
                                     <Select
-                                        name="year" // 🔥 Aseguramos que `name` esté presente
-                                        value={cardDetails.year} // 🔥 `value` debe coincidir con `formData.year`
+                                        name="year" 
+                                        value={cardDetails.year} 
                                         onChange={handleChange}
                                         required
                                         style={{
@@ -1628,11 +1649,12 @@ const AccountRecharge: React.FC = () => {
                                             borderRadius: "8px",
                                             width: "87px",
                                             height: "40px",
+                                            fontSize: "12px",
                                         }}
                                     >
                                         <MenuItem value="" disabled>Año</MenuItem>
                                         {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map((year) => (
-                                            <MenuItem key={year} value={year.toString()}>{year}</MenuItem> // 🔥 Convertimos a `string`
+                                            <MenuItem key={year} value={year.toString()}>{year}</MenuItem>
                                         ))}
                                     </Select>
 

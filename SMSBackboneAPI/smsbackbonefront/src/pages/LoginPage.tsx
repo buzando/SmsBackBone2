@@ -384,9 +384,9 @@ const Login: React.FC = () => {
                                                             }}
                                                         >
                                                             <>
-                                                                · Solo caracteres tales <br />
-                                                                · Longitud máxima de 40 <br />
-                                                                caracteres
+                                                                • Ingrese su correo registrado <br />
+                                                                en el sistema
+
                                                             </>
                                                         </Box>
                                                     }

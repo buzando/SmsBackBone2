@@ -58,7 +58,7 @@ namespace SmsDeliveryWorker
                     }
                     else
                     {
-                        _logger.Info("⏳ No hay campañas realmente listas para enviar.");
+                        //_logger.Info("⏳ No hay campañas realmente listas para enviar.");
                     }
 
                 }
@@ -67,7 +67,7 @@ namespace SmsDeliveryWorker
                     _logger.Error("Error durante ejecución del Worker", ex);
                 }
 
-                _logger.Info($"Esperando {minutosEjecucion} minutos para la siguiente verificación...");
+                //_logger.Info($"Esperando {minutosEjecucion} minutos para la siguiente verificación...");
                 await Task.Delay(minutosEjecucion * 60000, stoppingToken);
             }
         }
