@@ -325,17 +325,22 @@ export default function TestSMS() {
             value={message}
             placeholder={t('pages.testSMS.writeMessageOrSelect')}
             onChange={(e) => {
-              const value = e.target.value;
+              const value = e.target.value.slice(0, 160);
               setMessage(value);
-              setMessageError(value.length === 0 || value.length > 160); // 🔥 Error si está vacío o pasa 160 caracteres
+              setMessageError(value.length === 0 || value.length > 160);
             }}
             disabled={!!selectedTemplate}
             error={messageError}
             helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
+            inputProps={{ maxLength: 160 }} // 👈 límite físico del input
             InputProps={{
               sx: {
-                backgroundColor: "#FFFFFF", fontFamily: "Poppins", borderRadius: "2px",
-                border: "1px solid #C6BFC299", width: "545px", height: "123px"
+                backgroundColor: "#FFFFFF",
+                fontFamily: "Poppins",
+                borderRadius: "2px",
+                border: "1px solid #C6BFC299",
+                width: "545px",
+                height: "123px",
               },
               endAdornment: (
                 <Tooltip

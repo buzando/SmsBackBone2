@@ -74,6 +74,8 @@ const Rooms: React.FC = () => {
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };
+    const [originalRoom, setOriginalRoom] = useState({ name: "", description: "" });
+
 
 
     const handleOpenErrorModal = (title: string) => {
@@ -88,6 +90,28 @@ const Rooms: React.FC = () => {
         setSelectedRoom(room); // Almacena la sala seleccionada
         setDeleteModalOpen(true); // Abre el modal
     };
+
+    const handleOpenEditModal = () => {
+        if (selectedRoom!) {
+            const roomData = {
+                name: selectedRoom.name,
+                description: selectedRoom.description,
+            };
+            setNewRoom(roomData);
+            setOriginalRoom(roomData); // guarda los valores originales
+            setEditModalOpen(true);
+            handleMenuClose();
+        }
+    };
+
+
+    const hasChanges = () => {
+        return (
+            newRoom.name !== originalRoom.name ||
+            newRoom.description !== originalRoom.description
+        );
+    };
+
 
     const handleCloseDeleteModal = () => {
         setDeleteModalOpen(false); // Cierra el modal
@@ -156,21 +180,14 @@ const Rooms: React.FC = () => {
         setErrors({ name: false, description: false });
     };
 
-    const handleOpenEditModal = () => {
-        if (selectedRoom!) {
-            setNewRoom({
-                name: selectedRoom.name,
-                description: selectedRoom.description,
-            });
-            setEditModalOpen(true); // Abre el modal de edición
-            handleMenuClose(); // Cierra el menú después de abrir el modal
-        }
-    };
+
 
     const handleCloseEditModal = () => {
         setEditModalOpen(false);
         setSelectedRoom(null);
+        setOriginalRoom({ name: "", description: "" }); // opcional
     };
+
 
     const handleUpdateRoom = async () => {
         setLoading(true); // Muestra el loader mientras se procesa la solicitud
@@ -834,7 +851,9 @@ const Rooms: React.FC = () => {
                                     },
                                     '& .MuiFormHelperText-root': {
                                         fontFamily: 'Poppins, sans-serif',
-                                    }
+                                        whiteSpace: 'nowrap',
+                                        textOverflow: 'ellipsis',
+                                    },
                                 }}
                             />
                         </Box>
@@ -1136,29 +1155,23 @@ const Rooms: React.FC = () => {
                                 color="primary"
                                 onClick={handleUpdateRoom}
                                 disabled={
-                                    !newRoom.name || !newRoom.description || errors.name || errors.description
+                                    !hasChanges() || !newRoom.name || !newRoom.description || errors.name || errors.description
                                 }
                                 sx={{
                                     backgroundColor: "#833A53",
                                     color: "#fff",
-                                    "&:hover": {
-                                        backgroundColor: "#60293C",
-                                    },
+                                    "&:hover": { backgroundColor: "#60293C" },
                                     height: "100%",
                                     marginLeft: "8px",
                                 }}
                             >
                                 {loading ? (
-                                    <CircularProgress
-                                        size={24}
-                                        sx={{
-                                            color: "#fff",
-                                        }}
-                                    />
+                                    <CircularProgress size={24} sx={{ color: "#fff" }} />
                                 ) : (
                                     "Guardar Cambios"
                                 )}
                             </Button>
+
                         </Box>
                     </Box>
                 </Fade>

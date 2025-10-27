@@ -1009,7 +1009,8 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                             marginRight: '10px',
                                             color: '#574B4F',
                                         }}
-                                    />                                    Cerrar sesión
+                                    />
+                                    Cerrar sesión
                                 </Box>
                             </Typography>
                         </MenuItem>
