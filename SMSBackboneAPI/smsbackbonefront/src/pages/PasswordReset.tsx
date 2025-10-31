@@ -311,7 +311,7 @@ const TermsAndConditions: React.FC = () => {
             setErrorMessage(
                 "Ingresa un correo electrónico válido"
             );
-             setLoading(false);
+            setLoading(false);
         }
 
     }
@@ -893,7 +893,7 @@ const TermsAndConditions: React.FC = () => {
                                     </Box>
                                     <Divider sx={{ width: 'calc(100% + 42px)', marginLeft: '-21px', marginTop: "80px", marginBottom: "-15px" }} />
 
-                                    <Box display="flex" gap={73} alignContent={"center"} justifyContent={"center"}
+                                    <Box display="flex" gap={69} alignContent={"center"} justifyContent={"center"}
                                         sx={{ backgroundColor: "#FFFFFF", position: "absolute", marginTop: "44px" }}
                                     >
                                         <Button

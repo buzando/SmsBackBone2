@@ -817,29 +817,29 @@ const [autoStart, setAutoStart] = useState(false);
     ? Math.round((estadisticasCarga?.telefonosCargados || 0) * 100 / totalTelefonos)
     : 0;
 
-const resetUploadState = () => {
-  setUploadedFile(null);
-  setUploadedFileBase64('');
-  if (fileInputRef.current) fileInputRef.current.value = '';
+  const resetUploadState = () => {
+    setUploadedFile(null);
+    setUploadedFileBase64('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
 
-  setEstadisticasCarga(null);
-  setPostCargaActiva(false);
-  setFileError(false);
-  setFileSuccess(false);
+    setEstadisticasCarga(null);
+    setPostCargaActiva(false);
+    setFileError(false);
+    setFileSuccess(false);
 
-  setSelectedTelefonos([]);
-  setSelectedVariables([]);
-  setCheckedTelefonos([]);
+    setSelectedTelefonos([]);
+    setSelectedVariables([]);
+    setCheckedTelefonos([]);
 
-  setWorkbook(null);
-  setSheetNames([]);
-  setSelectedSheet('');
-  setColumns([]);
-  setExcelData([]);
-  setBase64File('');
-  setActiveStep(-1);
-setCampaignName('');
-};
+    setWorkbook(null);
+    setSheetNames([]);
+    setSelectedSheet('');
+    setColumns([]);
+    setExcelData([]);
+    setBase64File('');
+    setActiveStep(-1);
+    setCampaignName('');
+  };
 
 
   const handleCloseModalCampaña = () => {
@@ -1404,14 +1404,19 @@ setCampaignName('');
   // 🔹 Función que evalúa si el botón "Siguiente" debe estar deshabilitado
   const isNextDisabled = (() => {
     switch (activeStep) {
-      // Paso 0: Nombre y horarios
+      // Paso inicial (nombre + horarios)
       case -1:
-        return (
-          campaignName.trim() === '' ||
+      case 0:
+        const horariosInvalidos =
           !horarios.length ||
           !horarios[0]?.start ||
           !horarios[0]?.end ||
-          horarios[0].end <= horarios[0].start
+          horarios[0].end <= horarios[0].start;
+
+        return (
+          campaignName.trim() === '' || // vacío
+          isNameInvalid ||              // formato inválido (aparece "Formato inválido")
+          horariosInvalidos             // horarios incorrectos
         );
 
       default:
@@ -1684,6 +1689,8 @@ setCampaignName('');
                     }} value="detenidas">Campañas detenidas</MenuItem>
                   </Select>
 
+
+
                   {filteredCampaigns.length > 0 && (
                     <Box sx={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px", marginLeft: "8px", }}>
                       <Checkbox
@@ -1748,6 +1755,46 @@ setCampaignName('');
                           </Box>
                         }
                       />
+
+                      <Tooltip title="Eliminar" arrow placement="top"
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              backgroundColor: "rgba(0, 0, 0, 0.8)",
+                              color: "#DEDADA",
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: "12px",
+                              padding: "6px 8px",
+                              borderRadius: "8px",
+                              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                            }
+                          },
+                          arrow: {
+                            sx: {
+                              color: "rgba(0, 0, 0, 0.8)"
+                            }
+                          }
+                        }}
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: 'offset',
+                              options: {
+                                offset: [-0, -10] // [h,v]
+                              }
+                            }
+                          ]
+                        }}
+                      >
+                        <IconButton>
+                          <Box
+                            component="img"
+                            src={IconTrash}
+                            alt="Eliminar"
+                            sx={{ width: 24, height: 24, cursor: "pointer", opacity: 0.6, }}
+                          />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
 
                   )}
@@ -2699,7 +2746,7 @@ setCampaignName('');
                   </Paper>
                 )}
 
-                {/*Paper Mapa */}
+                {/*Paper Mapa 
                 {infoChecks["Mapa de concentración de mensajes"] && (
                   <Paper sx={{ padding: "10px", marginTop: "25px", borderRadius: "10px", width: "100%", height: "auto" }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
@@ -2738,7 +2785,7 @@ setCampaignName('');
                     </Box>
                   </Paper>
                 )}
-
+*/}
               </Box>
             </Grid>
           )}
@@ -5385,13 +5432,21 @@ setCampaignName('');
 
                     </Box>
 
-                    <Typography sx={{ fontFamily: "Poppins", fontWeight: 500, fontSize: "14px", mt: 2, mb: 1 }}>
+                    <Typography
+                      sx={{
+                        fontFamily: "Poppins",
+                        fontWeight: 500,
+                        fontSize: "14px",
+                        mt: 2, mb: 1,
+                        color: saveAsTemplate ? "#574B4F" : "#939393ff",
+                      }}>
                       Nombre
                     </Typography>
 
                     <TextField
                       fullWidth
                       placeholder="Nombre de la plantilla"
+                      disabled={!saveAsTemplate}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
@@ -5407,7 +5462,7 @@ setCampaignName('');
                                     fontFamily: "Poppins",
                                     color: "#574B4F",
                                     whiteSpace: "pre-line",
-                                    transform: "translate(2px, -15px)",
+                                    transform: "translate(0px, -15px)",
                                     borderColor: "#00131F3D",
                                     borderStyle: "solid",
                                     borderWidth: "1px"
@@ -5431,7 +5486,7 @@ setCampaignName('');
                                 },
                               }}
                             >
-                              <img src={infoicon} alt="info" style={{ width: 24, height: 24 }} />
+                              <img src={infoicon} alt="info" style={{ width: 24, height: 24, marginLeft: "-30px" }} />
                             </Tooltip>
                           </InputAdornment>
                         ),

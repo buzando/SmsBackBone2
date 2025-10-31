@@ -1195,7 +1195,7 @@ const BlackList: React.FC = () => {
                                                             {
                                                                 name: 'offset',
                                                                 options: {
-                                                                    offset: [0, -12] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                    offset: [0, -12]
                                                                 }
                                                             }
                                                         ]

@@ -211,44 +211,51 @@ const AccountRecharge: React.FC = () => {
         <Tooltip {...props} classes={{ popper: className }} />
     ))(() => ({
         [`& .MuiTooltip-tooltip`]: {
-            backgroundColor: '#ffffff',
-            color: '#000000',
-            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-            fontSize: '14px',
-            borderRadius: '4px',
+            backgroundColor: "#FFFFFF",
+            borderRadius: "8px",
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+            padding: "8px 12px",
+            fontSize: "14px",
+            fontFamily: "Poppins",
+            color: "#574B4F",
+            whiteSpace: "pre-line",
+            transform: "translate(-10px, -22px)",
+            borderColor: "#00131F3D",
+            borderStyle: "solid",
+            borderWidth: "1px"
         },
     }));
 
-const resetAddCardForm = () => {
-  setCardDetails({
-    cardNumber: '',
-    cardName: '',
-    street: '',
-    exteriorNumber: '',
-    interiorNumber: '',
-    neighborhood: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    cvv: '',
-    month: '',
-    year: '',
-    isDefault: false,
-    type: '',
-  });
-  setErrors({});
-};
+    const resetAddCardForm = () => {
+        setCardDetails({
+            cardNumber: '',
+            cardName: '',
+            street: '',
+            exteriorNumber: '',
+            interiorNumber: '',
+            neighborhood: '',
+            city: '',
+            state: '',
+            postalCode: '',
+            cvv: '',
+            month: '',
+            year: '',
+            isDefault: false,
+            type: '',
+        });
+        setErrors({});
+    };
 
 
     // Funciones para abrir y cerrar el modal
     const handleOpenModal = () => {
-          resetAddCardForm();
+        resetAddCardForm();
         setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
-          resetAddCardForm();
+        resetAddCardForm();
     };
 
     const handleChannelChange = (event: SelectChangeEvent<string>) => {
@@ -1225,7 +1232,12 @@ const resetAddCardForm = () => {
             </Box>
             <Modal
                 open={isModalOpen}
-                onClose={handleCloseModal}
+                onClose={(_, reason) => {
+                    if (reason !== "backdropClick" && reason !== "escapeKeyDown") {
+                        handleCloseModal();
+                    }
+                }}
+                disableEscapeKeyDown
                 aria-labelledby="add-card-modal-title"
                 aria-describedby="add-card-modal-description"
             >
@@ -1249,11 +1261,14 @@ const resetAddCardForm = () => {
                             id="add-card-modal-title"
                             style={{
                                 textAlign: "left",
-                                font: "normal normal 600 20px/54px Poppins",
+                                fontStyle: "normal",
+                                fontWeight: 600,
+                                fontSize: "20px",
+                                lineHeight: "54px",
+                                fontFamily: "Poppins",
                                 letterSpacing: "0px",
                                 color: "#574B4F",
                                 opacity: 1,
-                                fontSize: "20px",
                                 margin: 0
                             }}
                         >
@@ -1278,7 +1293,7 @@ const resetAddCardForm = () => {
                                 <label
                                     style={{
                                         textAlign: "left",
-                                        font: "normal normal medium 16px/54px Poppins",
+                                        fontFamily: "Poppins",
                                         letterSpacing: "0px",
                                         color: "#574B4F",
                                         opacity: 1,
@@ -1291,7 +1306,12 @@ const resetAddCardForm = () => {
                                 </label>
                                 <TextField name="cardNumber"
                                     value={cardDetails.cardNumber}
-                                    onChange={handleChange}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (/^[0-9]*$/.test(value)) {
+                                            handleChange(e);
+                                        }
+                                    }}
                                     error={Boolean(errors['cardNumber'])}
                                     helperText={errors['cardNumber']}
                                     fullWidth
@@ -1299,13 +1319,30 @@ const resetAddCardForm = () => {
                                         endAdornment: (
                                             <InputAdornment position="end">
                                                 <WhiteTooltip title={<>
-                                                    <div>• Solo caracteres numéricos</div>
-                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                    • Solo caracteres numéricos<br />
+                                                    • Longitud min. 14 dígitos, <br />
+                                                    máx. 19 dígitos
                                                 </>}>
                                                     <img src={errors['cardNumber'] ? infoiconerror : infoicon} alt="info-icon" />
                                                 </WhiteTooltip>
                                             </InputAdornment>
-                                        )
+                                        ),
+                                        sx: {
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "16px",
+                                            fontWeight: 500,
+                                            color: "#574B4F",
+                                        },
+                                    }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
                                     }}
                                 />
                             </div>
@@ -1313,7 +1350,7 @@ const resetAddCardForm = () => {
                                 <label
                                     style={{
                                         textAlign: "left",
-                                        font: "normal normal medium 16px/54px Poppins",
+                                        fontFamily: "Poppins",
                                         letterSpacing: "0px",
                                         color: "#574B4F",
                                         opacity: 1,
@@ -1334,21 +1371,39 @@ const resetAddCardForm = () => {
                                         endAdornment: (
                                             <InputAdornment position="end">
                                                 <WhiteTooltip title={<>
-                                                    <div>• Solo caracteres numéricos</div>
-                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                    • Solo caracteres alfabéticos<br />
+                                                    • Longitud máxima de 40<br />
+                                                    caracteres
                                                 </>}>
                                                     <img src={errors.cardName ? infoiconerror : infoicon} alt="info-icon" />
                                                 </WhiteTooltip>
                                             </InputAdornment>
-                                        )
-                                    }} />
+                                        ),
+                                        sx: {
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "16px",
+                                            fontWeight: 500,
+                                            color: "#574B4F",
+                                        },
+                                    }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
+                                    }}
+                                />
                             </div>
                         </div>
                         <div>
                             <label
                                 style={{
                                     textAlign: "left",
-                                    font: "normal normal medium 16px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#574B4F",
                                     opacity: 1,
@@ -1375,15 +1430,32 @@ const resetAddCardForm = () => {
                                                 <img src={errors.street ? infoiconerror : infoicon} alt="info-icon" />
                                             </WhiteTooltip>
                                         </InputAdornment>
-                                    )
-                                }} />
+                                    ),
+                                    sx: {
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
+                                        color: "#574B4F",
+                                    },
+                                }}
+                                sx={{
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        marginTop: 7,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "#D01247",
+                                    },
+                                }}
+                            />
                         </div>
                         <div style={{ display: 'flex', gap: '20px' }}>
                             <div style={{ flex: 1 }}>
                                 <label
                                     style={{
                                         textAlign: "left",
-                                        font: "normal normal medium 16px/54px Poppins",
+                                        fontFamily: "Poppins",
                                         letterSpacing: "0px",
                                         color: "#574B4F",
                                         opacity: 1,
@@ -1411,14 +1483,32 @@ const resetAddCardForm = () => {
                                                     <img src={errors.exteriorNumber ? infoiconerror : infoicon} alt="info-icon" />
                                                 </WhiteTooltip>
                                             </InputAdornment>
-                                        )
-                                    }} />
+                                        ),
+                                        sx: {
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "16px",
+                                            fontWeight: 500,
+                                            color: "#574B4F",
+                                        },
+                                    }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
+                                    }}
+
+                                />
                             </div>
                             <div style={{ flex: 1 }}>
                                 <label
                                     style={{
                                         textAlign: "left",
-                                        font: "normal normal medium 16px/54px Poppins",
+                                        fontFamily: "Poppins",
                                         letterSpacing: "0px",
                                         color: "#574B4F",
                                         opacity: 1,
@@ -1446,7 +1536,13 @@ const resetAddCardForm = () => {
                                                     <img src={errors.interiorNumber ? infoiconerror : infoicon} alt="info-icon" />
                                                 </WhiteTooltip>
                                             </InputAdornment>
-                                        )
+                                        ),
+                                        sx: {
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "16px",
+                                            fontWeight: 500,
+                                            color: "#574B4F",
+                                        },
                                     }} />
                             </div>
                         </div>
@@ -1454,7 +1550,7 @@ const resetAddCardForm = () => {
                             <label
                                 style={{
                                     textAlign: "left",
-                                    font: "normal normal medium 16px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#574B4F",
                                     opacity: 1,
@@ -1481,14 +1577,31 @@ const resetAddCardForm = () => {
                                                 <img src={errors.neighborhood ? infoiconerror : infoicon} alt="info-icon" />
                                             </WhiteTooltip>
                                         </InputAdornment>
-                                    )
-                                }} />
+                                    ),
+                                    sx: {
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
+                                        color: "#574B4F",
+                                    },
+                                }}
+                                sx={{
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        marginTop: 7,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "#D01247",
+                                    },
+                                }}
+                            />
                         </div>
                         <div>
                             <label
                                 style={{
                                     textAlign: "left",
-                                    font: "normal normal medium 16px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#574B4F",
                                     opacity: 1,
@@ -1515,14 +1628,31 @@ const resetAddCardForm = () => {
                                                 <img src={errors.city ? infoiconerror : infoicon} alt="info-icon" />
                                             </WhiteTooltip>
                                         </InputAdornment>
-                                    )
-                                }} />
+                                    ),
+                                    sx: {
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
+                                        color: "#574B4F",
+                                    },
+                                }}
+                                sx={{
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        marginTop: 7,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "#D01247",
+                                    },
+                                }}
+                            />
                         </div>
                         <div>
                             <label
                                 style={{
                                     textAlign: "left",
-                                    font: "normal normal medium 16px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#574B4F",
                                     opacity: 1,
@@ -1549,14 +1679,31 @@ const resetAddCardForm = () => {
                                                 <img src={errors.state ? infoiconerror : infoicon} alt="info-icon" />
                                             </WhiteTooltip>
                                         </InputAdornment>
-                                    )
-                                }} />
+                                    ),
+                                    sx: {
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
+                                        color: "#574B4F",
+                                    },
+                                }}
+                                sx={{
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        marginTop: 7,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "#D01247",
+                                    },
+                                }}
+                            />
                         </div>
                         <div>
                             <label
                                 style={{
                                     textAlign: "left",
-                                    font: "normal normal medium 16px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#574B4F",
                                     opacity: 1,
@@ -1584,15 +1731,32 @@ const resetAddCardForm = () => {
                                                 <img src={errors.postalCode ? infoiconerror : infoicon} alt="info-icon" />
                                             </WhiteTooltip>
                                         </InputAdornment>
-                                    )
-                                }} />
+                                    ),
+                                    sx: {
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
+                                        color: "#574B4F",
+                                    },
+                                }}
+                                sx={{
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        marginTop: 7,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "#D01247",
+                                    },
+                                }}
+                            />
                         </div>
                         <div style={{ display: 'flex', gap: '20px', gridColumn: 'span 2' }}>
                             <div style={{ flex: 1 }}>
                                 <label
                                     style={{
                                         textAlign: "left",
-                                        font: "normal normal medium 16px/54px Poppins",
+                                        fontFamily: "Poppins",
                                         letterSpacing: "0px",
                                         color: "#574B4F",
                                         opacity: 1,
@@ -1606,7 +1770,7 @@ const resetAddCardForm = () => {
                                 <label
                                     style={{
                                         textAlign: "left",
-                                        font: "normal normal medium 16px/54px Poppins",
+                                        fontFamily: "Poppins",
                                         letterSpacing: "0px",
                                         color: "#574B4F",
                                         opacity: 1,
@@ -1620,8 +1784,8 @@ const resetAddCardForm = () => {
                                 </label>
                                 <div style={{ display: 'flex', gap: '10px' }}>
                                     <Select
-                                        name="month" // 🔥 Aseguramos que `name` esté presente
-                                        value={cardDetails.month} // 🔥 `value` debe coincidir con `formData.month`
+                                        name="month"
+                                        value={cardDetails.month}
                                         onChange={handleChange}
                                         required
                                         style={{
@@ -1634,13 +1798,13 @@ const resetAddCardForm = () => {
                                     >
                                         <MenuItem value="" disabled>Mes</MenuItem>
                                         {[...Array(12)].map((_, i) => (
-                                            <MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem> 
+                                            <MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem>
                                         ))}
                                     </Select>
 
                                     <Select
-                                        name="year" 
-                                        value={cardDetails.year} 
+                                        name="year"
+                                        value={cardDetails.year}
                                         onChange={handleChange}
                                         required
                                         style={{
