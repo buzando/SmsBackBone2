@@ -204,7 +204,7 @@ const BlackList: React.FC = () => {
     const [allRows, setAllRows] = useState<BlackList[]>([]);
     useEffect(() => {
         setAllRows(currentItems);
-    }, [currentItems]);
+    }, []);
 
     const WhiteTooltip = styled(({ className, ...props }: TooltipProps) => (
         <Tooltip {...props} classes={{ popper: className }} />
@@ -1861,7 +1861,7 @@ const BlackList: React.FC = () => {
                                                 value={phone}
                                                 onChange={(e) => handlePhoneChange(index, e.target.value)}
                                                 fullWidth
-                                                placeholder="5255..."
+                                                placeholder="5552..."
                                                 InputProps={{
                                                     endAdornment: (
                                                         <InputAdornment position="end">
@@ -4735,12 +4735,12 @@ const BlackList: React.FC = () => {
                         <MainButton
                             onClick={handleSendToServer}
                             text='Guardar cambios'
-                              disabled={
-    !(
-      (fileSuccess && selectedSheet !== '') ||
-      individualPhones.some(p => /^\d{10}$/.test(p.trim()))
-    )
-  }
+                            disabled={
+                                !(
+                                    (fileSuccess && selectedSheet !== '') ||
+                                    individualPhones.some(p => /^\d{10}$/.test(p.trim()))
+                                )
+                            }
                         />
 
 

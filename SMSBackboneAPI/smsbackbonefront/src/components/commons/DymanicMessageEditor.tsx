@@ -49,6 +49,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
       range.collapse(false);
     }
 
+    // Crear chip no editable
     const chip = document.createElement('span');
     chip.setAttribute('data-chip', 'true');
     chip.contentEditable = 'false';
@@ -58,49 +59,35 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.color = '#fff';
     chip.style.padding = '4px 8px';
     chip.style.borderRadius = '12px';
-    chip.style.margin = '0 4px 4px 0';
+    chip.style.margin = '0 4px';
     chip.style.fontFamily = 'Poppins';
     chip.style.fontSize = '13px';
-
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = 'Variable';
-    input.style.background = 'transparent';
-    input.style.border = 'none';
-    input.style.color = '#fff';
-    input.style.fontFamily = 'Poppins';
-    input.style.fontSize = '13px';
-    input.style.minWidth = '30px';
-    input.style.maxWidth = '150px';
-    input.style.outline = 'none';
-    input.style.direction = 'ltr';
-    input.style.flexGrow = '1';
-    input.addEventListener('input', updateRawMessage);
+    chip.style.userSelect = 'none';
+    chip.textContent = 'Variable';
 
     const closeIcon = document.createElement('span');
-    closeIcon.innerText = '×';
-    closeIcon.style.marginLeft = '6px';
+    closeIcon.innerText = ' ×';
     closeIcon.style.cursor = 'pointer';
     closeIcon.onclick = (e) => {
       e.stopPropagation();
       chip.remove();
       updateRawMessage();
     };
-
-    chip.appendChild(input);
     chip.appendChild(closeIcon);
 
-    const space = document.createTextNode(' ');
+    // Insertar espacios no colapsables antes y después
+    const spaceBefore = document.createTextNode('\u00A0');
+    const spaceAfter = document.createTextNode('\u00A0');
     range.deleteContents();
-    range.insertNode(space);
+    range.insertNode(spaceAfter);
     range.insertNode(chip);
-    range.setStartAfter(space);
+    range.insertNode(spaceBefore);
+    range.setStartAfter(spaceAfter);
     range.collapse(false);
     sel?.removeAllRanges();
     sel?.addRange(range);
 
     updateRawMessage();
-    input.focus();
   };
 
   const updateRawMessage = () => {
@@ -117,10 +104,9 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const el = node as HTMLElement;
         if (el.getAttribute('data-chip') === 'true') {
-          const input = el.querySelector('input');
-          const val = input?.value || 'Variable';
-          finalText += `{${val}}`;
-          count += val.length + 2; // sumamos 2 por las llaves {}
+          const val = el.textContent?.replace('×', '').trim() || '{Variable}';
+          finalText += val;
+          count += val.length;
         } else {
           const text = el.textContent || '';
           finalText += text;
@@ -132,7 +118,6 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     setCharCount(count);
     onChange?.(finalText);
   };
-
 
   return (
     <Box>

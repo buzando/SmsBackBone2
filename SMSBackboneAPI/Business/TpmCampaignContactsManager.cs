@@ -149,7 +149,7 @@ namespace Business
                 }
             }
 
-            misc01 = string.Join(" ", otros);
+            misc01 = string.Join("|", otros);
         }
 
 

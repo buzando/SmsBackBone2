@@ -2,6 +2,8 @@
 using Contract.Other;
 using Contract.Request;
 using Contract.Response;
+using Contract.WebHooks;
+using Microsoft.EntityFrameworkCore;
 using Modal;
 using Modal.Model.Model;
 using Newtonsoft.Json.Linq;
@@ -166,5 +168,78 @@ namespace Business
             };
 
         }
+
+        public async Task<bool> ProcessStatusAsync(WebhookStatusDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Id))
+                return false;
+
+            using var ctx = new Entities();
+
+            var send = await ctx.CampaignContactScheduleSend
+                                .FirstOrDefaultAsync(s => s.IdBackBone == dto.Id);
+
+            if (send == null)
+            {
+                var test = await ctx.TestMessage.FirstOrDefaultAsync(t => t.IdBackBone == dto.Id);
+                if (test != null)
+                {
+                    test.Status = dto.Status.ToString(); // tu TestMessage usa string; déjalo igual
+                    await ctx.SaveChangesAsync();
+                    return true;
+                }
+                return false;
+            }
+
+            send.Status = dto.Status.ToString();                 
+     
+
+            if (dto.IsCharged)
+            {
+                var campaign = await ctx.Campaigns.FirstOrDefaultAsync(c => c.Id == send.CampaignId);
+                if (campaign != null)
+                {
+                    var room = await ctx.Rooms.FirstOrDefaultAsync(r => r.id == campaign.RoomId);
+                    if (room != null)
+                    {
+                        if (campaign.NumberType == 1)
+                            room.short_sms = Math.Max(0, room.short_sms - 1);
+                        else if (campaign.NumberType == 2)
+                            room.long_sms = Math.Max(0, room.long_sms - 1);
+                    }
+                }
+            }
+
+            await ctx.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> ProcessResponseAsync(WebhookResponseDto dto)
+        {
+            if (dto == null)
+                return false;
+
+            using var ctx = new Entities();
+
+            var send = await ctx.CampaignContactScheduleSend
+                                .FirstOrDefaultAsync(s => s.IdBackBone == dto.UserRef);
+
+            if (send == null)
+            {
+                var test = await ctx.TestMessage.FirstOrDefaultAsync(t => t.IdBackBone == dto.UserRef);
+                if (test != null)
+                {
+                    test.ResponseMessage = dto.Text; 
+                    await ctx.SaveChangesAsync();
+                    return true;
+                }
+                return false;
+            }
+
+            send.ResponseMessage = dto.Text;
+            await ctx.SaveChangesAsync();
+
+            return true;
+        }
+
     }
 }

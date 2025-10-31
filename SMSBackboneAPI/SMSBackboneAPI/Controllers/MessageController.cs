@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using log4net;
 using System;
 using System.Diagnostics;
+using System.ServiceModel.Channels;
+using Business;
 
 namespace SMSBackboneAPI.Controllers
 {
@@ -158,19 +160,30 @@ namespace SMSBackboneAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error en el servidor" });
             }
         }
-
+        [AllowAnonymous]
         [HttpPost("Webhook/Status")]
         public async Task<IActionResult> ReceiveStatusWebhook([FromBody] WebhookStatusDto status)
         {
             var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
             var sw = Stopwatch.StartNew();
+
+            if (status is null || string.IsNullOrWhiteSpace(status.Id))
+                return BadRequest(new { received = false, message = "Id vacío." });
+
             try
             {
-                _log.Info($"[{rid}] Webhook/Status id={status?.Id} st={status?.Status} charged={status?.IsCharged} err={status?.Error}");
+                _log.Info($"[{rid}] Webhook/Status id={status.Id} st={status.Status} charged={status.IsCharged} err={status.Error}");
 
-                // Aquí puedes guardar en base de datos si quieres
-
+                var negocio = new MessageManager();
+                var ok = await negocio.ProcessStatusAsync(status);
                 sw.Stop();
+
+                if (!ok)
+                {
+                    _log.Warn($"[{rid}] Webhook/Status no encontrado para IdBackBone={status.Id} ms={sw.ElapsedMilliseconds}");
+                    return NotFound(new { received = false, message = "BackboneId no encontrado." });
+                }
+
                 _log.Info($"[{rid}] Webhook/Status ok ms={sw.ElapsedMilliseconds}");
                 return Ok(new { received = true });
             }
@@ -178,22 +191,35 @@ namespace SMSBackboneAPI.Controllers
             {
                 sw.Stop();
                 _log.Error($"[{rid}] Webhook/Status error ms={sw.ElapsedMilliseconds}", ex);
-                return StatusCode(StatusCodes.Status500InternalServerError, new { received = false, message = "Error en el servidor" });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { received = false, message = "Error en el servidor" });
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("Webhook/Response")]
         public async Task<IActionResult> ReceiveResponseWebhook([FromBody] WebhookResponseDto response)
         {
             var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
             var sw = Stopwatch.StartNew();
+
+            if (response == null)
+                return BadRequest(new { received = false, message = "Webhook vacío" });
+
             try
             {
                 _log.Info($"[{rid}] Webhook/Response from={response?.Source} to={response?.Destination} len={response?.Text?.Length}");
 
-                // Guardar o procesar el mensaje recibido
+                var bussines = new MessageManager();
+                var ok = await bussines.ProcessResponseAsync(response);
 
                 sw.Stop();
+                if (!ok)
+                {
+                    _log.Warn($"[{rid}] Webhook/Response sin coincidencia BackboneId={response?.UserRef} ms={sw.ElapsedMilliseconds}");
+                    return NotFound(new { received = false });
+                }
+
                 _log.Info($"[{rid}] Webhook/Response ok ms={sw.ElapsedMilliseconds}");
                 return Ok(new { received = true });
             }
@@ -204,5 +230,6 @@ namespace SMSBackboneAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { received = false, message = "Error en el servidor" });
             }
         }
+
     }
 }

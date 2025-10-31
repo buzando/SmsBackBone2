@@ -242,5 +242,34 @@ namespace Business
             var enabled = Common.ConfigurationManagerJson("BACKBONE_ENABLED");
             return enabled == "1" || enabled?.Equals("true", StringComparison.OrdinalIgnoreCase) == true;
         }
+        public async Task<ApiResponse?> GetMessageStatusAsync(string token, string messageId)
+        {
+            try
+            {
+                using var client = CreateAuthenticatedClient(token);
+                var url = $"{_baseUrl}message/{messageId}";
+
+                var response = await client.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorText = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Error al consultar estado del mensaje {messageId}: {response.StatusCode} - {errorText}");
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                var statusResponse = JsonSerializer.Deserialize<ApiResponse>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return statusResponse;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error en GetMessageStatusAsync({messageId}): {ex.Message}");
+                return null;
+            }
+        }
+
     }
 }

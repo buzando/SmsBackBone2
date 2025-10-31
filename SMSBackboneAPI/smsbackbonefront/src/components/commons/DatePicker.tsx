@@ -127,7 +127,6 @@ const DatePicker: React.FC<DatePickerProps> = ({ open, anchorEl, onApply, onClos
                     showMonthAndYearPickers={false}
                     shownDate={shownDate}
                     onShownDateChange={(date) => setShownDate(date)}
-                    minDate={startOfDay(new Date())}  
                 />
 
 

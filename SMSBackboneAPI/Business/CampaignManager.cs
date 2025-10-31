@@ -5,6 +5,7 @@ using System.Linq;
 using Contract.Request;
 using Contract.Response;
 using Contract.WebHooks;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Microsoft.EntityFrameworkCore;
 using Modal;
 using Modal.Model.Model;
@@ -120,11 +121,16 @@ namespace Business
                     {
                         foreach (var newSchedule in newSchedules)
                         {
-                            bool alreadyExists = existingSchedules.Any(existing =>
-                                existing.StartDateTime == newSchedule.StartDateTime &&
-                                existing.EndDateTime == newSchedule.EndDateTime);
+                            var orden = existingSchedules.FirstOrDefault(x => x.Order == newSchedule.Order);
+                            if (orden != null)
+                            {
+                                if (orden.StartDateTime != newSchedule.StartDateTime)
+                                    orden.StartDateTime = newSchedule.StartDateTime;
 
-                            if (!alreadyExists)
+                                if (orden.EndDateTime != newSchedule.EndDateTime)
+                                    orden.EndDateTime = newSchedule.EndDateTime;
+                            }
+                            else
                             {
                                 newSchedule.CampaignId = campaign.Id;
                                 ctx.CampaignSchedules.Add(newSchedule);

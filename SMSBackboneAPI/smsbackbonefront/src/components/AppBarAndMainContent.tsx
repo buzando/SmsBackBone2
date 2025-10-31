@@ -1,4 +1,5 @@
 ﻿import React, { useState, useContext, useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
 import { styled, Theme, CSSObject } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -253,7 +254,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
     const location = useLocation();
     const [userMenu, setUserMenu] = useState(null);
 
-    const [OpenModal, SetOpenModal] = useState(true);
     const handleSelection = (link: string) => {
         setSelectedLink(link); // Cambia el enlace seleccionado
     };
@@ -412,7 +412,10 @@ const NavBarAndDrawer: React.FC<Props> = props => {
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
-
+    useEffect(() => {
+        setAnchorEl(null);
+        setAnchorElUser(null);
+    }, [location.pathname]);
 
     const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(null);
@@ -588,6 +591,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                         navigate(page.path);
                                                         setSearchOpen(false);
                                                         setSearchTerm('');
+                                                        setAnchorEl(null);
                                                     }}
                                                 >
                                                     <Typography
@@ -2146,7 +2150,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                     {/* Final del fondo para opciones */}
                 </Box>
-                {location.pathname !== '/ClientRoomPicker' && (
+                {userMenu === 'Mesa' && location.pathname !== '/ClientRoomPicker' && (
                     <Box
                         sx={{
                             position: 'fixed',
@@ -2200,7 +2204,9 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                 }}
             >
                 <Box sx={{ height: '4.5rem' }} />
-                {props.children}
+                <div key={location.pathname}>
+                    {props.children}
+                </div>
             </Container>
             <footer>
                 <Box

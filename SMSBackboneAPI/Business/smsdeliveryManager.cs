@@ -200,7 +200,7 @@ namespace Business
                             {
                                 bool isShort = campaign.NumberType == 1;
                                 decimal currentBalance = isShort
-                                    ? Convert.ToDecimal(actualrooms.short_sms)  
+                                    ? Convert.ToDecimal(actualrooms.short_sms)
                                     : Convert.ToDecimal(actualrooms.long_sms);
 
                                 if (currentBalance <= notif.AmountValue)
@@ -227,7 +227,7 @@ namespace Business
        .Select(s => s.ContactId)
        .ToList()
 );
-                          
+
                             var chuncks = int.TryParse(Common.ConfigurationManagerJson("CantidadDeChunks"), out int c) ? c : 50;
                             campaign.Contacts = campaign.Contacts
                                 .GroupBy(x => x.Id)
@@ -478,7 +478,7 @@ namespace Business
 
             if (!string.IsNullOrWhiteSpace(contact.Misc01))
             {
-                var pairs = contact.Misc01.Split(' ');
+                var pairs = contact.Misc01.Split('|');
 
                 foreach (var pair in pairs)
                 {
@@ -553,6 +553,198 @@ namespace Business
         {
             // Por ahora puedes simularlo así, o llamar una API real tipo Bitly/TinyURL
             return $"https://corta.link/{Guid.NewGuid().ToString().Substring(0, 6)}";
+        }
+
+        public async Task<bool> UpdateSmsStatusesByClient()
+        {
+            try
+            {
+                using var ctx = new Entities();
+
+                // 1️⃣ Obtenemos los clientes con mensajes pendientes (buscando por el usuario)
+                var clientsWithPending = (
+     from s in ctx.CampaignContactScheduleSend
+     join c in ctx.Campaigns on s.CampaignId equals c.Id
+     join r in ctx.Rooms on c.RoomId equals r.id
+     join ru in ctx.roomsbyuser on r.id equals ru.idRoom
+     join u in ctx.Users on ru.idUser equals u.Id
+     join cli in ctx.clients on u.IdCliente equals cli.id
+     where s.Status == "0" && s.IdBackBone != null
+     select cli.id
+ )
+ .Distinct()
+ .ToList();
+
+                if (!clientsWithPending.Any())
+                {
+                    _logger.Info("✅ No hay mensajes pendientes por cliente.");
+                    return true;
+                }
+
+                // 2️⃣ Recorremos cliente por cliente
+                foreach (var clientId in clientsWithPending)
+                {
+                    var access = ctx.Client_Access.FirstOrDefault(a => a.client_id == clientId);
+                    if (access == null)
+                    {
+                        _logger.Warn($"⚠️ Cliente {clientId} no tiene credenciales Backbone.");
+                        continue;
+                    }
+                    var pssw = ClientAccessManager.Decrypt(access.password);
+                    var login = await new ApiBackBoneManager().LoginResponse(access.username, pssw);
+                    if (login == null)
+                    {
+                        _logger.Error($"❌ No se pudo autenticar el cliente {clientId} en Backbone.");
+                        continue;
+                    }
+
+                    // 3️⃣ Obtenemos los mensajes pendientes de ese cliente
+                    var pending = (
+      from s in ctx.CampaignContactScheduleSend
+      join c in ctx.Campaigns on s.CampaignId equals c.Id
+      join r in ctx.Rooms on c.RoomId equals r.id
+      join ru in ctx.roomsbyuser on r.id equals ru.idRoom
+      join u in ctx.Users on ru.idUser equals u.Id
+      join cli in ctx.clients on u.IdCliente equals cli.id
+      where cli.id == clientId
+            && s.Status == "0"                          // pendientes
+            && s.IdBackBone != null
+            && s.IdBackBone != ""                       // evita vacíos
+      select new { s.Id, s.IdBackBone, s.SentAt }
+  )
+  .AsNoTracking()
+  .ToList();
+
+
+                    if (!pending.Any()) continue;
+
+                    _logger.Info($"🔄 Cliente {clientId} - {pending.Count} mensajes pendientes para verificar.");
+
+                    var api = new ApiBackBoneManager();
+
+                    foreach (var msg in pending)
+                    {
+                        try
+                        {
+                            var st = await api.GetMessageStatusAsync(login.token, msg.IdBackBone);
+                            if (st == null) continue;
+
+                            var record = ctx.CampaignContactScheduleSend.FirstOrDefault(x => x.Id == msg.Id);
+                            if (record != null)
+                            {
+                                record.Status = st.status.ToString();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error($"❌ Error verificando estado para mensaje {msg.IdBackBone}: {ex.Message}");
+                        }
+                    }
+
+                    await ctx.SaveChangesAsync();
+                    _logger.Info($"✅ Cliente {clientId} actualizado correctamente.");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error general en UpdateSmsStatusesByClient: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateTestSmsStatusesByClient()
+        {
+            try
+            {
+                using var ctx = new Entities();
+
+                // 1) Clientes que tienen TestMessage pendientes (Status = "0") con IdBackBone set
+                var clientsWithPending = (
+                    from t in ctx.TestMessage
+                    join u in ctx.Users on t.UserId equals u.Id
+                    join cli in ctx.clients on u.IdCliente equals cli.id
+                    where t.Status == "0" && t.IdBackBone != null && t.IdBackBone != ""
+                    select cli.id
+                )
+                .Distinct()
+                .ToList();
+
+                if (!clientsWithPending.Any())
+                {
+                    _logger.Info("✅ No hay TestMessage pendientes por cliente.");
+                    return true;
+                }
+
+                foreach (var clientId in clientsWithPending)
+                {
+                    var access = ctx.Client_Access.FirstOrDefault(a => a.client_id == clientId);
+                    if (access == null)
+                    {
+                        _logger.Warn($"⚠️ Cliente {clientId} no tiene credenciales Backbone para TestMessage.");
+                        continue;
+                    }
+
+                    var pssw = ClientAccessManager.Decrypt(access.password);
+                    var login = await new ApiBackBoneManager().LoginResponse(access.username, pssw);
+                    if (login == null)
+                    {
+                        _logger.Error($"❌ No se pudo autenticar el cliente {clientId} en Backbone (TestMessage).");
+                        continue;
+                    }
+
+                    // 2) Pendientes de ese cliente
+                    var pending = (
+                        from t in ctx.TestMessage
+                        join u in ctx.Users on t.UserId equals u.Id
+                        join cli in ctx.clients on u.IdCliente equals cli.id
+                        where cli.id == clientId
+                              && t.Status == "0"
+                              && t.IdBackBone != null && t.IdBackBone != ""
+                        select new { t.Id, t.IdBackBone }
+                    )
+                    .AsNoTracking()
+                    .ToList();
+
+                    if (!pending.Any())
+                        continue;
+
+                    _logger.Info($"🔄 (TestMessage) Cliente {clientId} - {pending.Count} mensajes pendientes para verificar.");
+
+                    var api = new ApiBackBoneManager();
+
+                    foreach (var msg in pending)
+                    {
+                        try
+                        {
+                            var st = await api.GetMessageStatusAsync(login.token, msg.IdBackBone);
+                            if (st == null) continue;
+
+                            var record = ctx.TestMessage.FirstOrDefault(x => x.Id == msg.Id);
+                            if (record != null)
+                            {
+                                record.Status = st.status.ToString();                   
+                                                                             
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error($"❌ Error verificando estado (TestMessage) {msg.IdBackBone}: {ex.Message}");
+                        }
+                    }
+
+                    await ctx.SaveChangesAsync();
+                    _logger.Info($"✅ (TestMessage) Cliente {clientId} actualizado correctamente.");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error general en UpdateTestSmsStatusesByClient: {ex.Message}");
+                return false;
+            }
         }
 
 

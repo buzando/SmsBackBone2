@@ -268,6 +268,7 @@ const Campains: React.FC = () => {
   const [loadingPage, setLoadingPage] = useState(false);
   const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(null);
   const [allowConcatenation, setAllowConcatenation] = useState(false);
+const [autoStart, setAutoStart] = useState(false);
 
   const [openPicker, setOpenPicker] = useState<{
     open: boolean;
@@ -927,7 +928,7 @@ setCampaignName('');
           message: mensajeTexto,
           useTemplate: tipoMensaje === "plantilla",
           templateId: tipoMensaje === "plantilla" ? selectedTemplate?.id : null,
-          autoStart: true,
+          autoStart: autoStart,
           flashMessage: flashEnabled,
           customANI: aniEnabled,
           recycleRecords: recycleEnabled,
@@ -1046,8 +1047,7 @@ setCampaignName('');
   const handleSelectCampaign = (selected: CampaignFullResponse) => {
     if (selectedCampaign?.id === selected.id) return;
     setSelectedCampaignId(selected.id);
-    const reordered = [selected, ...campaigns.filter(c => c.id !== selected.id)];
-    setCampaigns(reordered);
+
     setSelectedCampaign(selected);
     setPhone('');
     setError(false);
@@ -3547,8 +3547,8 @@ setCampaignName('');
                         }}
                       >
                         <Checkbox
-                          checked={isChecked}
-                          onChange={(e) => setIsChecked(e.target.checked)}
+                          checked={autoStart}
+                          onChange={(e) => setAutoStart(e.target.checked)}
                           icon={
                             <Box
                               sx={{

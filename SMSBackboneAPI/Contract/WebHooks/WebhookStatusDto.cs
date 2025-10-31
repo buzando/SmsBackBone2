@@ -11,15 +11,15 @@ namespace Contract.WebHooks
         public string Id { get; set; }
         public int Status { get; set; }
         public bool IsCharged { get; set; }
-        public string Error { get; set; }
+        public string? Error { get; set; }
     }
 
     public class WebhookResponseDto
     {
-        public string Source { get; set; }
-        public string Destination { get; set; }
-        public string Text { get; set; }
+        public string? Source { get; set; }
+        public string? Destination { get; set; }
+        public string? Text { get; set; }
         public DateTime Date { get; set; }
-        public string UserRef { get; set; }
+        public string? UserRef { get; set; }
     }
 }
