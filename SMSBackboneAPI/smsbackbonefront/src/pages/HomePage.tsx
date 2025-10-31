@@ -808,7 +808,7 @@ const HomePage: React.FC = () => {
                                                 alignItems: 'flex-start',
                                                 justifyContent: 'space-between',
                                                 position: 'relative',
-                                                '&:not(:last-child)::after': { // Aplica solo a los elementos excepto el último
+                                                '&:not(:last-child)::after': {
                                                     content: '""',
                                                     position: 'absolute',
                                                     right: '-18px',
@@ -1345,7 +1345,7 @@ const HomePage: React.FC = () => {
                                                                 {
                                                                     name: 'offset',
                                                                     options: {
-                                                                        offset: [-0, -10] // [h,v]
+                                                                        offset: [-0, -10]
                                                                     }
                                                                 }
                                                             ]

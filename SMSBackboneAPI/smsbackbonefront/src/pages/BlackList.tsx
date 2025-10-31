@@ -1195,7 +1195,7 @@ const BlackList: React.FC = () => {
                                                             {
                                                                 name: 'offset',
                                                                 options: {
-                                                                    offset: [0, -12] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                    offset: [0, -12]
                                                                 }
                                                             }
                                                         ]
@@ -4735,12 +4735,12 @@ const BlackList: React.FC = () => {
                         <MainButton
                             onClick={handleSendToServer}
                             text='Guardar cambios'
-                              disabled={
-    !(
-      (fileSuccess && selectedSheet !== '') ||
-      individualPhones.some(p => /^\d{10}$/.test(p.trim()))
-    )
-  }
+                            disabled={
+                                !(
+                                    (fileSuccess && selectedSheet !== '') ||
+                                    individualPhones.some(p => /^\d{10}$/.test(p.trim()))
+                                )
+                            }
                         />
 
 
