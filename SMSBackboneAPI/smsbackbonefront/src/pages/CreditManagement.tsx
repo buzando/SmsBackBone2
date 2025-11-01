@@ -37,6 +37,8 @@ import SecondaryButton from "../components/commons/SecondaryButton";
 import ErrorModal from '../components/commons/ModalError'
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "../assets/icon-punta-flecha-bottom.svg";
+import { Tooltip } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 type Rooms = {
     id: string | number;
     name: string;
@@ -236,6 +238,12 @@ const CreditManagement: React.FC = () => {
         }
     };
 
+    const isFormValid =
+        selectedRoom2 !== null &&
+        selectedChannel !== "" &&
+        transferAmount !== null &&
+        transferAmount > 0 &&
+        selectedRoom !== null;
 
 
     return (
@@ -594,9 +602,6 @@ const CreditManagement: React.FC = () => {
                             <ClickAwayListener onClickAway={handleCloseDropdown2}>
                                 <Box sx={{
                                     position: "relative",
-                                    // Importante: si tu contenedor tiene overflowY: "auto",
-                                    // cámbialo a overflow: "visible" o elimínalo:
-                                    // overflow: "visible",
                                 }}>
                                     <TextField
                                         fullWidth
@@ -653,8 +658,10 @@ const CreditManagement: React.FC = () => {
                                                     borderRadius: "4px",
                                                     px: 2,
                                                     py: 1,
-                                                    width: "100%",
-                                                    height: "40px"
+                                                    width: "218px",
+                                                    height: "40px",
+                                                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                                                    m: 2,
                                                 }}
                                             >
                                                 <img
@@ -664,7 +671,6 @@ const CreditManagement: React.FC = () => {
                                                         marginRight: "8px",
                                                         width: "16px",
                                                         height: "16px",
-
                                                         filter: searchTerm3
                                                             ? "invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)"
                                                             : "none",
@@ -672,7 +678,7 @@ const CreditManagement: React.FC = () => {
                                                 />
                                                 <input
                                                     type="text"
-                                                    placeholder="Buscar"
+                                                    placeholder="Buscar sala..."
                                                     value={searchTerm3}
                                                     onChange={(e) => setSearchTerm3(e.target.value)}
                                                     style={{
@@ -680,14 +686,14 @@ const CreditManagement: React.FC = () => {
                                                         outline: "none",
                                                         width: "100%",
                                                         fontSize: "16px",
-                                                        fontFamily: "Poppins",
+                                                        fontFamily: "Poppins, sans-serif",
                                                         color: searchTerm3 ? "#7B354D" : "#9B9295",
                                                         backgroundColor: "transparent",
                                                     }}
                                                 />
                                                 {searchTerm3 && (
                                                     <img
-                                                        src={iconclose}  // Tu ícono de cerrar
+                                                        src={iconclose}
                                                         alt="Limpiar búsqueda"
                                                         style={{
                                                             marginLeft: "8px",
@@ -699,6 +705,7 @@ const CreditManagement: React.FC = () => {
                                                     />
                                                 )}
                                             </Box>
+
                                             <Divider sx={{ my: 0 }} />
                                             <List sx={{ p: 0 }}>
                                                 {filteredRooms2.length > 0 ? (
@@ -861,18 +868,35 @@ const CreditManagement: React.FC = () => {
                                 }}
                             />
 
-                            <Typography
-                                sx={{
-                                    textAlign: "left",
-                                    font: "normal normal medium 16px/54px Poppins",
-                                    letterSpacing: "0px",
-                                    color: "#330F1B",
-                                    opacity: 1,
-                                    fontSize: "16px",
-                                }}
-                            >
-                                Créditos a transferir
-                            </Typography>
+                            <Box display="flex" alignItems="center" justifyContent="center" gap={0.6}>
+                                <Typography
+                                    sx={{
+                                        textAlign: "center",
+                                        font: "normal normal medium 16px/24px Poppins",
+                                        color: "#330F1B",
+                                        fontSize: "16px",
+                                    }}
+                                >
+                                    Créditos a transferir
+                                </Typography>
+                                <Tooltip
+                                    title="Cantidad de créditos que deseas mover a otra sala. No puede ser mayor que los disponibles."
+                                    placement="right"
+                                    arrow
+                                >
+                                    <InfoOutlinedIcon
+                                        sx={{
+                                            fontSize: 15,
+                                            color: "#7B354D",
+                                            opacity: 0.8,
+                                            cursor: "pointer",
+                                            transition: "all 0.2s ease-in-out",
+                                            "&:hover": { opacity: 1, transform: "scale(1.1)" },
+                                        }}
+                                    />
+                                </Tooltip>
+                            </Box>
+
                             <TextField
                                 type="number"
                                 value={transferAmount}
@@ -953,23 +977,21 @@ const CreditManagement: React.FC = () => {
                                         }}
                                     />
 
-                                    {/* 2. Menú flotante que se abre al dar clic */}
                                     {openDropdown && (
                                         <Paper
                                             elevation={3}
                                             sx={{
                                                 position: "absolute",
-                                                top: "calc(100% + 6px)", // Lo bajas un poco respecto al TextField
-                                                left: "6px",            // Lo mueves ligeramente a la derecha
-                                                width: "244px",         // Mismo ancho que el TextField
+                                                bottom: "calc(100% + 6px)",
+                                                left: "6px",
+                                                width: "244px",
                                                 zIndex: 9999,
                                                 maxHeight: 250,
                                                 overflowY: "auto",
                                                 borderRadius: "8px",
-                                                p: 0, // Quita padding interno extra
+                                                p: 0,
                                             }}
                                         >
-                                            {/* 3. Buscador interno estilo “externo” (con lupa y cerrar) */}
                                             <Box
                                                 display="flex"
                                                 alignItems="center"
@@ -1093,7 +1115,7 @@ const CreditManagement: React.FC = () => {
 
                         <Box display="flex" justifyContent="space-between" mt={3}>
                             <SecondaryButton onClick={handleCloseModal} text="Cancelar" />
-                            <MainButton isLoading={loading} text="Transferir" onClick={handleTransferSubmit} />
+                            <MainButton isLoading={loading} text="Transferir" onClick={handleTransferSubmit} disabled={!isFormValid} />
                         </Box>
                     </Box>
                 </Fade>

@@ -209,42 +209,43 @@ const HomePage: React.FC = () => {
 
             setdata([
                 {
-                    label: "Recepción",
+                    label: "En proceso",
                     value: total > 0 ? +(response.data.respondedRecords / total * 100).toFixed(1) : 0,
                     color: "#9674BF",
-                    tooltip: `${response.data.respondedRecords} recibidos (${((response.data.respondedRecords / total) * 100).toFixed(1)}%)`
+                    tooltip: `Los mensajes se están enviando en este momento.`
                 },
                 {
                     label: "Entregados",
                     value: total > 0 ? +(response.data.deliveredCount / total * 100).toFixed(1) : 0,
                     color: "#D9A93D",
-                    tooltip: `${response.data.deliveredCount} entregados (${((response.data.deliveredCount / total) * 100).toFixed(1)}%)`
+                    tooltip: `Mensajes entregados con éxito al destinatario.`
                 },
                 {
-                    label: "No recibidos",
+                    label: "No entregados",
                     value: total > 0 ? +(response.data.notDeliveredCount / total * 100).toFixed(1) : 0,
                     color: "#18ACED",
-                    tooltip: `${response.data.notDeliveredCount} no recibidos (${((response.data.notDeliveredCount / total) * 100).toFixed(1)}%)`
+                    tooltip: `El mensaje llegó al operador, pero no pudo entregarse al teléfono.`
                 },
                 {
                     label: "No enviados",
                     value: total > 0 ? +(response.data.notSentCount / total * 100).toFixed(1) : 0,
                     color: "#FB8FB8",
-                    tooltip: `${response.data.notSentCount} no enviados (${((response.data.notSentCount / total) * 100).toFixed(1)}%)`
+                    tooltip: `No se envió porque no había un operador disponible.`
                 },
                 {
-                    label: "Entregados-Falla",
+                    label: "Fallidos",
                     value: total > 0 ? +(response.data.failedCount / total * 100).toFixed(1) : 0,
                     color: "#DD8E26",
-                    tooltip: `${response.data.failedCount} con falla (${((response.data.failedCount / total) * 100).toFixed(1)}%)`
+                    tooltip: `Hubo un error al intentar enviarlo.`
                 },
                 {
                     label: "Excepción",
                     value: total > 0 ? +(response.data.exceptionCount / total * 100).toFixed(1) : 0,
                     color: "#6EB139",
-                    tooltip: `${response.data.exceptionCount} con excepción (${((response.data.exceptionCount / total) * 100).toFixed(1)}%)`
+                    tooltip: `Ocurrió un error inesperado en el sistema.`
                 }
             ]);
+
 
 
 
@@ -791,7 +792,10 @@ const HomePage: React.FC = () => {
                                 }}
                             >
                                 {campaigns.map((campaign, index) => {
-                                    const percentage = (campaign.numeroActual / campaign.numeroInicial) * 100;
+                                    const percentage =
+                                        campaign.numeroInicial && campaign.numeroInicial !== 0
+                                            ? (campaign.numeroActual / campaign.numeroInicial) * 100
+                                            : 0;
                                     return (
                                         <Box
                                             key={index}
@@ -877,7 +881,7 @@ const HomePage: React.FC = () => {
                                                         marginLeft: "-6px"
                                                     }}
                                                 >
-                                                    {Math.round(percentage)}%
+                                                    {isNaN(percentage) ? 0 : Math.round(percentage)}%
                                                 </Typography>
                                                 <Typography
                                                     variant="body2"
