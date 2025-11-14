@@ -890,7 +890,13 @@ const ManageAccounts: React.FC = () => {
                     </TableContainer>
                 )}
             </Box>
-            <Modal open={openAddUserModal} onClose={handleCloseModal}>
+            <Modal
+                open={openAddUserModal}
+                onClose={(_, reason) => {
+                    if (reason === "backdropClick") return;
+                    handleCloseModal();
+                }}
+            >
                 <Box
                     sx={{
                         position: "absolute",

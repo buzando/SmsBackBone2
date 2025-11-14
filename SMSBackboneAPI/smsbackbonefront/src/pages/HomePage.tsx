@@ -283,6 +283,7 @@ const HomePage: React.FC = () => {
 
     // Manejar cambios en los inputs
     const handleInputChange = (index: number, value: string) => {
+        value = value.replace(/[^0-9]/g, '');
         const updatedPhones = [...phoneNumbers];
         updatedPhones[index] = value;
         setPhoneNumbers(updatedPhones);
@@ -687,7 +688,7 @@ const HomePage: React.FC = () => {
             </Box>
 
             {!showData && (
-                <Box sx={{ textAlign: 'center', marginTop: '150px', marginLeft: '0px' }}>
+                <Box sx={{ textAlign: 'center', marginTop: '150px', marginLeft: '250px' }}>
                     <Box component="img" src={BoxEmpty} alt="Caja Vacía" sx={{ width: '250px', height: 'auto' }} />
                     <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
                         Seleccione un canal para continuar.
@@ -995,7 +996,7 @@ const HomePage: React.FC = () => {
                                 }}
                             >
                                 {data.map((item, index) => (
-                                    <Box key={index} sx={{ textAlign: "center", flex: 1 }}>
+                                    <Box key={index} sx={{ textAlign: "center", flex: 1, }}>
                                         <CustomTooltip title={item.tooltip}>
                                             <img src={infoicon} alt="Info" style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
                                         </CustomTooltip>
@@ -1015,8 +1016,8 @@ const HomePage: React.FC = () => {
                                     display: "flex",
                                     alignItems: "flex-end",
                                     justifyContent: "center",
-                                    height: "161px",
-                                    marginTop: 3,
+                                    height: "180px",
+                                    marginTop: 4,
                                     position: "relative",
                                     paddingBottom: 2,
                                 }}
@@ -1061,8 +1062,8 @@ const HomePage: React.FC = () => {
                                         display: "flex",
                                         alignItems: "flex-end",
                                         justifyContent: "space-around",
-                                        width: "1100px",
-                                        paddingLeft: "40px", marginLeft: "-10px"
+                                        width: "1200px",
+                                        paddingLeft: "40px", marginLeft: "-90px"
                                     }}
                                 >
                                     <Box
@@ -1145,7 +1146,14 @@ const HomePage: React.FC = () => {
 
 
 
-            <Modal open={open} onClose={handleClose} aria-labelledby="quick-send-title">
+            <Modal
+                open={open}
+                onClose={(event, reason) => {
+                    if (reason === "backdropClick") return;
+                    if (reason === "escapeKeyDown") handleClose();
+                }}
+                aria-labelledby="quick-send-title"
+            >
                 <Box sx={modalStyle}>
 
                     <Box sx={headerStyle}>
@@ -1162,7 +1170,7 @@ const HomePage: React.FC = () => {
                             Envío rápido
                         </Typography>
                         <IconButton onClick={handleClose}
-                            sx={{ position: "absolute", marginTop: "-40px", marginLeft: "502px" }}>
+                            sx={{ position: "absolute", marginTop: "-38px", marginLeft: "500px" }}>
                             <CloseIcon />
                         </IconButton>
                     </Box>
@@ -1183,7 +1191,9 @@ const HomePage: React.FC = () => {
                                     <Box key={index} sx={{ width: '100%' }}>
                                         <Box display="flex" alignItems="center" gap={1} sx={{ width: '100%' }}>
                                             <TextField
+                                                type="tel"
                                                 value={phone}
+                                                placeholder='5255'
                                                 onChange={(e) => handleInputChange(index, e.target.value)}
                                                 error={errors[index]}
                                                 helperText={errors[index] ? "Formato inválido" : ""}
@@ -1248,9 +1258,9 @@ const HomePage: React.FC = () => {
                                                                         }}
                                                                     >
                                                                         <>
-                                                                            • Solo caracteres alfabéticos<br />
-                                                                            • Longitud máxima de 160<br />
-                                                                            caracteres
+                                                                            • Solo caracteres numéricos<br />
+                                                                            • El teléfono debe incluir<br />
+                                                                            el código del país
                                                                         </>
                                                                     </Box>
                                                                 }
@@ -1279,44 +1289,64 @@ const HomePage: React.FC = () => {
 
                                             {index === phoneNumbers.length - 1 && (
                                                 <Box marginTop={"-14px"}>
-                                                    <Tooltip title="Añadir teléfono" arrow placement="top"
-                                                        componentsProps={{
-                                                            tooltip: {
-                                                                sx: {
-                                                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                                                    color: "#DEDADA",
-                                                                    fontFamily: "Poppins, sans-serif",
-                                                                    fontSize: "12px",
-                                                                    padding: "6px 8px",
-                                                                    borderRadius: "8px",
-                                                                }
-                                                            },
-                                                            arrow: {
-                                                                sx: {
-                                                                    color: "rgba(0, 0, 0, 0.8)"
-                                                                }
-                                                            }
-                                                        }}
-                                                        PopperProps={{
-                                                            modifiers: [
-                                                                {
-                                                                    name: 'offset',
-                                                                    options: {
-                                                                        offset: [0, -12]
+                                                    {(() => {
+                                                        const canAdd = phoneRegex.test(phone) && !errors[index];
+
+                                                        return (
+                                                            <Tooltip
+                                                                title="Añadir teléfono"
+                                                                arrow
+                                                                placement="top"
+                                                                componentsProps={{
+                                                                    tooltip: {
+                                                                        sx: {
+                                                                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                            color: "#DEDADA",
+                                                                            fontFamily: "Poppins, sans-serif",
+                                                                            fontSize: "12px",
+                                                                            padding: "6px 8px",
+                                                                            borderRadius: "8px",
+                                                                        }
+                                                                    },
+                                                                    arrow: {
+                                                                        sx: {
+                                                                            color: "rgba(0, 0, 0, 0.8)"
+                                                                        }
                                                                     }
-                                                                }
-                                                            ]
-                                                        }}
-                                                    >
-                                                        <IconButton onClick={handleAddInput} color="primary">
-                                                            <Box
-                                                                component="img"
-                                                                src={IconCirclePlus}
-                                                                alt="Agregar Horario"
-                                                                sx={{ width: "24px", height: "24px", cursor: "pointer", opacity: 0.6, }}
-                                                            />
-                                                        </IconButton>
-                                                    </Tooltip>
+                                                                }}
+                                                                PopperProps={{
+                                                                    modifiers: [
+                                                                        {
+                                                                            name: 'offset',
+                                                                            options: {
+                                                                                offset: [0, -12]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }}
+                                                            >
+                                                                {/* span para que el Tooltip funcione con botón disabled */}
+                                                                <span>
+                                                                    <IconButton
+                                                                        onClick={handleAddInput}
+                                                                        color="primary"
+                                                                        disabled={!canAdd}
+                                                                        sx={{
+                                                                            opacity: canAdd ? 1 : 0.4,
+                                                                            cursor: canAdd ? 'pointer' : 'not-allowed',
+                                                                        }}
+                                                                    >
+                                                                        <Box
+                                                                            component="img"
+                                                                            src={IconCirclePlus}
+                                                                            alt="Agregar teléfono"
+                                                                            sx={{ width: "24px", height: "24px" }}
+                                                                        />
+                                                                    </IconButton>
+                                                                </span>
+                                                            </Tooltip>
+                                                        );
+                                                    })()}
                                                 </Box>
                                             )}
                                             {index > 0 && (
@@ -1448,7 +1478,7 @@ const HomePage: React.FC = () => {
 
                         {/* Opciones de checkbox */}
                         <Box sx={{ marginTop: '20px', width: '100%' }}>  {/* 🔥 Evita desbordamiento */}
-                            <FormControlLabel
+                            {/*<FormControlLabel
                                 control={
                                     <Checkbox
                                         checked={shouldConcatenate}
@@ -1472,7 +1502,7 @@ const HomePage: React.FC = () => {
                                     },
                                 }}
 
-                            />
+                            /> */}
                             <FormControlLabel
                                 control={
                                     <Checkbox

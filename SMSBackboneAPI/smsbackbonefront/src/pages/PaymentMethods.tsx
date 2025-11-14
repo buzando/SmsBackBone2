@@ -672,7 +672,10 @@ const PaymentMethods: React.FC = () => {
             {/* Modal para agregar tarjeta */}
             <Modal
                 open={isAddCardModalOpen}
-                onClose={handleCloseModal}
+                onClose={(_, reason) => {
+                    if (reason === "backdropClick") return;
+                    handleCloseModal();
+                }}
                 aria-labelledby="add-card-modal-title"
                 aria-describedby="add-card-modal-description"
             >
@@ -1159,26 +1162,76 @@ const PaymentMethods: React.FC = () => {
                                         <Select
                                             name="month"
                                             value={formData.month}
-                                            onChange={() => handleChange}
+                                            onChange={(e) => handleChange(e)}
                                             required
-                                            label="Mes"
-                                            style={{
+                                            displayEmpty
+                                            IconComponent={() => null}
+                                            renderValue={(selected) => {
+                                                if (!selected) {
+                                                    return (
+                                                        <span style={{
+                                                            color: "#574B4F",
+                                                            fontFamily: "Poppins",
+                                                            opacity: 0.7,
+                                                            width: "100%",
+                                                            textAlign: "center",
+                                                            display: "block"
+                                                        }}>
+                                                            Mes
+                                                        </span>
+                                                    );
+                                                }
+                                                return (
+                                                    <span style={{
+                                                        width: "100%",
+                                                        textAlign: "center",
+                                                        display: "block"
+                                                    }}>
+                                                        {months[Number(selected) - 1]}
+                                                    </span>
+                                                );
+                                            }}
+                                            sx={{
                                                 background: "#FFFFFF",
                                                 border: "1px solid #9B9295",
                                                 borderRadius: "8px",
-                                                width: "95px",
+                                                width: "145px",   // te recomiendo subirlo un poco
                                                 height: "40px",
+                                                fontFamily: "Poppins",
 
+                                                // 🔥 Centro y quito ellipsis del texto seleccionado
+                                                '& .MuiSelect-select': {
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    whiteSpace: 'normal',
+                                                    overflow: 'visible',
+                                                    textOverflow: 'unset',
+                                                    textAlign: 'center',
+                                                }
                                             }}
                                         >
-                                            <MenuItem value="" disabled>Mes</MenuItem>
                                             {months.map((month, index) => (
-                                                <MenuItem key={index} value={(index + 1).toString()}>{month}</MenuItem> // 🔥 Convertimos a `string`
+                                                <MenuItem
+                                                    key={index}
+                                                    value={(index + 1).toString()}
+                                                    sx={{
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "14px",
+                                                        color: "#574B4F",
+                                                        textAlign: "center"
+                                                    }}
+                                                >
+                                                    {month}
+                                                </MenuItem>
                                             ))}
                                         </Select>
 
+
+
+
                                         <Select
-                                            name="year" // 🔥 Aseguramos que `name` esté presente
+                                            name="year"
                                             value={formData.year} // 🔥 `value` debe coincidir con `formData.year`
                                             onChange={() => handleChange}
                                             label="año"

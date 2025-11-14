@@ -48,7 +48,7 @@ const Login: React.FC = () => {
     const [messageAlert, setMessageAlert] = useState('Correo o contraseña inválidos');
     const [openAlert, setOpenAlert] = useState(false);
     const [spinner, setSpinner] = useState(false);
-    const [disabled, setdisabled] = useState(false);
+    const [disabled, setdisabled] = useState(true);
     const [passwordErr, setPasswordErr] = useState(true);
     const [showPasswordu, setShowPasswordu] = useState(false);
 
@@ -88,7 +88,7 @@ const Login: React.FC = () => {
         setEmailErr(isValidEmail);
 
         // Deshabilitar el botón si el email no es válido
-        setdisabled(!(isValidEmail && passwordErr));
+        setdisabled(!(isValidEmail && password.length >= 8 && password.trim() !== '' && value.trim() !== ''));
 
         if (isValidEmail) {
             setLoading(false);
@@ -103,7 +103,7 @@ const Login: React.FC = () => {
         setPasswordErr(isValidPassword);
 
         // Deshabilitar el botón si email o contraseña son inválidos
-        setdisabled(!(isValidPassword && emailErr));
+        setdisabled(!(isValidPassword && emailErr && email.trim() !== '' && value.trim() !== ''));
     };
 
 

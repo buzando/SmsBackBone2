@@ -268,7 +268,7 @@ const Campains: React.FC = () => {
   const [loadingPage, setLoadingPage] = useState(false);
   const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(null);
   const [allowConcatenation, setAllowConcatenation] = useState(false);
-const [autoStart, setAutoStart] = useState(false);
+  const [autoStart, setAutoStart] = useState(false);
 
   const [openPicker, setOpenPicker] = useState<{
     open: boolean;
@@ -3044,9 +3044,12 @@ const [autoStart, setAutoStart] = useState(false);
 
       <Dialog
         open={openCreateCampaignModal}
-        onClose={() => setOpenCreateCampaignModal(false)}
-        maxWidth={false} // Le quitamos el límite de ancho
-        fullWidth // Forzamos que se respete el ancho del Paper
+        onClose={(_, reason) => {
+          if (reason === "backdropClick") return;
+          setOpenCreateCampaignModal(false);
+        }}
+        maxWidth={false}
+        fullWidth
         PaperProps={{
           sx: {
             width: "810px",

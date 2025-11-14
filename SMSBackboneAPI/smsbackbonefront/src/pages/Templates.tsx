@@ -901,7 +901,12 @@ const Templates = () => {
             </Box>
 
 
-            <Modal open={openModal} onClose={handleCloseModal}>
+            <Modal
+                open={openModal}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick') handleCloseModal();
+                }}
+            >
                 <Box
                     sx={{
                         width: '580px',
