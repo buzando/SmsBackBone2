@@ -99,7 +99,6 @@ const HomePage: React.FC = () => {
     const [enableTwoFactor, setenableTwoFactor] = useState(true);
     const [IsErrormodal, setIsErrormodal] = useState(false);
     const [ShowSnackBar, setShowSnackBar] = useState(false);
-    const [shouldConcatenate, setShouldConcatenate] = useState(false);
     const [isFlashMessage, setIsFlashMessage] = useState(false);
     const [MessageModalError, setMessageModalError] = useState("");
     const [MessageSnackBar, setMessageSnackBar] = useState("");
@@ -399,7 +398,6 @@ const HomePage: React.FC = () => {
                 TemplateId: null,
                 ClientID: clientId.idCliente || null,
                 UserID: clientId.id,
-                Concatenate: shouldConcatenate,
                 Flash: isFlashMessage
             };
 
@@ -414,6 +412,9 @@ const HomePage: React.FC = () => {
             }
         } catch (error) {
             setIsErrormodal(true);
+        }
+        finally{
+            setOpen(false);
         }
     };
 
@@ -1030,7 +1031,7 @@ const HomePage: React.FC = () => {
                                     sx={{
                                         position: "absolute",
                                         left: 0,
-                                        bottom: 20,
+                                        bottom: 10,
                                         height: "100%",
                                         width: "100%",
                                         display: "flex",
@@ -1059,7 +1060,6 @@ const HomePage: React.FC = () => {
                                     ))}
                                 </Box>
 
-                                {/* Contenedor de barras */}
                                 <Box
                                     sx={{
                                         display: "flex",
@@ -1087,7 +1087,6 @@ const HomePage: React.FC = () => {
                                                 sx={{
                                                     width: "90px",
                                                     height: `${(item.value / 100) * 120}px`,
-                                                    minHeight: "10px",
                                                     maxHeight: "120px",
                                                     backgroundColor: item.color,
                                                     borderRadius: "0px",
@@ -1095,7 +1094,6 @@ const HomePage: React.FC = () => {
                                                     margin: "auto", marginLeft: "5px"
                                                 }}
                                             />
-                                            {/* Nombres correctos debajo del 0% */}
                                             <Typography
                                                 sx={{
                                                     fontFamily: 'Poppins', textAlign: "center",
@@ -1452,31 +1450,6 @@ const HomePage: React.FC = () => {
 
                         {/* Opciones de checkbox */}
                         <Box sx={{ marginTop: '20px', width: '100%' }}>  {/* 🔥 Evita desbordamiento */}
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={shouldConcatenate}
-                                        onChange={(e) => setShouldConcatenate(e.target.checked)}
-                                        checkedIcon={
-                                            <img
-                                                src={IconCheckBox1}
-                                                alt="Seleccionado"
-                                                style={{ width: '24px', height: '24px' }}
-                                            />
-                                        }
-                                    />
-                                }
-                                label="Concatenar mensajes de más de 160 caracteres"
-                                sx={{
-                                    '& .MuiTypography-root': {
-                                        fontSize: '16px',
-                                        fontWeight: '400',
-                                        fontFamily: 'Poppins',
-                                        color: shouldConcatenate ? '#8F4D63' : '#574B4FCC',
-                                    },
-                                }}
-
-                            />
                             <FormControlLabel
                                 control={
                                     <Checkbox
@@ -2029,7 +2002,7 @@ const HomePage: React.FC = () => {
             {
                 ShowSnackBar && (
                     <SnackBar
-                        message="Contraseña Actualizada con exito"
+                        message={MessageSnackBar}
                         buttonText="Cerrar"
                         onClose={() => setShowSnackBar(false)}
                     />

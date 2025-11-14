@@ -15,7 +15,7 @@ import infoiconerror from '../assets/Icon-infoerror.svg'
 import { InputAdornment } from "@mui/material";
 import ChipBar from "../components/commons/ChipBar";
 import CircularProgress from "@mui/material/CircularProgress";
-
+import SecondaryButton from "../components/commons/SecondaryButton";
 const ManageAccount: React.FC = () => {
     const [formData, setFormData] = useState({
         firstName: "",
@@ -26,7 +26,7 @@ const ManageAccount: React.FC = () => {
         confirmPassword: "",
         email: "",
     });
-
+    const [initialData, setInitialData] = useState<typeof formData | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
     const [passwordError, setPasswordError] = useState("");
@@ -35,51 +35,70 @@ const ManageAccount: React.FC = () => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     const [loading, setLoading] = useState(false);
 
-    // Load user data from localStorage
+    const [firstNameError, setFirstNameError] = useState("");
+    const [lastNameError, setLastNameError] = useState("");
+    const [phoneError, setPhoneError] = useState("");
+    const [altEmailError, setAltEmailError] = useState("");
+
+    const nameRegex = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$/;
     useEffect(() => {
         const userData = localStorage.getItem("userData");
         if (userData) {
             const parsedData = JSON.parse(userData);
-            setFormData({
+            const loaded = {
                 firstName: parsedData.firstName || "",
                 lastName: parsedData.lastName || "",
                 phone: parsedData.phonenumber || "",
                 email: parsedData.email || "",
                 alternateEmail: parsedData.secondaryEmail || "",
-                password: "", // For security reasons, do not prefill passwords
-                confirmPassword: "", // For security reasons, do not prefill passwords
-            });
+                password: "",
+                confirmPassword: "",
+            };
+            setFormData(loaded);
+            setInitialData(loaded); // <- importante para comparar
         }
     }, []);
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
 
-        // Restringir el número de teléfono solo a números
-        if (name === "phone" && !/^[0-9]*$/.test(value)) return;
+        if (name === "phone") {
+            const digits = value.replace(/\D/g, "").slice(0, 10); // solo 10 dígitos
+            setFormData({ ...formData, phone: digits });
+            setPhoneError(digits.length === 10 ? "" : "Debe contener 10 dígitos.");
+            return;
+        }
+
+        if (name === "firstName") {
+            setFormData({ ...formData, firstName: value });
+            setFirstNameError(value.trim() && !nameRegex.test(value) ? "Solo letras y espacios." : "");
+            return;
+        }
+
+        if (name === "lastName") {
+            setFormData({ ...formData, lastName: value });
+            setLastNameError(value.trim() && !nameRegex.test(value) ? "Solo letras y espacios." : "");
+            return;
+        }
+
+        if (name === "alternateEmail") {
+            setFormData({ ...formData, alternateEmail: value });
+            setAltEmailError(value.trim() && !validateEmail(value) ? "Formato de correo inválido." : "");
+            return;
+        }
 
         setFormData({ ...formData, [name]: value });
 
-        // Validar la contraseña en tiempo real
         if (name === "password") {
-            if (!value || passwordRegex.test(value)) {
-                setPasswordError("");
-            } else {
-                setPasswordError(
-                    "La contraseña debe tener mínimo 8 caracteres, una letra mayúscula, una letra minúscula y un número."
-                );
-            }
+            if (!value || passwordRegex.test(value)) setPasswordError("");
+            else setPasswordError("8+ caracteres, 1 mayúscula, 1 minúscula y 1 número.");
         }
-
-        // Validar la confirmación de contraseña en tiempo real
         if (name === "confirmPassword") {
-            if (!value || value === formData.password) {
-                setConfirmPasswordError("");
-            } else {
-                setConfirmPasswordError("Las contraseñas no coinciden.");
-            }
+            setConfirmPasswordError(!value || value === formData.password ? "" : "Las contraseñas no coinciden.");
         }
     };
+
 
 
 
@@ -118,13 +137,14 @@ const ManageAccount: React.FC = () => {
                 "Access-Control-Allow-Origin": "*",
             };
 
-            const apiEndpoint = `${import.meta.env.VITE_API_UPDATE_USER}`; 
+            const apiEndpoint = `${import.meta.env.VITE_API_UPDATE_USER}`;
             const response = await axios.post(apiEndpoint, data, { headers });
 
             if (response.status === 200) {
-
-                setshowChipBarAdd(true); // Mostrar ChipBar para edición exitosa
+                setshowChipBarAdd(true);
                 setTimeout(() => setshowChipBarAdd(false), 3000);
+                setInitialData(formData);
+                setFormData(fd => ({ ...fd, password: "", confirmPassword: "" }));
             }
 
 
@@ -138,8 +158,31 @@ const ManageAccount: React.FC = () => {
         }
     };
 
+    const requiredOk =
+        !!formData.firstName && !!formData.lastName && !!formData.phone && !!formData.alternateEmail;
+
+    const namesOk = !firstNameError && !lastNameError && nameRegex.test(formData.firstName) && nameRegex.test(formData.lastName);
+    const phoneOk = /^\d{10}$/.test(formData.phone);
+    const emailOk = !altEmailError && validateEmail(formData.alternateEmail);
+
+    const isDirty =
+        initialData !== null && JSON.stringify(formData) !== JSON.stringify(initialData);
+
+    const saveDisabled =
+        loading || !isDirty || !requiredOk || !namesOk || !phoneOk || !emailOk || !!passwordError || !!confirmPasswordError;
+
+
+    const handleCancel = () => {
+        if (initialData) {
+            setFormData(initialData);
+            setPasswordError("");
+            setConfirmPasswordError("");
+        }
+    };
+
+
     return (
-        <Box p={6} maxWidth={800} sx={{marginTop: "-100px", textAlign: 'center'}} >
+        <Box p={6} maxWidth={800} sx={{ marginTop: "-100px", textAlign: 'center' }} >
             <Typography
                 sx={{
                     textAlign: "left",
@@ -168,11 +211,14 @@ const ManageAccount: React.FC = () => {
                             }}
                         >
                             Nombre
+                            <span style={{ color: "red" }}>*</span>
                         </Typography>
                         <TextField
                             name="firstName"
                             value={formData.firstName}
                             onChange={handleChange}
+                            error={!!firstNameError}
+                            helperText={firstNameError}
                             required
                             InputProps={{
                                 endAdornment: (
@@ -205,12 +251,15 @@ const ManageAccount: React.FC = () => {
                             }}
                         >
                             Apellido
+                            <span style={{ color: "red" }}>*</span>
                         </Typography>
                         <TextField
                             label=""
                             name="lastName"
                             value={formData.lastName}
                             onChange={handleChange}
+                            error={!!lastNameError}
+                            helperText={lastNameError}
                             required
                             InputProps={{
                                 endAdornment: (
@@ -243,12 +292,15 @@ const ManageAccount: React.FC = () => {
                             }}
                         >
                             Teléfono
+                            <span style={{ color: "red" }}>*</span>
                         </Typography>
                         <TextField
                             label=""
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
+                            error={!!phoneError}
+                            helperText={phoneError}
                             required
                             InputProps={{
                                 endAdornment: (
@@ -282,12 +334,15 @@ const ManageAccount: React.FC = () => {
                             }}
                         >
                             Correo Alternativo
+                            <span style={{ color: "red" }}>*</span>
                         </Typography>
                         <TextField
                             label=""
                             name="alternateEmail"
                             value={formData.alternateEmail}
                             onChange={handleChange}
+                            error={!!altEmailError}
+                            helperText={altEmailError}
                             required
                             InputProps={{
                                 endAdornment: (
@@ -397,23 +452,28 @@ const ManageAccount: React.FC = () => {
                 <Typography variant="body2" color="textSecondary" mt={2}>
                     *El asterisco indica los campos obligatorios.
                 </Typography>
-               
+
             </Paper>
             <Box
                 display="flex"
-                justifyContent="flex-end"
+                justifyContent="space-between"
+                alignItems="center"
                 mt={3}
             >
+
+
+                <SecondaryButton
+                    text="Cancelar"
+                    onClick={handleCancel}
+                    disabled={loading || !isDirty}
+                />
+
+
                 <Button
                     variant="contained"
                     color="primary"
                     onClick={handleSubmit}
-                    disabled={
-                        !formData.firstName ||
-                        !formData.lastName ||
-                        !formData.phone ||
-                        !formData.alternateEmail
-                    }
+                    disabled={saveDisabled}
                     sx={{
                         position: "relative",
                         backgroundColor: "#8D4B62",
@@ -435,6 +495,7 @@ const ManageAccount: React.FC = () => {
                         "Guardar cambios"
                     )}
                 </Button>
+
             </Box>
 
             {/* Modal de error */}

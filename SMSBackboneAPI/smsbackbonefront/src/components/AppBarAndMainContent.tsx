@@ -258,7 +258,17 @@ const NavBarAndDrawer: React.FC<Props> = props => {
         setSelectedLink(link); // Cambia el enlace seleccionado
     };
 
+    useEffect(() => {
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+            const user = JSON.parse(userDataString);
 
+            // Si el usuario es Root y no está ya en /Clients, redirige
+            if (user.rol === 'Root' && location.pathname !== '/Clients') {
+                navigate('/Clients');
+            }
+        }
+    }, [location.pathname]);
 
     const closeHelpModal = () => setHelpModalIsOpen(false);
 
@@ -457,6 +467,9 @@ const NavBarAndDrawer: React.FC<Props> = props => {
         a.click();
         window.URL.revokeObjectURL(url);
     };
+
+    const SHOW_NUMBER_SHORTCUTS = false;
+    const SHORTCUTS_WIDTH = 56;
 
     return (
         <>
@@ -1082,11 +1095,11 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                             {/* Créditos totales con sombra */}
                             <Box
                                 sx={{
+                                    width: SHOW_NUMBER_SHORTCUTS ? `calc(100% - ${SHORTCUTS_WIDTH + 8}px)` : '100%',
                                     background: '#DDD8D933',
                                     border: '1px solid #DDD8DA',
                                     borderRadius: '8px',
                                     padding: '12px',
-                                    width: '80%',
                                 }}
                             >
                                 <Typography
@@ -1187,126 +1200,127 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                             </Box>
                             {/* Contenedor para el botón redondo */}
                             {/* Contenedor para los dos botones (el de cambio y el dropdown) */}
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    top: '35%',
-                                    right: '5px',
-                                    transform: 'translateY(-50%)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '6px',
-                                    zIndex: 10,
-                                }}
-                            >
-                                {/* Botón cuadrado con icono de cambio */}
-                                <IconButton
+                            {SHOW_NUMBER_SHORTCUTS && (
+                                <Box
                                     sx={{
-                                        background: '#FFFFFF 0% 0% no-repeat padding-box',
-                                        boxShadow: '2px 2px 2px #6C64741A',
-                                        border: '1px solid #C6BFC299',
-                                        borderRadius: '8px',
-                                        padding: '10px',
+                                        position: 'absolute',
+                                        top: '35%',
+                                        right: '5px',
+                                        transform: 'translateY(-50%)',
                                         display: 'flex',
+                                        flexDirection: 'column',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        width: '44px',
-                                        height: '44px',
-                                        opacity: 1,
-                                        '&:hover': {
-                                            background: '#BE93A066 0% 0% no-repeat padding-box',
-                                            boxShadow: '2px 2px 2px #6C64741A',
-                                            border: '1px solid #D9C5CB',
-                                            opacity: 1,
-                                        },
-                                        '&:active': {
-                                            background: '#312D2E 0% 0% no-repeat padding-box',
-                                            boxShadow: '0px 8px 16px #837C7C7A',
-                                            border: '1px solid #BE93A066',
-                                            opacity: 1,
-                                        },
+                                        gap: '6px',
+                                        zIndex: 10,
                                     }}
                                 >
-                                    <Tooltip title="Mis números"
-                                        placement="top"
-                                        arrow
+                                    {/* Botón cuadrado con icono de cambio */}
+                                    <IconButton
+                                        sx={{
+                                            background: '#FFFFFF 0% 0% no-repeat padding-box',
+                                            boxShadow: '2px 2px 2px #6C64741A',
+                                            border: '1px solid #C6BFC299',
+                                            borderRadius: '8px',
+                                            padding: '10px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            width: '44px',
+                                            height: '44px',
+                                            opacity: 1,
+                                            '&:hover': {
+                                                background: '#BE93A066 0% 0% no-repeat padding-box',
+                                                boxShadow: '2px 2px 2px #6C64741A',
+                                                border: '1px solid #D9C5CB',
+                                                opacity: 1,
+                                            },
+                                            '&:active': {
+                                                background: '#312D2E 0% 0% no-repeat padding-box',
+                                                boxShadow: '0px 8px 16px #837C7C7A',
+                                                border: '1px solid #BE93A066',
+                                                opacity: 1,
+                                            },
+                                        }}
+                                    >
+                                        <Tooltip title="Mis números"
+                                            placement="top"
+                                            arrow
 
-                                        PopperProps={{
-                                            modifiers: [
-                                                {
-                                                    name: 'arrow',
-                                                    options: {
-                                                        padding: 8,
+                                            PopperProps={{
+                                                modifiers: [
+                                                    {
+                                                        name: 'arrow',
+                                                        options: {
+                                                            padding: 8,
+                                                        },
+                                                    },
+                                                ],
+                                            }}
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        fontFamily: 'Poppins',
+                                                        backgroundColor: '#322D2E',
+                                                        color: '#DEDADA',
+                                                        fontSize: '12px',
+                                                        borderRadius: '4px',
+                                                        padding: '6px 10px',
                                                     },
                                                 },
-                                            ],
-                                        }}
-                                        componentsProps={{
-                                            tooltip: {
-                                                sx: {
-                                                    fontFamily: 'Poppins',
-                                                    backgroundColor: '#322D2E',
-                                                    color: '#DEDADA',
-                                                    fontSize: '12px',
-                                                    borderRadius: '4px',
-                                                    padding: '6px 10px',
+                                                arrow: {
+                                                    sx: {
+                                                        color: '#322D2E',
+                                                    },
                                                 },
-                                            },
-                                            arrow: {
-                                                sx: {
-                                                    color: '#322D2E',
-                                                },
-                                            },
-                                        }}
+                                            }}
 
+                                        >
+
+                                            <img
+                                                src={rentaNumerosUrl}
+                                                alt="Renta Números"
+                                                style={{ width: '39px', height: '38px', }}
+                                                onClick={() => navigate('/MyNumbers')}
+
+                                            />
+                                        </Tooltip>
+                                    </IconButton>
+
+                                    {/* Botón de DropDown debajo */}
+                                    <IconButton
+                                        sx={{
+                                            background: '#FFFFFF 0% 0% no-repeat padding-box',
+                                            boxShadow: '2px 2px 2px #6C64741A',
+                                            border: '1px solid #C6BFC299',
+                                            borderRadius: '8px',
+                                            padding: '6px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            width: '32px',
+                                            height: '32px',
+                                            opacity: 1,
+                                            marginTop: '20px',
+                                            '&:hover': {
+                                                background: '#EBE5E7 0% 0% no-repeat padding-box',
+                                                boxShadow: '2px 2px 2px #6C64741A',
+                                                border: '1px solid #D9C5CB',
+                                                opacity: 1,
+                                            },
+                                            '&:active': {
+                                                background: '#EBD9DF 0% 0% no-repeat padding-box',
+                                                boxShadow: '2px 2px 2px #6C64741A',
+                                                border: '1px solid #BE93A066',
+                                                opacity: 1,
+                                            },
+                                        }}
+                                        onClick={() => console.log("Dropdown clicked")}
                                     >
-
-                                        <img
-                                            src={rentaNumerosUrl}
-                                            alt="Renta Números"
-                                            style={{ width: '39px', height: '38px', }}
-                                            onClick={() => navigate('/MyNumbers')}
-
-                                        />
-                                    </Tooltip>
-                                </IconButton>
-
-                                {/* Botón de DropDown debajo */}
-                                <IconButton
-                                    sx={{
-                                        background: '#FFFFFF 0% 0% no-repeat padding-box',
-                                        boxShadow: '2px 2px 2px #6C64741A',
-                                        border: '1px solid #C6BFC299',
-                                        borderRadius: '8px',
-                                        padding: '6px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        width: '32px',
-                                        height: '32px',
-                                        opacity: 1,
-                                        marginTop: '20px',
-                                        '&:hover': {
-                                            background: '#EBE5E7 0% 0% no-repeat padding-box',
-                                            boxShadow: '2px 2px 2px #6C64741A',
-                                            border: '1px solid #D9C5CB',
-                                            opacity: 1,
-                                        },
-                                        '&:active': {
-                                            background: '#EBD9DF 0% 0% no-repeat padding-box',
-                                            boxShadow: '2px 2px 2px #6C64741A',
-                                            border: '1px solid #BE93A066',
-                                            opacity: 1,
-                                        },
-                                    }}
-                                    onClick={() => console.log("Dropdown clicked")}
-                                >
-                                    <img src={DropDownIcon} alt="Dropdown Icon" style={{ width: '20px', height: 'auto', transform: 'rotate(90deg)' }} />
-                                </IconButton>
-                            </Box>
-
+                                        <img src={DropDownIcon} alt="Dropdown Icon" style={{ width: '20px', height: 'auto', transform: 'rotate(90deg)' }} />
+                                    </IconButton>
+                                </Box>
+                            )}
                         </Box>
 
                         {/* Botones Gestionar y Recargar */}
@@ -1452,7 +1466,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                 }} />
 
                                             <ListItemText
-                                                primary="Clients"
+                                                primary="Clientes"
                                                 primaryTypographyProps={{
                                                     fontFamily: "Poppins",
                                                     marginLeft: '30px',

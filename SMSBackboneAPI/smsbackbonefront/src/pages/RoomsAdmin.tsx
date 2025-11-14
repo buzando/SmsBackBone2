@@ -42,6 +42,7 @@ interface Clients {
 }
 
 export interface RoomAdminData {
+    idRoom: number;
     id: number;
     fechaAlta: string;
     nombrecliente: string;
@@ -288,23 +289,32 @@ const RoomsAdmin: React.FC = () => {
 
     const handleDelete = async (id: number) => {
         try {
+            const id = rowToDelete?.idRoom;
+            const requestUrl = `${import.meta.env.VITE_API_DELETE_ROOM}?id=${rowToDelete?.idRoom}`;
+            const response = await axios.get(requestUrl);
 
-            const requestUrl = `${import.meta.env.VITE_API_DELETE_CLIENT}${id}`;
-            await axios.get(requestUrl);
+            if (response.data?.ok) {
+                setDeleteModalOpen(false);
+                setRowToDelete(null);
 
-            setDeleteModalOpen(false);
-            setRowToDelete(null);
-
-            const updated = roomsData.filter(r => r.id !== id);
-            setRoomsData(updated);
-            setOriginalData(updated);
-            setCurrentPageData(updated.slice(0, itemsPerPage));
-            setShowSnackBar(true);
+                const updated = roomsData.filter(r => r.idRoom !== id);
+                setRoomsData(updated);
+                setOriginalData(updated);
+                setCurrentPageData(updated.slice(0, itemsPerPage));
+                setShowSnackBar(true);
+            }
+            else {
+                setDeleteModalOpen(false);
+                setShowModalError(true);
+                setTitleModalError(response.data?.message || "Error al eliminar la sala");
+            }
         } catch (error) {
+            setDeleteModalOpen(false);
             setShowModalError(true);
-            setTitleModalError('Error al eliminar la campaña');
+            setTitleModalError("Error al eliminar la sala");
         }
     };
+
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
@@ -751,7 +761,8 @@ const RoomsAdmin: React.FC = () => {
                                             <IconButton
                                                 onClick={(event) => {
                                                     setAnchorEl(event.currentTarget);
-                                                    setSelectedRow(room); // o el item actual
+                                                    setSelectedRow(room);
+                                                    setRowToDelete(room);
                                                 }}
                                             >
                                                 <MoreVertIcon sx={{ color: '#7B354D' }} />

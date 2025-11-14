@@ -24,7 +24,7 @@ import backarrow from '../assets/MoveTable.svg';
 import emptybox from '../assets/Nousers.svg';
 import NoResult from '../assets/NoResultados.svg';
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
-
+import SnackBar from "../components/commons/ChipBar";
 interface Clients {
     id: number;
     nombrecliente: string;
@@ -60,6 +60,8 @@ const ReportsAdmin = () => {
     const [pagination, SetPagination] = useState(0);
     const [totaldivision, Settotaldivision] = useState(0);
     const [resetKey, setResetKey] = useState(0);
+    const [MessageSnack, setMessageSnack] = useState("");
+    const [ShowSnackBar, setShowSnackBar] = useState(false);
     const DualSpinner = () => (
         <Box
             sx={{
@@ -198,6 +200,13 @@ const ReportsAdmin = () => {
                 a.download = response.data?.fileName;
                 a.click();
                 window.URL.revokeObjectURL(url);
+
+
+                setMessageSnack('Reporte Descargado correctamente');
+                setShowSnackBar(true);
+                setTimeout(() => {
+                    setShowSnackBar(false);
+                }, 5000);
             } else {
                 console.error("Error: No se generó el archivo.");
             }
@@ -230,6 +239,21 @@ const ReportsAdmin = () => {
         if (currentPage > 0) setCurrentPage(currentPage - 1);
     };
 
+    useEffect(() => {
+        if (openFecha) {
+            setClientMenuOpen(false);
+            setClientAnchorEl(null);
+        }
+    }, [openFecha]);
+
+    useEffect(() => {
+        if (clientMenuOpen) {
+            setOpenFecha(false);
+            setAnchorElFecha(null);
+        }
+    }, [clientMenuOpen]);
+
+    const showToolbar = hasFiltered && originalData.length > 0;
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", width: '100%', minHeight: 'calc(100vh - 80px)', overflow: 'hidden' }}>
@@ -290,27 +314,39 @@ const ReportsAdmin = () => {
                 <Box sx={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '24px', mt: 1 }}>
                     {['FECHA', 'CLIENTE'].map((label) => {
                         const key = label.toLowerCase() as 'fecha' | 'cliente';
-                        const isActive = activeFilter === key;
-                        const isFecha = key === 'fecha';
-                        const isCliente = key === 'cliente';
+                        const isActive =
+                            (key === 'fecha' && selectedStartDate && selectedEndDate) ||
+                            (key === 'cliente' && selectedClients.length > 0);
+
                         const hasFechas = selectedStartDate && selectedEndDate;
                         const fechaLabel = hasFechas
                             ? `${dayjs(selectedStartDate).format('D MMM, HH:mm')} – ${dayjs(selectedEndDate).format('D MMM HH:mm')}`
                             : 'FECHA';
 
+                        const clienteLabel =
+                            selectedClients.length > 0
+                                ? `${selectedClients.length} CLIENTE${selectedClients.length > 1 ? 'S' : ''}`
+                                : 'CLIENTE';
+
                         return (
                             <Box
                                 key={label}
+                                // dentro del map de chips
                                 onClick={(event) => {
                                     setActiveFilter(key);
                                     if (key === 'fecha') {
+                                        setClientMenuOpen(false);
+                                        setClientAnchorEl(null);
                                         setAnchorElFecha(event.currentTarget);
                                         setOpenFecha(true);
-                                    } else if (key === 'cliente') {
+                                    } else {
+                                        setOpenFecha(false);
+                                        setAnchorElFecha(null);
                                         setClientAnchorEl(event.currentTarget);
                                         setClientMenuOpen(true);
                                     }
                                 }}
+
                                 sx={{
                                     px: '16px',
                                     py: '6px',
@@ -324,14 +360,18 @@ const ReportsAdmin = () => {
                                     backgroundColor: isActive ? '#F6EEF1' : '#FFFFFF',
                                     color: isActive ? '#7B354D' : '#9B9295',
                                     transition: 'all 0.2s ease-in-out',
-                                    userSelect: 'none', marginBottom: "-10px"
+                                    userSelect: 'none',
+                                    marginBottom: '-10px',
                                 }}
                             >
-                                {isFecha ? fechaLabel : label}
+                                {key === 'fecha'
+                                    ? (isActive ? fechaLabel : 'FECHA')
+                                    : (isActive ? clienteLabel : 'CLIENTE')}
                             </Box>
                         );
                     })}
                 </Box>
+
 
                 {/* Divider inferior opcional */}
                 <Divider sx={{ marginBottom: "5px" }} />
@@ -347,89 +387,89 @@ const ReportsAdmin = () => {
 
 
 
+                    {showToolbar && (
+                        <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" mt={-0.5} mb={-0.5}>
+                            {/* Paginación + texto */}
+                            <Box display="flex" alignItems="center" gap={2}>
+                                <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E", whiteSpace: "nowrap" }}>
+                                    {`${(currentPage - 1) * pagination + 1}–${Math.min(currentPage * pagination, totalregisters)} de ${totalregisters}`}
+                                </Typography>
 
-                    <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" mt={-0.5} mb={-0.5}>
-                        {/* Paginación + texto */}
-                        <Box display="flex" alignItems="center" gap={2}>
-                            <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E", whiteSpace: "nowrap" }}>
-                                {`${(currentPage - 1) * pagination + 1}–${Math.min(currentPage * pagination, totalregisters)} de ${totalregisters}`}
-                            </Typography>
+                                {/* Botones de navegación */}
+                                <Tooltip title="Primera página" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
+                                    <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
+                                        <Box display="flex" alignItems="center" sx={{ opacity: currentPage === 1 ? 0.3 : 1 }}>
+                                            <img src={backarrow} style={{ width: 24, marginRight: "-16px" }} />
+                                            <img src={backarrow} style={{ width: 24 }} />
+                                        </Box>
+                                    </IconButton>
+                                </Tooltip>
 
-                            {/* Botones de navegación */}
-                            <Tooltip title="Primera página" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
-                                <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
-                                    <Box display="flex" alignItems="center" sx={{ opacity: currentPage === 1 ? 0.3 : 1 }}>
-                                        <img src={backarrow} style={{ width: 24, marginRight: "-16px" }} />
-                                        <img src={backarrow} style={{ width: 24 }} />
-                                    </Box>
-                                </IconButton>
-                            </Tooltip>
+                                <Tooltip title="Página anterior" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
+                                    <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                                        <img src={backarrow} style={{ width: 24, opacity: currentPage === 1 ? 0.3 : 1, marginLeft: "-18px" }} />
+                                    </IconButton>
+                                </Tooltip>
 
-                            <Tooltip title="Página anterior" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
-                                <IconButton onClick={handlePrevPage} disabled={currentPage === 1}>
-                                    <img src={backarrow} style={{ width: 24, opacity: currentPage === 1 ? 0.3 : 1, marginLeft: "-18px" }} />
-                                </IconButton>
-                            </Tooltip>
+                                <Tooltip title="Siguiente página" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
+                                    <IconButton onClick={handleNextPage} disabled={currentPage === totaldivision}>
+                                        <img
+                                            src={backarrow}
+                                            style={{
+                                                width: 24,
+                                                transform: 'rotate(180deg)',
+                                                marginRight: "-28px",
+                                                marginLeft: "-28px",
+                                                opacity: currentPage === totaldivision ? 0.3 : 1
+                                            }}
+                                        />
+                                    </IconButton>
+                                </Tooltip>
 
-                            <Tooltip title="Siguiente página" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
-                                <IconButton onClick={handleNextPage} disabled={currentPage === totaldivision}>
-                                    <img
-                                        src={backarrow}
-                                        style={{
-                                            width: 24,
-                                            transform: 'rotate(180deg)',
-                                            marginRight: "-28px",
-                                            marginLeft: "-28px",
-                                            opacity: currentPage === totaldivision ? 0.3 : 1
-                                        }}
-                                    />
-                                </IconButton>
-                            </Tooltip>
+                                <Tooltip title="Última página" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
+                                    <IconButton onClick={goToLastPage} disabled={currentPage === Math.ceil(pagination / totalregisters)}>
+                                        <Box display="flex" alignItems="center" sx={{ opacity: currentPage === totaldivision ? 0.3 : 1 }}>
+                                            <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-6px" }} />
+                                            <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-16px" }} />
+                                        </Box>
+                                    </IconButton>
+                                </Tooltip>
+                            </Box>
 
-                            <Tooltip title="Última página" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
-                                <IconButton onClick={goToLastPage} disabled={currentPage === Math.ceil(pagination / totalregisters)}>
-                                    <Box display="flex" alignItems="center" sx={{ opacity: currentPage === totaldivision ? 0.3 : 1 }}>
-                                        <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-6px" }} />
-                                        <img src={backarrow} style={{ width: 24, transform: 'rotate(180deg)', marginLeft: "-16px" }} />
-                                    </Box>
-                                </IconButton>
-                            </Tooltip>
+                            {/* Botones de exportación */}
+                            <Box display="flex" alignItems="center" gap={1}>
+                                <Tooltip title="Exportar a CSV" placement="top" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
+                                    <IconButton
+                                        onClick={() => handleExportClick('csv', setIsExportingCSV)}
+                                        disabled={anyExporting && !isExportingCSV}
+                                        sx={{ opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
+                                    >
+                                        {isExportingCSV ? <DualSpinner /> : <img src={IconDownloadCSV} alt="CSV" />}
+                                    </IconButton>
+                                </Tooltip>
+
+                                <Tooltip title="Exportar a Excel" placement="top" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
+                                    <IconButton
+                                        onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
+                                        disabled={anyExporting && !isExportingXLSX}
+                                        sx={{ opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
+                                    >
+                                        {isExportingXLSX ? <DualSpinner /> : <img src={IconDownloadExcel} alt="Excel" />}
+                                    </IconButton>
+                                </Tooltip>
+
+                                <Tooltip title="Exportar a PDF" placement="top" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
+                                    <IconButton
+                                        onClick={() => handleExportClick('pdf', setIsExportingPDF)}
+                                        disabled={anyExporting && !isExportingPDF}
+                                        sx={{ opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
+                                    >
+                                        {isExportingPDF ? <DualSpinner /> : <img src={IconDownloadPDF} alt="PDF" />}
+                                    </IconButton>
+                                </Tooltip>
+                            </Box>
                         </Box>
-
-                        {/* Botones de exportación */}
-                        <Box display="flex" alignItems="center" gap={1}>
-                            <Tooltip title="Exportar a CSV" placement="top" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
-                                <IconButton
-                                    onClick={() => handleExportClick('csv', setIsExportingCSV)}
-                                    disabled={anyExporting && !isExportingCSV}
-                                    sx={{ opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
-                                >
-                                    {isExportingCSV ? <DualSpinner /> : <img src={IconDownloadCSV} alt="CSV" />}
-                                </IconButton>
-                            </Tooltip>
-
-                            <Tooltip title="Exportar a Excel" placement="top" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
-                                <IconButton
-                                    onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
-                                    disabled={anyExporting && !isExportingXLSX}
-                                    sx={{ opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
-                                >
-                                    {isExportingXLSX ? <DualSpinner /> : <img src={IconDownloadExcel} alt="Excel" />}
-                                </IconButton>
-                            </Tooltip>
-
-                            <Tooltip title="Exportar a PDF" placement="top" componentsProps={{ tooltip: { sx: tooltipStyle }, arrow: { sx: arrowStyle } }} arrow>
-                                <IconButton
-                                    onClick={() => handleExportClick('pdf', setIsExportingPDF)}
-                                    disabled={anyExporting && !isExportingPDF}
-                                    sx={{ opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
-                                >
-                                    {isExportingPDF ? <DualSpinner /> : <img src={IconDownloadPDF} alt="PDF" />}
-                                </IconButton>
-                            </Tooltip>
-                        </Box>
-                    </Box>
-
+                    )}
                 </Box>
                 <Box mt={0}>
                     {!hasFiltered ? (
@@ -902,7 +942,19 @@ const ReportsAdmin = () => {
                 }}
                 placement="bottom-start"
             />
+
+            {
+                ShowSnackBar && (
+                    <SnackBar
+                        message={MessageSnack}
+                        buttonText="Cerrar"
+                        onClose={() => setShowSnackBar(false)}
+                    />
+                )
+            }
         </Box>
+
+
     );
 };
 const tooltipStyle = {

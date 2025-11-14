@@ -1039,7 +1039,6 @@ const Register: React.FC = () => {
                                     </Typography>
                                     <TextField
                                         name="password"
-                                        label="Contraseña*"
                                         type={showPassword ? "text" : "password"}
                                         value={password}
                                         onChange={handlePasswordChange}

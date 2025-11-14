@@ -122,7 +122,7 @@ namespace SMSBackboneAPI.Controllers
                 var clientManager = new ClientManager();
 
                 bool result;
-                string passwordtmp = string.Empty; // lo dejas como lo tenías
+                string passwordtmp = string.Empty; 
 
                 if (dto.Id.HasValue)
                 {

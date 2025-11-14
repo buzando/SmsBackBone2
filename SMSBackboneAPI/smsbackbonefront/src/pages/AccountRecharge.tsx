@@ -292,8 +292,20 @@ const AccountRecharge: React.FC = () => {
 
 
     const handleRechargeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRechargeAmount(event.target.value);
+        let value = event.target.value;
+
+        // Evitar negativos
+        if (value.startsWith('-')) value = value.replace('-', '');
+
+        // Evitar notación científica o caracteres extraños
+        value = value.replace(/[^0-9]/g, '');
+
+        // Si queda vacío, es 0
+        if (value === '') value = '0';
+
+        setRechargeAmount(value);
     };
+
 
 
     const fetchCreditCards = async () => {
@@ -883,9 +895,23 @@ const AccountRecharge: React.FC = () => {
                                 type="number"
                                 value={creditAmount}
                                 onChange={(e) => {
-                                    const value = e.target.value;
+                                    let value = e.target.value;
+
+                                    value = value.replace(/[^0-9]/g, '');
+
+                                    if (value.length > 1 && value.startsWith('0')) {
+                                        value = value.replace(/^0+/, '');
+                                        if (value === '') value = '0';
+                                    }
+
                                     setCreditAmount(value);
-                                    calculateCredits(value); // 🔥 Calcula en tiempo real
+                                    calculateCredits(value);
+                                }}
+
+                                onKeyDown={(e) => {
+                                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                                        e.preventDefault();
+                                    }
                                 }}
                                 variant="outlined"
                                 fullWidth
@@ -894,17 +920,26 @@ const AccountRecharge: React.FC = () => {
                                         textAlign: "left",
                                         fontFamily: "Poppins, sans-serif",
                                         fontSize: "16px",
-                                        fontWeight: 500, // medium
+                                        fontWeight: 500,
                                         lineHeight: "54px",
                                         letterSpacing: "0.03px",
                                         color: "#574B4F",
                                         opacity: 1,
-                                        height: "54px", // Altura fija según la imagen
-                                        backgroundColor: "#FFFFFF", // Asegurar fondo blanco
+                                        height: "54px",
+                                        backgroundColor: "#FFFFFF",
+
+                                        /* AQUÍ SE OCULTAN LOS SPINNERS */
+                                        "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button": {
+                                            WebkitAppearance: "none",
+                                            margin: 0,
+                                        },
+                                        "& input[type=number]": {
+                                            MozAppearance: "textfield",
+                                        },
                                     },
                                 }}
                                 sx={{
-                                    width: "210px", // Ancho según la imagen
+                                    width: "210px",
                                     "& .MuiOutlinedInput-root": {
                                         borderRadius: "5px",
                                         border: "1px solid #dcdcdc",
@@ -912,14 +947,15 @@ const AccountRecharge: React.FC = () => {
                                             borderColor: "#dcdcdc",
                                         },
                                         "&:hover fieldset": {
-                                            borderColor: "#b8b8b8", // Cambio de color al pasar el mouse
+                                            borderColor: "#b8b8b8",
                                         },
                                         "&.Mui-focused fieldset": {
-                                            borderColor: "#574B4F", // Color al seleccionar
+                                            borderColor: "#574B4F",
                                         },
                                     },
                                 }}
                             />
+
                         </div>
 
                         <div style={{ flex: 1 }}>

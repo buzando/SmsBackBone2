@@ -117,7 +117,7 @@ namespace SMSBackboneAPI.Controllers
                 var responseDto = RoomManager.DeleteRoom(id);
 
                 sw.Stop();
-                if (!responseDto)
+                if (!responseDto.Ok)
                 {
                     _log.Warn($"[{rid}] DeleteRoom badrequest id={id} ms={sw.ElapsedMilliseconds}");
                     return BadRequest(new GeneralErrorResponseDto() { code = "Error", description = "Creating ROOM" });
@@ -125,7 +125,7 @@ namespace SMSBackboneAPI.Controllers
                 else
                 {
                     _log.Info($"[{rid}] DeleteRoom ok id={id} ms={sw.ElapsedMilliseconds}");
-                    var response = Ok();
+                    var response = Ok(responseDto);
                     return response;
                 }
             }

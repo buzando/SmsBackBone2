@@ -427,7 +427,10 @@ const Templates = () => {
 
 
     const handleOpenModal = () => setOpenModal(true);
-    const handleCloseModal = () => setOpenModal(false);
+    const handleCloseModal = () => {
+        setOpenModal(false)
+        resetTemplateForm();
+    };
 
     const handlePreviewClick = () => {
         console.log("Mensaje crudo:", mensaje);
@@ -1022,10 +1025,12 @@ const Templates = () => {
                     </Typography>
 
                     {isEdit ? (
-                        <DynamicMessageEditText
-                            value={mensaje}
-                            onChange={setEditMessage}
-                            variables={extractVariablesFromMessage(editMessage)}
+                        <DynamicMessageEditor
+                            initialMessage={mensaje}
+                            onChange={(value) => {
+                                setMensaje(value);
+                                setEditMessage(value);
+                            }}
                         />
                     ) : (
                         <DynamicMessageEditor

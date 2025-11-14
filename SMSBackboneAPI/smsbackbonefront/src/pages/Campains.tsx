@@ -268,7 +268,7 @@ const Campains: React.FC = () => {
   const [loadingPage, setLoadingPage] = useState(false);
   const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(null);
   const [allowConcatenation, setAllowConcatenation] = useState(false);
-const [autoStart, setAutoStart] = useState(false);
+  const [autoStart, setAutoStart] = useState(false);
 
   const [openPicker, setOpenPicker] = useState<{
     open: boolean;
@@ -1397,6 +1397,7 @@ const [autoStart, setAutoStart] = useState(false);
 
   const canDuplicate =
     !!duplicateName.trim() &&
+    !isFormatInvalid &&
     duplicateHorarios.length >= 1 &&
     !!duplicateHorarios[0].start &&
     !!duplicateHorarios[0].end;
@@ -1424,6 +1425,45 @@ const [autoStart, setAutoStart] = useState(false);
     }
   })();
 
+  const handleBackCreate = () => {
+    if (activeStep === 1 && mensajeAceptado) {
+      setMensajeAceptado(false);
+
+      setTipoMensaje('escrito');
+      setSelectedTemplate(undefined);
+      setMensajeTexto('');
+      return;
+    }
+
+    // En cualquier otro caso, retroceder de paso normalmente
+    setActiveStep((prev) => prev - 1);
+  };
+
+
+  // ✅ Créditos de la sala (desde localStorage)
+  const [roomCredits, setRoomCredits] = useState<number>(0);
+
+  useEffect(() => {
+    const readCredits = () => {
+      try {
+        const room = JSON.parse(localStorage.getItem('selectedRoom') || '{}');
+        const credits = Number(room?.credits ?? room?.credit ?? 0);
+        setRoomCredits(isNaN(credits) ? 0 : credits);
+      } catch {
+        setRoomCredits(0);
+      }
+    };
+
+    readCredits();
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'selectedRoom') readCredits();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  const canSendQuickTest = !!phone && !error && roomCredits > 0;
 
 
   return (
@@ -2138,12 +2178,6 @@ const [autoStart, setAutoStart] = useState(false);
                         </Box>
                       </Typography>
                       <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
-                        Registros <br />respondidos:<br />
-                        <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F" }}>
-                          {selectedCampaign?.respondedRecords ?? 0}
-                        </Box>
-                      </Typography>
-                      <Typography sx={{ fontSize: "12px", fontFamily: "Poppins", opacity: 0.7, textAlign: "center" }}>
                         Registros <br />fuera de horario:<br />
                         <Box component="span" sx={{ fontSize: "24px", fontWeight: "bold", color: "#574B4F" }}>
                           {selectedCampaign?.outOfScheduleRecords ?? 0}
@@ -2478,7 +2512,7 @@ const [autoStart, setAutoStart] = useState(false);
                             <MainButton
                               text="Enviar"
                               onClick={handleSend}
-                              disabled={!phone || error}
+                              disabled={!canSendQuickTest}
                             />
                           </Box>
 
@@ -2542,10 +2576,6 @@ const [autoStart, setAutoStart] = useState(false);
                         </TableHead>
                         <TableBody>
                           {[
-                            {
-                              tipo: "Respondidos",
-                              total: selectedCampaign?.respondedRecords ?? 0
-                            },
                             {
                               tipo: "Fuera de horario",
                               total: selectedCampaign?.outOfScheduleRecords ?? 0
@@ -6285,7 +6315,7 @@ const [autoStart, setAutoStart] = useState(false);
           <Box sx={{ display: "flex", gap: "20px" }}>
             {activeStep > -1 && (
               <Button
-                onClick={() => setActiveStep((prev) => prev - 1)}
+                onClick={handleBackCreate}
                 sx={{
                   width: "118px",
                   height: "36px",
@@ -6324,7 +6354,7 @@ const [autoStart, setAutoStart] = useState(false);
                 letterSpacing: "1.12px",
               }}
             >
-              {activeStep === 2 || (activeStep === 0 && !postCargaActiva) ? "Cargar" : "Siguiente"}
+              {activeStep === 2 || (activeStep === 0 && !postCargaActiva) ? "Crear" : "Siguiente"}
 
             </Button>
           </Box>
@@ -8815,7 +8845,7 @@ const [autoStart, setAutoStart] = useState(false);
             <MainButton
               onClick={handleConfirmDuplicateCampaign}
               text='Duplicar'
-              disabled={!duplicateName || isDuplicateNameInvalid}
+              disabled={!canDuplicate}
             />
           </DialogActions>
         </Box>

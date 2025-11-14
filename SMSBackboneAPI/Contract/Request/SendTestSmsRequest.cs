@@ -16,5 +16,6 @@ namespace Contract.Request
         public int UserID { get; set; }
         public bool Concatenate { get; set; }
         public bool Flash { get; set; }
+        public string SmsType { get; set; }
     }
 }

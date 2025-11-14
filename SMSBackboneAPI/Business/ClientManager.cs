@@ -201,7 +201,7 @@ namespace Business
                                     Extension = reader.IsDBNull(reader.GetOrdinal("extension"))
     ? (int?)null
     : reader.GetInt32(reader.GetOrdinal("extension")),
-                                    RoomName = reader.GetString(reader.GetOrdinal("RoomName")) ?? "",
+                                    RoomName = reader["RoomName"] as string ?? "",
                                     TotalCredits = reader.GetDouble(reader.GetOrdinal("TotalCredits")),
                                     TotalLongSmsCredits = reader.GetDouble(reader.GetOrdinal("TotalLongSmsCredits")),
                                     TotalShortSmsCredits = reader.GetDouble(reader.GetOrdinal("TotalShortSmsCredits")),
@@ -375,6 +375,20 @@ namespace Business
                 {
                     try
                     {
+                        var email = (dto.Email ?? string.Empty).Trim().ToLower();
+                        bool emailExists = ctx.Users.Any(u =>
+                   (u.email != null && u.email.ToLower() == email) ||
+                   (u.userName != null && u.userName.ToLower() == email) ||
+                   (u.SecondaryEmail != null && u.SecondaryEmail.ToLower() == email)
+               );
+
+                        if (emailExists)
+                        {
+                            // opcional: loguea para diagnóstico
+                            log.Warn($"CreateClient: intento con email duplicado '{dto.Email}'.");
+                            return false; // o lanza una excepción si prefieres
+                        }
+
                         // 1. Crear cliente
                         var client = new clients
                         {
@@ -914,7 +928,7 @@ namespace Business
                                     creditosGlobales = r.credits,
                                     creditosSmsCortos = r.short_sms,
                                     creditosSmsLargos = r.long_sms,
-
+                                    IdRoom = r.id,
                                     CanBeDeleted = !ctx.Campaigns.Any(cam => cam.RoomId == r.id)
                                 };
 

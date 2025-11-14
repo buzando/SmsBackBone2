@@ -209,6 +209,18 @@ const Clients: React.FC = () => {
     const [longRates, setLongRates] = useState<SmsCost[]>([]);
     const [standardShortRates, setStandardShortRates] = useState<Record<string, number>>({});
     const [standardLongRates, setStandardLongRates] = useState<Record<string, number>>({});
+    const [phoneError, setPhoneError] = useState(false);
+    const [clientNameError, setClientNameError] = useState(false);
+    const [firstNameError, setFirstNameError] = useState(false);
+    const [lastNameError, setLastNameError] = useState(false);
+    const [extError, setExtError] = useState(false);
+
+    const reClientName = /^[\p{L}\d\s.&-]{2,100}$/u;
+    const rePersonName = /^[\p{L}\s'’-]{2,60}$/u;
+    const reExt = /^\d{0,5}$/;
+    const reEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const rePhone10 = /^\d{10}$/;
+
 
     const DualSpinner = () => (
         <Box
@@ -289,7 +301,14 @@ const Clients: React.FC = () => {
                     ...new Map(fetchedClient.map((item: Clients) => [item.nombreCliente, item])).values()
                 ];
                 setClientsList(uniqueClients);
-                setOriginalData(uniqueClients);
+                const sinFiltros =
+                    (!requestPayload.ClienteIds || requestPayload.ClienteIds.length === 0) &&
+                    (!requestPayload.Estatus || requestPayload.Estatus.length === 0) &&
+                    !requestPayload.SearchTerm;
+
+                if (sinFiltros) {
+                    setOriginalData(uniqueClients);
+                }
                 setTotalPages(Math.ceil(response.data.total / itemsPerPage));
                 setItemsPerPage(response.data.total);
                 setTotalItems(response.data.total);
@@ -351,16 +370,11 @@ const Clients: React.FC = () => {
         callback: () => void
     ) => {
         try {
-            const selectedRoom = localStorage.getItem("selectedRoom");
-            if (!selectedRoom) {
-                return;
-            }
 
-            const roomId = JSON.parse(selectedRoom).id;
             const payload = {
                 ReportType: "Clients",
                 Format: format,
-                RoomId: roomId,
+                RoomId: 0,
                 PageOrigin: "Reportes"
             };
 
@@ -547,10 +561,13 @@ const Clients: React.FC = () => {
             }
 
             setShowSnackBar(true);
+            setTimeout(() => {
+                setShowSnackBar(false);
+            }, 5000);
             setMainModal(false);
         } catch (error) {
             setTitleModalError('Error al agregar el cliente');
-            setMessageModal('Intentelo màs tarde');
+            setMessageModal('Intentelo más tarde');
             setShowModalError(true);
         }
         finally {
@@ -578,14 +595,25 @@ const Clients: React.FC = () => {
                         : client
                 )
             );
+            const message =
+                newStatus === 0
+                    ? 'El cliente ha sido dado de baja exitosamente'
+                    : 'El cliente ha sido activado exitosamente';
+
+            setMessageSnack(message);
             setShowSnackBar(true);
-            setMessageSnack('Cliente desactivado correctamente');
+            setTimeout(() => {
+                setShowSnackBar(false);
+            }, 5000);
             setMainModal(false);
 
         } catch (error) {
             setTitleModalError('Error al desactivar el cliente');
             setMessageModal('Intentelo màs tarde');
             setShowModalError(true);
+        }
+        finally {
+            setAnchorEl(null);
         }
     };
 
@@ -626,6 +654,9 @@ const Clients: React.FC = () => {
             setMainModalDelete(false);
             setShowSnackBar(true);
             setMessageSnack('Cliente Eliminado correctamente');
+            setTimeout(() => {
+                setShowSnackBar(false);
+            }, 5000);
         } catch (error) {
             console.error('Error al eliminar cliente:', error);
             setTitleModalError('Error al eliminar el cliente');
@@ -724,6 +755,9 @@ const Clients: React.FC = () => {
                 GetClientsAdmin();
                 setShowSnackBar(true);
                 setMessageSnack('Recarga Exitosa');
+                setTimeout(() => {
+                    setShowSnackBar(false);
+                }, 5000);
             } else {
                 setTitleModalError('Error al capturar la recarga');
                 setMessageModal('Intentelo màs tarde');
@@ -785,6 +819,74 @@ const Clients: React.FC = () => {
 
 
     const showEstadoHighlight = selectedStatus.length > 0;
+
+    const resetClientModalState = () => {
+        // core del modal
+        setSelectedClient(null);
+        setIsEditClient(false);
+        setStep(0);
+
+        // inputs de Info
+        setEmail('');
+        setConfirmEmail('');
+        setEmailError(false);
+        setConfirmEmailError(false);
+
+        // tarifas (tipos + cantidades + precios)
+        setShortRateType('estandar');
+        setLongRateType('estandar');
+
+        setShortStandardQty('');
+        setShortStandardPrice('');
+        setShortCustomQty('');
+
+        setLongStandardQty('');
+        setLongStandardPrice('');
+        setLongCustomQty('');
+
+
+        setNewRooms(['']);
+    };
+
+    const handleCloseClientModal = () => {
+        resetClientModalState();
+        setOpenClientModal(false);
+    };
+
+    const isStepValid = () => {
+        if (step === 0) {
+            const phoneOk = rePhone10.test((selectedClient?.phoneNumber || '').trim());
+            const clientNameOk = reClientName.test((selectedClient?.nombreCliente || '').trim());
+            const firstOk = rePersonName.test((selectedClient?.firstName || '').trim());
+            const lastOk = rePersonName.test((selectedClient?.lastName || '').trim());
+            const extOk = !extError; // ya limitado arriba
+            const emailOk = reEmail.test(email.trim());
+            const confirmOk = email === confirmEmail && reEmail.test(confirmEmail.trim());
+
+            const noErrors = !clientNameError && !firstNameError && !lastNameError &&
+                !phoneError && !extError && !emailError && !confirmEmailError;
+
+            return clientNameOk && firstOk && lastOk && phoneOk && extOk && emailOk && confirmOk && noErrors;
+        }
+
+        if (step === 1) {
+            const shortValid = shortRateType === 'estandar'
+                ? shortStandardQty && shortStandardPrice
+                : shortCustomQty && selectedClient?.rateForShort;
+
+            const longValid = longRateType === 'estandar'
+                ? longStandardQty && longStandardPrice
+                : longCustomQty && selectedClient?.rateForLong;
+
+            return !!(shortValid && longValid);
+        }
+
+        return true;
+    };
+
+
+
+
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             {/* Header con título y flecha */}
@@ -1225,6 +1327,10 @@ const Clients: React.FC = () => {
                                         textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
                                         fontWeight: 500, color: "#330F1B", fontSize: "13px"
                                     }}>Créditos SMS # Largos</th>
+                                    <th style={{
+                                        textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
+                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
+                                    }}>Fecha de desactivación</th>
                                     <td style={{
                                         position: 'sticky', textAlign: "center",
                                         right: -2,
@@ -1320,7 +1426,12 @@ const Clients: React.FC = () => {
                                             fontSize: "13px"
 
                                         }}>{Client.totalLongSmsCredits}</td>
+                                        <td style={{
+                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins',
+                                            fontSize: "13px"
 
+                                        }}>{Client.deactivationDate}</td>
                                         <td style={{
                                             position: 'sticky', textAlign: "center",
                                             right: -2,
@@ -1365,8 +1476,9 @@ const Clients: React.FC = () => {
                         fontFamily: 'Poppins',
                         fontSize: '14px',
                         width: "198px",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         '&:hover': {
+                            borderRadius: 0,
                             backgroundColor: '#F2EBED'
                         }
                     }}
@@ -1388,7 +1500,9 @@ const Clients: React.FC = () => {
                     sx={{
                         fontFamily: 'Poppins',
                         fontSize: '14px',
+                        borderRadius: 0,
                         '&:hover': {
+                            borderRadius: 0,
                             backgroundColor: '#F2EBED'
                         }
                     }}
@@ -1412,7 +1526,9 @@ const Clients: React.FC = () => {
                         sx={{
                             fontFamily: 'Poppins',
                             fontSize: '14px',
+                            borderRadius: 0,
                             '&:hover': {
+                                borderRadius: 0,
                                 backgroundColor: '#F2EBED'
                             }
                         }}
@@ -1434,7 +1550,9 @@ const Clients: React.FC = () => {
                         sx={{
                             fontFamily: 'Poppins',
                             fontSize: '14px',
+                            borderRadius: 0,
                             '&:hover': {
+                                borderRadius: 0,
                                 backgroundColor: '#F2EBED'
                             }
                         }}
@@ -1463,7 +1581,9 @@ const Clients: React.FC = () => {
                     sx={{
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                         fontSize: '14px',
+                        borderRadius: 0,
                         '&:hover': {
+                            borderRadius: 0,
                             backgroundColor: '#F2EBED'
                         }
                     }}
@@ -1623,58 +1743,54 @@ const Clients: React.FC = () => {
                 <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
 
                 <Box sx={{ height: '126px', overflowY: 'auto' }}>
-                    {clientsList
-                        .filter((c) => c.nombreCliente.toLowerCase().includes(clientSearch))
-                        .map((client) => (
-                            <MenuItem
-                                key={client.id}
-                                onClick={() =>
-                                    setSelectedClients((prev) =>
-                                        prev.includes(client.id!)
-                                            ? prev.filter((c) => c !== client.id)
-                                            : [...prev, client.id!]
-                                    )
-                                }
-                                sx={{ height: "32px", marginLeft: "-12px" }}
-                            >
-                                <Checkbox checked={selectedClients.includes(client.id as number)}
-                                    checkedIcon={
-                                        <Box
-                                            sx={{
-                                                width: '24px',
-                                                height: '24px',
-                                                position: 'relative',
-                                                marginTop: '0px',
-                                                marginLeft: '0px',
-                                            }}
-                                        >
-                                            <img
-                                                src={IconCheckBox1}
-                                                alt="Seleccionado"
-                                                style={{ width: '24px', height: '24px' }}
-                                            />
-                                        </Box>
+                    {originalData
+                        .filter((c) => (c.nombreCliente || '').toLowerCase()
+                            .includes(clientSearch.trim().toLowerCase()))
+                        .map((client) => {
+                            const id = Number(client.id);
+                            const checked = selectedClients.includes(id);
+                            return (
+                                <MenuItem
+                                    key={id}
+                                    onClick={() =>
+                                        setSelectedClients(prev =>
+                                            checked ? prev.filter(x => x !== id) : [...prev, id]
+                                        )
                                     }
-                                />
-                                <ListItemText
-                                    primary={client.nombreCliente}
-                                    primaryTypographyProps={{
-                                        fontFamily: 'Poppins',
-                                        fontSize: '16px',
-                                        fontWeight: 500,
-                                        color: selectedClients.includes(client.id as number) ? '#8F4E63' : '#786E71',
-                                    }}
-                                />
-                            </MenuItem>
-                        ))}
-                    {clientsList.filter((c) => c.nombreCliente.toLowerCase().includes(clientSearch)).length === 0 && (
-                        <Box sx={{ marginTop: "60px" }}>
-                            <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins" }}>
-                                No se encontraron resultados.
-                            </Typography>
-                        </Box>
-                    )}
+                                    sx={{ height: "32px", marginLeft: "-12px" }}
+                                >
+                                    <Checkbox
+                                        checked={checked}
+                                        checkedIcon={
+                                            <Box sx={{ width: 24, height: 24, position: 'relative' }}>
+                                                <img src={IconCheckBox1} alt="Seleccionado" style={{ width: 24, height: 24 }} />
+                                            </Box>
+                                        }
+                                    />
+                                    <ListItemText
+                                        primary={client.nombreCliente}
+                                        primaryTypographyProps={{
+                                            fontFamily: 'Poppins',
+                                            fontSize: '16px',
+                                            fontWeight: 500,
+                                            color: checked ? '#8F4E63' : '#786E71',
+                                        }}
+                                    />
+                                </MenuItem>
+                            );
+                        })}
+                    {originalData.filter(c =>
+                        (c.nombreCliente || '').toLowerCase()
+                            .includes(clientSearch.trim().toLowerCase())
+                    ).length === 0 && (
+                            <Box sx={{ marginTop: "60px" }}>
+                                <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins" }}>
+                                    No se encontraron resultados.
+                                </Typography>
+                            </Box>
+                        )}
                 </Box>
+
 
                 <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
 
@@ -1786,7 +1902,7 @@ const Clients: React.FC = () => {
 
 
             {/* Modal para añadir o editar cliente */}
-            <Dialog open={openClientModal} onClose={() => setOpenClientModal(false)} maxWidth="md" fullWidth sx={{ overflowX: "hidden" }}>
+            <Dialog open={openClientModal} onClose={handleCloseClientModal} maxWidth="md" fullWidth sx={{ overflowX: "hidden" }}>
                 <DialogTitle sx={{
                     fontFamily: 'Poppins', fontSize: '20px', fontWeight: 600,
                     color: '#574B4F', textTransform: 'none', mt: 1, mb: 1, marginLeft: "10px"
@@ -1925,13 +2041,12 @@ const Clients: React.FC = () => {
                                     </Typography>
                                     <TextField
                                         value={selectedClient?.nombreCliente || ''}
-                                        onChange={(e) => setSelectedClient({
-                                            ...(selectedClient as Clients),
-                                            nombreCliente: e.target.value
-                                        })}
-                                        error={
-                                            !!(selectedClient?.nombreCliente && (selectedClient?.nombreCliente.length > 40 || !/^[a-zA-Z0-9 ]+$/.test(selectedClient?.nombreCliente)))
-                                        }
+                                        onChange={(e) => {
+                                            const v = e.target.value;
+                                            setSelectedClient(prev => ({ ...(prev as Clients), nombreCliente: v }));
+                                            setClientNameError(v.trim().length > 0 && !reClientName.test(v));
+                                        }}
+                                        error={clientNameError}
                                         helperText={
                                             selectedClient?.nombreCliente && selectedClient?.nombreCliente.length > 40
                                                 ? "Máximo 40 caracteres"
@@ -1973,9 +2088,7 @@ const Clients: React.FC = () => {
                                                                 }}
                                                             >
                                                                 <>
-                                                                    • Solo caracteres alfabéticos<br />
-                                                                    • Longitud máxima de 40<br />
-                                                                    caracteres
+                                                                    • Solo caracteres alfanuméricos
                                                                 </>
                                                             </Box>
                                                         }
@@ -2047,10 +2160,13 @@ const Clients: React.FC = () => {
                                             </Typography>
                                             <TextField
                                                 value={selectedClient?.firstName || ''}
-                                                onChange={(e) => setSelectedClient({
-                                                    ...(selectedClient as Clients),
-                                                    firstName: e.target.value
-                                                })}
+                                                onChange={(e) => {
+                                                    const v = e.target.value;
+                                                    setSelectedClient(prev => ({ ...(prev as Clients), firstName: v }));
+                                                    setFirstNameError(v.trim().length > 0 && !rePersonName.test(v));
+                                                }}
+                                                error={firstNameError}
+                                                helperText={firstNameError ? "Formato inválido" : ""}
                                                 sx={{
                                                     fontFamily: "Poppins",
                                                     "& .MuiInputBase-input": {
@@ -2135,16 +2251,13 @@ const Clients: React.FC = () => {
                                             </Typography>
                                             <TextField
                                                 value={selectedClient?.lastName || ''}
-                                                onChange={(e) => setSelectedClient({
-                                                    ...(selectedClient as Clients),
-                                                    lastName: e.target.value
-                                                })}
-                                                sx={{
-                                                    fontFamily: "Poppins",
-                                                    "& .MuiInputBase-input": {
-                                                        fontFamily: "Poppins",
-                                                    },
+                                                onChange={(e) => {
+                                                    const v = e.target.value;
+                                                    setSelectedClient(prev => ({ ...(prev as Clients), lastName: v }));
+                                                    setLastNameError(v.trim().length > 0 && !rePersonName.test(v));
                                                 }}
+                                                error={lastNameError}
+                                                helperText={lastNameError ? "Formato inválido" : ""}
                                                 InputProps={{
                                                     endAdornment: (
                                                         <InputAdornment position="end">
@@ -2221,19 +2334,48 @@ const Clients: React.FC = () => {
                                                     color: "#330F1B"
                                                 }}
                                             >
-                                                Teléfono
-                                                <span style={{ color: "#D01247" }}>*</span>
+                                                Teléfono<span style={{ color: "#D01247" }}>*</span>
                                             </Typography>
+
                                             <TextField
-                                                value={selectedClient?.phoneNumber || ''}
-                                                onChange={(e) => setSelectedClient({
-                                                    ...(selectedClient as Clients),
-                                                    phoneNumber: e.target.value
-                                                })}
+                                                type="tel"
+                                                required
+                                                value={selectedClient?.phoneNumber || ""}
+                                                onChange={(e) => {
+                                                    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                                                    setSelectedClient(prev => ({ ...(prev as Clients), phoneNumber: value }));
+                                                    setPhoneError(value.length > 0 && !rePhone10.test(value));
+                                                }}
+                                                error={phoneError}
+                                                helperText={phoneError ? "Formato inválido" : ""}
+                                                /* --- apariencia alineada a otros inputs --- */
+                                                fullWidth
                                                 sx={{
-                                                    fontFamily: "Poppins",
+                                                    mt: 1,
+                                                    width: "324px",
+                                                    height: "54px",
+                                                    background: "#FFFFFF",
+                                                    border: "1px solid #9B9295",
+                                                    borderRadius: "4px",
+                                                    "& .MuiOutlinedInput-root": {
+                                                        background: "#FFFFFF",
+                                                        height: "54px",
+                                                        borderRadius: "4px",
+                                                        "& fieldset": {
+                                                            borderColor: phoneError ? "#d32f2f" : "#9B9295",
+                                                        },
+                                                    },
                                                     "& .MuiInputBase-input": {
                                                         fontFamily: "Poppins",
+                                                        fontSize: "16px",
+                                                        color: "#330F1B",
+                                                    },
+                                                    "& .MuiFormHelperText-root": {
+                                                        marginLeft: 0,
+                                                        fontFamily: "Poppins",
+                                                        fontSize: "13px",
+                                                        color: "#d32f2f",
+                                                        fontWeight: 500,
                                                     },
                                                 }}
                                                 InputProps={{
@@ -2245,7 +2387,7 @@ const Clients: React.FC = () => {
                                                                         sx={{
                                                                             backgroundColor: "#FFFFFF",
                                                                             borderRadius: "8px",
-                                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                                            boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
                                                                             padding: "8px 12px",
                                                                             fontSize: "14px",
                                                                             fontFamily: "Poppins",
@@ -2254,48 +2396,31 @@ const Clients: React.FC = () => {
                                                                             transform: "translate(-10px, -22px)",
                                                                             borderColor: "#00131F3D",
                                                                             borderStyle: "solid",
-                                                                            borderWidth: "1px"
+                                                                            borderWidth: "1px",
                                                                         }}
                                                                     >
-                                                                        <>
-                                                                            • Solo caracteres alfabéticos<br />
-                                                                            • Longitud máxima de 40<br />
-                                                                            caracteres
-                                                                        </>
+                                                                        <>• Solo caracteres numéricos<br />• Debe tener 10 dígitos</>
                                                                     </Box>
                                                                 }
                                                                 placement="bottom-end"
                                                                 componentsProps={{
-                                                                    tooltip: {
-                                                                        sx: {
-                                                                            backgroundColor: "transparent",
-                                                                            padding: 0,
-
-                                                                        },
-                                                                    },
+                                                                    tooltip: { sx: { backgroundColor: "transparent", padding: 0 } },
                                                                 }}
                                                             >
-                                                                <IconButton
-                                                                    disableRipple
-                                                                    sx={{
-                                                                        backgroundColor: "transparent !important",
-                                                                        "&:hover": {
-                                                                            backgroundColor: "transparent !important",
-                                                                        },
-                                                                    }}
-                                                                >
+                                                                <IconButton disableRipple sx={{ backgroundColor: "transparent !important", "&:hover": { backgroundColor: "transparent !important" } }}>
                                                                     <img
-                                                                        src={infoicon}
+                                                                        src={phoneError ? infoiconerror : infoicon}
                                                                         alt="info-icon"
                                                                         style={{ width: 24, height: 24 }}
                                                                     />
                                                                 </IconButton>
                                                             </Tooltip>
-
                                                         </InputAdornment>
                                                     ),
                                                 }}
                                             />
+
+
                                         </Box>
                                         <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"} width={"340px"}>
                                             <Typography
@@ -2315,14 +2440,15 @@ const Clients: React.FC = () => {
                                             <TextField
                                                 value={selectedClient?.extension || ''}
                                                 onChange={(e) => {
-                                                    const value = Number(e.target.value);
-                                                    if (!isNaN(value)) {
-                                                        setSelectedClient({
-                                                            ...(selectedClient as Clients),
-                                                            extension: value
-                                                        });
-                                                    }
+                                                    const raw = e.target.value.replace(/\D/g, '').slice(0, 5);
+                                                    setSelectedClient(prev => ({
+                                                        ...(prev as Clients),
+                                                        extension: raw === '' ? 0 : Number(raw),
+                                                    }));
+                                                    setExtError(raw !== '' && !reExt.test(raw)); // por si algo raro se cuela
                                                 }}
+                                                error={extError}
+                                                helperText={extError ? "Formato inválido" : ""}
                                                 sx={{
                                                     fontFamily: "Poppins",
                                                     "& .MuiInputBase-input": {
@@ -2410,11 +2536,13 @@ const Clients: React.FC = () => {
                                             <TextField
                                                 value={email}
                                                 onChange={(e) => {
-                                                    setEmail(e.target.value);
-                                                    setEmailError(!validateEmailFormat(e.target.value));
+                                                    const v = e.target.value.trim();
+                                                    setEmail(v);
+                                                    setEmailError(v.length > 0 && !reEmail.test(v));
+                                                    setConfirmEmailError(confirmEmail.length > 0 && v !== confirmEmail);
                                                 }}
                                                 error={emailError}
-                                                helperText={emailError ? 'Formato inválido' : ''}
+                                                helperText={emailError ? "Ingrese un correo electrónico válido" : ""}
                                                 sx={{
                                                     fontFamily: "Poppins",
                                                     "& .MuiInputBase-input": {
@@ -2443,9 +2571,7 @@ const Clients: React.FC = () => {
                                                                         }}
                                                                     >
                                                                         <>
-                                                                            • Solo caracteres alfabéticos<br />
-                                                                            • Longitud máxima de 40<br />
-                                                                            caracteres
+                                                                            • Ingrese un correo electrónico válido
                                                                         </>
                                                                     </Box>
                                                                 }
@@ -2500,11 +2626,12 @@ const Clients: React.FC = () => {
                                             <TextField
                                                 value={confirmEmail}
                                                 onChange={(e) => {
-                                                    setConfirmEmail(e.target.value);
-                                                    setConfirmEmailError(e.target.value !== email);
+                                                    const v = e.target.value.trim();
+                                                    setConfirmEmail(v);
+                                                    setConfirmEmailError(v.length > 0 && (v !== email || !reEmail.test(v)));
                                                 }}
                                                 error={confirmEmailError}
-                                                helperText={confirmEmailError ? 'Los correos no coinciden' : ''}
+                                                helperText={confirmEmailError ? "Los correos electrónicos deben coincidir" : ""}
                                                 sx={{
                                                     fontFamily: "Poppins",
                                                     "& .MuiInputBase-input": {
@@ -2533,9 +2660,7 @@ const Clients: React.FC = () => {
                                                                         }}
                                                                     >
                                                                         <>
-                                                                            • Solo caracteres alfabéticos<br />
-                                                                            • Longitud máxima de 40<br />
-                                                                            caracteres
+                                                                            • Los correos electrónicos deben coincidir
                                                                         </>
                                                                     </Box>
                                                                 }
@@ -2767,8 +2892,24 @@ const Clients: React.FC = () => {
                                                 Cantidad de mensajes
                                             </Typography>
                                             <TextField
+                                                type="text"
                                                 value={shortCustomQty}
-                                                onChange={(e) => setShortCustomQty(e.target.value)}
+                                                onChange={(e) => {
+                                                    const v = e.target.value.replace(/[^\d]/g, '');
+                                                    setShortCustomQty(v);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (['-', '+', 'e', 'E', '.', ' '].includes(e.key)) e.preventDefault();
+                                                }}
+                                                onPaste={(e) => {
+                                                    const text = (e.clipboardData.getData('text') || '').replace(/[^\d]/g, '');
+                                                    e.preventDefault();
+                                                    setShortCustomQty(prev => (prev ?? '') + text);
+                                                }}
+                                                inputProps={{
+                                                    inputMode: 'numeric',
+                                                    pattern: '[0-9]*',
+                                                }}
                                                 disabled={shortRateType !== 'personalizada'}
                                                 fullWidth
                                                 sx={{
@@ -2782,9 +2923,7 @@ const Clients: React.FC = () => {
                                                         background: '#FFFFFF',
                                                         height: '54px',
                                                         borderRadius: '8px',
-                                                        '& fieldset': {
-                                                            borderColor: '#9B9295',
-                                                        },
+                                                        '& fieldset': { borderColor: '#9B9295' },
                                                     },
                                                     '& input': {
                                                         fontFamily: 'Poppins',
@@ -2806,18 +2945,39 @@ const Clients: React.FC = () => {
                                             </Typography>
                                             <TextField
                                                 type="number"
-                                                value={selectedClient?.rateForShort || ''}
+                                                value={selectedClient?.rateForShort ? selectedClient.rateForShort : ''} // '' si es 0
                                                 onChange={(e) => {
-                                                    const value = parseFloat(e.target.value);
-                                                    setSelectedClient({
-                                                        ...(selectedClient as Clients),
-                                                        rateForShort: isNaN(value) ? 0 : value
-                                                    });
+                                                    let v = e.target.value;
+
+                                                    // permite vacío mientras escribe
+                                                    if (v === '') {
+                                                        setSelectedClient(prev => ({ ...(prev as Clients), rateForShort: 0 }));
+                                                        return;
+                                                    }
+
+                                                    // solo dígitos y un punto decimal
+                                                    v = v.replace(/[^0-9.]/g, '');
+                                                    // elimina puntos extra
+                                                    const firstDot = v.indexOf('.');
+                                                    if (firstDot !== -1) {
+                                                        v = v.slice(0, firstDot + 1) + v.slice(firstDot + 1).replace(/\./g, '');
+                                                    }
+
+                                                    const num = parseFloat(v);
+                                                    if (!isNaN(num) && num >= 0) {
+                                                        setSelectedClient(prev => ({ ...(prev as Clients), rateForShort: num }));
+                                                    }
+                                                }}
+                                                onKeyDown={(e) => {
+
+                                                    if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') e.preventDefault();
                                                 }}
 
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                                     inputProps: {
+                                                        min: 0,
+                                                        step: 'any',
                                                         style: {
                                                             appearance: 'textfield',
                                                             MozAppearance: 'textfield',
@@ -2836,22 +2996,26 @@ const Clients: React.FC = () => {
                                                     '& .MuiOutlinedInput-root': {
                                                         height: '54px',
                                                         borderRadius: '8px',
-                                                        '& fieldset': {
-                                                            borderColor: '#9B9295',
-                                                        },
+                                                        '& fieldset': { borderColor: '#9B9295' },
                                                     },
                                                     '& input': {
                                                         fontFamily: 'Poppins',
                                                         fontSize: '16px',
                                                         color: '#330F1B',
+                                                        MozAppearance: 'textfield',
+                                                        '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+                                                            WebkitAppearance: 'none',
+                                                            margin: 0,
+                                                        },
                                                     },
                                                     '& .MuiInputAdornment-root': {
                                                         color: '#645E60',
                                                         fontFamily: 'Poppins',
-                                                        fontSize: '14px'
+                                                        fontSize: '14px',
                                                     },
                                                 }}
                                             />
+
 
 
                                         </Box>
@@ -3039,8 +3203,24 @@ const Clients: React.FC = () => {
                                                 Cantidad de mensajes
                                             </Typography>
                                             <TextField
+                                                type="text"
                                                 value={longCustomQty}
-                                                onChange={(e) => setLongCustomQty(e.target.value)}
+                                                onChange={(e) => {
+                                                    const v = e.target.value.replace(/[^\d]/g, '');
+                                                    setLongCustomQty(v);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (['-', '+', 'e', 'E', '.', ' '].includes(e.key)) e.preventDefault();
+                                                }}
+                                                onPaste={(e) => {
+                                                    const text = (e.clipboardData.getData('text') || '').replace(/[^\d]/g, '');
+                                                    e.preventDefault();
+                                                    setLongCustomQty((prev) => (prev ?? '') + text);
+                                                }}
+                                                inputProps={{
+                                                    inputMode: 'numeric',
+                                                    pattern: '[0-9]*',
+                                                }}
                                                 disabled={longRateType !== 'personalizada'}
                                                 fullWidth
                                                 sx={{
@@ -3066,6 +3246,7 @@ const Clients: React.FC = () => {
                                                 }}
                                             />
 
+
                                             <Typography
                                                 sx={{
                                                     fontFamily: 'Poppins',
@@ -3077,17 +3258,40 @@ const Clients: React.FC = () => {
                                                 Tarifa por mensaje
                                             </Typography>
                                             <TextField
-                                                type='number'
-                                                value={selectedClient?.rateForLong || ''}
+                                                type="number"
+                                                value={selectedClient?.rateForLong ? selectedClient.rateForLong : ''}
                                                 onChange={(e) => {
-                                                    const value = parseFloat(e.target.value);
-                                                    setSelectedClient({
-                                                        ...selectedClient!,
-                                                        rateForLong: isNaN(value) ? 0 : value,
-                                                    });
+                                                    let v = e.target.value;
+                                                    if (v === '') {
+                                                        setSelectedClient(prev => ({ ...(prev as Clients), rateForLong: 0 }));
+                                                        return;
+                                                    }
+
+                                                    v = v.replace(/[^0-9.]/g, '');
+                                                    const firstDot = v.indexOf('.');
+                                                    if (firstDot !== -1) {
+                                                        v = v.slice(0, firstDot + 1) + v.slice(firstDot + 1).replace(/\./g, '');
+                                                    }
+
+                                                    const num = parseFloat(v);
+                                                    if (!isNaN(num) && num >= 0) {
+                                                        setSelectedClient(prev => ({ ...(prev as Clients), rateForLong: num }));
+                                                    }
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') e.preventDefault();
                                                 }}
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                                    inputProps: {
+                                                        min: 0,
+                                                        step: 'any',
+                                                        style: {
+                                                            appearance: 'textfield',
+                                                            MozAppearance: 'textfield',
+                                                            WebkitAppearance: 'none',
+                                                        },
+                                                    },
                                                 }}
                                                 disabled={longRateType !== 'personalizada'}
                                                 fullWidth
@@ -3100,22 +3304,26 @@ const Clients: React.FC = () => {
                                                     '& .MuiOutlinedInput-root': {
                                                         height: '54px',
                                                         borderRadius: '8px',
-                                                        '& fieldset': {
-                                                            borderColor: '#9B9295',
-                                                        },
+                                                        '& fieldset': { borderColor: '#9B9295' },
                                                     },
                                                     '& input': {
                                                         fontFamily: 'Poppins',
                                                         fontSize: '16px',
                                                         color: '#330F1B',
+                                                        MozAppearance: 'textfield',
+                                                        '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+                                                            WebkitAppearance: 'none',
+                                                            margin: 0,
+                                                        },
                                                     },
                                                     '& .MuiInputAdornment-root': {
                                                         color: '#645E60',
                                                         fontFamily: 'Poppins',
-                                                        fontSize: '14px'
+                                                        fontSize: '14px',
                                                     },
                                                 }}
                                             />
+
                                         </Box>
                                     </Box>
                                 </Box>
@@ -3140,11 +3348,12 @@ const Clients: React.FC = () => {
                                         }}
                                         disabled={roomCount === 0}
                                         sx={{
-                                            border: '1px solid #C4B2B9',
+                                            border: 0,
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
                                             color: '#7B354D',
+
                                         }}
                                     >
                                         <img
@@ -3347,7 +3556,8 @@ const Clients: React.FC = () => {
                     <Box sx={{ display: "flex", gap: 2 }}>
                         <Box sx={{ display: "flex", gap: 1.5 }}>
                             <MainButton
-                            isLoading={isSavingClient}
+                                isLoading={isSavingClient}
+                                disabled={!isStepValid()}
                                 text={
                                     step === 2 || (step === 1 && isEditClient)
                                         ? isEditClient ? 'Guardar cambios' : 'Guardar'
@@ -3377,8 +3587,10 @@ const Clients: React.FC = () => {
                                 }}
                             />
                             <Box sx={{ mt: -0.2 }}>
-                                {isEditClient && step == 0 && (
-                                    <SecondaryButton text="Guardar" disabled={isSavingClient}
+                                {isEditClient && step === 0 && (
+                                    <SecondaryButton
+                                        text="Guardar"
+                                        disabled={isSavingClient || !isStepValid()}
                                         onClick={() => handleSubmit()}
                                     />
                                 )}
@@ -3387,8 +3599,8 @@ const Clients: React.FC = () => {
                         {/*Guardars*/}
                         <Box sx={{ mt: -0 }}>
                             {!isEditClient && step > 0 && step < 2 && (
-                                <MainButton              
-                                isLoading={isSavingClient}
+                                <MainButton
+                                    isLoading={isSavingClient}
                                     text="Guardar"
                                     onClick={() => handleSubmit()}
                                 />
@@ -3630,6 +3842,7 @@ const Clients: React.FC = () => {
                                 >
                                     Monto por servicio
                                 </Typography>
+
                                 <TextField
                                     type="number"
                                     fullWidth
@@ -3644,24 +3857,40 @@ const Clients: React.FC = () => {
                                             background: '#FFFFFF',
                                             height: '54px',
                                             borderRadius: '8px',
-                                            '& fieldset': {
-                                                borderColor: '#9B9295',
-                                            },
+                                            '& fieldset': { borderColor: '#9B9295' },
                                         },
                                         '& input': {
                                             fontFamily: 'Poppins',
                                             fontSize: '16px',
                                             color: '#330F1B',
+                                            MozAppearance: 'textfield',
+                                            '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+                                                WebkitAppearance: 'none',
+                                                margin: 0,
+                                            },
                                         },
                                     }}
-                                    value={rechargeData.amount}
-                                    onChange={(e) =>
-                                        setRechargeData((prev) => ({
-                                            ...prev,
-                                            amount: parseFloat(e.target.value) || 0,
-                                        }))
-                                    }
+                                    value={rechargeData.amount === 0 ? '' : rechargeData.amount}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        // Permite vacío, bloquea negativos y letras
+                                        if (val === '') {
+                                            setRechargeData((prev) => ({ ...prev, amount: 0 }));
+                                            return;
+                                        }
+
+                                        const clean = val.replace(/[^0-9]/g, '');
+                                        const numeric = parseFloat(clean);
+
+                                        if (!isNaN(numeric) && numeric >= 0) {
+                                            setRechargeData((prev) => ({ ...prev, amount: numeric }));
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault();
+                                    }}
                                 />
+
                             </Grid>
                             <Grid item xs={6}>
                                 <Typography

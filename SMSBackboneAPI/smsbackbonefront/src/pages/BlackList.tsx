@@ -340,6 +340,20 @@ const BlackList: React.FC = () => {
 
     const handleCloseModal = () => {
         setIsblacklistModalOpen(false);
+        setShowColumnOptions(false);
+        setWorkbook(null);
+        setSheetNames([]);
+        setSelectedSheet('');
+        setColumns([]);
+        setExcelData([]);
+        setSelectedBlackList(null);
+        setSelectedBlackListName('');
+        setIndividualPhones(['']);
+        setUploadedFile(null);
+        setBase64File('');
+        setUploadedFileBase64('');
+        setFileError(false);
+        setFileSuccess(false);
     };
 
 
@@ -359,10 +373,30 @@ const BlackList: React.FC = () => {
         setBase64File('');
         setUploadedFileBase64('');
 
-        // Limpiar file input
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
+
+        setSelectedBlackList(null);
+        setSelectedBlackListName('');
+        setIndividualPhones(['']);
+        setUploadedFile(null);
+        setBase64File('');
+        setUploadedFileBase64('');
+        setFileError(false);
+        setFileSuccess(false);
+
+        setWorkbook(null);
+        setSheetNames([]);
+        setSelectedSheet('');
+        setColumns([]);
+        setExcelData([]);
+
+        setManageOperation('agregar');
+        setManageByList(false);
+        setManageByIndividual(false);
+
+        setShowColumnOptions(false);
 
 
         setIsblacklistModalOpen(false);
@@ -825,7 +859,6 @@ const BlackList: React.FC = () => {
     const handleCloseManageModal = () => {
         setIsManageModalOpen(false);
 
-
         setSelectedBlackList(null);
         setSelectedBlackListName('');
         setIndividualPhones(['']);
@@ -834,20 +867,25 @@ const BlackList: React.FC = () => {
         setUploadedFileBase64('');
         setFileError(false);
         setFileSuccess(false);
-        setSelectedSheet('');
-        setSelectedTelefonoCol('');
-        setSelectedDatoCol('');
+
+        setWorkbook(null);
         setSheetNames([]);
+        setSelectedSheet('');
         setColumns([]);
         setExcelData([]);
+
         setManageOperation('agregar');
         setManageByList(false);
         setManageByIndividual(false);
+
+        setShowColumnOptions(false);
     };
 
 
 
     const [showColumnOptions, setShowColumnOptions] = useState(true);
+
+
 
     return (
         <div style={{ padding: '20px', marginTop: '-70px', marginLeft: "40px", maxWidth: "1180px" }}>
@@ -2742,7 +2780,8 @@ const BlackList: React.FC = () => {
                                 sx={{
                                     flex: 1,
                                     overflowY: 'auto',
-                                    border: '1px solid transparent'
+                                    border: '1px solid transparent',
+                                    maxHeight: "300px",
                                 }}
                             >
                                 {inspectData
@@ -2822,9 +2861,9 @@ const BlackList: React.FC = () => {
                 </Box>
             </Modal>
 
-            <Modal open={isManageModalOpen} onClose={() => setIsManageModalOpen(false)}>
+            <Modal open={isManageModalOpen} onClose={handleCloseManageModal}>
                 <Box sx={{
-                    width: '580px',
+                    width: '600px',
                     height: '592px',
                     bgcolor: 'white',
                     borderRadius: '10px',
@@ -3505,113 +3544,58 @@ const BlackList: React.FC = () => {
                                                                 <Select
                                                                     displayEmpty
                                                                     value={selectedDatoCol}
-                                                                    onChange={(e) => setSelectedTelefonoCol(e.target.value)}
+                                                                    onChange={(e) => setSelectedPhoneColumn(e.target.value as string)}
                                                                     sx={{ borderRadius: '8px' }}
                                                                     renderValue={(selected) =>
                                                                         selected ? (
-                                                                            <span style={{
-                                                                                fontSize: "12px",
-                                                                                fontFamily: "Poppins",
-                                                                                color: "#645E60"
-                                                                            }}>
-                                                                                {selected}
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                                {selected as string}
                                                                             </span>
                                                                         ) : (
-                                                                            <span style={{
-                                                                                fontSize: "12px",
-                                                                                fontFamily: "Poppins",
-                                                                                color: "#645E60",
-                                                                                opacity: 0.8
-                                                                            }}>
-                                                                                Seleccionar columna 1
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
+                                                                                Seleccionar columna Teléfono
+                                                                                <span style={{ color: '#D32F2F', marginLeft: 4 }}>*</span>
                                                                             </span>
                                                                         )
                                                                     }
                                                                 >
+                                                                    <MenuItem value="" ></MenuItem>
                                                                     {columns
                                                                         .filter((col) => col !== selectedTelefonoCol)
                                                                         .map((col, idx) => (
-                                                                            <MenuItem
-                                                                                key={idx}
-                                                                                value={col}
-                                                                                sx={{
-                                                                                    fontSize: '12px',
-                                                                                    fontFamily: 'Poppins',
-                                                                                    color: '#645E60',
-                                                                                    opacity: 0.8,
-                                                                                    '&:hover': {
-                                                                                        backgroundColor: '#F2EBED',
-                                                                                    },
-                                                                                    '&.Mui-selected': {
-                                                                                        backgroundColor: '#F2EBED',
-                                                                                    },
-                                                                                    '&.Mui-selected:hover': {
-                                                                                        backgroundColor: '#F2EBED',
-                                                                                    }
-                                                                                }}
-                                                                            >
+                                                                            <MenuItem key={idx} value={col} >
                                                                                 {col}
                                                                             </MenuItem>
                                                                         ))}
                                                                 </Select>
                                                             </FormControl>
 
-
-                                                            {/* Columna de teléfono */}
                                                             <FormControl fullWidth size="small">
                                                                 <Select
                                                                     displayEmpty
                                                                     value={selectedTelefonoCol}
-                                                                    onChange={(e) => setSelectedDatoCol(e.target.value)}
+                                                                    onChange={(e) => setSelectedDataColumn(e.target.value as string)}
                                                                     sx={{ borderRadius: '8px' }}
                                                                     renderValue={(selected) =>
                                                                         selected ? (
-                                                                            <span style={{
-                                                                                fontSize: "12px",
-                                                                                fontFamily: "Poppins",
-                                                                                color: "#645E60"
-                                                                            }}>
-                                                                                {selected}
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                                {selected as string}
                                                                             </span>
                                                                         ) : (
-                                                                            <span style={{
-                                                                                fontSize: "12px",
-                                                                                fontFamily: "Poppins",
-                                                                                color: "#645E60",
-                                                                                opacity: 0.8
-                                                                            }}>
-                                                                                Seleccionar columna 2
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
+                                                                                Seleccionar columna ID
                                                                             </span>
                                                                         )
                                                                     }
                                                                 >
-                                                                    <MenuItem disabled value=""></MenuItem>
+                                                                    <MenuItem value="" ></MenuItem>
                                                                     {columns
                                                                         .filter((col) => col !== selectedDatoCol)
                                                                         .map((col, idx) => (
-                                                                            <MenuItem
-                                                                                key={idx}
-                                                                                value={col}
-                                                                                sx={{
-                                                                                    fontSize: '12px',
-                                                                                    fontFamily: 'Poppins',
-                                                                                    color: '#645E60',
-                                                                                    opacity: 0.8,
-                                                                                    '&:hover': {
-                                                                                        backgroundColor: '#F2EBED',
-                                                                                    },
-                                                                                    '&.Mui-selected': {
-                                                                                        backgroundColor: '#F2EBED',
-                                                                                    },
-                                                                                    '&.Mui-selected:hover': {
-                                                                                        backgroundColor: '#F2EBED',
-                                                                                    }
-                                                                                }}
-                                                                            >
+                                                                            <MenuItem key={idx} value={col} >
                                                                                 {col}
                                                                             </MenuItem>
                                                                         ))}
-
                                                                 </Select>
                                                             </FormControl>
                                                             <Box mt={-1} mb={0}>
@@ -3731,7 +3715,7 @@ const BlackList: React.FC = () => {
                                                 onDragOver={(e) => e.preventDefault()}
                                                 onDrop={(e) => {
                                                     e.preventDefault();
-                                                    if (hasPhoneInput) return; // 🔒 prevenir carga
+                                                    if (hasPhoneInput) return;
                                                     const file = e.dataTransfer.files?.[0];
                                                     if (file) handleFile(file);
                                                 }}
@@ -3739,12 +3723,12 @@ const BlackList: React.FC = () => {
                                                     border: fileError
                                                         ? '2px solid #EF5466'
                                                         : fileSuccess
-                                                            ? '2px solid #8F4E63CC' // ✅ borde éxito
+                                                            ? '2px solid #8F4E63CC'
                                                             : '2px dashed #D9B4C3',
                                                     backgroundColor: fileError
                                                         ? '#FFF4F5'
                                                         : fileSuccess
-                                                            ? '#E5CBD333'           // ✅ fondo éxito
+                                                            ? '#E5CBD333'
                                                             : 'transparent',
                                                     borderRadius: '8px',
                                                     width: '160px',
@@ -3753,7 +3737,7 @@ const BlackList: React.FC = () => {
                                                     flexDirection: 'column',
                                                     justifyContent: 'center',
                                                     alignItems: fileSuccess ? 'flex-start' : 'center',
-                                                    transition: 'all 0.3s ease', // animación suave
+                                                    transition: 'all 0.3s ease',
                                                     marginLeft: fileSuccess ? '20px' : 'auto',
                                                     marginRight: fileSuccess ? '10px' : 'auto',
                                                     textAlign: 'center',
@@ -4010,8 +3994,12 @@ const BlackList: React.FC = () => {
                                                                         }}
                                                                         disablePadding
                                                                     >
-                                                                        <ListItemButton onClick={() => setSelectedBlackListName(bl.name)} dense>
-                                                                            <Checkbox
+                                                                        <ListItemButton
+                                                                            onClick={() =>
+                                                                                setSelectedBlackListName(prev => prev === bl.name ? null : bl.name)
+                                                                            }
+                                                                            dense
+                                                                        >                                                                            <Checkbox
                                                                                 edge="start"
                                                                                 tabIndex={-1}
                                                                                 disableRipple
@@ -4066,41 +4054,75 @@ const BlackList: React.FC = () => {
                                                             </MenuItem>
                                                         ))}
                                                     </Select>
+                                                    {/* Columna de DATO */}
+                                                    <FormControl fullWidth size="small">
+                                                        <Select
+                                                            displayEmpty
+                                                            value={selectedDatoCol}
+                                                            onChange={(e) => setSelectedPhoneColumn(e.target.value as string)}   // ✅ corregido
+                                                            sx={{ borderRadius: '8px' }}
+                                                            renderValue={(selected) =>
+                                                                selected ? (
+                                                                    <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                        {selected as string}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
+                                                                        Seleccionar columna Teléfono
+                                                                        <span style={{ color: '#D32F2F', marginLeft: 4 }}>*</span>
+                                                                    </span>
+                                                                )
+                                                            }
+                                                        >
+                                                            {/* opción para quitar selección */}
+                                                            <MenuItem value="" >— Quitar selección —</MenuItem>
 
-                                                    <Typography fontSize="14px" fontWeight={600}>Seleccionar columnas</Typography>
-                                                    <Select
-                                                        fullWidth
-                                                        value={selectedDataColumn}
-                                                        onChange={(e) => setSelectedTelefonoCol(e.target.value)}
-                                                        displayEmpty
-                                                        sx={{ fontFamily: 'Poppins', fontSize: '14px' }}
-                                                    >
-                                                        <MenuItem disabled value=""></MenuItem>
-                                                        {columns
-                                                            .filter((col) => col !== selectedPhoneColumn)
-                                                            .map((col, index) => (
-                                                                <MenuItem key={index} value={col}>
-                                                                    {col}
-                                                                </MenuItem>
-                                                            ))}
-                                                    </Select>
+                                                            {columns
+                                                                .filter((col) => col !== selectedTelefonoCol)
+                                                                .map((col, idx) => (
+                                                                    <MenuItem key={idx} value={col} >
+                                                                        {col}
+                                                                    </MenuItem>
+                                                                ))}
+                                                        </Select>
+                                                    </FormControl>
+                                                    {/* Columna de TELÉFONO */}
+                                                    <FormControl fullWidth size="small">
+                                                        <Select
+                                                            displayEmpty
+                                                            value={selectedTelefonoCol}
+                                                            onChange={(e) => setSelectedDataColumn(e.target.value as string)}   // ✅ corregido
+                                                            sx={{ borderRadius: '8px' }}
+                                                            renderValue={(selected) =>
+                                                                selected ? (
+                                                                    <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                        {selected as string}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span style={{
+                                                                        fontSize: 12,
+                                                                        fontFamily: 'Poppins',
+                                                                        color: '#645E60',
+                                                                        opacity: 0.8
+                                                                    }}>
+                                                                        Seleccionar columna ID
+                                                                    </span>
+                                                                )
+                                                            }
+                                                        >
+                                                            {/* opción para quitar selección */}
+                                                            <MenuItem value="" >— Quitar selección —</MenuItem>
 
-                                                    <Select
-                                                        fullWidth
-                                                        value={selectedPhoneColumn}
-                                                        onChange={(e) => setSelectedDatoCol(e.target.value)}
-                                                        displayEmpty
-                                                        sx={{ fontFamily: 'Poppins', fontSize: '14px' }}
-                                                    >
-                                                        <MenuItem disabled value=""></MenuItem>
-                                                        {columns
-                                                            .filter((col) => col !== selectedDataColumn)
-                                                            .map((col, index) => (
-                                                                <MenuItem key={index} value={col}>
-                                                                    {col}
-                                                                </MenuItem>
-                                                            ))}
-                                                    </Select>
+                                                            {columns
+                                                                .filter((col) => col !== selectedDatoCol)
+                                                                .map((col, idx) => (
+                                                                    <MenuItem key={idx} value={col} >
+                                                                        {col}
+                                                                    </MenuItem>
+                                                                ))}
+                                                        </Select>
+                                                    </FormControl>
+
 
                                                     <FormControlLabel
                                                         control={
@@ -4150,7 +4172,7 @@ const BlackList: React.FC = () => {
                                                 onDragOver={(e) => e.preventDefault()}
                                                 onDrop={(e) => {
                                                     e.preventDefault();
-                                                    if (hasPhoneInput) return; // 🔒 prevenir carga
+                                                    if (hasPhoneInput) return;
                                                     const file = e.dataTransfer.files?.[0];
                                                     if (file) handleFile(file);
                                                 }}
@@ -4158,12 +4180,12 @@ const BlackList: React.FC = () => {
                                                     border: fileError
                                                         ? '2px solid #EF5466'
                                                         : fileSuccess
-                                                            ? '2px solid #8F4E63CC' // ✅ borde éxito
+                                                            ? '2px solid #8F4E63CC'
                                                             : '2px dashed #D9B4C3',
                                                     backgroundColor: fileError
                                                         ? '#FFF4F5'
                                                         : fileSuccess
-                                                            ? '#E5CBD333'           // ✅ fondo éxito
+                                                            ? '#E5CBD333'
                                                             : 'transparent',
                                                     borderRadius: '8px',
                                                     width: '160px',
@@ -4188,7 +4210,6 @@ const BlackList: React.FC = () => {
 
                                             >
 
-                                                {/*Tooltip */}
                                                 <Box
                                                     sx={{
                                                         position: 'absolute',
@@ -4286,7 +4307,7 @@ const BlackList: React.FC = () => {
                                                                 ]
                                                             }}
                                                         >
-                                                            {/*Trashicon 2*/}
+
                                                             <IconButton
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
@@ -4320,7 +4341,6 @@ const BlackList: React.FC = () => {
                                                 </Box>
 
 
-                                                {/*Imagen central del archivo a subir*/}
                                                 <Box
                                                     sx={{
                                                         width: "142px", height: "100px"
@@ -4362,8 +4382,8 @@ const BlackList: React.FC = () => {
                                                             color: '#574B4F',
                                                             opacity: 0.7,
                                                             textAlign: 'center',
-                                                            wordBreak: 'break-word', // para dividir texto largo
-                                                            maxWidth: '142px' // asegúrate de limitar ancho si el nombre del archivo es largo
+                                                            wordBreak: 'break-word',
+                                                            maxWidth: '142px'
                                                         }}
                                                     >
                                                         {fileSuccess && uploadedFile
@@ -4403,27 +4423,25 @@ const BlackList: React.FC = () => {
                                             </Box>
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                                 {/* Seleccionar hoja */}
-                                                <Box>
-                                                    <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '15px', mb: 1 }}>
-                                                        Seleccionar hoja
-                                                    </Typography>
-                                                    <FormControl fullWidth size="small">
-                                                        <Select
-                                                            displayEmpty
-                                                            value={selectedSheet}
-                                                            onChange={handleSheetChange}
-                                                            sx={{ borderRadius: '8px' }}
-                                                        >
-                                                            {sheetNames.map((name, index) => (
-                                                                <MenuItem key={index} value={name}>{name}</MenuItem>
-                                                            ))}
-                                                        </Select>
-                                                    </FormControl>
-                                                </Box>
 
-                                                {/* Seleccionar columnas */}
+
                                                 {columns.length > 0 && (
                                                     <Box>
+                                                        <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '15px', mb: 1 }}>
+                                                            Seleccionar hoja
+                                                        </Typography>
+                                                        <FormControl fullWidth size="small">
+                                                            <Select
+                                                                displayEmpty
+                                                                value={selectedSheet}
+                                                                onChange={handleSheetChange}
+                                                                sx={{ borderRadius: '8px' }}
+                                                            >
+                                                                {sheetNames.map((name, index) => (
+                                                                    <MenuItem key={index} value={name}>{name}</MenuItem>
+                                                                ))}
+                                                            </Select>
+                                                        </FormControl>
                                                         <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '15px', mb: 1 }}>
                                                             Seleccionar columnas
                                                         </Typography>
@@ -4432,31 +4450,57 @@ const BlackList: React.FC = () => {
                                                                 <Select
                                                                     displayEmpty
                                                                     value={selectedDatoCol}
-                                                                    onChange={(e) => setSelectedTelefonoCol(e.target.value)}
+                                                                    onChange={(e) => setSelectedPhoneColumn(e.target.value as string)}
                                                                     sx={{ borderRadius: '8px' }}
+                                                                    renderValue={(selected) =>
+                                                                        selected ? (
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                                {selected as string}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
+                                                                                Seleccionar columna Teléfono
+                                                                                <span style={{ color: '#D32F2F', marginLeft: 4 }}>*</span>
+                                                                            </span>
+                                                                        )
+                                                                    }
                                                                 >
-                                                                    <MenuItem disabled value=""></MenuItem>
+                                                                    <MenuItem value="" >— Quitar selección —</MenuItem>
                                                                     {columns
                                                                         .filter((col) => col !== selectedTelefonoCol)
                                                                         .map((col, idx) => (
-                                                                            <MenuItem key={idx} value={col}>{col}</MenuItem>
+                                                                            <MenuItem key={idx} value={col} >
+                                                                                {col}
+                                                                            </MenuItem>
                                                                         ))}
                                                                 </Select>
                                                             </FormControl>
 
-                                                            {/* Columna de teléfono */}
                                                             <FormControl fullWidth size="small">
                                                                 <Select
                                                                     displayEmpty
                                                                     value={selectedTelefonoCol}
-                                                                    onChange={(e) => setSelectedDatoCol(e.target.value)}
+                                                                    onChange={(e) => setSelectedDataColumn(e.target.value as string)}
                                                                     sx={{ borderRadius: '8px' }}
+                                                                    renderValue={(selected) =>
+                                                                        selected ? (
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                                {selected as string}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
+                                                                                Seleccionar columna ID
+                                                                            </span>
+                                                                        )
+                                                                    }
                                                                 >
-                                                                    <MenuItem disabled value=""></MenuItem>
+                                                                    <MenuItem value="" >— Quitar selección —</MenuItem>
                                                                     {columns
                                                                         .filter((col) => col !== selectedDatoCol)
                                                                         .map((col, idx) => (
-                                                                            <MenuItem key={idx} value={col}>{col}</MenuItem>
+                                                                            <MenuItem key={idx} value={col} >
+                                                                                {col}
+                                                                            </MenuItem>
                                                                         ))}
                                                                 </Select>
                                                             </FormControl>
@@ -4729,7 +4773,7 @@ const BlackList: React.FC = () => {
                         marginBottom: "6px"
 
                     }}>
-                        <SecondaryButton onClick={() => setIsManageModalOpen(false)} text='Cancelar'
+                        <SecondaryButton onClick={handleCloseManageModal} text='Cancelar'
 
                         />
                         <MainButton

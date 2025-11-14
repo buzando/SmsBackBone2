@@ -20,19 +20,23 @@ namespace Business
         public bool SendMessage(SendTestSmsRequest smsRequestDto)
         {
             var clientacces = new ClientAccess();
-            if (smsRequestDto.To.Count == 0)
+
+            if (smsRequestDto.To == null || smsRequestDto.To.Count == 0)
                 return false;
 
             if (string.IsNullOrWhiteSpace(smsRequestDto.Message) && smsRequestDto.TemplateId == null)
                 return false;
 
+            // Validar SmsType
+            var isShort = string.Equals(smsRequestDto.SmsType, "short", StringComparison.OrdinalIgnoreCase);
+            var senderType = isShort ? "shortcode" : "longcode";
+            var encoding = (isShort && smsRequestDto.Flash) ? 1 : 0; // igual que en campañas :contentReference[oaicite:1]{index=1}
+
             using var context = new Entities();
             {
                 clientacces = context.Client_Access.FirstOrDefault(ca => ca.client_id == smsRequestDto.ClientID);
-
                 if (clientacces == null)
                     return false;
-
 
                 try
                 {
@@ -45,14 +49,11 @@ namespace Business
 
                     var token = loginResponse.Result.token;
 
-
-                    var credits = api.GetOwnCredit(token).GetAwaiter()
-                                .GetResult(); ;
+                    var credits = api.GetOwnCredit(token).GetAwaiter().GetResult();
                     int id = JObject.Parse(credits)["credit"].Value<int>();
                     if (id == 0)
-                    {
                         return false;
-                    }
+
                     string finalMessage = smsRequestDto.Message;
                     if (string.IsNullOrWhiteSpace(finalMessage) && smsRequestDto.TemplateId.HasValue)
                     {
@@ -63,74 +64,47 @@ namespace Business
                         finalMessage = template.Message;
                     }
 
-                    var smsPayload = new
+                    var messagesToSend = smsRequestDto.To.Select(to => new MessageToSend
                     {
-                        from = smsRequestDto.From,
-                        to = smsRequestDto.To,
-                        message = finalMessage
-                    };
+                        text = finalMessage,
+                        phoneNumber = to,
+                        registryClient = "",   
+                        encoding = encoding,    
+                        senderType = senderType 
+                    }).ToList();
 
-                    if (smsRequestDto.To.Count() == 1)
+                    // Enviar (un destinatario o varios usan el mismo camino)
+                    var sendResults = api.SendMessagesAsync(messagesToSend, token).GetAwaiter().GetResult();
+
+                    // Registrar en TestMessage
+                    foreach (var result in sendResults)
                     {
-                        var sendResult = api.SendTestMessage(smsRequestDto.To[0], finalMessage, loginResponse.Result).GetAwaiter()
-                                .GetResult();
-
-                        var testmessage = new Modal.Model.Model.TestMessage
+                        var testMessage = new Modal.Model.Model.TestMessage
                         {
                             CreatedAt = DateTime.Now,
-                            FromNumber = smsRequestDto.From,
+                            // Antes venía From del front; ahora guardamos el tipo seleccionado
+                            FromNumber = senderType,
                             Message = finalMessage,
-                            Status = sendResult.status.ToString(),
+                            Status = result.status.ToString(),
                             TemplateId = smsRequestDto.TemplateId,
-                            ToNumber = smsRequestDto.To[0],
+                            ToNumber = result.phoneNumber,
                             UserId = smsRequestDto.UserID,
-                            IdBackBone = sendResult.id
+                            IdBackBone = result.id
                         };
 
-                        context.TestMessage.Add(testmessage);
-                        context.SaveChanges();
-                    }
-                    else
-                    {
-                        var messageList = smsRequestDto.To.Select(to => new MessageToSend
-                        {
-                            text = finalMessage,
-                            phoneNumber = to,
-                            registryClient = ""
-                        }).ToList();
-
-                        var sendResults = api.SendMessagesAsync(messageList, loginResponse.Result.token).GetAwaiter()
-                                .GetResult(); ; ;
-
-                        foreach (var result in sendResults)
-                        {
-                            var testMessage = new Modal.Model.Model.TestMessage
-                            {
-                                CreatedAt = DateTime.Now,
-                                FromNumber = smsRequestDto.From,
-                                Message = result.text,
-                                Status = result.status.ToString(),
-                                TemplateId = smsRequestDto.TemplateId,
-                                ToNumber = result.phoneNumber,
-                                UserId = smsRequestDto.UserID,
-                                IdBackBone = result.id
-                                
-                            };
-
-                            context.TestMessage.Add(testMessage);
-                        }
-
-                        context.SaveChanges();
+                        context.TestMessage.Add(testMessage);
                     }
 
-                        return true;
+                    context.SaveChanges();
+                    return true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return false;
                 }
             }
         }
+
 
 
         public List<SmsDto> SendListMessage(List<SmsRequestDto> smsRequestDto)

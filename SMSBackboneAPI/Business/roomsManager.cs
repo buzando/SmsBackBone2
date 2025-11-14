@@ -1,4 +1,5 @@
-﻿using Contract.Request;
+﻿using Contract.Other;
+using Contract.Request;
 using Contract.Response;
 using Modal;
 using Modal.Model;
@@ -173,28 +174,35 @@ namespace Business
             }
         }
 
-        public bool DeleteRoom(int id)
+        public EstatusResponseDTO DeleteRoom(int id)
         {
-            try
+            using (var ctx = new Entities())
+            using (var tx = ctx.Database.BeginTransaction())
             {
-                using (var ctx = new Entities())
-                {
-                    var roomforeign = ctx.roomsbyuser.Where(x => x.idRoom == id).ToList();
-                    ctx.roomsbyuser.RemoveRange(roomforeign);
-                    ctx.SaveChanges();
+                var room = ctx.Rooms.FirstOrDefault(r => r.id == id);
+                if (room == null)
+                    return new EstatusResponseDTO { Ok = false, Message = "La sala no existe." };
 
-                    var room = ctx.Rooms.Where(x => x.id == id).FirstOrDefault();
-                    ctx.Rooms.Remove(room);
-                    ctx.SaveChanges();
+                var now = DateTime.UtcNow; // o Now según tu app
 
-                }
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
+
+                bool roomInUse = ctx.Campaigns.Any(c => c.RoomId == id);
+                if (roomInUse) return new EstatusResponseDTO { Ok = false, Message = "La sala no puede ser borrada." };
+
+
+                var links = ctx.roomsbyuser.Where(x => x.idRoom == id).ToList();
+                if (links.Count > 0)
+                    ctx.roomsbyuser.RemoveRange(links);
+
+                ctx.Rooms.Remove(room);
+
+                ctx.SaveChanges();
+                tx.Commit();
+
+                return new EstatusResponseDTO { Ok = true, Message = "Sala eliminada correctamente." };
             }
         }
+
 
         public List<roomsDTO> GetRoomsByClient(int id)
         {

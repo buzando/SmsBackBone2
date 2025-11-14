@@ -48,9 +48,13 @@ const Login: React.FC = () => {
     const [messageAlert, setMessageAlert] = useState('Correo o contraseña inválidos');
     const [openAlert, setOpenAlert] = useState(false);
     const [spinner, setSpinner] = useState(false);
-    const [disabled, setdisabled] = useState(false);
+    const [disabled, setdisabled] = useState(true);
     const [passwordErr, setPasswordErr] = useState(true);
     const [showPasswordu, setShowPasswordu] = useState(false);
+
+    const [isValidEmail, setIsValidEmail] = useState(false);
+    const [isValidPassword, setIsValidPassword] = useState(false);
+
 
     const togglePasswordVisibility = () => {
         setShowPasswordu((prev) => !prev);
@@ -78,34 +82,26 @@ const Login: React.FC = () => {
 
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value; // Convertir a mayúsculas automáticamente
+        const value = event.target.value;
         setEmail(value);
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        const isValidEmail = emailRegex.test(value);
+        const isValid = emailRegex.test(value);
 
-        // Actualizar el estado de error dependiendo de si es válido o no
-        setEmailErr(isValidEmail);
+        setIsValidEmail(isValid);
 
-        // Deshabilitar el botón si el email no es válido
-        setdisabled(!(isValidEmail && passwordErr));
-
-        if (isValidEmail) {
-            setLoading(false);
-        }
+        setdisabled(!(isValid && isValidPassword));
     };
 
     const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setPassword(value);
 
-        const isValidPassword = value.length >= 8;
-        setPasswordErr(isValidPassword);
+        const isValid = value.length >= 8;
+        setIsValidPassword(isValid);
 
-        // Deshabilitar el botón si email o contraseña son inválidos
-        setdisabled(!(isValidPassword && emailErr));
+        setdisabled(!(isValid && isValidEmail));
     };
-
 
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -335,7 +331,7 @@ const Login: React.FC = () => {
                                         variant="outlined"
                                         fullWidth
                                         margin="dense"
-                                        error={!emailErr}
+                                        error={!isValidEmail && email.length > 0}
                                         helperText={
                                             <span style={{
                                                 minHeight: "17px", display: "inline-block",
@@ -541,7 +537,7 @@ const Login: React.FC = () => {
                                     <ButtonLoadingSubmit
                                         text="Ingresar"
                                         isLoading={loading}
-                                        disabled={disabled} // Depende de emailErr y passwordErr
+                                        disabled={disabled}
                                         width='208px'
                                     />
 

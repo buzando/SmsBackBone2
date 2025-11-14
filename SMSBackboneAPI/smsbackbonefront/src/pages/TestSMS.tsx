@@ -95,7 +95,7 @@ export default function TestSMS() {
     const clientId = JSON.parse(localStorage.getItem('userData') || '{}');
     try {
       const payload = {
-        From: fromNumber,
+        SmsType: fromNumber,
         To: [toNumber],
         Message: message || null,
         TemplateId: selectedTemplateId || null,
@@ -209,14 +209,15 @@ export default function TestSMS() {
                 },
               }}
             >
-              <MenuItem value="" sx={{ fontFamily: "Poppins", color: "#786E71", mt: "-8px", fontSize: "12px" }}>
+              <MenuItem value="" sx={{ fontFamily: "Poppins", color: "#786E71" }}>
                 <em>{t('pages.testSMS.numberPlaceholder')}</em>
               </MenuItem>
-              {numbersData.map((number) => (
-                <MenuItem key={number.id} value={number.id} sx={{ fontFamily: "Poppins", color: "#786E71", mt: "-8px" }}>
-                  {number.number}
-                </MenuItem>
-              ))}
+              <MenuItem value="short" sx={{ fontFamily: "Poppins", color: "#786E71" }}>
+                Número corto
+              </MenuItem>
+              <MenuItem value="long" sx={{ fontFamily: "Poppins", color: "#786E71" }}>
+                Número largo
+              </MenuItem>
             </Select>
           </FormControl>
 
@@ -349,7 +350,7 @@ export default function TestSMS() {
             }}
             error={messageError}
             helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
-            inputProps={{ maxLength: 160 }} // 👈 límite físico del input
+            inputProps={{ maxLength: 160 }}
             InputProps={{
               sx: {
                 backgroundColor: "#FFFFFF",
@@ -422,46 +423,96 @@ export default function TestSMS() {
           </Typography>
 
           <Box display="flex" alignItems="center" gap={1}>
-            <FormControl sx={{
-              backgroundColor: "#ffffff",
-              fontFamily: "Poppins",
-              borderRadius: "8px",
-              border: "1px solid #9B9295",
-              width: "220px", height: "40px"
-            }}>
-              <Select defaultValue="" value={selectedTemplateId}
+
+            <FormControl
+              sx={{
+                backgroundColor: "#ffffff",
+                fontFamily: "Poppins",
+                borderRadius: "8px",
+                border: "1px solid #9B9295",
+                width: "220px",
+                height: "40px",
+              }}
+              size="small"
+            >
+              <Select
+                value={selectedTemplateId}
                 onChange={(e) => {
                   const id = e.target.value as string;
                   setSelectedTemplateId(id);
 
-                  setMessage('');
+                  setMessage("");
                   setMessageError(false);
 
-                  const t = templates.find(x => x.id === Number(id)) || null;
+                  const t = templates.find((x) => x.id === Number(id)) || null;
                   setSelectedTemplate(t);
                 }}
                 disabled={message.trim().length > 0}
-                displayEmpty sx={{
+                displayEmpty
+                renderValue={(value) =>
+                  value ? (
+                    <span
+                      style={{
+                        display: "block",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {templates.find((t) => t.id === Number(value))?.name || ""}
+                    </span>
+                  ) : (
+                    <em style={{ color: "#786E71" }}>
+                      {t("pages.testSMS.selectMessagePlaceholder")}
+                    </em>
+                  )
+                }
+                sx={{
                   color: "#786E71",
-                  borderRadius: '8px',
-                  fontFamily: 'Poppins',
-                  fontSize: '14px', mt: "-8px",
-                  paddingRight: '32px !important',
-                  '& .MuiSelect-select': {
-                    display: 'flex',
-                    alignItems: 'center',
-                    paddingRight: '32px !important'
+                  borderRadius: "8px",
+                  fontFamily: "Poppins",
+                  fontSize: "14px",
+                  mt: "1px",
+
+                  paddingRight: "32px !important",
+
+                  "& .MuiSelect-select": {
+                    display: "block",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    paddingRight: "32px !important",
                   },
-                  '& fieldset': {
-                    border: 'none',
+
+                  "& fieldset": {
+                    border: "none",
                   },
                 }}
               >
-                <MenuItem value="" sx={{ fontFamily: "Poppins", color: "#786E71", mt: "-8px", fontSize: "12px" }}>
-                  <em>{t('pages.testSMS.selectMessagePlaceholder')}</em>
+                <MenuItem
+                  value=""
+                  sx={{
+                    fontFamily: "Poppins",
+                    color: "#786E71",
+                    mt: "-8px",
+                    fontSize: "12px",
+                  }}
+                >
+                  <em>{t("pages.testSMS.selectMessagePlaceholder")}</em>
                 </MenuItem>
+
                 {templates.map((template) => (
-                  <MenuItem key={template.id} value={template.id}>
+                  <MenuItem
+                    key={template.id}
+                    value={template.id}
+                    sx={{
+                      maxWidth: 280,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      fontFamily: "Poppins",
+                    }}
+                  >
                     {template.name}
                   </MenuItem>
                 ))}
@@ -473,7 +524,9 @@ export default function TestSMS() {
               onClick={() => {
                 if (!isViewButtonEnabled) return;
 
-                const template = templates.find((t) => t.id === Number(selectedTemplateId));
+                const template = templates.find(
+                  (t) => t.id === Number(selectedTemplateId)
+                );
 
                 console.log("Plantilla seleccionada:", template);
 
@@ -484,7 +537,10 @@ export default function TestSMS() {
               }}
               disabled={!isViewButtonEnabled}
             >
-              <Tooltip title="Visualizar" arrow placement="top"
+              <Tooltip
+                title="Visualizar"
+                arrow
+                placement="top"
                 componentsProps={{
                   tooltip: {
                     sx: {
@@ -494,32 +550,34 @@ export default function TestSMS() {
                       fontSize: "12px",
                       padding: "6px 8px",
                       borderRadius: "8px",
-                      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                    }
+                      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)",
+                    },
                   },
                   arrow: {
                     sx: {
-                      color: "rgba(0, 0, 0, 0.8)"
-                    }
-                  }
+                      color: "rgba(0, 0, 0, 0.8)",
+                    },
+                  },
                 }}
                 PopperProps={{
                   modifiers: [
                     {
-                      name: 'offset',
+                      name: "offset",
                       options: {
-                        offset: [0, -12]
-                      }
-                    }
-                  ]
+                        offset: [0, -12],
+                      },
+                    },
+                  ],
                 }}
               >
                 <img
                   src={Iconeyesopen}
-                  style={{ color: isViewButtonEnabled ? "#7B354D" : "#C4C4C4" }} />
+                  style={{ color: isViewButtonEnabled ? "#7B354D" : "#C4C4C4" }}
+                />
               </Tooltip>
             </IconButton>
           </Box>
+
         </Box>
 
 

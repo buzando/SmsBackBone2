@@ -20,7 +20,9 @@ import Fab from "@mui/material/Fab";
 import Modal from "@mui/material/Modal";
 import helpicon from "../assets/Iconoayuda.svg";
 import logorq from '../assets/Logo-RQ_2.svg';
-
+import DescriptionIcon from '@mui/icons-material/Description';
+import CloseSession from '../assets/Icon-CerrarSesion.svg';
+import TermsAndConditions from "../pages/TermsAndConditions";
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
 }
@@ -47,11 +49,14 @@ const AutentificationLayout: React.FC<Props> = (props) => {
     };
     const openHelpModal = () => setHelpModalIsOpen(true);
     const closeHelpModal = () => setHelpModalIsOpen(false);
-
+    const [openTerms, setOpenTerms] = useState(false);
     const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(null);
         switch (Number(event.currentTarget.id)) {
-            case 3: // Cerrar sesión
+            case 2:
+                setOpenTerms(true);
+                break;
+            case 3:
                 setContextState({
                     user: {},
                     token: "",
@@ -117,7 +122,21 @@ const AutentificationLayout: React.FC<Props> = (props) => {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-
+                                <MenuItem id="2" onClick={handleCloseUserMenu}>
+                                    <Typography
+                                        sx={{
+                                            textAlign: 'center',
+                                            fontFamily: 'Poppins',
+                                            fontSize: "14px",
+                                            letterSpacing: '0px',
+                                            color: '#574B4F',
+                                            opacity: 1,
+                                        }}
+                                    >
+                                        <DescriptionIcon sx={{ fontSize: 20, mr: 1 }} />
+                                        Terminos y condiciones
+                                    </Typography>
+                                </MenuItem>
                                 <MenuItem id="3" onClick={handleCloseUserMenu}>
                                     <Typography
                                         sx={{
@@ -129,6 +148,16 @@ const AutentificationLayout: React.FC<Props> = (props) => {
                                             opacity: 1,
                                         }}
                                     >
+                                        <img
+                                            src={CloseSession}
+                                            alt="Room Icon"
+                                            style={{
+                                                width: '19px',
+                                                height: '19px',
+                                                marginRight: '10px',
+                                                color: '#574B4F',
+                                            }}
+                                        />
                                         Cerrar Sesión
                                     </Typography>
                                 </MenuItem>
@@ -511,6 +540,115 @@ const AutentificationLayout: React.FC<Props> = (props) => {
                     </Box>
                 </Box>
             </Modal>
+            <Modal
+                open={openTerms}
+                onClose={() => setOpenTerms(false)}
+                aria-labelledby="terms-and-conditions"
+                aria-describedby="terms-and-conditions-content"
+                sx={{
+                    backdropFilter: "blur(4px)",
+                    backgroundColor: "rgba(0, 0, 0, 0.3)",
+                }}
+            >
+                <Box
+                    sx={{
+                        background: "#FFFFFF 0% 0% no-repeat padding-box",
+                        boxShadow: "0px 8px 16px #00131F14",
+                        border: "1px solid #E6E4E4",
+                        borderRadius: "8px",
+                        opacity: 1,
+                        width: "80%",
+                        maxWidth: "800px",
+                        maxHeight: "80vh",
+                        overflowY: "auto",
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        p: 4,
+                    }}
+                >
+                    {/* Botón de cerrar (✕) */}
+                    <IconButton
+                        onClick={() => setOpenTerms(false)}
+                        sx={{
+                            position: "absolute",
+                            top: 10,
+                            right: 10,
+                            color: "#C0C0C0",
+                            "&:hover": { color: "#7B354D" },
+                        }}
+                    >
+                        ✕
+                    </IconButton>
+
+                    {/* Título */}
+                    <Typography
+                        sx={{
+                            textAlign: "left",
+                            font: "normal normal medium 26px/55px Poppins",
+                            letterSpacing: "0px",
+                            color: "#330F1B",
+                            opacity: 1,
+                            mb: 2,
+                        }}
+                    >
+                        Términos y Condiciones
+                    </Typography>
+
+                    {/* Texto */}
+                    <Typography
+                        sx={{
+                            textAlign: "left",
+                            font: "normal normal normal 16px/22px Poppins",
+                            letterSpacing: "0px",
+                            color: "#330F1B",
+                            opacity: 1,
+                        }}
+                    >
+                        Aparte del crédito disponible en su cuenta, no establecemos un tope en el número de mensajes que puede enviar a través de nuestro servicio.
+                        Se evaluará si su comportamiento se alinea con los términos y esencia del acuerdo firmado entre las partes, y CENTERNEXT se reserva el derecho
+                        de finalizar el servicio en cualquier momento si su comportamiento viola lo establecido dentro del acuerdo firmado.
+                        <br /><br />
+                        Nos esforzaremos por entregar sus mensajes tan rápido como sea posible, pero existen condiciones de demoras derivadas de congestiones o tráfico alto
+                        en la red. A pesar de estos retrasos, el mensaje podría mostrarse como “entregado”.
+                        <br /><br />
+                        <strong>Se compromete a utilizar los servicios únicamente:</strong>
+                        <br />
+                        • Siguiendo estos términos y condiciones.<br />
+                        • Con fines estrictamente apegados a la ley.<br />
+                        • Respetando todas las leyes y normativas aplicables, tanto locales como internacionales.<br />
+                        • Para los objetivos por los que fueron creados.
+                        <br /><br />
+                        <strong>Al emplear nuestros servicios, deberá evitar:</strong>
+                        <br />
+                        • Enviar mensajes SMS no solicitados o spam.<br />
+                        • Engañar, estafar, suplantar o crear una identidad falsa.<br />
+                        • Alterar los detalles de origen o modificar comunicaciones sin autorización.<br />
+                        • Enviar mensajes ofensivos, abusivos o con contenido ilegal.<br />
+                        • Participar en fraudes o esquemas piramidales.<br />
+                        • Infringir derechos de propiedad intelectual o privacidad de terceros.<br />
+                        • Usar el servicio con fines comerciales sin autorización.<br />
+                        • Transmitir virus, malware o código malicioso.<br />
+                        • Afectar sistemas, redes o servicios, incluyendo los de CENTERNEXT.
+                        <br /><br />
+                        <strong>Uso del Servicio API</strong>
+                        <br />
+                        Hemos habilitado la posibilidad de que las empresas o los individuos se conecten a nuestro servidor para facilitar el envío de mensajes de texto
+                        directamente a nuestro sistema de SMS. Nos reservamos el derecho de aprobar o rechazar conexiones de clientes y APIs según nuestro propio criterio.
+                        <br /><br />
+                        Proporcionaremos especificaciones para las conexiones API y nos esforzaremos por mantenerlas actualizadas. Estas especificaciones pueden estar incompletas
+                        y sujetas a cambios sin previo aviso. Es su responsabilidad revisarlas periódicamente.
+                        <br /><br />
+                        Para todos los servicios de mensajería SMS, le proporcionaremos un nombre de usuario y contraseña. La seguridad, accesos y uso indebido son responsabilidad
+                        del usuario. CENTERNEXT queda exento de cualquier uso inapropiado realizado por las cuentas del cliente.
+                        <br /><br />
+                        Las transacciones de pago se gestionan a través de Openpay, propiedad de BBVA, y están sujetas a sus términos. CENTERNEXT no se hace responsable por errores
+                        o fallas imputables al servicio de Openpay.
+                    </Typography>
+                </Box>
+            </Modal>
+
 
         </>
     );

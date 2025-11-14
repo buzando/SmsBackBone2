@@ -12,7 +12,7 @@ import MainButton from '../components/commons/MainButton'
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import infoicon from '../assets/Icon-info.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
 import { Divider, InputAdornment, Tooltip, TooltipProps, Typography } from "@mui/material";
@@ -414,6 +414,13 @@ const PaymentMethods: React.FC = () => {
         }
     };
 
+    const handleMuiSelectChange = (e: SelectChangeEvent<string>) => {
+        const name = e.target.name as 'month' | 'year';
+        const value = e.target.value;
+
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        setErrors((prev) => ({ ...prev, [name]: validateField(name, String(value)) }));
+    };
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
@@ -1159,7 +1166,7 @@ const PaymentMethods: React.FC = () => {
                                         <Select
                                             name="month"
                                             value={formData.month}
-                                            onChange={() => handleChange}
+                                            onChange={handleMuiSelectChange}
                                             required
                                             label="Mes"
                                             style={{
@@ -1178,9 +1185,9 @@ const PaymentMethods: React.FC = () => {
                                         </Select>
 
                                         <Select
-                                            name="year" // 🔥 Aseguramos que `name` esté presente
-                                            value={formData.year} // 🔥 `value` debe coincidir con `formData.year`
-                                            onChange={() => handleChange}
+                                            name="year"
+                                            value={formData.year}
+                                            onChange={handleMuiSelectChange}
                                             label="año"
                                             required
                                             style={{

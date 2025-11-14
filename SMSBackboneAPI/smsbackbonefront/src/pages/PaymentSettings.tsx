@@ -548,6 +548,16 @@ const PaymentSettings: React.FC = () => {
         setSelectedCard(card);
     };
 
+    const handleToggleAllUsers = () => {
+        if (selectedUsers.length === Users.length) {
+            // Si ya están todos seleccionados → limpiar selección
+            setSelectedUsers([]);
+        } else {
+            // Selecciona todos los usuarios visibles
+            setSelectedUsers(Users.map(u => u.id));
+        }
+    };
+
     return (
         <Box p={4} sx={{ padding: '10px', marginLeft: "35px", marginTop: '-50px', maxWidth: "1140px", minHeight: '760px', }}>
             <Box sx={{ display: 'flex', alignItems: 'center', pl: '0px', mb: 1 }}>
@@ -758,6 +768,29 @@ const PaymentSettings: React.FC = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
+                                <TableCell>
+                                    <Checkbox
+                                        checked={Users.length > 0 && selectedUsers.length === Users.length}
+                                        indeterminate={selectedUsers.length > 0 && selectedUsers.length < Users.length}
+                                        onChange={handleToggleAllUsers}
+                                        disabled={!isNotificationEnabled}
+                                        checkedIcon={
+                                            <Box
+                                                sx={{
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    position: 'relative',
+                                                }}
+                                            >
+                                                <img
+                                                    src={IconCheckBox1}
+                                                    alt="Seleccionado"
+                                                    style={{ width: '24px', height: '24px' }}
+                                                />
+                                            </Box>
+                                        }
+                                    />
+                                </TableCell>
                                 <TableCell />
                                 <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Nombre</TableCell>
                                 <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Rol</TableCell>
