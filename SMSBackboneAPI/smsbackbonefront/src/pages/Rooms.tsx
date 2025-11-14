@@ -608,7 +608,10 @@ const Rooms: React.FC = () => {
             {/* Modal for adding room */}
             <Modal
                 open={modalOpen}
-                onClose={handleCloseModal}
+                onClose={(_, reason) => {
+                    if (reason === "backdropClick") return;
+                    handleCloseModal();
+                }}
                 closeAfterTransition
                 BackdropComponent={Backdrop}
                 BackdropProps={{

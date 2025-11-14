@@ -200,6 +200,7 @@ const BlackList: React.FC = () => {
     const [individualPhones, setIndividualPhones] = useState<string[]>([]);
     const [selectedBlackListName, setSelectedBlackListName] = useState<string>('');
     const [selectedRows, setSelectedRows] = useState<BlackList[]>([]);
+    const [originalExpiration, setOriginalExpiration] = useState<Date | null>(null);
 
     const [allRows, setAllRows] = useState<BlackList[]>([]);
     useEffect(() => {
@@ -225,6 +226,17 @@ const BlackList: React.FC = () => {
         },
     }));
 
+    const hasChanges =
+        formData.Name.trim() !== originalName.trim() ||
+        (
+            (formData.ExpirationDate && originalExpiration &&
+                formData.ExpirationDate.getTime() !== originalExpiration.getTime())
+            ||
+            (formData.ExpirationDate && !originalExpiration) ||
+            (!formData.ExpirationDate && originalExpiration)
+        );
+
+
     const openEditModal = (item: BlackList) => {
         setEditData(item);
         setFormData({
@@ -234,6 +246,7 @@ const BlackList: React.FC = () => {
             File: ''
         });
         setOriginalName(item.name);
+        setOriginalExpiration(item.expirationDate ? new Date(item.expirationDate) : null);
         setIsEditModalOpen(true);
     };
 
@@ -888,19 +901,10 @@ const BlackList: React.FC = () => {
 
 
     return (
-        <div style={{ padding: '20px', marginTop: '-70px', marginLeft: "40px", maxWidth: "1180px" }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
-                    onClick={() => navigate('/')}
-                    sx={{
-                        p: 0,
-                        mr: 1,
-                        ml: '-28px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
+                    onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
                     <img
                         src={ArrowBackIosNewIcon}
                         alt="Regresar"
@@ -925,406 +929,406 @@ const BlackList: React.FC = () => {
                     Listas negras
                 </Typography>
             </Box>
-            <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '25px', marginBottom: '20px' }}>
-                <MainIcon
-                    text="Nueva Lista Negra"
-                    isLoading={Loading}
-                    onClick={() => {
-                        setFormData({
-                            Name: '',
-                            Phones: [''],
-                            ExpirationDate: null,
-                            File: '',
-                        });
-                        setFileSuccess(false);
-                        setFileError(false);
-                        setUploadedFile(null);
-                        setBase64File('');
-                        setUploadedFileBase64('');
-                        setIsblacklistModalOpen(true);
-                    }}
-                    width="218px"
-                >
-                    <span className="flex items-center">
-                        <span className="mr-2">+</span> Add Card
-                    </span>
-                </MainIcon>
-                <div style={{ position: 'relative', width: '220px' }}>
-                    <Box
-                        display="flex"
-                        alignItems="center"
-                        sx={{
-                            backgroundColor: "#FFFFFF",
-                            border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
-                            borderRadius: "4px",
-                            padding: "8px 12px",
-                            width: "218px",
-                            height: "40px",
-                            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+            <Box sx={{ marginLeft: "32px", }}>
+                <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
+                <Box style={{ display: 'flex', justifyContent: 'flex-end', gap: '25px', marginBottom: '20px' }}>
+                    <MainIcon
+                        text="Nueva Lista Negra"
+                        isLoading={Loading}
+                        onClick={() => {
+                            setFormData({
+                                Name: '',
+                                Phones: [''],
+                                ExpirationDate: null,
+                                File: '',
+                            });
+                            setFileSuccess(false);
+                            setFileError(false);
+                            setUploadedFile(null);
+                            setBase64File('');
+                            setUploadedFileBase64('');
+                            setIsblacklistModalOpen(true);
                         }}
+                        width="218px"
                     >
-                        <img
-                            src={searchTerm ? Iconseachred : seachicon}
-                            alt="Buscar"
-                            style={{ marginRight: 8, width: 24 }}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Buscar"
-                            value={searchTerm}
-                            onChange={handleSearch}
-                            style={{
-                                border: "none",
-                                outline: "none",
-                                width: "100%",
-                                fontSize: "16px",
-                                fontFamily: "Poppins, sans-serif",
-                                color: searchTerm ? "#7B354D" : "#9B9295",
-                                backgroundColor: "transparent",
+                        <span className="flex items-center">
+                            <span className="mr-2">+</span> Add Card
+                        </span>
+                    </MainIcon>
+                    <Box sx={{ position: 'relative', width: '220px' }}>
+                        <Box
+                            display="flex"
+                            alignItems="center"
+                            sx={{
+                                backgroundColor: "#FFFFFF",
+                                border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
+                                borderRadius: "4px",
+                                padding: "8px 12px",
+                                width: "218px",
+                                height: "40px",
+                                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
                             }}
-                        />
-
-                        {searchTerm && (
+                        >
                             <img
-                                src={iconclose}
-                                alt="Limpiar búsqueda"
+                                src={searchTerm ? Iconseachred : seachicon}
+                                alt="Buscar"
+                                style={{ marginRight: 8, width: 24 }}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Buscar"
+                                value={searchTerm}
+                                onChange={handleSearch}
                                 style={{
-                                    marginLeft: "8px",
-                                    width: "24px",
-                                    height: "24px",
-                                    cursor: "pointer",
-                                }}
-                                onClick={() => {
-                                    setSearchTerm('');
+                                    border: "none",
+                                    outline: "none",
+                                    width: "100%",
+                                    fontSize: "16px",
+                                    fontFamily: "Poppins, sans-serif",
+                                    color: searchTerm ? "#7B354D" : "#9B9295",
+                                    backgroundColor: "transparent",
                                 }}
                             />
-                        )}
-                    </Box>
-                </div>
-            </div>
-            {BlackList.length > 0 && (
-                <Box sx={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', marginTop: '-46px',
-                }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, marginLeft: "10px" }}>
-                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#574B4F', minWidth: '120px' }}>
-                            {startItem}–{endItem} de {totalItems}
-                        </Typography>
-                        <Box sx={{ marginLeft: "-25px" }}>
-                            {/* Ir al inicio */}
-                            <IconButton
-                                onClick={() => setCurrentPage(1)}
-                                disabled={currentPage === 1}
-                                sx={{ p: 0 }}
-                            >
-                                <img
-                                    src={currentPage === 1 ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(0deg)', width: 22 }}
-                                    alt="Primera página"
-                                />
-                                <img
-                                    src={currentPage === 1 ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(0deg)', width: 22, marginLeft: '-16px' }}
-                                    alt=""
-                                />
-                            </IconButton>
 
-                            {/* Anterior */}
-                            <IconButton
-                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                disabled={currentPage === 1}
-                                sx={{ p: 0 }}
-                            >
+                            {searchTerm && (
                                 <img
-                                    src={currentPage === 1 ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(0deg)', width: 22 }}
-                                    alt="Anterior"
+                                    src={iconclose}
+                                    alt="Limpiar búsqueda"
+                                    style={{
+                                        marginLeft: "8px",
+                                        width: "24px",
+                                        height: "24px",
+                                        cursor: "pointer",
+                                    }}
+                                    onClick={() => {
+                                        setSearchTerm('');
+                                    }}
                                 />
-                            </IconButton>
-
-                            {/* Siguiente */}
-                            <IconButton
-                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                disabled={currentPage === totalPages}
-                                sx={{ p: 0 }}
-                            >
-                                <img
-                                    src={currentPage === totalPages ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(180deg)', width: 22 }}
-                                    alt="Siguiente"
-                                />
-                            </IconButton>
-
-                            {/* Ir al final */}
-                            <IconButton
-                                onClick={() => setCurrentPage(totalPages)}
-                                disabled={currentPage === totalPages}
-                                sx={{ p: 0 }}
-                            >
-                                <img
-                                    src={currentPage === totalPages ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(180deg)', width: 22 }}
-                                    alt="Última página"
-                                />
-                                <img
-                                    src={currentPage === totalPages ? backarrowD : backarrow}
-                                    style={{ transform: 'rotate(180deg)', width: 22, marginLeft: '-16px' }}
-                                    alt=""
-                                />
-                            </IconButton>
+                            )}
                         </Box>
                     </Box>
                 </Box>
-            )}
+                {BlackList.length > 0 && (
+                    <Box sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', marginTop: '-46px',
+                    }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, marginLeft: "10px" }}>
+                            <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#574B4F', minWidth: '120px' }}>
+                                {startItem}–{endItem} de {totalItems}
+                            </Typography>
+                            <Box sx={{ marginLeft: "-25px" }}>
+                                {/* Ir al inicio */}
+                                <IconButton
+                                    onClick={() => setCurrentPage(1)}
+                                    disabled={currentPage === 1}
+                                    sx={{ p: 0 }}
+                                >
+                                    <img
+                                        src={currentPage === 1 ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(0deg)', width: 22 }}
+                                        alt="Primera página"
+                                    />
+                                    <img
+                                        src={currentPage === 1 ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(0deg)', width: 22, marginLeft: '-16px' }}
+                                        alt=""
+                                    />
+                                </IconButton>
 
-            <div style={{ display: 'flex', gap: '20px', margin: '20px 0', flexWrap: 'wrap' }}>
-                {BlackList.length === 0 && (
-                    <Box
-                        sx={{
-                            width: '100%',
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: '8px',
-                            padding: '60px 0',
-                            height: '625px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                            mt: 3
-                        }}
-                    >
-                        <img
-                            src={BoxEmpty}
-                            alt="Caja vacía"
-                            style={{ width: '263px', marginBottom: '16px' }}
-                        />
-                        <Typography
+                                {/* Anterior */}
+                                <IconButton
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                    sx={{ p: 0 }}
+                                >
+                                    <img
+                                        src={currentPage === 1 ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(0deg)', width: 22 }}
+                                        alt="Anterior"
+                                    />
+                                </IconButton>
+
+                                {/* Siguiente */}
+                                <IconButton
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                    sx={{ p: 0 }}
+                                >
+                                    <img
+                                        src={currentPage === totalPages ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(180deg)', width: 22 }}
+                                        alt="Siguiente"
+                                    />
+                                </IconButton>
+
+                                {/* Ir al final */}
+                                <IconButton
+                                    onClick={() => setCurrentPage(totalPages)}
+                                    disabled={currentPage === totalPages}
+                                    sx={{ p: 0 }}
+                                >
+                                    <img
+                                        src={currentPage === totalPages ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(180deg)', width: 22 }}
+                                        alt="Última página"
+                                    />
+                                    <img
+                                        src={currentPage === totalPages ? backarrowD : backarrow}
+                                        style={{ transform: 'rotate(180deg)', width: 22, marginLeft: '-16px' }}
+                                        alt=""
+                                    />
+                                </IconButton>
+                            </Box>
+                        </Box>
+                    </Box>
+                )}
+
+                <Box style={{ display: 'flex', gap: '20px', margin: '20px 0', flexWrap: 'wrap' }}>
+                    {BlackList.length === 0 && (
+                        <Box
                             sx={{
-                                fontFamily: 'Poppins',
-                                fontSize: '14px',
-                                color: '#7B354D',
-                                fontWeight: 500
+                                width: '100%',
+                                backgroundColor: '#FFFFFF',
+                                borderRadius: '8px',
+                                padding: '60px 0',
+                                height: '450px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                                mt: 1,
                             }}
                         >
-                            Cree una lista negra para comenzar.
-                        </Typography>
-                    </Box>
-                )}
-                {BlackList.length > 0 && (
-                    <Box
-                        sx={{
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: '8px',
-                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                            overflowX: 'auto',
-                            mt: 1.2, height: "450px"
-                        }}
-                    >
-                        <table style={{
-                            width: 'auto', minWidth: '1100px',
-                            borderCollapse: 'collapse',
-                            fontFamily: 'Poppins'
-                        }}>
-                            <thead>
-                                {selectedRows.length === 0 ? (
-                                    <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', width: '100%' }}>
-                                        <th style={{ padding: '5px' }}>
-                                            <Box sx={{ marginLeft: "7px" }}>
-                                                <Checkbox
-                                                    sx={{
-                                                        color: '#574861',
-                                                        '&.Mui-checked': { color: '#8F4E63' },
-                                                        '&.MuiCheckbox-indeterminate': { color: '#8F4E63' }
-                                                    }}
-                                                    checked={isAllSelected}
-                                                    indeterminate={isIndeterminate}
-                                                    onChange={handleSelectAll}
-                                                />
-                                            </Box>
-                                        </th>
-                                        <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500' }}>Fecha de creación</th>
-                                        <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500' }}>Nombre de lista</th>
-                                        <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500' }}>Fecha de expiración</th>
-                                        <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', borderRight: '1px solid #E0E0E0', }}>Cantidad de registros</th>
-                                        <th style={{ padding: '0px' }}></th>
-                                    </tr>
-                                ) : (
-                                    <tr style={{
-                                        backgroundColor: '#FFFFFF',
-                                        textAlign: 'left', width: '100%'
-                                    }}>
-                                        <th colSpan={6} style={{ minWidth: "967px" }}>
+                            <img
+                                src={BoxEmpty}
+                                alt="Caja vacía"
+                                style={{ width: '176px', height: "149px", marginBottom: '16px' }} />
+                            <Typography
+                                sx={{
+                                    fontFamily: 'Poppins',
+                                    fontSize: '14px',
+                                    color: '#7B354D',
+                                    fontWeight: 500
+                                }}
+                            >
+                                Cree una lista negra para comenzar.
+                            </Typography>
+                        </Box>
+                    )}
+                    {BlackList.length > 0 && (
+                        <Box
+                            sx={{
+                                backgroundColor: '#FFFFFF',
+                                borderRadius: '8px',
+                                boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                                overflowX: 'auto',
+                                mt: 1.2, height: "450px"
+                            }}
+                        >
+                            <table style={{
+                                width: 'auto', minWidth: '1100px',
+                                borderCollapse: 'collapse',
+                                fontFamily: 'Poppins'
+                            }}>
+                                <thead>
+                                    {selectedRows.length === 0 ? (
+                                        <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', width: '100%' }}>
+                                            <th style={{ padding: '5px' }}>
+                                                <Box sx={{ marginLeft: "7px" }}>
+                                                    <Checkbox
+                                                        sx={{
+                                                            color: '#574861',
+                                                            '&.Mui-checked': { color: '#8F4E63' },
+                                                            '&.MuiCheckbox-indeterminate': { color: '#8F4E63' }
+                                                        }}
+                                                        checked={isAllSelected}
+                                                        indeterminate={isIndeterminate}
+                                                        onChange={handleSelectAll}
+                                                    />
+                                                </Box>
+                                            </th>
+                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500' }}>Fecha de creación</th>
+                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500' }}>Nombre de lista</th>
+                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500' }}>Fecha de expiración</th>
+                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', borderRight: '1px solid #E0E0E0', }}>Cantidad de registros</th>
+                                            <th style={{ padding: '0px' }}></th>
+                                        </tr>
+                                    ) : (
+                                        <tr style={{
+                                            backgroundColor: '#FFFFFF',
+                                            textAlign: 'left', width: '100%'
+                                        }}>
+                                            <th colSpan={6} style={{ minWidth: "967px" }}>
 
-                                            <Box display="flex" alignItems="center" gap={1} pl={2} marginTop={"4px"} marginLeft={"-5px"} marginBottom={"4px"}>
-                                                {/*Checkbox para tablas*/}
-                                                <Checkbox
-                                                    checked={isAllSelected}
-                                                    indeterminate={isIndeterminate}
-                                                    onChange={handleSelectAll}
-                                                    icon={
-                                                        <Box
-                                                            sx={{
-                                                                width: 24,
-                                                                height: 24,
-                                                                border: '2px solid #8F4E63',
-                                                                borderRadius: '2px',
-                                                            }}
-                                                        />
-                                                    }
-                                                    checkedIcon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                                position: 'relative',
-                                                                marginTop: '0px',
-                                                                marginLeft: '0px',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={IconCheckBox1}
-                                                                alt="Seleccionado"
-                                                                style={{ width: '24px', height: '24px' }}
+                                                <Box display="flex" alignItems="center" gap={1} pl={2} marginTop={"4px"} marginLeft={"-5px"} marginBottom={"4px"}>
+                                                    {/*Checkbox para tablas*/}
+                                                    <Checkbox
+                                                        checked={isAllSelected}
+                                                        indeterminate={isIndeterminate}
+                                                        onChange={handleSelectAll}
+                                                        icon={
+                                                            <Box
+                                                                sx={{
+                                                                    width: 24,
+                                                                    height: 24,
+                                                                    border: '2px solid #8F4E63',
+                                                                    borderRadius: '2px',
+                                                                }}
                                                             />
-                                                        </Box>
-                                                    }
-                                                    indeterminateIcon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                                position: 'relative',
-                                                                marginTop: '0px',
-                                                                marginLeft: '0px',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={IconCheckBox2}
-                                                                alt="Indeterminado"
-                                                                style={{ width: '24px', height: '24px' }}
-                                                            />
-                                                        </Box>
-                                                    }
-
-                                                />
-                                                <Tooltip title="Eliminar" arrow placement="top"
-                                                    componentsProps={{
-                                                        tooltip: {
-                                                            sx: {
-                                                                backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                                                color: "#CCC3C3",
-                                                                fontFamily: "Poppins, sans-serif",
-                                                                fontSize: "12px",
-                                                                padding: "6px 8px",
-                                                                borderRadius: "8px",
-                                                                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
-                                                            }
-                                                        },
-                                                        arrow: {
-                                                            sx: {
-                                                                color: "rgba(0, 0, 0, 0.8)"
-                                                            }
                                                         }
-                                                    }}
-                                                    PopperProps={{
-                                                        modifiers: [
-                                                            {
-                                                                name: 'offset',
-                                                                options: {
-                                                                    offset: [0, -12]
+                                                        checkedIcon={
+                                                            <Box
+                                                                sx={{
+                                                                    width: '24px',
+                                                                    height: '24px',
+                                                                    position: 'relative',
+                                                                    marginTop: '0px',
+                                                                    marginLeft: '0px',
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={IconCheckBox1}
+                                                                    alt="Seleccionado"
+                                                                    style={{ width: '24px', height: '24px' }}
+                                                                />
+                                                            </Box>
+                                                        }
+                                                        indeterminateIcon={
+                                                            <Box
+                                                                sx={{
+                                                                    width: '24px',
+                                                                    height: '24px',
+                                                                    position: 'relative',
+                                                                    marginTop: '0px',
+                                                                    marginLeft: '0px',
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={IconCheckBox2}
+                                                                    alt="Indeterminado"
+                                                                    style={{ width: '24px', height: '24px' }}
+                                                                />
+                                                            </Box>
+                                                        }
+
+                                                    />
+                                                    <Tooltip title="Eliminar" arrow placement="top"
+                                                        componentsProps={{
+                                                            tooltip: {
+                                                                sx: {
+                                                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                    color: "#CCC3C3",
+                                                                    fontFamily: "Poppins, sans-serif",
+                                                                    fontSize: "12px",
+                                                                    padding: "6px 8px",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                                }
+                                                            },
+                                                            arrow: {
+                                                                sx: {
+                                                                    color: "rgba(0, 0, 0, 0.8)"
                                                                 }
                                                             }
-                                                        ]
-                                                    }}
-                                                >
-                                                    <IconButton onClick={() => handleDeleteSelected(null)} >
-                                                        <img src={Thrashicon} alt="Eliminar" style={{ width: 20, height: 20 }} />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </Box>
-                                        </th>
+                                                        }}
+                                                        PopperProps={{
+                                                            modifiers: [
+                                                                {
+                                                                    name: 'offset',
+                                                                    options: {
+                                                                        offset: [0, -12]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }}
+                                                    >
+                                                        <IconButton onClick={() => handleDeleteSelected(null)} >
+                                                            <img src={Thrashicon} alt="Eliminar" style={{ width: 20, height: 20 }} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Box>
+                                            </th>
 
-                                    </tr>
-                                )}
-                            </thead>
+                                        </tr>
+                                    )}
+                                </thead>
 
 
-                            <tbody>
-                                {currentItems.map((black) => (
-                                    <tr key={black.id} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0', }}>
-                                        <td style={{ padding: '0px', width: "50px" }}>
-                                            <Box sx={{ marginLeft: "10px" }}>
-                                                <Checkbox
-                                                    checkedIcon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                                position: 'relative',
-                                                                marginTop: '0px',
-                                                                marginLeft: '0px',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={IconCheckBox1}
-                                                                alt="Seleccionado"
-                                                                style={{ width: '24px', height: '24px' }}
-                                                            />
-                                                        </Box>
-                                                    }
-                                                    sx={{
-                                                        color: '#574861',
-                                                    }}
-                                                    checked={selectedRows.some(r => r.id === black.id)}
-                                                    onChange={(e) => {
-                                                        if (e.target.checked) {
-                                                            setSelectedRows(prev => [...prev, black]);
-                                                        } else {
-                                                            setSelectedRows(prev => prev.filter(r => r.id !== black.id));
+                                <tbody>
+                                    {currentItems.map((black) => (
+                                        <tr key={black.id} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0', }}>
+                                            <td style={{ padding: '0px', width: "50px" }}>
+                                                <Box sx={{ marginLeft: "10px" }}>
+                                                    <Checkbox
+                                                        checkedIcon={
+                                                            <Box
+                                                                sx={{
+                                                                    width: '24px',
+                                                                    height: '24px',
+                                                                    position: 'relative',
+                                                                    marginTop: '0px',
+                                                                    marginLeft: '0px',
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={IconCheckBox1}
+                                                                    alt="Seleccionado"
+                                                                    style={{ width: '24px', height: '24px' }}
+                                                                />
+                                                            </Box>
                                                         }
-                                                    }}
-                                                />
-                                            </Box>
-                                        </td>
-                                        <td style={{
-                                            padding: '0px', fontFamily: 'Poppins',
-                                            color: "#574B4F", fontSize: "13px", width: '210px',
-                                        }}>{formatDate(black.creationDate)}</td>
+                                                        sx={{
+                                                            color: '#574861',
+                                                        }}
+                                                        checked={selectedRows.some(r => r.id === black.id)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setSelectedRows(prev => [...prev, black]);
+                                                            } else {
+                                                                setSelectedRows(prev => prev.filter(r => r.id !== black.id));
+                                                            }
+                                                        }}
+                                                    />
+                                                </Box>
+                                            </td>
+                                            <td style={{
+                                                padding: '0px', fontFamily: 'Poppins',
+                                                color: "#574B4F", fontSize: "13px", width: '210px',
+                                            }}>{formatDate(black.creationDate)}</td>
 
-                                        <td style={{
-                                            padding: '0px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
-                                        }}>
-                                            {black.name}
-                                        </td>
-
-                                        <td style={{ padding: '0px', width: '200px', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px" }}>{formatDate(black.expirationDate)}</td>
-                                        <td style={{ padding: '0px', width: '200px', textAlign: 'left', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px", }}>{black.quantity}</td>
-                                        <td style={{
-                                            padding: '0px', width: '50px',
-                                            borderLeft: '1px solid #E0E0E0',
-                                            textAlign: 'center'
-                                        }}>
-                                            <IconButton onClick={(e) => {
-                                                setMenuAnchorEl(e.currentTarget);
-                                                setSelectedBlackList(black);
+                                            <td style={{
+                                                padding: '0px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                                textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                             }}>
+                                                {black.name}
+                                            </td>
 
-                                                <MoreVertIcon sx={{ color: '#7B354D' }} />
-                                            </IconButton>
+                                            <td style={{ padding: '0px', width: '200px', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px" }}>{formatDate(black.expirationDate)}</td>
+                                            <td style={{ padding: '0px', width: '200px', textAlign: 'left', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px", }}>{black.quantity}</td>
+                                            <td style={{
+                                                padding: '0px', width: '50px',
+                                                borderLeft: '1px solid #E0E0E0',
+                                                textAlign: 'center'
+                                            }}>
+                                                <IconButton onClick={(e) => {
+                                                    setMenuAnchorEl(e.currentTarget);
+                                                    setSelectedBlackList(black);
+                                                }}>
 
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </Box>
-                )}
+                                                    <MoreVertIcon sx={{ color: '#7B354D' }} />
+                                                </IconButton>
 
-            </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </Box>
+                    )}
 
+                </Box>
+            </Box>
 
             <ModalError
                 isOpen={isErrorModalOpen}
@@ -1372,7 +1376,9 @@ const BlackList: React.FC = () => {
             {/* Modal para agregar */}
             <Modal
                 open={isblacklistdModalOpen}
-                onClose={handleCloseModal}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick') handleCloseModal();
+                }}
                 aria-labelledby="add-card-modal-title"
                 aria-describedby="add-card-modal-description"
             >
@@ -2146,7 +2152,11 @@ const BlackList: React.FC = () => {
 
             <Modal
                 open={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
+                onClose={(event, reason) => {
+                    if (reason === "backdropClick") return;
+                    if (reason === "escapeKeyDown") return;
+                    setIsEditModalOpen(false);
+                }}
             >
                 <Box
                     sx={{
@@ -2176,7 +2186,7 @@ const BlackList: React.FC = () => {
                         }}>
                             Editar lista negra
                         </Typography>
-                        <Box sx={{ marginTop: "-26px", marginLeft: "30px" }}>
+                        <Box sx={{ marginTop: "-36px", marginLeft: "35px" }}>
                             <IconButton onClick={() => setIsEditModalOpen(false)}>
                                 <CloseIcon sx={{ color: '#A6A6A6' }} />
                             </IconButton>
@@ -2356,7 +2366,7 @@ const BlackList: React.FC = () => {
                                         {
                                             name: 'offset',
                                             options: {
-                                                offset: [0, -380], // 🔥 prueba valores como -4, -6 o incluso 0 si quieres que quede más abajo
+                                                offset: [0, -380],
                                             },
                                         },
                                     ]}
@@ -2388,7 +2398,9 @@ const BlackList: React.FC = () => {
                             text="Guardar cambios"
                             onClick={handleUpdateBlackList}
                             disabled={
-                                !formData.Name.trim() || isNameInvalid
+                                !hasChanges ||
+                                !formData.Name.trim() ||
+                                isNameInvalid
                             }
                         />
                     </Box>
@@ -4897,7 +4909,7 @@ const BlackList: React.FC = () => {
             </Menu>
 
 
-        </div >
+        </Box >
     );
 };
 

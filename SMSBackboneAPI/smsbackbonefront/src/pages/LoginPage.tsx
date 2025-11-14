@@ -90,7 +90,12 @@ const Login: React.FC = () => {
 
         setIsValidEmail(isValid);
 
-        setdisabled(!(isValid && isValidPassword));
+        // Deshabilitar el botón si el email no es válido
+        setdisabled(!(isValidEmail && password.length >= 8 && password.trim() !== '' && value.trim() !== ''));
+
+        if (isValidEmail) {
+            setLoading(false);
+        }
     };
 
     const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,7 +105,8 @@ const Login: React.FC = () => {
         const isValid = value.length >= 8;
         setIsValidPassword(isValid);
 
-        setdisabled(!(isValid && isValidEmail));
+        // Deshabilitar el botón si email o contraseña son inválidos
+        setdisabled(!(isValidPassword && emailErr && email.trim() !== '' && value.trim() !== ''));
     };
 
 

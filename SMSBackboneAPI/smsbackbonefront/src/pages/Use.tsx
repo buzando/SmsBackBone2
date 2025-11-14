@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IconButton, Button, Typography, Divider, Box, Popper, Paper, RadioGroup, FormControlLabel, Radio, MenuItem, Checkbox, ListItemText, TextField, InputAdornment } from '@mui/material';
+import { IconButton, Button, Typography, Divider, Box, Popper, Paper, RadioGroup, FormControlLabel, Radio, MenuItem, Checkbox, ListItemText, TextField, InputAdornment, Icon } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import BoxEmpty from '../assets/Nousers.svg';
 import MainButton from '../components/commons/MainButton'
@@ -8,8 +8,11 @@ import DatePicker from '../components/commons/DatePicker';
 import { es } from 'date-fns/locale';
 import { format } from 'date-fns';
 import CircularProgress from '@mui/material/CircularProgress';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
+import Tooltip from '@mui/material/Tooltip';
 import ClearIcon from '@mui/icons-material/Clear';
+import NoResult from '../assets/NoResultados.svg';
+import IconPDF from '../assets/IconPDF.svg';
 import IconLeft from '../assets/icon-punta-flecha-bottom.svg'
 import { useNavigate } from 'react-router-dom';
 import axios from "../components/commons/AxiosInstance";
@@ -108,14 +111,22 @@ const Use: React.FC = () => {
 
 
     const handleCampaignClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        // Cierra usuarios si está abierto
+        setUserMenuOpen(false);
+        setUserAnchorEl(null);
+
+        // Cierra datepicker si está abierto (opcional)
+        setDatePickerOpen(false);
+
         if (campaignMenuOpen) {
-            setCampaignMenuOpen(false);  // Cierra si ya está abierto
-            setAnchorElC(null);          // Limpia el ancla
+            setCampaignMenuOpen(false);
+            setAnchorElC(null);
         } else {
             setAnchorElC(event.currentTarget);
-            setCampaignMenuOpen(true);   // Abre si estaba cerrado
+            setCampaignMenuOpen(true);
         }
     };
+
 
     const handleCampaignSelection = (campaign: { id: number; name: string }) => {
         const exists = selectedCampaigns.some((c) => c.id === campaign.id);
@@ -245,7 +256,7 @@ const Use: React.FC = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             {/* Encabezado */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -365,6 +376,7 @@ const Use: React.FC = () => {
                     >
                         {formatDateRange()}
                     </Button>
+
                     <Button
                         variant="outlined"
                         onClick={handleCampaignClick}
@@ -400,17 +412,17 @@ const Use: React.FC = () => {
                                                 <img
                                                     src={campaignSearch ? Iconseachred : seachicon}
                                                     alt="Buscar"
-                                                    style={{ marginRight: 4, width: 24 }}
+                                                    style={{ marginRight: 0, width: 24 }}
                                                 />
                                             </InputAdornment>
                                         ),
                                         endAdornment: campaignSearch && (
-                                            <IconButton onClick={() => setCampaignSearch('')}>
+                                            <IconButton onClick={() => setCampaignSearch('')} sx={{ marginRight: "-10px" }}>
                                                 <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
                                             </IconButton>
                                         ),
                                         sx: {
-                                            fontFamily: 'Poppins',
+                                            fontFamily: 'Poppins', fontSize: "16px", fontWeight: 400,
                                             color: campaignSearch ? '#7B354D' : '#000',
                                         }
                                     }}
@@ -445,7 +457,7 @@ const Use: React.FC = () => {
                                 {/* Checkbox de "Seleccionar todo" */}
                                 {campaigns.filter(c => c.name.toLowerCase().includes(campaignSearch)).length > 0 && (
                                     <MenuItem onClick={handleSelectAllCampaigns}
-                                        sx={{ height: "32px", marginLeft: "-12px" }}
+                                        sx={{ height: "30px", marginLeft: "-16px" }}
                                     >
                                         <Checkbox checked={selectedCampaigns.length === campaigns.length}
                                             checkedIcon={
@@ -479,7 +491,7 @@ const Use: React.FC = () => {
                                 {/* Lista de campañas */}
                                 {campaigns.filter((campaign) => campaign.name.toLowerCase().includes(campaignSearch)).map((campaign) => (
                                     <MenuItem key={campaign.id} value={campaign.id} onClick={() => handleCampaignSelection(campaign)}
-                                        sx={{ height: "32px", marginLeft: "-12px" }}
+                                        sx={{ height: "30px", marginLeft: "-16px" }}
                                     >
                                         <Checkbox checked={selectedCampaigns.includes(campaign)}
                                             checkedIcon={
@@ -505,6 +517,9 @@ const Use: React.FC = () => {
                                                 fontSize: '16px',
                                                 fontWeight: 500,
                                                 color: selectedCampaigns.includes(campaign) ? '#8F4E63' : '#786E71',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
                                             }}
                                         />
                                     </MenuItem>
@@ -512,7 +527,8 @@ const Use: React.FC = () => {
 
                                 {/* Mostrar mensaje si no hay resultados */}
                                 {campaigns.filter((campaign) => campaign.name.toLowerCase().includes(campaignSearch)).length === 0 && (
-                                    <Box sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins", mt: "50px" }}>
+                                    <Box sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins", mt: "95px" }}>
+                                        <img src={NoResult} alt="No resultados" style={{ width: '120px', position: "absolute", marginLeft: "48px", marginTop: "-90px" }} />
                                         No se encontraron resultados.
                                     </Box>
                                 )}
@@ -548,7 +564,12 @@ const Use: React.FC = () => {
                             </Box>
                         </Paper>
                     </Popper>
-                    <Button variant="outlined" sx={buttonStyle} onClick={handleUserClick}>USUARIO</Button>
+                    <Button
+                        variant="outlined"
+                        sx={buttonStyle}
+                        onClick={handleUserClick}>
+                        USUARIO
+                    </Button>
                     {/* Popper de Usuarios */}
                     <Popper open={userMenuOpen} anchorEl={userAnchorEl} placement="bottom-start">
                         <Paper sx={{
@@ -580,7 +601,7 @@ const Use: React.FC = () => {
                                             </InputAdornment>
                                         ),
                                         endAdornment: userSearch && (
-                                            <IconButton onClick={() => setUserSearch('')}>
+                                            <IconButton onClick={() => setUserSearch('')} sx={{ marginRight: "-10px" }}>
                                                 <img src={iconclose} alt="Limpiar" style={{ width: 24 }} />
                                             </IconButton>
                                         ),
@@ -619,7 +640,7 @@ const Use: React.FC = () => {
                             <Box sx={{ height: '126px', overflowY: 'auto' }}>
                                 {users.filter((user) => user.name.toLowerCase().includes(userSearch)).length > 0 && (
                                     <MenuItem onClick={handleSelectAllUsers}
-                                        sx={{ height: "32px", marginLeft: "-12px" }}>
+                                        sx={{ height: "30px", marginLeft: "-16px" }}>
                                         <Checkbox checked={selectedUsers.length === users.length}
                                             checkedIcon={
                                                 <Box
@@ -652,7 +673,7 @@ const Use: React.FC = () => {
                                 )}
                                 {users.filter((user) => user.name.toLowerCase().includes(userSearch)).map((user) => (
                                     <MenuItem key={user.id} value={user.id} onClick={() => handleUserSelection(user)}
-                                        sx={{ height: "32px", marginLeft: "-12px" }}
+                                        sx={{ height: "30px", marginLeft: "-16px" }}
                                     >
                                         <Checkbox checked={selectedUsers.includes(user)}
                                             checkedIcon={
@@ -678,14 +699,18 @@ const Use: React.FC = () => {
                                                 fontSize: '16px',
                                                 fontWeight: 500,
                                                 color: selectedUsers.includes(user) ? '#8F4E63' : '#786E71',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
                                             }}
                                         />
                                     </MenuItem>
                                 ))}
                                 {users.filter((user) => user.name.toLowerCase().includes(userSearch)).length === 0 && (
-                                    <Typography sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins", mt: "50px" }}>
+                                    <Box sx={{ textAlign: 'center', color: '#7B354D', fontSize: '14px', fontWeight: 500, fontFamily: "Poppins", mt: "95px" }}>
+                                        <img src={NoResult} alt="No resultados" style={{ width: '120px', position: "absolute", marginLeft: "48px", marginTop: "-90px" }} />
                                         No se encontraron resultados.
-                                    </Typography>
+                                    </Box>
                                 )}
                             </Box>
                             <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5, mt: 1 }} />
@@ -717,6 +742,47 @@ const Use: React.FC = () => {
                             </Box>
                         </Paper>
                     </Popper>
+
+                    <Box sx={{ marginLeft: "1220px", gap: 2, position: "absolute" }}>
+                        <Tooltip title="Exportar a PDF"
+                            placement="top"
+                            arrow
+
+                            PopperProps={{
+                                modifiers: [
+                                    {
+                                        name: 'arrow',
+                                        options: {
+                                            padding: 8,
+                                        },
+                                    },
+                                ],
+                            }}
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        fontFamily: 'Poppins',
+                                        backgroundColor: '#322D2E',
+                                        color: '#FFFFFF',
+                                        fontSize: '12px',
+                                        borderRadius: '4px',
+                                        padding: '6px 10px',
+                                    },
+                                },
+                                arrow: {
+                                    sx: {
+                                        color: '#322D2E',
+                                    },
+                                },
+                            }}
+
+                        >
+                            <IconButton>
+                                <img src={IconPDF} alt="pdf" style={{ transform: 'rotate(0deg)', width: 24 }} />
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+
                 </Box>
                 <DatePicker
                     open={datePickerOpen}
@@ -725,6 +791,7 @@ const Use: React.FC = () => {
                     onApply={handleDateSelectionApply}
                     onClose={handleCancelDatePicker}
                 />
+
 
                 <Divider sx={{ marginBottom: '20px', marginTop: "-5px" }} />
                 {loading && (
@@ -828,6 +895,7 @@ const Use: React.FC = () => {
 
                     </Box>
                 )}
+
             </Box>
         </Box>
     );

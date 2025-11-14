@@ -3074,9 +3074,12 @@ const Campains: React.FC = () => {
 
       <Dialog
         open={openCreateCampaignModal}
-        onClose={() => setOpenCreateCampaignModal(false)}
-        maxWidth={false} // Le quitamos el límite de ancho
-        fullWidth // Forzamos que se respete el ancho del Paper
+        onClose={(_, reason) => {
+          if (reason === "backdropClick") return;
+          setOpenCreateCampaignModal(false);
+        }}
+        maxWidth={false}
+        fullWidth
         PaperProps={{
           sx: {
             width: "810px",
