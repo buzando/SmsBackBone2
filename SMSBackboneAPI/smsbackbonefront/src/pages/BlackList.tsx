@@ -1116,18 +1116,51 @@ const BlackList: React.FC = () => {
                             </Typography>
                         </Box>
                     )}
-                    {BlackList.length > 0 && (
+
+                    {BlackList.length > 0 && filteredBlackList.length === 0 && (
                         <Box
                             sx={{
+                                width: '100%',
                                 backgroundColor: '#FFFFFF',
                                 borderRadius: '8px',
+                                padding: '60px 0',
+                                height: '450px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                                mt: 1,
+                            }}
+                        >
+                            <img src={Emptybox} style={{ width: 240, marginBottom: 16 }} />
+                            <Typography
+                                sx={{
+                                    fontFamily: 'Poppins',
+                                    fontSize: '14px',
+                                    color: '#7B354D',
+                                    fontWeight: 500,
+                                }}
+                            >
+                                No se encontraron resultados.
+                            </Typography>
+                        </Box>
+                    )}
+
+                    {filteredBlackList.length > 0 && (
+                        <Box
+                            sx={{
+                                width: '100%',
+                                backgroundColor: '#FFFFFF',
+                                borderRadius: '8px',
+                                height: '450px',
                                 boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                                 overflowX: 'auto',
-                                mt: 1.2, height: "450px"
+                                mt: 1.2
                             }}
                         >
                             <table style={{
-                                width: 'auto', minWidth: '1100px',
+                                width: '100%', minWidth: '1100px',
                                 borderCollapse: 'collapse',
                                 fontFamily: 'Poppins'
                             }}>
@@ -2525,22 +2558,16 @@ const BlackList: React.FC = () => {
                                         backgroundColor: "#FFFFFF",
                                         border: campaignSearch ? "1px solid #7B354D" : "1px solid #9B9295",
                                         borderRadius: "4px",
-                                        padding: "6px 10px",
-                                        width: "220px",
-                                        height: "40px",
+                                        padding: '8px 12px',
+                                        width: '218px',
+                                        height: '40px',
+                                        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
                                     }}
                                 >
                                     <img
-                                        src={seachicon}
+                                        src={campaignSearch ? Iconseachred : seachicon}
                                         alt="Buscar"
-                                        style={{
-                                            marginRight: "8px",
-                                            width: "24px",
-                                            height: "24px",
-                                            filter: campaignSearch
-                                                ? "invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)"
-                                                : "none",
-                                        }}
+                                        style={{ marginRight: 8, width: 24 }}
                                     />
                                     <input
                                         type="text"
@@ -2551,7 +2578,7 @@ const BlackList: React.FC = () => {
                                             border: "none",
                                             outline: "none",
                                             width: "100%",
-                                            fontSize: "14px",
+                                            fontSize: "16px",
                                             fontFamily: "Poppins, sans-serif",
                                             color: campaignSearch ? "#7B354D" : "#9B9295",
                                             backgroundColor: "transparent",
@@ -2560,13 +2587,8 @@ const BlackList: React.FC = () => {
                                     {campaignSearch && (
                                         <img
                                             src={iconclose}
-                                            alt="Limpiar búsqueda"
-                                            style={{
-                                                marginLeft: "8px",
-                                                width: "24px",
-                                                height: "24px",
-                                                cursor: "pointer",
-                                            }}
+                                            alt="Limpiar"
+                                            style={{ marginLeft: '8px', width: '24px', height: '24px', cursor: 'pointer' }}
                                             onClick={() => setCampaignSearch('')}
                                         />
                                     )}
@@ -2735,23 +2757,16 @@ const BlackList: React.FC = () => {
                                         backgroundColor: "#FFFFFF",
                                         border: inspectSearch ? "1px solid #7B354D" : "1px solid #9B9295",
                                         borderRadius: "4px",
-                                        padding: "0px 10px",
-                                        width: "220px",
-                                        height: "40px",
-                                        boxShadow: "0px 1px 3px rgba(0, 0, 0, 0.1)",
+                                        padding: '8px 12px',
+                                        width: '218px',
+                                        height: '40px',
+                                        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
                                     }}
                                 >
                                     <img
-                                        src={seachicon}
+                                        src={inspectSearch ? Iconseachred : seachicon}
                                         alt="Buscar"
-                                        style={{
-                                            marginRight: "8px",
-                                            width: "24px",
-                                            height: "24px",
-                                            filter: inspectSearch
-                                                ? "invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)"
-                                                : "none",
-                                        }}
+                                        style={{ marginRight: 8, width: 24 }}
                                     />
                                     <input
                                         type="text"
@@ -2762,7 +2777,7 @@ const BlackList: React.FC = () => {
                                             border: "none",
                                             outline: "none",
                                             width: "100%",
-                                            fontSize: "14px",
+                                            fontSize: "16px",
                                             fontFamily: "Poppins, sans-serif",
                                             color: inspectSearch ? "#7B354D" : "#9B9295",
                                             backgroundColor: "transparent",
@@ -2772,13 +2787,8 @@ const BlackList: React.FC = () => {
                                     {inspectSearch && (
                                         <img
                                             src={iconclose}
-                                            alt="Limpiar búsqueda"
-                                            style={{
-                                                marginLeft: "8px",
-                                                width: "24px",
-                                                height: "24px",
-                                                cursor: "pointer",
-                                            }}
+                                            alt="Limpiar"
+                                            style={{ marginLeft: '8px', width: '24px', height: '24px', cursor: 'pointer' }}
                                             onClick={() => setInspectSearch('')}
                                         />
                                     )}

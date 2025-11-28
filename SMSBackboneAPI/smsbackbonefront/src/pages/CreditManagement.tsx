@@ -23,8 +23,10 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
+import infoicon from '../assets/Icon-info.svg'
 import axios from "../components/commons/AxiosInstance";
 import TrashIcon from "../assets/Icon-trash.svg";
+import IconCloseModal from "../assets/IconCloseModal.svg";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import seachicon from '../assets/icon-lupa.svg'
 import Iconseachred from "../assets/Iconseachred.svg";
@@ -66,6 +68,8 @@ const CreditManagement: React.FC = () => {
     const [searchTerm3, setSearchTerm3] = useState("");
     const [OpenErrorModal, setOpenErrorModal] = useState(false);
     const [showChipBarAdd, setshowChipBarAdd] = useState(false);
+    const [transferAmountInput, setTransferAmountInput] = useState("");
+
     const navigate = useNavigate();
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -141,8 +145,9 @@ const CreditManagement: React.FC = () => {
     );
 
     const handleOpenDropdown = () => {
-        setOpenDropdown(true);
+        setOpenDropdown(prev => !prev);
     };
+
 
     const handleCloseDropdown = () => {
         setOpenDropdown(false);
@@ -159,8 +164,9 @@ const CreditManagement: React.FC = () => {
     };
 
     const handleOpenDropdown2 = () => {
-        setOpenDropdown2(true); // Abre el desplegable
+        setOpenDropdown2((prev) => !prev);
     };
+
 
     const handleCloseDropdown2 = () => {
         setOpenDropdown2(false); // Cierra el desplegable
@@ -289,7 +295,7 @@ const CreditManagement: React.FC = () => {
                             <img
                                 src={searchTerm ? Iconseachred : seachicon}
                                 alt="Buscar"
-                                style={{ marginRight: 8, width: 24 }}
+                                style={{ marginRight: 6, width: 24 }}
                             />
                             <input
                                 type="text"
@@ -311,7 +317,7 @@ const CreditManagement: React.FC = () => {
                                 <img
                                     src={iconclose}
                                     alt="Limpiar búsqueda"
-                                    style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
+                                    style={{ marginRight: -6, width: 24, height: 24, cursor: 'pointer' }}
                                     onClick={() => setSearchTerm("")}
                                 />
                             )}
@@ -337,17 +343,16 @@ const CreditManagement: React.FC = () => {
                             const nameWords = rooms.name.toLowerCase().split(" ");
                             return nameWords.some((word) => word.startsWith(term));
                         }).length === 0 ? (
-                            <Grid item xs={12}>
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "flex-end",
-                                        justifyContent: "center",
-                                        height: "300px",
-                                        marginLeft: "50px",
-                                    }}
-                                >
+
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "flex-end",
+                                    justifyContent: "center", marginRight: "-350px"
+                                }}
+                            >
+                                <Box sx={{ marginTop: "120px" }}>
                                     <img
                                         src={NoResult}
                                         alt="Sin resultados"
@@ -369,7 +374,7 @@ const CreditManagement: React.FC = () => {
                                         No se encontraron resultados.
                                     </Typography>
                                 </Box>
-                            </Grid>
+                            </Box>
                         ) : (
                             rooms
                                 .filter((rooms) => {
@@ -418,29 +423,59 @@ const CreditManagement: React.FC = () => {
                                                             color: '#574B4F',
                                                             opacity: 1,
                                                             fontSize: '16px',
-                                                            whiteSpace: 'nowrap', // Evita el salto de línea
-                                                            overflow: 'hidden', // Oculta el texto si es muy largo
+                                                            whiteSpace: 'nowrap',
+                                                            overflow: 'hidden',
                                                         }}
                                                     >
                                                         {room.name}
                                                     </Typography>
-
-                                                    <Typography
-                                                        variant="body2"
-                                                        sx={{
-                                                            textAlign: 'left',
-                                                            fontFamily: "Poppins, sans-serif",
-                                                            letterSpacing: '0px',
-                                                            color: '#574B4F',
-                                                            opacity: 1,
-                                                            fontSize: '14px',
+                                                    <Tooltip
+                                                        title={room.description}
+                                                        arrow
+                                                        placement="top"
+                                                        componentsProps={{
+                                                            tooltip: {
+                                                                sx: {
+                                                                    backgroundColor: "rgba(0, 0, 0, 0.9)",
+                                                                    color: "#DEDADA",
+                                                                    fontFamily: "Poppins, sans-serif",
+                                                                    fontSize: "12px",
+                                                                    padding: "6px 8px",
+                                                                    borderRadius: "8px",
+                                                                }
+                                                            },
+                                                            arrow: {
+                                                                sx: {
+                                                                    color: "rgba(0, 0, 0, 0.9)",
+                                                                    marginLeft: "20px",
+                                                                }
+                                                            }
+                                                        }}
+                                                        PopperProps={{
+                                                            modifiers: [
+                                                                {
+                                                                    name: "offset",
+                                                                    options: { offset: [20, -10] }
+                                                                },
+                                                            ],
                                                         }}
                                                     >
-                                                        {room.description.length > 25
-                                                            ? `${room.description.slice(0, 20)}...`
-                                                            : room.description}
-                                                    </Typography>
-
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                textAlign: 'left',
+                                                                fontFamily: "Poppins, sans-serif",
+                                                                letterSpacing: '0px',
+                                                                color: '#574B4F',
+                                                                opacity: 1,
+                                                                fontSize: '14px',
+                                                            }}
+                                                        >
+                                                            {room.description.length > 25
+                                                                ? `${room.description.slice(0, 17)}...`
+                                                                : room.description}
+                                                        </Typography>
+                                                    </Tooltip>
 
                                                 </Box>
                                             </Box>
@@ -499,7 +534,7 @@ const CreditManagement: React.FC = () => {
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         gap: '8px',
-                                                        padding: '10px 16px',
+                                                        padding: '6px 14px',
                                                         borderRadius: '8px',
                                                         '&:hover': {
                                                             background: '#F2EBED 0% 0% no-repeat padding-box',
@@ -510,15 +545,16 @@ const CreditManagement: React.FC = () => {
                                                             <img
                                                                 src={TrashIcon}
                                                                 alt="Distribución de créditos"
-                                                                width="24"
-                                                                height="24"
+                                                                width="29"
+                                                                height="29"
                                                                 style={{ marginRight: "8px" }}
                                                             />
                                                             <Typography
                                                                 sx={{
                                                                     fontSize: '14px',
-                                                                    fontWeight: 'medium',
+                                                                    fontWeight: '500',
                                                                     textAlign: 'left',
+                                                                    fontFamily: 'Poppins', color: '#574B4F'
                                                                 }}
                                                             >
                                                                 Distribución de créditos
@@ -538,13 +574,17 @@ const CreditManagement: React.FC = () => {
             {/* Modal */}
             <Modal
                 open={modalOpen}
-                onClose={handleCloseModal}
+                onClose={(event, reason) => {
+                    if (reason === "backdropClick") return;
+                    handleCloseModal();
+                }}
                 closeAfterTransition
                 BackdropComponent={Backdrop}
                 BackdropProps={{
                     timeout: 500,
                 }}
             >
+
                 <Fade in={modalOpen}>
                     <Box
                         sx={{
@@ -552,57 +592,69 @@ const CreditManagement: React.FC = () => {
                             top: "50%",
                             left: "50%",
                             transform: "translate(-50%, -50%)",
-                            width: 460,
-                            maxHeight: "80vh", // Limita la altura máxima
+                            width: '460px',
+                            height: "576px",
                             bgcolor: "background.paper",
                             boxShadow: 24,
                             p: 4,
                             borderRadius: "12px",
-                            overflowY: "auto", // Habilita el scroll vertical
+                            overflowY: "hidden",
+                            overflowX: "hidden"
                         }}
                     >
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography
-                                sx={{
-                                    textAlign: 'left',
-                                    font: 'normal normal 600 20px/54px Poppins',
-                                    letterSpacing: '0px',
-                                    color: '#574B4F',
-                                    opacity: 1,
-                                    fontSize: '20px',
-                                }}
-                            >
-                                Distribución de créditos
-                            </Typography>
-                            <IconButton onClick={handleCloseModal}>
-                                <CloseIcon />
-                            </IconButton>
+                            <Box sx={{ marginTop: "-24px", marginLeft: "-8px", marginBottom: "-10px" }}>
+                                <Typography
+                                    sx={{
+                                        textAlign: 'left',
+                                        font: 'normal normal 600 20px/54px Poppins',
+                                        letterSpacing: '0px',
+                                        color: '#574B4F',
+                                        opacity: 1,
+                                        fontSize: '20px',
+                                    }}
+                                >
+                                    Distribución de créditos
+                                </Typography>
+                            </Box>
+                            <Box sx={{ marginTop: "-40px", marginRight: "-26px" }}>
+                                <IconButton onClick={handleCloseModal}>
+                                    <img
+                                        src={IconCloseModal}
+                                        alt="x"
+                                        width="24"
+                                        height="24"
+                                    />
+                                </IconButton>
+                            </Box>
                         </Box>
-                        <Divider sx={{ my: 2 }} />
+                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', my: 2 }} />
                         <Box
                             sx={{
                                 display: 'flex',
                                 flexDirection: 'column',
-                                alignItems: 'center', // Centra horizontalmente
-                                gap: 2,               // Espaciado vertical entre elementos
+                                alignItems: 'center',
+                                marginLeft: "-22px", marginTop: "-12px", marginBottom: "-32px",
+                                height: "430px", width: "446px",
+                                gap: 2,
+                                backgroundColor: "withe",
+                                overflowY: "auto", overflowX: "hidden"
                             }}
                         >
                             <Typography
                                 sx={{
                                     textAlign: "left",
-                                    font: "normal normal medium 16px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#330F1B",
                                     opacity: 1,
-                                    fontSize: "16px",
+                                    fontSize: "16px", marginTop: "14px"
                                 }}
                             >
                                 Seleccionar sala destino
                             </Typography>
                             <ClickAwayListener onClickAway={handleCloseDropdown2}>
-                                <Box sx={{
-                                    position: "relative",
-                                }}>
+                                <Box sx={{ position: "relative" }}>
                                     <TextField
                                         fullWidth
                                         placeholder="Seleccionar sala destino"
@@ -623,9 +675,10 @@ const CreditManagement: React.FC = () => {
                                                 opacity: 1,
                                                 width: "244px",
                                                 height: "40px",
+                                                cursor: "pointer",
                                                 "& input": {
                                                     textAlign: "left",
-                                                    font: "normal normal normal 12px/54px Poppins",
+                                                    fontFamily: "Poppins",
                                                     letterSpacing: "0px",
                                                     color: "#786E71",
                                                     opacity: 1,
@@ -644,9 +697,8 @@ const CreditManagement: React.FC = () => {
                                                 width: "244px",
                                                 zIndex: 9999,
                                                 maxHeight: 300,
-                                                overflowY: "auto",
+                                                overflowY: "auto", overflowX: "hidden",
                                                 borderRadius: "8px",
-
                                             }}
                                         >
                                             <Box
@@ -661,20 +713,13 @@ const CreditManagement: React.FC = () => {
                                                     width: "218px",
                                                     height: "40px",
                                                     boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                                                    m: 2,
+                                                    m: 2, marginLeft: "13px"
                                                 }}
                                             >
                                                 <img
-                                                    src={seachicon}
+                                                    src={searchTerm3 ? Iconseachred : seachicon}
                                                     alt="Buscar"
-                                                    style={{
-                                                        marginRight: "8px",
-                                                        width: "16px",
-                                                        height: "16px",
-                                                        filter: searchTerm3
-                                                            ? "invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)"
-                                                            : "none",
-                                                    }}
+                                                    style={{ marginLeft: -6, marginRight: 4, width: 24 }}
                                                 />
                                                 <input
                                                     type="text"
@@ -688,19 +733,14 @@ const CreditManagement: React.FC = () => {
                                                         fontSize: "16px",
                                                         fontFamily: "Poppins, sans-serif",
                                                         color: searchTerm3 ? "#7B354D" : "#9B9295",
-                                                        backgroundColor: "transparent",
+                                                        backgroundColor: "transparent"
                                                     }}
                                                 />
                                                 {searchTerm3 && (
                                                     <img
                                                         src={iconclose}
                                                         alt="Limpiar búsqueda"
-                                                        style={{
-                                                            marginLeft: "8px",
-                                                            width: "16px",
-                                                            height: "16px",
-                                                            cursor: "pointer",
-                                                        }}
+                                                        style={{ marginRight: -8, width: 24, height: 24, cursor: 'pointer' }}
                                                         onClick={() => setSearchTerm3("")}
                                                     />
                                                 )}
@@ -715,20 +755,16 @@ const CreditManagement: React.FC = () => {
                                                             component="button"
                                                             onClick={() => handleSelectRoom2(room)}
                                                             sx={{
-                                                                // Quita cualquier borde u outline
                                                                 border: "none",
                                                                 outline: "none",
                                                                 boxShadow: "none",
-
-                                                                // Fondo blanco por defecto
                                                                 backgroundColor: "#FFF",
-
-                                                                // Evita el color de hover morado
+                                                                borderRadius: 0,
                                                                 "&:hover": {
-                                                                    backgroundColor: "#f5f5f5", // o "transparent"
+                                                                    backgroundColor: "#F2EBED",
+                                                                    cursor: "pointer",
                                                                 },
 
-                                                                // Quita color de foco o selección si existe
                                                                 "&.Mui-focusVisible": {
                                                                     backgroundColor: "transparent",
                                                                 },
@@ -737,7 +773,7 @@ const CreditManagement: React.FC = () => {
                                                                 },
                                                                 "& .MuiListItemText-primary": {
                                                                     textAlign: "left",
-                                                                    font: "normal normal normal 12px/54px Poppins",
+                                                                    fontFamily: "Poppins",
                                                                     letterSpacing: "0px",
                                                                     color: "#786E71",
                                                                     opacity: 1,
@@ -750,7 +786,6 @@ const CreditManagement: React.FC = () => {
                                                             <ListItemText
                                                                 primary={room.name}
                                                                 sx={{
-                                                                    // Asegura que el texto sea visible
                                                                     color: "#574B4F",
                                                                     fontSize: "16px",
                                                                 }}
@@ -759,7 +794,19 @@ const CreditManagement: React.FC = () => {
                                                     ))
                                                 ) : (
                                                     <ListItem>
-                                                        <ListItemText primary="No se encontraron resultados" />
+                                                        <ListItemText
+                                                            primary="No se encontraron resultados"
+                                                            sx={{
+                                                                whiteSpace: "nowrap",
+                                                                overflow: "hidden", marginTop: 1.5, marginBottom: 1.5,
+                                                                "& .MuiListItemText-primary": {
+                                                                    fontFamily: "Poppins, sans-serif",
+                                                                    fontSize: "14px",
+                                                                    color: "#7B354D",
+                                                                    fontWeight: 400,
+                                                                }
+                                                            }}
+                                                        />
                                                     </ListItem>
                                                 )}
                                             </List>
@@ -771,7 +818,7 @@ const CreditManagement: React.FC = () => {
                             <Typography
                                 sx={{
                                     textAlign: "left",
-                                    font: "normal normal medium 16px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#330F1B",
                                     opacity: 1,
@@ -784,6 +831,21 @@ const CreditManagement: React.FC = () => {
                                 fullWidth
                                 value={selectedChannel}
                                 onChange={(e) => setSelectedChannel(e.target.value)}
+                                displayEmpty
+                                renderValue={(selected) => {
+                                    if (!selected) {
+                                        return (
+                                            <span style={{
+                                                color: "#9B9295",
+                                                fontFamily: "Poppins",
+                                                fontSize: "12px"
+                                            }}>
+                                                Seleccionar
+                                            </span>
+                                        );
+                                    }
+                                    return selected;
+                                }}
                                 sx={{
                                     background: "#FFFFFF",
                                     border: "1px solid #9B9295",
@@ -808,7 +870,7 @@ const CreditManagement: React.FC = () => {
                             >
                                 <MuiMenuItem value="SMS Cortos" sx={{
                                     textAlign: "left",
-                                    font: "normal normal normal 12px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#786E71",
                                     opacity: 1,
@@ -820,7 +882,7 @@ const CreditManagement: React.FC = () => {
                                 }}>SMS # Cortos</MuiMenuItem>
                                 <MuiMenuItem value="SMS Largos" sx={{
                                     textAlign: "left",
-                                    font: "normal normal normal 12px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#786E71",
                                     opacity: 1,
@@ -834,7 +896,7 @@ const CreditManagement: React.FC = () => {
                             <Typography
                                 sx={{
                                     textAlign: "left",
-                                    font: "normal normal medium 16px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#330F1B",
                                     opacity: 1,
@@ -851,7 +913,7 @@ const CreditManagement: React.FC = () => {
                                         width: "244px",
                                         height: "40px",
                                         textAlign: 'center',
-                                        backgroundColor: "#E0E0E0", // Ajusta el tono de gris que quieras
+                                        backgroundColor: "#E5E4E4",
                                         borderRadius: "2px",
                                         "&:hover fieldset": {
                                             borderColor: "#833A53",
@@ -859,7 +921,7 @@ const CreditManagement: React.FC = () => {
                                     },
                                     "& input": {
                                         textAlign: "left",
-                                        font: "normal normal medium 16px/54px Poppins",
+                                        fontFamily: "Poppins",
                                         letterSpacing: "0.03px",
                                         color: "#574B4F",
                                         opacity: 1,
@@ -871,39 +933,74 @@ const CreditManagement: React.FC = () => {
                             <Box display="flex" alignItems="center" justifyContent="center" gap={0.6}>
                                 <Typography
                                     sx={{
-                                        textAlign: "center",
-                                        font: "normal normal medium 16px/24px Poppins",
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
                                         color: "#330F1B",
+                                        opacity: 1,
                                         fontSize: "16px",
                                     }}
                                 >
                                     Créditos a transferir
                                 </Typography>
-                                <Tooltip
-                                    title="Cantidad de créditos que deseas mover a otra sala. No puede ser mayor que los disponibles."
-                                    placement="right"
-                                    arrow
-                                >
-                                    <InfoOutlinedIcon
-                                        sx={{
-                                            fontSize: 15,
-                                            color: "#7B354D",
-                                            opacity: 0.8,
-                                            cursor: "pointer",
-                                            transition: "all 0.2s ease-in-out",
-                                            "&:hover": { opacity: 1, transform: "scale(1.1)" },
+                                <InputAdornment position="end">
+                                    <Tooltip title={
+                                        <Box
+                                            sx={{
+                                                backgroundColor: "#FFFFFF",
+                                                borderRadius: "8px",
+                                                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                padding: "8px 12px",
+                                                fontSize: "14px",
+                                                fontFamily: "Poppins",
+                                                color: "#574B4F",
+                                                whiteSpace: "pre-line",
+                                                transform: "translate(-10px, -22px)",
+                                                borderColor: "#00131F3D",
+                                                borderStyle: "solid",
+                                                borderWidth: "1px"
+                                            }}
+                                        >
+                                            <>
+                                                • Cantidad de créditos que<br />
+                                                desea adicionar a la sala
+                                            </>
+                                        </Box>
+                                    }
+
+                                        placement="bottom-end"
+                                        componentsProps={{
+                                            tooltip: {
+                                                sx: {
+                                                    backgroundColor: "transparent",
+                                                    padding: 0,
+                                                },
+                                            },
                                         }}
-                                    />
-                                </Tooltip>
+                                    >
+                                        <img
+                                            src={infoicon}
+                                            alt="Info"
+                                            style={{ width: 24, height: 24 }}
+                                        />
+                                    </Tooltip>
+                                </InputAdornment>
                             </Box>
 
                             <TextField
-                                type="number"
-                                value={transferAmount}
+                                type="text"
+                                value={transferAmountInput}
                                 onChange={(e) => {
-                                    const value = parseInt(e.target.value, 10);
-                                    if (value <= (getAvailableCredits())) {
+                                    const clean = e.target.value.replace(/\D/g, ""); // Solo números
+
+                                    setTransferAmountInput(clean); // 👈 Esto actualiza lo que se muestra en pantalla
+
+                                    const value = clean === "" ? null : parseInt(clean, 10);
+
+                                    if (value !== null && value <= getAvailableCredits()) {
                                         setTransferAmount(value);
+                                    } else {
+                                        setTransferAmount(null);
                                     }
                                 }}
                                 inputProps={{
@@ -919,7 +1016,7 @@ const CreditManagement: React.FC = () => {
                                     },
                                     "& input": {
                                         textAlign: "left",
-                                        font: "normal normal medium 16px/54px Poppins",
+                                        fontFamily: "Poppins",
                                         letterSpacing: "0.03px",
                                         color: "#574B4F",
                                         opacity: 1,
@@ -931,7 +1028,7 @@ const CreditManagement: React.FC = () => {
                             <Typography
                                 sx={{
                                     textAlign: "left",
-                                    font: "normal normal medium 16px/54px Poppins",
+                                    fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#330F1B",
                                     opacity: 1,
@@ -957,39 +1054,38 @@ const CreditManagement: React.FC = () => {
                                             ),
                                         }}
                                         sx={{
+                                            marginBottom: "30px",
                                             "& .MuiOutlinedInput-root": {
+                                                background: "#FFFFFF",
+                                                border: "1px solid #9B9295",
                                                 borderRadius: "8px",
-                                                backgroundColor: "#f5f5f5",
-                                                "&:hover fieldset": {
-                                                    borderColor: "#833A53",
-                                                },
-                                                width: "244px", // Ajusta el ancho fijo
-                                                height: "40px", // Ajusta la altura
-                                            },
-                                            "& input": {
-                                                textAlign: "left",
-                                                font: "normal normal normal 12px/54px Poppins",
-                                                letterSpacing: "0px",
-                                                color: "#786E71",
                                                 opacity: 1,
-                                                fontSize: "12px",
+                                                width: "244px",
+                                                height: "40px",
+                                                cursor: "pointer",
+                                                "& input": {
+                                                    textAlign: "left",
+                                                    fontFamily: "Poppins",
+                                                    letterSpacing: "0px",
+                                                    color: "#786E71",
+                                                    opacity: 1,
+                                                    fontSize: "12px",
+                                                },
                                             },
                                         }}
                                     />
-
                                     {openDropdown && (
                                         <Paper
                                             elevation={3}
                                             sx={{
                                                 position: "absolute",
-                                                bottom: "calc(100% + 6px)",
-                                                left: "6px",
+                                                top: "calc(100% - 26px)",
+                                                left: "0px",
                                                 width: "244px",
                                                 zIndex: 9999,
-                                                maxHeight: 250,
-                                                overflowY: "auto",
-                                                borderRadius: "8px",
-                                                p: 0,
+                                                maxHeight: 300,
+                                                overflowY: "auto", overflowX: "hidden",
+                                                borderRadius: "8px"
                                             }}
                                         >
                                             <Box
@@ -999,25 +1095,20 @@ const CreditManagement: React.FC = () => {
                                                     backgroundColor: "#FFFFFF",
                                                     border: searchTerm2 ? "1px solid #7B354D" : "1px solid #9B9295",
                                                     borderRadius: "4px",
-                                                    padding: "8px 12px",
+                                                    px: 2,
+                                                    py: 1,
                                                     width: "218px",
                                                     height: "40px",
                                                     boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                                                    m: 2, // Separación dentro del Paper
+                                                    m: 2, marginLeft: "13px"
                                                 }}
                                             >
                                                 <img
-                                                    src={seachicon} // tu ícono de lupa
+                                                    src={searchTerm2 ? Iconseachred : seachicon}
                                                     alt="Buscar"
-                                                    style={{
-                                                        marginRight: "8px",
-                                                        width: "16px",
-                                                        height: "16px",
-                                                        filter: searchTerm2
-                                                            ? "invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)"
-                                                            : "none",
-                                                    }}
+                                                    style={{ marginLeft: -6, marginRight: 4, width: 24 }}
                                                 />
+
                                                 <input
                                                     type="text"
                                                     placeholder="Buscar sala..."
@@ -1035,14 +1126,9 @@ const CreditManagement: React.FC = () => {
                                                 />
                                                 {searchTerm2 && (
                                                     <img
-                                                        src={iconclose} // tu ícono de cerrar
+                                                        src={iconclose}
                                                         alt="Limpiar búsqueda"
-                                                        style={{
-                                                            marginLeft: "8px",
-                                                            width: "16px",
-                                                            height: "16px",
-                                                            cursor: "pointer",
-                                                        }}
+                                                        style={{ marginRight: -8, width: 24, height: 24, cursor: 'pointer' }}
                                                         onClick={() => setSearchTerm2("")}
                                                     />
                                                 )}
@@ -1056,23 +1142,44 @@ const CreditManagement: React.FC = () => {
                                                             key={room.id}
                                                             onClick={() => handleSelectRoom(room)}
                                                             sx={{
-                                                                // Menos espacio vertical
-                                                                py: 1,
-                                                                px: 2,
-                                                                cursor: "pointer",
-                                                                "&:hover": { backgroundColor: "#f5f5f5" },
+                                                                border: "none",
+                                                                outline: "none",
+                                                                boxShadow: "none",
+                                                                backgroundColor: "#FFF",
+                                                                borderRadius: 0,
+                                                                "&:hover": {
+                                                                    backgroundColor: "#F2EBED",
+                                                                    cursor: "pointer",
+                                                                },
+
+                                                                "&.Mui-focusVisible": {
+                                                                    backgroundColor: "transparent",
+                                                                },
+                                                                "&.Mui-selected": {
+                                                                    backgroundColor: "transparent",
+                                                                },
+                                                                "& .MuiListItemText-primary": {
+                                                                    textAlign: "left",
+                                                                    fontFamily: "Poppins",
+                                                                    letterSpacing: "0px",
+                                                                    color: "#786E71",
+                                                                    opacity: 1,
+                                                                    fontSize: "12px",
+                                                                    lineHeight: "1.2",
+                                                                },
+
                                                             }}
                                                         >
                                                             <ListItemText
                                                                 primary={room.name}
                                                                 sx={{
                                                                     textAlign: "left",
-                                                                    font: "normal normal normal 12px/54px Poppins",
+                                                                    fontFamily: "Poppins",
                                                                     letterSpacing: "0px",
                                                                     color: "#786E71",
                                                                     opacity: 1,
                                                                     fontSize: "12px",
-                                                                    lineHeight: "1.2", // Más compacto
+                                                                    lineHeight: "1.2"
                                                                 }}
                                                             />
                                                         </ListItem>
@@ -1082,12 +1189,14 @@ const CreditManagement: React.FC = () => {
                                                         <ListItemText
                                                             primary="No se encontraron resultados"
                                                             sx={{
-                                                                textAlign: "left",
-                                                                font: "normal normal normal 12px/54px Poppins",
-                                                                letterSpacing: "0px",
-                                                                color: "#786E71",
-                                                                opacity: 1,
-                                                                fontSize: "12px",
+                                                                whiteSpace: "nowrap",
+                                                                overflow: "hidden", marginTop: 1.5, marginBottom: 1.5,
+                                                                "& .MuiListItemText-primary": {
+                                                                    fontFamily: "Poppins, sans-serif",
+                                                                    fontSize: "14px",
+                                                                    color: "#7B354D",
+                                                                    fontWeight: 400,
+                                                                }
                                                             }}
                                                         />
                                                     </ListItem>
@@ -1111,11 +1220,15 @@ const CreditManagement: React.FC = () => {
                         {/*    <MuiMenuItem value="SMS Cortos">SMS # Cortos</MuiMenuItem>*/}
                         {/*    <MuiMenuItem value="SMS Largos">SMS # Largos</MuiMenuItem>*/}
                         {/*</Select>*/}
-                        <Divider sx={{ my: 2 }} />
+                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', my: 4 }} />
 
-                        <Box display="flex" justifyContent="space-between" mt={3}>
-                            <SecondaryButton onClick={handleCloseModal} text="Cancelar" />
-                            <MainButton isLoading={loading} text="Transferir" onClick={handleTransferSubmit} disabled={!isFormValid} />
+                        <Box display="flex" justifyContent="space-between" mt={"-15px"}>
+                            <Box sx={{ marginLeft: "-12px" }}>
+                                <SecondaryButton onClick={handleCloseModal} text="Cancelar" />
+                            </Box>
+                            <Box sx={{ marginRight: "-12px" }}>
+                                <MainButton isLoading={loading} text="Transferir" onClick={handleTransferSubmit} disabled={!isFormValid} />
+                            </Box>
                         </Box>
                     </Box>
                 </Fade>

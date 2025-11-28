@@ -221,7 +221,7 @@ const BillingInformation: React.FC = () => {
 
     return (
 
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
                     <img src={ArrowBackIosNewIcon} alt="Regresar" style={{ width: 24, transform: 'rotate(270deg)' }} />
@@ -238,11 +238,11 @@ const BillingInformation: React.FC = () => {
                         padding: '20px',
                         borderRadius: '8px',
                         minWidth: '850px',
-                        maxHeight: '500px',
+                        maxHeight: '600px',
                         overflowY: 'auto',
                     }}
                 >
-                    <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', gap: '20px', marginBottom: '25px' }}>
                         <div style={{ flex: 1, maxWidth: '400px' }}>
                             <Typography
                                 style={{
@@ -268,7 +268,12 @@ const BillingInformation: React.FC = () => {
                                 sx={{
                                     fontFamily: "Poppins",
                                     "& .MuiInputBase-input": {
+                                        fontFamily: "Poppins", color: "#574B4F"
+                                    },
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute", mt: 7,
                                         fontFamily: "Poppins",
+                                        fontSize: "12px",
                                     },
                                 }}
                                 InputProps={{
@@ -324,7 +329,6 @@ const BillingInformation: React.FC = () => {
                                                     />
                                                 </IconButton>
                                             </Tooltip>
-
                                         </InputAdornment>
                                     ),
                                 }}
@@ -350,12 +354,17 @@ const BillingInformation: React.FC = () => {
                                 value={rfc}
                                 onChange={handleRfcChange}
                                 fullWidth
-                                error={rfcError} // Marca el campo como error si no es válido
+                                error={rfcError}
                                 helperText={rfcError ? 'Formato Invalido' : ''}
                                 sx={{
                                     fontFamily: "Poppins",
                                     "& .MuiInputBase-input": {
                                         fontFamily: "Poppins",
+                                    },
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute", mt: 7,
+                                        fontFamily: "Poppins",
+                                        fontSize: "12px",
                                     },
                                 }}
                                 InputProps={{
@@ -413,7 +422,6 @@ const BillingInformation: React.FC = () => {
                                                     />
                                                 </IconButton>
                                             </Tooltip>
-
                                         </InputAdornment>
                                     ),
                                 }}
@@ -449,6 +457,7 @@ const BillingInformation: React.FC = () => {
                                 value={taxRegime}
                                 onChange={(e) => setTaxRegime(e.target.value)}
                                 select
+                                SelectProps={{ displayEmpty: true }}
                                 sx={{
                                     width: '400px',
                                     height: '40px',
@@ -456,21 +465,39 @@ const BillingInformation: React.FC = () => {
                                     background: '#FFFFFF',
                                     border: '1px solid #9B9295',
                                     borderRadius: '8px',
+
                                     '& .MuiSelect-select': {
                                         fontFamily: 'Poppins',
                                         fontSize: '12px',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        height: '40px',
+                                        height: '100%',
                                         paddingLeft: '12px',
-                                        paddingTop: "7px", color: "#645E60",
+                                        paddingTop: "8px",   // texto
+                                        color: taxRegime === "" ? "#786E71" : "#786E71",
                                     },
-                                    '& fieldset': {
-                                        border: 'none',
-                                    },
-                                }}
 
+                                    '& .MuiSelect-icon': {
+                                        top: '45%',           // flecha
+                                        transform: 'translateY(-50%)',
+                                        color: '#786E71',
+                                    },
+
+                                    '& fieldset': { border: 'none' },
+                                }}
                             >
+
+
+                                <MenuItem
+                                    value=""
+                                    disabled
+                                    sx={{ display: "none" }}
+                                >
+                                    <span style={{ fontFamily: "Poppins", color: "#9B9295" }}>
+                                        Seleccionar
+                                    </span>
+                                </MenuItem>
+
                                 <MenuItem value="601" sx={{
                                     fontFamily: 'Poppins', fontSize: '12px',
                                     color: '#645E60', '&:hover': {

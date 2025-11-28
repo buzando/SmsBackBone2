@@ -43,6 +43,7 @@ import IconArrowDown1 from "../assets/IconArrowDown1.svg";
 import CloseIcon from '@mui/icons-material/Close';
 import IconCheckedCircle1 from "../assets/IconCheckedCircle1.svg";
 import IconCheckedCircle2 from "../assets/IconCheckedCircle2.svg";
+import IconCheckedCircle3 from "../assets/IconCheckedCircle3.svg";
 import IconTache from "../assets/icon-close.svg";
 import iconclose from "../assets/icon-close.svg";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
@@ -1458,6 +1459,7 @@ const Campains: React.FC = () => {
 
       default:
         return false;
+
     }
   })();
 
@@ -2179,25 +2181,26 @@ const Campains: React.FC = () => {
           {/* Visualización de campaña */}
           {filteredCampaigns.length > 0 && (
             <Grid item xs >
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>            <Typography
-                variant="h6"
-                sx={{
-                  textAlign: "left",
-                  fontFamily: "Poppins",
-                  letterSpacing: "0px",
-                  color: "#330F1B",
-                  opacity: 1,
-                  fontSize: "18px",
-                }}
-              >
-                Visualización
-              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
 
+                <Typography
+                  variant="h6"
+                  sx={{
+                    textAlign: "left",
+                    fontFamily: "Poppins",
+                    letterSpacing: "0px",
+                    color: "#330F1B",
+                    opacity: 1,
+                    fontSize: "18px",
+                  }}
+                >
+                  Visualización
+                </Typography>
                 <Tooltip title="Añadir información" arrow placement="top"
                   componentsProps={{
                     tooltip: {
                       sx: {
-                        backgroundColor: "rgba(0, 0, 0, 0.8)", // Fondo negro con transparencia
+                        backgroundColor: "rgba(0, 0, 0, 0.8)",
                         color: "#CCC3C3",
                         fontFamily: "Poppins, sans-serif",
                         fontSize: "12px",
@@ -2212,29 +2215,30 @@ const Campains: React.FC = () => {
                       }
                     }
                   }}
+                  PopperProps={{
+                    modifiers: [
+                      {
+                        name: "offset",
+                        options: { offset: [-18, -6] }
+                      },
+                    ],
+                  }}
                 >
                   <IconButton
                     style={{
                       backgroundColor: "#FFFFFF",
-                      left: "84%",
                       border: '1px solid #CCCFD2',
                       borderRadius: '8px',
                       color: '#8F4D63',
                       background: '#FFFFFF',
+                      marginRight: "10px"
                     }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = '#F2E9EC';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = 'transparent';
-                      e.currentTarget.style.border = '1px solid #CCCFD2';
-                    }}
-                    onClick={() => setOpenInfoModal(true)}
                   >
                     <img src={welcome} alt="Welcome" style={{ width: '24px', height: '24px' }} />
                   </IconButton>
                 </Tooltip>
               </Box>
+
               <Box
                 sx={{
                   height: "540px",
@@ -2303,7 +2307,7 @@ const Campains: React.FC = () => {
                       <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <AutorenewIcon sx={{ fontSize: "16px" }} />
                         <Typography>{selectedCampaign?.recycleCount ?? 0}</Typography>
-                      </Box>
+                      </Box> */}
                     </Box>
 
                     <LinearProgress
@@ -2780,9 +2784,11 @@ const Campains: React.FC = () => {
                                     <Box component="img" src={IconTrash} alt="Eliminar" sx={{ width: "25px", height: "25px", cursor: "pointer", opacity: 0.6 }} />
                                   </IconButton>
                                 </Tooltip>
+                                {/* 
                                 <IconButton>
                                   <RestoreIcon sx={{ color: "#9B9295" }} />
                                 </IconButton>
+                                */}
                               </TableCell>
                             </TableRow>
                           ))}
@@ -3282,9 +3288,10 @@ const Campains: React.FC = () => {
 
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "24px", width: "100%" }}>
               {["Nombre y horarios", "Registros", "Mensaje", "Configuraciones"].map((label, index) => {
-                const isActive = index === activeStep;
-                const isCompleted = index < activeStep;
+                const isActive = index === activeStep + 1;
+                const isCompleted = index < activeStep + 1;
                 const isLast = index === 3;
+                console.log(index, activeStep);
 
                 return (
                   <React.Fragment key={label}>
@@ -3303,11 +3310,11 @@ const Campains: React.FC = () => {
                       >
                         {isActive ? (
                           <img
-                            src={IconCheckedCircle1}
+                            src={IconCheckedCircle3}
                             alt="Paso activo"
                             style={{
                               width: '28px',
-                              height: '28px',
+                              height: '28px'
                             }}
                           />
                         ) : isCompleted ? (
@@ -3358,19 +3365,19 @@ const Campains: React.FC = () => {
               <Divider
                 sx={{
                   width: '174px', position: "absolute", border: '1.5px solid',
-                  mt: "-39px", ml: "86px", borderColor: activeStep > 0 && activeStep !== 0 ? "#8F4E63" : "#574B4F66"
+                  mt: "-39px", ml: "86px", borderColor: activeStep === -1 ? "#574B4F66" : "#8F4E63"
                 }}
               />
               <Divider
                 sx={{
                   width: '174px', position: "absolute", border: '1.5px solid',
-                  mt: "-39px", ml: "286px", borderColor: activeStep > 1 && activeStep !== 1 ? "#8F4E63" : "#574B4F66"
+                  mt: "-39px", ml: "286px", borderColor: activeStep > 0 ? "#8F4E63" : "#574B4F66"
                 }}
               />
               <Divider
                 sx={{
                   width: '174px', position: "absolute", border: '1.5px solid',
-                  mt: "-39px", ml: "486px", borderColor: activeStep > 2 && activeStep !== 2 ? "#8F4E63" : "#574B4F66"
+                  mt: "-39px", ml: "486px", borderColor: activeStep === 2 ? "#8F4E63" : "#574B4F66"
                 }}
               />
             </Box>
@@ -3417,6 +3424,7 @@ const Campains: React.FC = () => {
                   }}
                 >
                   Ingrese un nombre
+                  <span style={{ color: "#D01247" }}>*</span>
                 </Typography>
                 <TextField
                   variant="outlined"
@@ -3484,7 +3492,6 @@ const Campains: React.FC = () => {
                         </InputAdornment>
                       </Tooltip>
 
-
                   }}
                   sx={{
                     width: "340px",
@@ -3501,9 +3508,19 @@ const Campains: React.FC = () => {
 
               {/* Box 2: Horarios */}
               {/* Renderiza todos los horarios */}
+              <Typography
+                sx={{
+                  fontFamily: "Poppins",
+                  fontSize: "18px",
+                  color: "#574B4F", marginBottom: "-10px", marginTop: "-15px"
+                }}
+              >
+                Ingresar de 1 a 5 horarios
+                <span style={{ color: "#D01247" }}>*</span>
+              </Typography>
               {horarios.map((horario, index) => (
                 <React.Fragment key={index}>
-                  {/*Modo de operación*/}
+                  {/*Modo de operación
                   {index !== 0 && mostrarModoOperacion && (
                     <Box sx={{ mt: -2, mb: -2, ml: 2 }}>
                       <Typography
@@ -3558,7 +3575,7 @@ const Campains: React.FC = () => {
                         </RadioGroup>
                       </FormControl>
                     </Box>
-                  )}
+                  )}*/}
 
                   <Box
                     key={index}
@@ -3754,10 +3771,78 @@ const Campains: React.FC = () => {
                           </Tooltip>
                         )}
                       </Box>
+
                     </Box>
+                    {index === 0 && (
+                      <Box
+                        sx={{
+                          width: "250px",
+                          height: "30px",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center", marginTop: "2px"
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px"
+                          }}
+                        >
+                          <Checkbox
+                            checked={autoStart}
+                            onChange={(e) => setAutoStart(e.target.checked)}
+                            icon={
+                              <Box
+                                sx={{
+                                  width: "20px",
+                                  height: "20px",
+                                  borderRadius: "4px",
+                                  border: "2px solid #574B4FCC"
+                                }}
+                              />
+                            }
+                            checkedIcon={
+                              <Box
+                                sx={{
+                                  width: '24px',
+                                  height: '24px',
+                                  position: 'relative',
+                                  marginTop: '0px',
+                                  marginLeft: '-2px',
+                                }}
+                              >
+                                <img
+                                  src={IconCheckBox1}
+                                  alt="Seleccionado"
+                                  style={{ width: '24px', height: '24px' }}
+                                />
+                              </Box>
+                            }
+                            sx={{
+                              color: "#8F4D63",
+                              "&.Mui-checked": { color: "#8F4D63" },
+                              alignSelf: "flex-start",
+                              padding: 0,
+                            }}
+                          />
+                          <Typography
+                            sx={{
+                              fontFamily: "Poppins",
+                              fontSize: "14px",
+                              color: isChecked ? '#8F4D63' : '#574B4FCC',
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            Iniciar campaña automáticamente
+                          </Typography>
+                        </Box>
+                      </Box>
+                    )}
                   </Box>
 
-                  {/* Checkbox Iniciar campaña automáticamente */}
+                  {/* Checkbox Iniciar campaña automáticamente 
                   {index === 0 && (
                     <Box
                       sx={{
@@ -3827,7 +3912,7 @@ const Campains: React.FC = () => {
                         </Typography>
                       </Box>
                     </Box>
-                  )}
+                  )}*/}
                 </React.Fragment>
               ))}
 
@@ -3977,7 +4062,7 @@ const Campains: React.FC = () => {
                                 {
                                   name: 'offset',
                                   options: {
-                                    offset: [104, -260] //  [horizontal, vertical]
+                                    offset: [104, -260]
                                   }
                                 }
                               ]
@@ -4014,7 +4099,7 @@ const Campains: React.FC = () => {
                                   {
                                     name: 'offset',
                                     options: {
-                                      offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                      offset: [0, -8]
                                     }
                                   }
                                 ]
@@ -5402,7 +5487,7 @@ const Campains: React.FC = () => {
                               sx={{
                                 color: "#574B4F",
                                 '&.Mui-checked': {
-                                  color: "#574B4F",
+                                  color: "#8F4D63",
                                 },
                               }}
                             />
@@ -5424,7 +5509,7 @@ const Campains: React.FC = () => {
                           labelPlacement="bottom"
                           sx={{
                             marginLeft: "110px",
-                            alignItems: 'flex-start',      //  opcional, ajusta alineación vertical si lo necesitas
+                            alignItems: 'flex-start',
                           }}
                         />
 
@@ -5440,12 +5525,22 @@ const Campains: React.FC = () => {
                       <Box sx={{ border: "2px solid #9B929599", borderRadius: "8px", width: "160px", height: "160px" }}>
                         <FormControlLabel
                           value="plantilla"
-                          control={<Radio checked={tipoMensaje === "plantilla"} onChange={() => setTipoMensaje("plantilla")} />}
+                          control={
+                            <Radio checked={tipoMensaje === "plantilla"}
+                              onChange={() => setTipoMensaje("plantilla")}
+                              sx={{
+                                marginRight: "-113px", marginTop: "-2px", marginBottom: "4px",
+                                color: "#574B4F",
+                                '&.Mui-checked': {
+                                  color: "#8F4D63",
+                                },
+                              }}
+                            />}
                           label={
                             <Box sx={{
                               textAlign: "center", p: 2, border: "3px solid",
                               borderColor: tipoMensaje === "plantilla" ? "#8F4D63" : "#8F4D63",
-                              borderRadius: "6px", width: "123px", height: "37px", mt: 2, mb: 8
+                              borderRadius: "6px", width: "123px", height: "37px", mt: 2, mb: 8, marginLeft: "1px"
                             }}>
                               <Box sx={{ marginLeft: "70px", marginTop: "-12px", }}>
                                 <img
@@ -5486,6 +5581,7 @@ const Campains: React.FC = () => {
                   {/* Opciones adicionales debajo */}
                   <Box>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: -2, marginTop: "-25px" }}>
+                      {/* 
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -5529,7 +5625,7 @@ const Campains: React.FC = () => {
                           },
                         }}
                       />
-
+*/}
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -5617,85 +5713,88 @@ const Campains: React.FC = () => {
                       />
 
                     </Box>
+                    {saveAsTemplate && (
+                      <>
+                        <Typography
+                          sx={{
+                            fontFamily: "Poppins",
+                            fontWeight: 500,
+                            fontSize: "14px",
+                            mt: 1, mb: 1,
+                            color: saveAsTemplate ? "#574B4F" : "#939393ff",
+                          }}>
+                          Nombre
+                        </Typography>
 
-                    <Typography
-                      sx={{
-                        fontFamily: "Poppins",
-                        fontWeight: 500,
-                        fontSize: "14px",
-                        mt: 2, mb: 1,
-                        color: saveAsTemplate ? "#574B4F" : "#939393ff",
-                      }}>
-                      Nombre
-                    </Typography>
+                        <TextField
+                          fullWidth
+                          placeholder="Nombre de la plantilla"
+                          disabled={!saveAsTemplate}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <Tooltip
+                                  title={
+                                    <Box
+                                      sx={{
+                                        backgroundColor: "#FFFFFF",
+                                        borderRadius: "8px",
+                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                        padding: "8px 12px",
+                                        fontSize: "14px",
+                                        fontFamily: "Poppins",
+                                        color: "#574B4F",
+                                        whiteSpace: "pre-line",
+                                        transform: "translate(0px, -15px)",
+                                        borderColor: "#00131F3D",
+                                        borderStyle: "solid",
+                                        borderWidth: "1px"
+                                      }}
+                                    >
+                                      <>
+                                        • Solo caracteres alfabéticos<br />
+                                        • Longitud máxima de 40<br />
+                                        caracteres
+                                      </>
+                                    </Box>
+                                  }
+                                  placement="bottom-end"
+                                  componentsProps={{
+                                    tooltip: {
+                                      sx: {
+                                        backgroundColor: "transparent",
+                                        padding: 0,
 
-                    <TextField
-                      fullWidth
-                      placeholder="Nombre de la plantilla"
-                      disabled={!saveAsTemplate}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <Tooltip
-                              title={
-                                <Box
-                                  sx={{
-                                    backgroundColor: "#FFFFFF",
-                                    borderRadius: "8px",
-                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                    padding: "8px 12px",
-                                    fontSize: "14px",
-                                    fontFamily: "Poppins",
-                                    color: "#574B4F",
-                                    whiteSpace: "pre-line",
-                                    transform: "translate(0px, -15px)",
-                                    borderColor: "#00131F3D",
-                                    borderStyle: "solid",
-                                    borderWidth: "1px"
+                                      },
+                                    },
                                   }}
                                 >
-                                  <>
-                                    • Solo caracteres alfabéticos<br />
-                                    • Longitud máxima de 40<br />
-                                    caracteres
-                                  </>
-                                </Box>
-                              }
-                              placement="bottom-end"
-                              componentsProps={{
-                                tooltip: {
-                                  sx: {
-                                    backgroundColor: "transparent",
-                                    padding: 0,
-
-                                  },
-                                },
-                              }}
-                            >
-                              <img src={infoicon} alt="info" style={{ width: 24, height: 24, marginLeft: "-30px" }} />
-                            </Tooltip>
-                          </InputAdornment>
-                        ),
-                      }}
-                      onChange={(e) => setTemplateName(e.target.value)}
-                      sx={{
-                        width: "500px",
-                        backgroundColor: "#FFFFFF",
-                        borderRadius: "8px",
-                        '& .MuiOutlinedInput-root': {
-                          fontSize: "14px",
-                          paddingRight: "8px",
-                        },
-                        '& .MuiOutlinedInput-input': {
-                          fontFamily: 'Poppins, sans-serif',
-                          '&::placeholder': {
-                            fontFamily: 'Poppins, sans-serif',
-                            color: '#A1A1A1',
-                            opacity: 1,
-                          },
-                        },
-                      }}
-                    />
+                                  <img src={infoicon} alt="info" style={{ width: 24, height: 24, marginLeft: "-30px" }} />
+                                </Tooltip>
+                              </InputAdornment>
+                            ),
+                          }}
+                          onChange={(e) => setTemplateName(e.target.value)}
+                          sx={{
+                            width: "500px",
+                            backgroundColor: "#FFFFFF",
+                            borderRadius: "8px",
+                            '& .MuiOutlinedInput-root': {
+                              fontSize: "14px",
+                              paddingRight: "8px",
+                            },
+                            '& .MuiOutlinedInput-input': {
+                              fontFamily: 'Poppins, sans-serif',
+                              '&::placeholder': {
+                                fontFamily: 'Poppins, sans-serif',
+                                color: '#A1A1A1',
+                                opacity: 1,
+                              },
+                            },
+                          }}
+                        />
+                      </>
+                    )}
                   </Box>
                 </Box>
               ) : (
@@ -5732,9 +5831,9 @@ const Campains: React.FC = () => {
                   control={
                     <Radio
                       sx={{
-                        color: '#330F1B', // color cuando no está seleccionado
+                        color: '#330F1B',
                         '&.Mui-checked': {
-                          color: '#8F4D63', // color circulito seleccionado
+                          color: '#8F4D63',
                         },
                       }}
                     />
@@ -5744,7 +5843,7 @@ const Campains: React.FC = () => {
                     mr: 4,
                     '& .MuiFormControlLabel-label': {
                       fontFamily: 'Poppins',
-                      color: tipoNumero === 'corto' ? '#8F4D63' : '#330F1B', // texto cambia con selección
+                      color: tipoNumero === 'corto' ? '#8F4D63' : '#330F1B',
                     },
                   }}
                 />
@@ -6025,7 +6124,7 @@ const Campains: React.FC = () => {
                 )}
               </Box>
 
-              {/*Reciclar registros automaticamente box*/}
+              {/*Reciclar registros automaticamente box
               <Box
                 sx={{
                   display: 'flex',
@@ -6039,7 +6138,7 @@ const Campains: React.FC = () => {
                   gap: 2,
                 }}
               >
-                {/* Bloque 1: Texto + tooltip + switch */}
+                {/* Bloque 1: Texto + tooltip + switch 
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Typography
@@ -6121,10 +6220,10 @@ const Campains: React.FC = () => {
                   />
                 </Box>
 
-                {/* Bloque 2: Visible solo si switch está activado */}
+                {/* Bloque 2: Visible solo si switch está activado 
                 {recycleEnabled && (
                   <Box sx={{ display: 'flex', gap: 6 }}>
-                    {/* Box A: Tipo de registros */}
+                    {/* Box A: Tipo de registros 
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                       <Typography sx={{ fontSize: '14px', fontFamily: 'Poppins', mb: 1 }}>
                         Tipo de registros
@@ -6179,7 +6278,7 @@ const Campains: React.FC = () => {
 
                     </Box>
 
-                    {/* Box B: Incluir no contactados */}
+                    {/* Box B: Incluir no contactados
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: "130px" }}>
                       <Typography sx={{ fontSize: '14px', fontFamily: 'Poppins', mb: 1, textAlign: "center" }}>
                         Incluir registros no contactados
@@ -6197,7 +6296,7 @@ const Campains: React.FC = () => {
 
                     </Box>
 
-                    {/* Box C: Número de reciclajes */}
+                    {/* Box C: Número de reciclajes
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <Typography sx={{ fontSize: '14px', fontFamily: 'Poppins', mb: 1 }}>
                         Número de reciclajes
@@ -6226,7 +6325,7 @@ const Campains: React.FC = () => {
                     </Box>
                   </Box>
                 )}
-              </Box>
+              </Box>*/}
 
               {/*Listas negras box*/}
               <Box
@@ -6426,9 +6525,7 @@ const Campains: React.FC = () => {
 
             </Box>
           )}
-
         </Box>
-
 
         {/*Botones Cancelar / Atras / Siguiente */}
         <DialogActions
@@ -6947,75 +7044,65 @@ const Campains: React.FC = () => {
           </DialogTitle>
 
           {/* Línea divisoria */}
-          <Divider
-            sx={{
-              position: "absolute",
-              marginY: "15px",
-              left: "0px",
-              backgroundColor: "#9F94A5",
-              height: "1px",
-              width: "100%",
-              opacity: 0.3
-            }}
-          />
-
-          <Divider sx={{ marginTop: "10px", marginBottom: "18px", opacity: 0.3 }} />
+          <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mt: 1.5, mb: 1.5 }} />
 
           {/*Stepper */}
-          <DialogContent sx={{ padding: "0 8px", }}>
-
+          <Box sx={{ padding: "0 0px", }}>
 
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "24px", width: "100%" }}>
               {["Nombre y horarios", "Registros", "Mensaje", "Configuraciones"].map((label, index) => {
-                const isActive = index === editActiveStep;
-                const isCompleted = index < editActiveStep;
+                const isActive = index === editActiveStep + 1;
+                const isCompleted = index < editActiveStep + 1;
                 const isLast = index === 3;
 
                 return (
                   <React.Fragment key={label}>
-                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "90px" }}>
                       <Box
                         sx={{
-                          width: "24px",
-                          height: "24px",
+                          width: "28px",
+                          height: "28px",
                           borderRadius: "50%",
-                          border: `2px solid ${isActive || isCompleted ? "#8F4D63" : "#D6D6D6"}`,
+                          border: `2px solid ${isActive || isCompleted ? "#8F4D63" : "#574B4F66"}`,
                           backgroundColor: isActive ? "#8F4D63" : isCompleted ? "#8F4D63" : "#FFFFFF",
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "center",
+                          justifyContent: "center", marginTop: "0px"
                         }}
                       >
-                        {isActive && (
-                          <Box
-                            component="span"
-                            sx={{
-                              color: "#FFFFFF",
-                              fontSize: "14px",
-                              fontWeight: "bold",
-                              fontFamily: "Poppins",
+                        {isActive ? (
+                          <img
+                            src={IconCheckedCircle3}
+                            alt="Paso activo"
+                            style={{
+                              width: '28px',
+                              height: '28px'
                             }}
-                          >
-                            ✓
-                          </Box>
-                        )}
-                        {!isActive && isCompleted && (
-                          <CheckIcon sx={{ fontSize: 16, color: "#FFFFFF" }} />
-                        )}
+                          />
+                        ) : isCompleted ? (
+                          <img
+                            src={IconCheckedCircle2}
+                            alt="Paso completado"
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                            }}
+                          />
+                        ) : null}
                       </Box>
 
                       <Typography
                         sx={{
-                          marginTop: "6px",
+                          position: "absolute",
+                          marginTop: "30px",
                           fontSize: "12px",
                           fontFamily: "Poppins",
                           color: isActive ? "#8F4D63" : "#9B9295",
                           textAlign: "center",
                           fontWeight: 500,
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          maxWidth: "80px",
+                          whiteSpace: "normal",
+                          overflowWrap: "break-word",
+                          maxWidth: "110px",
                         }}
                       >
                         {label}
@@ -7025,19 +7112,54 @@ const Campains: React.FC = () => {
                     {!isLast && (
                       <Box
                         sx={{
-                          width: "80px",
+                          width: "70px",
                           height: "2px",
-                          backgroundColor: "#D6D6D6",
                           mx: "20px",
                         }}
                       />
                     )}
+
                   </React.Fragment>
                 );
               })}
             </Box>
-
-          </DialogContent>
+            <Box>
+              <Divider
+                sx={{
+                  width: '174px', position: "absolute", border: '1.5px solid',
+                  mt: "-39px", ml: "86px", borderColor: editActiveStep === -1 ? "#574B4F66" : "#8F4E63"
+                }}
+              />
+              <Divider
+                sx={{
+                  width: '174px', position: "absolute", border: '1.5px solid',
+                  mt: "-39px", ml: "286px", borderColor: editActiveStep > 0 ? "#8F4E63" : "#574B4F66"
+                }}
+              />
+              <Box>
+                <Divider
+                  sx={{
+                    width: '174px', position: "absolute", borderBottom: "2px dashed",
+                    mt: "-39px", ml: "486px", borderColor: editActiveStep === 2 ? "#8F4E63" : "#574B4F66"
+                  }}
+                />
+                <Typography sx={{
+                  position: "absolute",
+                  marginTop: "-58px", marginLeft: "550px",
+                  fontSize: "12px",
+                  fontFamily: "Poppins",
+                  color: editActiveStep === 2 ? "#8F4D63B3" : "#574B4F66",
+                  textAlign: "center",
+                  fontWeight: 500,
+                  whiteSpace: "normal",
+                  overflowWrap: "break-word",
+                  maxWidth: "110px",
+                }}>
+                  Opcional
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
         </Box>
 
         {/* Línea divisoria */}
@@ -7081,6 +7203,7 @@ const Campains: React.FC = () => {
                   }}
                 >
                   Ingrese un nombre
+                  <span style={{ color: "#D01247" }}>*</span>
                 </Typography>
                 <TextField
                   variant="outlined"
@@ -7168,6 +7291,16 @@ const Campains: React.FC = () => {
 
               {/* Box 2: Horarios */}
               {/* Renderiza todos los horarios */}
+              <Typography
+                sx={{
+                  fontFamily: "Poppins",
+                  fontSize: "18px",
+                  color: "#574B4F", marginBottom: "-10px", marginTop: "-15px"
+                }}
+              >
+                Ingresar de 1 a 5 horarios
+                <span style={{ color: "#D01247" }}>*</span>
+              </Typography>
               {editHorarios.map((horario, index) => (
 
                 <React.Fragment key={index}>
@@ -7401,78 +7534,7 @@ const Campains: React.FC = () => {
 
                   </Box>
                   {/* Checkbox Iniciar campaña automáticamente */}
-                  {index === 0 && (
-                    <Box
-                      sx={{
-                        width: "250px",
-                        height: "80px",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        mt: editHorarios.length <= 1 ? -3.5 : -1,
-                        mb: -1,
-                        marginBotttom: "10px",
-                        marginLeft: "2px",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px"
-                        }}
-                      >
-                        <Checkbox
-                          disabled={editHorarios.length <= 1} // 🔒 Desactivado hasta que haya más de 1 horario
-                          checked={editAutoStart}
-                          onChange={(e) => setEditAutoStart(e.target.checked)}
-                          icon={
-                            <Box
-                              sx={{
-                                width: "20px",
-                                height: "20px",
-                                borderRadius: "4px",
-                                border: `2px solid ${editHorarios.length <= 1 ? '#C0C0C0' : '#8F4D63'}`,
-                              }}
-                            />
-                          }
-                          checkedIcon={
-                            <Box
-                              sx={{
-                                width: '24px',
-                                height: '24px',
-                                position: 'relative',
-                                marginTop: '0px',
-                                marginLeft: '-2px',
-                              }}
-                            >
-                              <img
-                                src={IconCheckBox1}
-                                alt="Seleccionado"
-                                style={{ width: '24px', height: '24px' }}
-                              />
-                            </Box>
-                          }
-                          sx={{
-                            color: "#8F4D63",
-                            "&.Mui-checked": { color: "#8F4D63" },
-                            alignSelf: "flex-start",
-                            padding: 0,
-                          }}
-                        />
-                        <Typography
-                          sx={{
-                            fontFamily: "Poppins",
-                            fontSize: "16px",
-                            color: editHorarios.length <= 1 ? "#C0C0C0" : "#8F4D63",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          Iniciar campaña automáticamente
-                        </Typography>
-                      </Box>
-                    </Box>
-                  )}
+
                 </React.Fragment>
               ))}
 

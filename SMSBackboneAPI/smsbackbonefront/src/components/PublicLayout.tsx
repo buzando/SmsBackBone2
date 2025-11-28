@@ -6,7 +6,8 @@ import Box from '@mui/material/Box';
 import nuxiba_svg from '../assets/nuxiba.svg'
 import appIcon_svg from '../assets/AppIcon.svg'
 import { useNavigate } from 'react-router-dom';
-import logorq from '../assets/Logo-RQ_2.svg';
+import logorq from '../assets/quantum-logov25.svg';
+
 type Props = {
     children: React.ReactNode;
 }
@@ -20,7 +21,20 @@ const Layout: React.FC<Props> = props => {
             <AppBar position="sticky" sx={{ top: 0 }}>
                 <Toolbar>
                     <IconButton edge="start" color="inherit" aria-label="menu" onClick={() => navigate('/')}>
-                        <img src={logorq} alt="Description" width="170" />
+                        <Box
+                            component="img"
+                            src={logorq}
+                            alt="Quantum"
+                            sx={{
+                                position: "absolute",
+                                display: "block",
+                                height: { xs: 38, sm: 42, md: 110 },
+                                width: "auto",
+                                objectFit: "contain",
+                                filter: "brightness(0) invert(1)",
+                                marginLeft: 22
+                            }}
+                        />
                     </IconButton>
                 </Toolbar>
             </AppBar>

@@ -4,6 +4,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '../../assets/icon-lupa.svg';
 import iconclose from '../../assets/icon-close.svg';
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 interface Template {
   id: number;
@@ -138,7 +139,7 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
 
 
   return (
-    <Box>
+    <Box sx={{ marginTop: "20px" }}>
       <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '16px', mb: 2 }}>
         Seleccionar plantilla y editar variables según se requiera.
       </Typography>
@@ -153,8 +154,9 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
             readOnly: true,
             endAdornment: (
               <InputAdornment position="end">
-                <Typography sx={{ fontSize: 18, color: '#574B4F', pr: 1 }}>▼</Typography>
+                <ArrowDropDownIcon style={{ color: "#A05B71" }} />
               </InputAdornment>
+
             )
           }}
           sx={{
@@ -164,9 +166,14 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
             fontSize: '14px',
             cursor: 'pointer',
             height: '56px',
-            '& .MuiInputBase-input': {
-              padding: '16px',
-            }
+            "& input": {
+              textAlign: "left",
+              fontFamily: "Poppins",
+              letterSpacing: "0px",
+              color: "#786E71",
+              opacity: 1,
+              fontSize: "14px",
+            },
           }}
         />
 
@@ -185,22 +192,47 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <img src={SearchIcon} alt="buscar" style={{ width: 16, height: 16 }} />
+                    <img src={SearchIcon} alt="buscar"
+                      style={{ width: 24, height: 24 }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
-                    <img src={iconclose} alt="cerrar" style={{ width: 16, height: 16, cursor: 'pointer' }} onClick={() => setSearchText('')} />
+                    <img src={iconclose} alt="cerrar"
+                      style={{ width: 24, height: 24, cursor: 'pointer' }}
+                      onClick={() => setSearchText('')} />
                   </InputAdornment>
                 )
               }}
-              sx={{ backgroundColor: '#F8F8F8', borderRadius: '8px', fontSize: '14px', fontFamily: 'Poppins', mb: 1 }}
+              sx={{
+                backgroundColor: "#FFFFFF",
+                borderRadius: "8px",
+                border: searchText ? "1px solid #7B354D" : "1px solid #9B9295",
+                mb: 1,
+
+                "& .MuiInputBase-input": {
+                  fontFamily: "Poppins !important",
+                  fontSize: "14px",
+                  color: "#574B4F",
+                },
+
+              }}
             />
           </Box>
 
           {filteredTemplates.length > 0 ? (
             filteredTemplates.map((t) => (
-              <MenuItem key={t.id} onClick={() => handleSelect(t.id.toString())}>
+              <MenuItem key={t.id} onClick={() => handleSelect(t.id.toString())}
+                sx={{
+                  textAlign: "left",
+                  fontFamily: "Poppins",
+                  letterSpacing: "0px",
+                  color: "#786E71",
+                  opacity: 1,
+                  fontSize: "14px",
+                  lineHeight: "1.2", marginLeft: "10px"
+                }}
+              >
                 {t.name}
               </MenuItem>
             ))
@@ -248,9 +280,6 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
           });
         }}
 
-
-
-
         sx={{
           backgroundColor: '#F8F8F8',
           borderRadius: '8px',
@@ -260,12 +289,10 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
           padding: '12px',
           border: '1px solid #ccc',
           whiteSpace: 'pre-wrap',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'flex-start',
-          gap: '4px',
           overflowWrap: 'anywhere',
-          outline: 'none'
+          outline: 'none',
+          display: 'block',
+          lineHeight: "2.2",
         }}
       >
         {tokens.map((token, i) =>
@@ -281,28 +308,43 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
               sx={{
                 backgroundColor: '#C08194',
                 color: '#fff',
-                px: '6px',
-                py: '2px',
-                borderRadius: '16px',
+                px: '4px',
+                py: '0px',
+                borderRadius: '6px',
                 fontSize: '12px',
                 fontFamily: 'Poppins',
-                lineHeight: 1,
+                //lineHeight: 1,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 userSelect: 'none',
-                maxHeight: '24px',
-                margin: '0 2px',
+                height: '24px',
+                margin: '-2px 2px',
               }}
             >
               <span>{`{{${token.variable}}}`}</span>
-              <span
+              <Box
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteVariable(i);
                 }}
-                style={{ cursor: 'pointer', marginLeft: '4px' }}
-              >✖</span>
+                sx={{
+                  cursor: "pointer",
+                  marginLeft: "6px",
+                  width: "18px",
+                  height: "18px",
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1px solid #C08194",
+                }}
+              >
+                <span style={{ color: "#C08194", fontSize: "12px", fontWeight: "bold", lineHeight: 1 }}>
+                  ✖
+                </span>
+              </Box>
             </Box>
           )
         )}
