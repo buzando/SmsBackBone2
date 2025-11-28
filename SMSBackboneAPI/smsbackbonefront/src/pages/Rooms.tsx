@@ -507,11 +507,12 @@ const Rooms: React.FC = () => {
                                                         >
                                                             {room.name}
                                                         </Typography>
+
                                                         <Typography
                                                             variant="body2"
                                                             sx={{ fontSize: '14px', color: '#574B4F', fontFamily: "Poppins", }}
                                                         >
-                                                            Cliente: {room.cliente}
+                                                            Descripción: {room.cliente}
                                                         </Typography>
                                                     </Box>
                                                 </Box>
@@ -717,7 +718,7 @@ const Rooms: React.FC = () => {
                                                     }}
                                                 >
                                                     <>
-                                                        • Solo caracteres alfabéticos<br />
+                                                        • Solo caracteres alfanuméricos<br />
                                                         • Longitud máxima de 40<br />
                                                         caracteres
                                                     </>

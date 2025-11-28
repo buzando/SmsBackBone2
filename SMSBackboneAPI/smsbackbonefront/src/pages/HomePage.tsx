@@ -414,7 +414,7 @@ const HomePage: React.FC = () => {
         } catch (error) {
             setIsErrormodal(true);
         }
-        finally{
+        finally {
             setOpen(false);
         }
     };

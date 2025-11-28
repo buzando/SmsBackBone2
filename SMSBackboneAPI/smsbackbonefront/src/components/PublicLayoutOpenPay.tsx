@@ -282,7 +282,7 @@ const PublicLayoutOpenPay: React.FC<Props> = props => {
                     console.error('Los datos de las salas no están en el formato correcto.');
                 }
             }
-             catch (error) {
+            catch (error) {
                 console.error('Error al parsear las salas desde localStorage', error);
             }
         }

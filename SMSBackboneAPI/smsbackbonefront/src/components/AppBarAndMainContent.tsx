@@ -264,9 +264,11 @@ const NavBarAndDrawer: React.FC<Props> = props => {
             const user = JSON.parse(userDataString);
 
             // Si el usuario es Root y no está ya en /Clients, redirige
+            {/* 
             if (user.rol === 'Root' && location.pathname !== '/Clients') {
                 navigate('/Clients');
             }
+                */}
         }
     }, [location.pathname]);
 
@@ -497,11 +499,13 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                 src={logorq}
                                 alt="Quantum"
                                 sx={{
+                                    position: "absolute",
                                     display: "block",
-                                    height: { xs: 38, sm: 42, md: 46 }, // 👈 aumentado
+                                    height: { xs: 38, sm: 42, md: 110 },
                                     width: "auto",
                                     objectFit: "contain",
-                                    filter: "brightness(0) invert(1)", // Si tu logo es oscuro
+                                    filter: "brightness(0) invert(1)",
+                                    marginLeft: 22
                                 }}
                             />
                         </IconButton>

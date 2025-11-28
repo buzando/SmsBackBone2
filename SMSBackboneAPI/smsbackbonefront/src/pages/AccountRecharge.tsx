@@ -786,7 +786,7 @@ const AccountRecharge: React.FC = () => {
 
             <Box sx={{ display: 'flex', alignItems: 'center', pl: '0px', mb: 1, marginLeft: '25px' }}>
                 <IconButton
-                    onClick={() => navigate('/')} // ← O ajusta la ruta a donde quieras volver
+                    onClick={() => navigate('/')}
                     sx={{
                         ml: '-20px',
                         p: 0,
@@ -811,7 +811,7 @@ const AccountRecharge: React.FC = () => {
                         fontSize: '26px',
                     }}
                 >
-                    Recarga de credito
+                    Recarga de créditos
                 </Typography>
             </Box>
             <Box sx={{ pl: 5 }}>

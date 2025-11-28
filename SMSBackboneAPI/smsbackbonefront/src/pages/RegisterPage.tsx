@@ -1090,8 +1090,31 @@ const Register: React.FC = () => {
                                         }
                                         InputProps={{
                                             endAdornment: (
-                                                <InputAdornment position="end" sx={{ gap: 1 }}>
-                                                    {/* 🔹 Botón de información con tooltip fijo */}
+                                                <InputAdornment position="end" sx={{ gap: 0 }}>
+                                                    <Tooltip
+                                                        title="Ver / Ocultar contraseña"
+                                                        placement="bottom-end"
+                                                        componentsProps={{
+                                                            tooltip: {
+                                                                sx: { backgroundColor: "transparent", p: 0 },
+                                                            },
+                                                        }}
+                                                    >
+                                                        <IconButton
+                                                            onClick={() => setShowPassword((v) => !v)}
+                                                            disableRipple
+                                                            sx={{
+                                                                backgroundColor: "transparent !important",
+                                                                "&:hover": { backgroundColor: "transparent !important" },
+                                                            }}
+                                                        >
+                                                            <img
+                                                                alt={!showPassword ? "ocultar" : "ver"}
+                                                                src={!showPassword ? Iconeyeslash : Iconeyesopen}
+                                                                style={{ width: 24, height: 24 }}
+                                                            />
+                                                        </IconButton>
+                                                    </Tooltip>
                                                     <Tooltip
                                                         title={
                                                             <Box
@@ -1136,32 +1159,6 @@ const Register: React.FC = () => {
                                                                         : infoicon
                                                                 }
                                                                 alt="info"
-                                                                style={{ width: 24, height: 24 }}
-                                                            />
-                                                        </IconButton>
-                                                    </Tooltip>
-
-                                                    {/* 👁️ Ojito de mostrar/ocultar */}
-                                                    <Tooltip
-                                                        title="Ver / Ocultar contraseña"
-                                                        placement="bottom-end"
-                                                        componentsProps={{
-                                                            tooltip: {
-                                                                sx: { backgroundColor: "transparent", p: 0 },
-                                                            },
-                                                        }}
-                                                    >
-                                                        <IconButton
-                                                            onClick={() => setShowPassword((v) => !v)}
-                                                            disableRipple
-                                                            sx={{
-                                                                backgroundColor: "transparent !important",
-                                                                "&:hover": { backgroundColor: "transparent !important" },
-                                                            }}
-                                                        >
-                                                            <img
-                                                                alt={!showPassword ? "ocultar" : "ver"}
-                                                                src={!showPassword ? Iconeyeslash : Iconeyesopen}
                                                                 style={{ width: 24, height: 24 }}
                                                             />
                                                         </IconButton>
@@ -1211,8 +1208,14 @@ const Register: React.FC = () => {
                                         helperText={confirmPassword && confirmPassword !== password ? "Las contraseñas no coinciden" : ""}
                                         InputProps={{
                                             endAdornment: (
-                                                <InputAdornment position="end" sx={{ gap: 1 }}>
-                                                    {/* Tooltip fijo (no depende de si coincide o no) */}
+                                                <InputAdornment position="end" sx={{ gap: 0 }}>
+                                                    <IconButton onClick={() => setShowConfirm(v => !v)}>
+                                                        <img
+                                                            src={showConfirm ? Iconeyesopen : Iconeyeslash}
+                                                            alt="toggle confirm"
+                                                            style={{ width: 24, height: 24 }}
+                                                        />
+                                                    </IconButton>
                                                     <Tooltip
                                                         title={
                                                             <Box sx={{
@@ -1226,9 +1229,9 @@ const Register: React.FC = () => {
                                                                 whiteSpace: "pre-line",
                                                                 transform: "translate(-10px, -22px)",
                                                                 border: "1px solid #00131F3D"
-                                                            }}>
-                                                                {/* texto estático para confirmación */}
-                                                                • Debe coincidir exactamente con la contraseña.
+                                                            }}>{/* 
+                                                                • Debe coincidir exactamente con la contraseña.*/}
+                                                                • Las contraseñas deben coincidir.
                                                             </Box>
                                                         }
                                                         placement="bottom-end"
@@ -1242,15 +1245,6 @@ const Register: React.FC = () => {
                                                             />
                                                         </IconButton>
                                                     </Tooltip>
-
-                                                    {/* Ojito mostrar/ocultar */}
-                                                    <IconButton onClick={() => setShowConfirm(v => !v)}>
-                                                        <img
-                                                            src={showConfirm ? Iconeyesopen : Iconeyeslash}
-                                                            alt="toggle confirm"
-                                                            style={{ width: 24, height: 24 }}
-                                                        />
-                                                    </IconButton>
                                                 </InputAdornment>
                                             ),
                                         }}
@@ -1263,13 +1257,30 @@ const Register: React.FC = () => {
 
                                 </Grid>
 
-                                <Grid item xs={12}>
+
+                                {/* <Grid item xs={12}>
+                                    
                                     {password && confirmPassword && !arePasswordsValid() && (
-                                        <Typography variant="caption" color="#D01247" sx={{ marginBottom: 2, fontFamily: "Poppins", fontSize: "12px" }}>
-                                            Asegúrate de cumplir con los requisitos de contraseña y que coincidan.
-                                        </Typography>
+                                        <Box sx={{ width: "400px", marginLeft: "407px", height: "20px", marginTop: "8px", marginBottom: "20px" }}>
+                                            <Typography
+                                                variant="caption"
+                                                color="#D01247"
+                                                sx={{
+                                                    marginBottom: 2,
+                                                    fontFamily: "Poppins",
+                                                    fontSize: "12px",
+                                                }}
+                                            >
+                                                <span style={{ display: "block", lineHeight: "12px" }}>
+                                                    Asegúrate de cumplir con los requisitos
+                                                </span>
+                                                <span style={{ display: "block", lineHeight: "12px" }}>
+                                                    de contraseña y que coincidan.
+                                                </span>
+                                            </Typography>
+                                        </Box>
                                     )}
-                                </Grid>
+                                </Grid> */}
 
                                 {/* Services */}
                                 {/* <Grid item xs={12}>

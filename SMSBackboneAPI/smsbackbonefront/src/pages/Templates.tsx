@@ -6,6 +6,7 @@ import seachicon from '../assets/icon-lupa.svg';
 import iconclose from "../assets/icon-close.svg";
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import IconCheckBox2 from "../assets/IconCheckBox2.svg";
+import IconCloseModal from "../assets/IconCloseModal.svg";
 import BoxEmpty from '../assets/Nousers.svg';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
@@ -642,6 +643,40 @@ const Templates = () => {
                             Crea una plantilla para comenzar.
                         </Typography>
                     </Box>
+                ) : filteredTemplates.length === 0 ? (
+                    <Box
+                        sx={{
+                            width: '100%',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '8px',
+                            padding: '60px 0',
+                            height: '450px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            marginTop: "28px",
+                        }}
+                    >
+                        <img src={Emptybox} alt="Caja vacía" style={{
+                            width: '240px',
+                            marginTop: '-56px',
+                            position: 'absolute',
+                        }} />
+                        <Typography
+                            sx={{
+                                fontFamily: 'Poppins',
+                                position: 'absolute',
+                                fontSize: '14px',
+                                color: '#7B354D',
+                                fontWeight: 500,
+                                marginTop: '158px',
+                            }}
+                        >
+                            No se encontraron resultados.
+                        </Typography>
+                    </Box>
                 ) : (
                     <Box
                         sx={{
@@ -783,119 +818,80 @@ const Templates = () => {
                             </thead>
 
                             <tbody>
-                                {filteredTemplates.length === 0 ? (
-                                    <Box
-                                        sx={{
-                                            width: '100%',
-                                            backgroundColor: '#FFFFFF',
-                                            borderRadius: '8px',
-                                            padding: '60px 0',
-                                            height: '332px',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                                            mt: 3,
-                                        }}
-                                    >
-                                        <img src={Emptybox} alt="Caja vacía" style={{
-                                            width: '240px',
-                                            marginTop: '-56px',
-                                            marginLeft: '620px',
-                                            position: 'absolute',
-                                        }} />
-                                        <Typography
-                                            sx={{
-                                                fontFamily: 'Poppins',
-                                                position: 'absolute',
-                                                fontSize: '14px',
-                                                color: '#7B354D',
-                                                fontWeight: 500,
-                                                marginTop: '158px',
-                                                marginLeft: '629px',
+                                {currentItems.map((template) => (
+                                    <tr key={template.id} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0' }}>
+                                        <td style={{ padding: '0px', width: "60px" }}>
+                                            <Box sx={{ marginLeft: "10px" }}>
+                                                <Checkbox
+                                                    checked={selectedTemplates.some((t) => t.id === template.id)}
+                                                    onChange={() => handleSelectTemplate(template)}
+                                                    checkedIcon={
+                                                        <Box
+                                                            sx={{
+                                                                width: '24px',
+                                                                height: '24px',
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={IconCheckBox1}
+                                                                alt="Seleccionado"
+                                                                style={{ width: '24px', height: '24px' }}
+                                                            />
+                                                        </Box>
+                                                    }
+                                                    sx={{
+                                                        color: '#574861',
+                                                        '&.MuiCheckbox-indeterminate': {
+                                                            color: '#7B354D'
+                                                        }
+                                                    }}
+                                                />
+                                            </Box>
+                                        </td>
+
+                                        {/* Fecha */}
+                                        <td style={{
+                                            padding: '0px', width: '200px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', textAlign: "left",
+                                            fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins',
+                                        }}>
+                                            {new Date(template.creationDate).toLocaleDateString('es-MX')}
+                                        </td>
+
+                                        {/* Nombre con Tooltip */}
+                                        <td style={{
+                                            padding: '0px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {template.name.length > 15 ? (
+                                                <Tooltip title={template.name} arrow>
+                                                    <span>{template.name.slice(0, 15) + '...'}</span>
+                                                </Tooltip>
+                                            ) : (
+                                                template.name
+                                            )}
+                                        </td>
+
+                                        {/* Contenido  */}
+                                        <td style={{
+                                            padding: '10px 0px', width: '480px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', display: 'inline-block', fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins'
+                                        }}>{template.message}</td>
+
+                                        {/* Menú de acciones */}
+                                        <td
+                                            style={{
+                                                padding: '0px', width: '50px',
+                                                borderLeft: '1px solid #E0E0E0',
+                                                textAlign: 'center',
                                             }}
                                         >
-                                            No se encontraron resultados.
-                                        </Typography>
-                                    </Box>
-                                ) : (
-                                    currentItems.map((template) => (
-                                        <tr key={template.id} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0' }}>
-                                            <td style={{ padding: '0px', width: "60px" }}>
-                                                <Box sx={{ marginLeft: "10px" }}>
-                                                    <Checkbox
-                                                        checked={selectedTemplates.some((t) => t.id === template.id)}
-                                                        onChange={() => handleSelectTemplate(template)}
-                                                        checkedIcon={
-                                                            <Box
-                                                                sx={{
-                                                                    width: '24px',
-                                                                    height: '24px',
-                                                                }}
-                                                            >
-                                                                <img
-                                                                    src={IconCheckBox1}
-                                                                    alt="Seleccionado"
-                                                                    style={{ width: '24px', height: '24px' }}
-                                                                />
-                                                            </Box>
-                                                        }
-                                                        sx={{
-                                                            color: '#574861',
-                                                            '&.MuiCheckbox-indeterminate': {
-                                                                color: '#7B354D'
-                                                            }
-                                                        }}
-                                                    />
-                                                </Box>
-                                            </td>
-
-                                            {/* Fecha */}
-                                            <td style={{
-                                                padding: '0px', width: '200px', whiteSpace: 'nowrap', overflow: 'hidden',
-                                                textOverflow: 'ellipsis', textAlign: "left",
-                                                fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins',
-                                            }}>
-                                                {new Date(template.creationDate).toLocaleDateString('es-MX')}
-                                            </td>
-
-                                            {/* Nombre con Tooltip */}
-                                            <td style={{
-                                                padding: '0px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
-                                                textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
-                                            }}>
-                                                {template.name.length > 15 ? (
-                                                    <Tooltip title={template.name} arrow>
-                                                        <span>{template.name.slice(0, 15) + '...'}</span>
-                                                    </Tooltip>
-                                                ) : (
-                                                    template.name
-                                                )}
-                                            </td>
-
-                                            {/* Contenido */}
-                                            <td style={{
-                                                padding: '0px', width: '480px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
-                                                textOverflow: 'ellipsis', fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins'
-                                            }}>{template.message}</td>
-
-                                            {/* Menú de acciones */}
-                                            <td
-                                                style={{
-                                                    padding: '0px', width: '50px',
-                                                    borderLeft: '1px solid #E0E0E0',
-                                                    textAlign: 'center',
-                                                }}
-                                            >
-                                                <IconButton onClick={(e) => handleMenuClick(e, template)}>
-                                                    <MoreVertIcon sx={{ color: '#7B354D' }} />
-                                                </IconButton>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-
+                                            <IconButton onClick={(e) => handleMenuClick(e, template)}>
+                                                <MoreVertIcon sx={{ color: '#7B354D' }} />
+                                            </IconButton>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
 
                         </table>
@@ -913,15 +909,15 @@ const Templates = () => {
                 <Box
                     sx={{
                         width: '580px',
-                        height: "664px",
+                        height: "646px",
                         fontFamily: 'Poppins',
                         backgroundColor: 'white',
                         borderRadius: 2,
                         p: 3,
-                        mx: 'auto',
-                        my: '3%',
+                        position: "absolute",
+                        top: "10%",
+                        left: "35%",
                         outline: 'none',
-
                     }}
                 >
                     <Typography variant="h6" fontWeight={600} fontFamily="Poppins"
@@ -929,8 +925,14 @@ const Templates = () => {
                         {isEdit ? 'Editar plantilla' : 'Añadir plantilla'}
                     </Typography>
 
-                    <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', marginTop: "-48px", marginLeft: '506px' }}>
-                        <CloseIcon />
+                    <IconButton onClick={handleCloseModal}
+                        sx={{ position: 'absolute', marginTop: "-48px", marginLeft: '510px' }}>
+                        <img
+                            src={IconCloseModal}
+                            alt="x"
+                            width="24"
+                            height="24"
+                        />
                     </IconButton>
 
                     <Divider sx={{ width: 'calc(100% + 49px)', marginLeft: '-24px', mb: 2, mt: 3 }} />
@@ -1024,7 +1026,7 @@ const Templates = () => {
                         </Tooltip>
                     </Box>
 
-                    <Typography mt={4.5} fontWeight={500} fontSize={'16px'} fontFamily="Poppins" mb={1.5} color={'#330F1B'}>
+                    <Typography mt={4} fontWeight={500} fontSize={'16px'} fontFamily="Poppins" mb={1.5} color={'#330F1B'}>
                         Mensaje
                         <Box component="span" sx={{ color: "#EF5466", ml: "2px" }}>*</Box>
                     </Typography>
@@ -1134,7 +1136,7 @@ const Templates = () => {
 
                     </Box>
 
-                    <Divider sx={{ width: 'calc(100% + 49px)', marginLeft: '-24px', mb: 3, mt: 3 }} />
+                    <Divider sx={{ width: 'calc(100% + 49px)', marginLeft: '-24px', mb: 2, mt: 3 }} />
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <SecondaryButton text='Cancelar' onClick={handleCloseModal} />
@@ -1166,7 +1168,12 @@ const Templates = () => {
                     </Typography>
 
                     <IconButton onClick={() => setOpenPreviewModal(false)} sx={{ position: 'absolute', marginTop: '-58px', marginLeft: '484px' }}>
-                        <CloseIcon />
+                        <img
+                            src={IconCloseModal}
+                            alt="x"
+                            width="24"
+                            height="24"
+                        />
                     </IconButton>
 
                     <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 2 }} />
