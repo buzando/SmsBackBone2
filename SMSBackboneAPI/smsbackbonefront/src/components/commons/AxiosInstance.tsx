@@ -10,12 +10,9 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    // === 1️⃣ Token de autenticación ===
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-      console.log('✅ Token agregado al header:', config.headers.Authorization);
-    } else {
+      config.headers.Authorization = `Bearer ${token}`;    } else {
       console.warn('⚠️ No se encontró token en localStorage');
     }
 
@@ -23,7 +20,6 @@ instance.interceptors.request.use(
       const client = JSON.parse(localStorage.getItem('selectedClient') || 'null');
       if (client?.id) {
         config.headers['X-Client-Id'] = client.id;
-        console.log('✅ X-Client-Id agregado al header:', client.id);
       } else {
         console.warn('⚠️ No se encontró selectedClient en localStorage');
       }

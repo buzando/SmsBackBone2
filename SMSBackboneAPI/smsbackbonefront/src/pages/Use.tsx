@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { IconButton, Button, Typography, Divider, Box, Popper, Paper, RadioGroup, FormControlLabel, Radio, MenuItem, Checkbox, ListItemText, TextField, InputAdornment, Icon } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import BoxEmpty from '../assets/Nousers.svg';
@@ -41,23 +41,57 @@ const Use: React.FC = () => {
     const [selectedOption, setSelectedOption] = useState("corto");
     const [loading, setLoading] = useState(false);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        if (!datePickerOpen) {
-            setAnchorEl(anchorEl ? null : event.currentTarget);
+        if (ignoreNextFilterClickRef.current) {
+            ignoreNextFilterClickRef.current = false;
+            return;
         }
+
+        if (datePickerOpen) {
+            setDatePickerOpen(false);
+            return;
+        }
+
+        setAnchorEl(anchorEl ? null : event.currentTarget);
     };
+
+
     const [buttonText, setButtonText] = useState("SMS # CORTOS");
     const [selectedDates, setSelectedDates] = useState<{ start: Date, end: Date, startHour: number, startMinute: number, endHour: number, endMinute: number } | null>(null);
     const [datePickerOpen, setDatePickerOpen] = useState(false)
-    const [data, setData] = useState(false); // Nueva variable para simular datos disponibles
+    const [data, setData] = useState(false);
     const [searchingData, setSearchingData] = useState(true);
     const handleDateClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-        setDatePickerOpen(true);
+        closeAllFilters();                 
+        setAnchorEl(event.currentTarget);  
+        setDatePickerOpen(true);           
     };
 
-    const handleCancelDatePicker = () => {
+
+    const handleCancelDatePicker = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        } else {
+            ignoreNextFilterClickRef.current = false;
+        }
+
         setDatePickerOpen(false);
+        setAnchorEl(null);
     };
+
+
+    const closeAllFilters = () => {
+        setAnchorEl(null);
+
+        setDatePickerOpen(false);
+
+        setCampaignMenuOpen(false);
+        setAnchorElC(null);
+
+        setUserMenuOpen(false);
+        setUserAnchorEl(null);
+    };
+
     const [campaignMenuOpen, setCampaignMenuOpen] = useState(false);
     const [anchorElC, setAnchorElC] = useState<HTMLElement | null>(null);
     const [selectedCampaigns, setSelectedCampaigns] = useState<{ id: number; name: string }[]>([]);
@@ -72,8 +106,57 @@ const Use: React.FC = () => {
     const [dataChart, setdataChart] = useState<{ date: string; value: number }[]>([]);
     const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
     const [campaigns, setCampaigns] = useState<{ id: number; name: string }[]>([]);
-    const [shouldFetch, setShouldFetch] = useState(false);
+    const ignoreNextFilterClickRef = useRef(false);
+
+
+    const closeSmsPopper = () => setAnchorEl(null);
+
+    const closeCampaignPopper = () => {
+        setCampaignMenuOpen(false);
+        setAnchorElC(null);
+    };
+
+    const closeUserPopper = () => {
+        setUserMenuOpen(false);
+        setUserAnchorEl(null);
+    };
+
+    const handleClearSms = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        } else {
+            ignoreNextFilterClickRef.current = true;
+        }
+
+        setSelectedOption("corto");
+        setButtonText("SMS # CORTOS");
+        closeSmsPopper();
+    };
+
+    const handleClearCampaigns = (e?: React.MouseEvent) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+
+        ignoreNextFilterClickRef.current = true;
+        handleClearSelection();
+        setCampaignSearch("");
+        closeCampaignPopper();
+    };
+
+    const handleClearUsers = (e?: React.MouseEvent) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+
+        ignoreNextFilterClickRef.current = true;
+        handleClearUserSelection();
+        setUserSearch("");
+        closeUserPopper();
+    };
+
+
     const handleUserClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        closeAllFilters();
         setCampaignMenuOpen(false);
         setDatePickerOpen(false);
         if (userMenuOpen) {
@@ -106,16 +189,18 @@ const Use: React.FC = () => {
 
     const handleClearUserSelection = () => {
         setSelectedUsers([]);
+        setUserMenuOpen(false);
+        setUserAnchorEl(null);
+        setUserSearch('');
     };
 
 
 
     const handleCampaignClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        // Cierra usuarios si está abierto
+        closeAllFilters();
         setUserMenuOpen(false);
         setUserAnchorEl(null);
 
-        // Cierra datepicker si está abierto (opcional)
         setDatePickerOpen(false);
 
         if (campaignMenuOpen) {
@@ -144,6 +229,9 @@ const Use: React.FC = () => {
 
     const handleClearSelection = () => {
         setSelectedCampaigns([]);
+        setCampaignMenuOpen(false);
+        setAnchorElC(null);
+        setCampaignSearch('');
     };
 
 
@@ -153,13 +241,12 @@ const Use: React.FC = () => {
     };
 
     const handleApply = () => {
-        // Cambiar el texto del botón basado en la selección
         if (selectedOption === "largo") {
             setButtonText("SMS # LARGOS");
         } else {
             setButtonText("SMS # CORTOS");
         }
-        setAnchorEl(null); // Cerrar el Popper
+        setAnchorEl(null);
     };
 
     const handleDateSelectionApply = (start: Date, end: Date, startHour: number, startMinute: number, endHour: number, endMinute: number) => {
@@ -363,7 +450,7 @@ const Use: React.FC = () => {
                             </RadioGroup>
                             <Divider sx={{ width: 'calc(100% + 21px)', marginLeft: '-10px', mb: 2, mt: 0.5 }} />
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-                                <SecondaryButton text='Limpiar' onClick={() => setSelectedOption("corto")} />
+                                <SecondaryButton text='Limpiar' onClick={handleClearSms} />
                                 <MainButton text='Aplicar' onClick={handleApply} />
                             </Box>
                         </Paper>
@@ -396,8 +483,6 @@ const Use: React.FC = () => {
                                 borderRadius: '12px',
                                 boxShadow: '0px 8px 16px #00131F29',
                             }}
-                            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                         >
                             <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 1 }}>
                                 <TextField
@@ -580,8 +665,6 @@ const Use: React.FC = () => {
                             borderRadius: '12px',
                             boxShadow: '0px 8px 16px #00131F29',
                         }}
-                            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                         >
                             <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 1 }}>
                                 <TextField

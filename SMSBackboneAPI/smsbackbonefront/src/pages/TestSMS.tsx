@@ -42,6 +42,7 @@ export default function TestSMS() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [showChipBar, setshowChipBar] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
   useEffect(() => {
     i18n.changeLanguage(language);
   }, [language]);
@@ -52,22 +53,17 @@ export default function TestSMS() {
 
   const fetchNumbersAndTemplates = async () => {
     try {
-      // Obtenemos email para números
-      const user = JSON.parse(localStorage.getItem('userData') || '{}')?.id; // Ajusta aquí si necesitas
-
-      // Obtenemos salaId para plantillas
+      const user = JSON.parse(localStorage.getItem('userData') || '{}')?.id;
       const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
 
       if (!user || !salaId) {
         return;
       }
 
-      // Petición de plantillas
       const templatesRequestUrl = `${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM}${salaId}`;
       const templatesResponse = await axios.get(templatesRequestUrl);
 
 
-      // Petición de números
       const numbersRequestUrl = `${import.meta.env.VITE_API_GET_NUMBERS}${user}`;
       const numbersResponse = await axios.get(numbersRequestUrl);
 
@@ -92,6 +88,8 @@ export default function TestSMS() {
       console.error('Faltan datos obligatorios');
       return;
     }
+    const selectedRoom = JSON.parse(localStorage.getItem("selectedRoom") || "{}");
+    const roomId = selectedRoom?.id;
     const clientId = JSON.parse(localStorage.getItem('userData') || '{}');
     try {
       const payload = {
@@ -100,13 +98,23 @@ export default function TestSMS() {
         Message: message || null,
         TemplateId: selectedTemplateId || null,
         ClientID: clientId.idCliente || null,
-        UserID: clientId.id
+        UserID: clientId.id,
+        Room: roomId
       };
 
       const requestUrl = `${import.meta.env.VITE_API_MESSAGE_SEND}`;
       const response = await axios.post(requestUrl, payload);
 
-      if (response.status === 200 && response.data) {
+      if (response.status === 200) {
+        const serverMessage = typeof response.data === "string" ? response.data : "";
+
+        if (serverMessage === "OK") {
+          setSnackMessage("Se han enviado los mensajes correctamente");
+        } else if (serverMessage) {
+          setSnackMessage(serverMessage);
+        } else {
+          setSnackMessage("No se recibió respuesta del servidor.");
+        }
 
         setshowChipBar(true);
       } else {
@@ -114,8 +122,7 @@ export default function TestSMS() {
       }
     } catch (error) {
       setIsErrorModalOpen(true);
-    }
-    finally {
+    } finally {
       setIsPreviewOpen(false);
     }
   };
@@ -640,7 +647,7 @@ export default function TestSMS() {
 
       {showChipBar && (
         <SnackBar
-          message="Se han enviado los mensajes correctamente"
+          message={snackMessage}
           buttonText="Cerrar"
           onClose={() => setshowChipBar(false)}
         />

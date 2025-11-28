@@ -247,7 +247,7 @@ const Campains: React.FC = () => {
   const [editFlash, setEditFlash] = useState(false);
   const [editUsarListaNegra, setEditUsarListaNegra] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [campaignFilter, setCampaignFilter] = useState<'todas' | 'encendidas' | 'detenidas'>();
+  const [campaignFilter, setCampaignFilter] = useState<'todas' | 'encendidas' | 'detenidas'>('todas');
   const [elapsedTime, setElapsedTime] = useState('');
   const [openDuplicateModal, setOpenDuplicateModal] = useState(false);
   const [duplicateName, setDuplicateName] = useState('');
@@ -269,7 +269,7 @@ const Campains: React.FC = () => {
   const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(null);
   const [allowConcatenation, setAllowConcatenation] = useState(false);
   const [autoStart, setAutoStart] = useState(false);
-
+  const [sampleData, setSampleData] = useState<Record<string, string>>({});
   const [openPicker, setOpenPicker] = useState<{
     open: boolean;
     index: number;
@@ -293,10 +293,12 @@ const Campains: React.FC = () => {
 
   const handleOpenEditCampaignModal = (campaign: CampaignFullResponse) => {
     setSelectedCampaign(campaign);
+
     setEditCampaignName(campaign.name);
-    setEditAutoStart(campaign.autoStart ?? false);
     setEditMensaje(campaign.message ?? '');
-    // ✅ Fechas y horarios
+
+    setEditAutoStart(campaign.autoStart ?? false);
+
     setEditHorarios(
       campaign.schedules.map((s, index) => ({
         titulo: `Horario ${index + 1}`,
@@ -307,16 +309,22 @@ const Campains: React.FC = () => {
       }))
     );
 
-    // ✅ Configuraciones adicionales
     setEditIsLongNumber(campaign.numberType === 2);
     setEditCustomAni(campaign.customANI);
     setEditAniValue('');
     setEditReciclar(campaign.recycleRecords);
-    setEditUsarListaNegra(false);
     setEditFlash(campaign.flashMessage || false);
-    setEditMensaje(campaign.message || '');
 
-    // ✅ Variables disponibles
+    const listaIds = (campaign as any).blacklistIds as number[] | undefined;
+
+    if (listaIds && listaIds.length > 0) {
+      setEditUsarListaNegra(true);
+      setSelectedBlackListIds(listaIds);
+    } else {
+      setEditUsarListaNegra(false);
+      setSelectedBlackListIds([]);
+    }
+
     const tieneDato = campaign.contacts.some(c => !!c.dato);
     const tieneID = campaign.contacts.some(c => !!c.datoId);
     const vars: string[] = [];
@@ -324,9 +332,14 @@ const Campains: React.FC = () => {
     if (tieneID) vars.push("ID");
     setEditVariables(vars);
 
+    // (opcional) si tu API regresa esto:
+    //np setEditGuardarComoPlantilla(campaign.saveAsTemplate ?? false);
+    // setEditTemplateName(campaign.templateName ?? '');
+
     setOpenEditCampaignModal(true);
     setEditActiveStep(-1);
   };
+
 
 
 
@@ -461,8 +474,8 @@ const Campains: React.FC = () => {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [calendarAnchor, setCalendarAnchor] = useState<null | HTMLElement>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [calendarTarget, setCalendarTarget] = useState<"start" | "end" | null>(null); // saber cuál está editando
-
+  const [calendarTarget, setCalendarTarget] = useState<"start" | "end" | null>(null);
+  const [calendarInitialDate, setCalendarInitialDate] = useState<Date | null>(null);
   const handleManageFile = (file: File) => {
     console.log("📁 Archivo recibido:", file.name);
     const isValid = file.name.endsWith('.xlsx');
@@ -966,7 +979,10 @@ const Campains: React.FC = () => {
         setTimeout(() => setShowChipBarAdd(false), 3000);
       }
     } catch (error) {
-      console.error(error);
+      var errorMessage = error.response.data.description;
+      setMessageErrorModal(errorMessage);
+      setTitleErrorModal("Error al genera la campaña");
+      setIsErrorModalOpen(true);
     }
     finally {
       handleCloseModalCampaña();
@@ -1402,23 +1418,43 @@ const Campains: React.FC = () => {
     !!duplicateHorarios[0].start &&
     !!duplicateHorarios[0].end;
 
-  // 🔹 Función que evalúa si el botón "Siguiente" debe estar deshabilitado
   const isNextDisabled = (() => {
     switch (activeStep) {
-      // Paso inicial (nombre + horarios)
       case -1:
-      case 0:
         const horariosInvalidos =
           !horarios.length ||
-          !horarios[0]?.start ||
-          !horarios[0]?.end ||
-          horarios[0].end <= horarios[0].start;
+          horarios.some(h =>
+            !h.start ||
+            !h.end ||
+            h.end <= h.start
+          );
+
 
         return (
-          campaignName.trim() === '' || // vacío
-          isNameInvalid ||              // formato inválido (aparece "Formato inválido")
-          horariosInvalidos             // horarios incorrectos
+          campaignName.trim() === '' ||
+          isNameInvalid ||
+          horariosInvalidos
         );
+      case 0: {
+        const hasValidFile =
+          !!uploadedFileBase64 &&
+          !!uploadedFile &&
+          fileSuccess &&
+          !fileError;
+
+        const hasSelectedSheet = !!selectedSheet;
+
+        const hasAtLeastOnePhone =
+          Array.isArray(selectedTelefonos) &&
+          selectedTelefonos.length > 0;
+
+        return !(
+          hasValidFile &&
+          hasSelectedSheet &&
+          hasAtLeastOnePhone
+        );
+      }
+
 
       default:
         return false;
@@ -1464,6 +1500,115 @@ const Campains: React.FC = () => {
   }, []);
 
   const canSendQuickTest = !!phone && !error && roomCredits > 0;
+
+  const hasCurrentSchedule = (campaign: any) =>
+    campaign?.schedules?.some((h: any) =>
+      getScheduleStatus(h.startDateTime, h.endDateTime) === "current"
+    ) ?? false;
+
+  const hasUpcomingSchedule = (campaign: any) =>
+    campaign?.schedules?.some((h: any) =>
+      getScheduleStatus(h.startDateTime, h.endDateTime) === "upcoming"
+    ) ?? false;
+
+  const hasExpiredSchedule = (campaign: any) =>
+    campaign?.schedules?.some((h: any) =>
+      getScheduleStatus(h.startDateTime, h.endDateTime) === "expired"
+    ) ?? false;
+
+  const isCampaignRunning = (campaign: any) =>
+    campaign?.autoStart && hasCurrentSchedule(campaign);
+
+  const getCampaignButtonState = (campaign: any) => {
+    if (!campaign) {
+      return { text: "Iniciar", disabled: true };
+    }
+
+    const hasCurrent = hasCurrentSchedule(campaign);
+    const hasUpcoming = hasUpcomingSchedule(campaign);
+    const hasExpired = hasExpiredSchedule(campaign);
+    const running = isCampaignRunning(campaign);
+
+    if (running) {
+      return { text: "Detener", disabled: false };
+    }
+
+    if (hasCurrent) {
+      return { text: "Iniciar", disabled: false };
+    }
+
+    if (hasUpcoming) {
+      return { text: "Programada", disabled: true };
+    }
+
+    if (hasExpired && !hasUpcoming) {
+      return { text: "Finalizada", disabled: true };
+    }
+
+    if (!campaign.schedules || campaign.schedules.length === 0) {
+      return { text: "Sin horarios", disabled: true };
+    }
+
+    return { text: "Iniciar", disabled: true };
+  };
+
+  const { text: buttonText, disabled: buttonDisabled } =
+    getCampaignButtonState(selectedCampaign);
+
+  const showCounter = (campaign: any) =>
+    campaign &&
+    campaign.autoStart &&
+    campaign.schedules?.some((h: any) =>
+      getScheduleStatus(h.startDateTime, h.endDateTime) === "current"
+    );
+
+  const isEditNextDisabled = (() => {
+    switch (editActiveStep) {
+      case -1: {
+        const editHorariosInvalidos =
+          !editHorarios.length ||
+          editHorarios.some(h =>
+            !h.start ||
+            !h.end ||
+            h.end <= h.start
+          );
+
+        return (
+          editCampaignName.trim() === '' ||
+          isEditNameInvalid ||
+          editHorariosInvalidos
+        );
+      }
+      default:
+        return false;
+    }
+  })();
+
+  useEffect(() => {
+    if (!excelData.length || !selectedVariables.length || !columns.length) {
+      setSampleData({});
+      return;
+    }
+
+    const dataRowIndex = omitHeaders ? 0 : 1;
+
+    if (excelData.length <= dataRowIndex) {
+      setSampleData({});
+      return;
+    }
+
+    const row = excelData[dataRowIndex] as any[];
+    const sample: Record<string, string> = {};
+
+    selectedVariables.forEach((colName) => {
+      const colIndex = columns.indexOf(colName);
+      if (colIndex >= 0 && row[colIndex] !== undefined && row[colIndex] !== null) {
+        sample[colName] = String(row[colIndex]);
+      }
+    });
+
+    setSampleData(sample);
+  }, [excelData, selectedVariables, columns, omitHeaders]);
 
 
   return (
@@ -2146,12 +2291,15 @@ const Campains: React.FC = () => {
                       <Typography sx={{ fontFamily: "Poppins" }}>
                         Progreso: <span style={{ color: "#8F4D63" }}>Completada al {progresoCampaña}%</span>
                       </Typography>
-                      {selectedCampaign?.startDate && (
+                      {showCounter(selectedCampaign) && (
                         <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
                           <AccessTimeIcon sx={{ fontSize: "16px" }} />
-                          <Typography sx={{ fontFamily: "Poppins", opacity: 0.7, fontSize: "14px" }}>{elapsedTime}</Typography>
+                          <Typography sx={{ fontFamily: "Poppins", opacity: 0.7, fontSize: "14px" }}>
+                            {elapsedTime}
+                          </Typography>
                         </Box>
                       )}
+
                       <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <AutorenewIcon sx={{ fontSize: "16px" }} />
                         <Typography>{selectedCampaign?.recycleCount ?? 0}</Typography>
@@ -2199,9 +2347,11 @@ const Campains: React.FC = () => {
                   </Box>
                   <Box sx={{ display: "flex", justifyContent: "right", marginTop: "8px" }}>
                     <MainButton
-                      text={selectedCampaign?.autoStart ? 'Detener' : 'Iniciar'}
-                      onClick={() => handleStartCampaign(selectedCampaign)}
+                      text={buttonText}
+                      disabled={buttonDisabled}
+                      onClick={() => selectedCampaign && handleStartCampaign(selectedCampaign)}
                     />
+
                   </Box>
 
 
@@ -3432,7 +3582,7 @@ const Campains: React.FC = () => {
                           color: "#574B4F",
                         }}
                       >
-                        {horario.titulo}
+                        {`Horario ${index + 1}`}
                       </Typography>
                     </Box>
                     {/*Horarios textfields */}
@@ -3466,6 +3616,7 @@ const Campains: React.FC = () => {
                                   setCalendarOpen(true);
                                   setCalendarTarget("start");
                                   setCurrentHorarioIndex(index);
+                                  setCalendarInitialDate(horario.start ?? null);
                                 }}
                                 size="small"
                                 sx={{ padding: 0 }}
@@ -3505,6 +3656,7 @@ const Campains: React.FC = () => {
                                   setCalendarOpen(true);
                                   setCalendarTarget("end");
                                   setCurrentHorarioIndex(index);
+                                  setCalendarInitialDate(horario.end ?? null);
                                 }}
                                 size="small"
                                 sx={{ padding: 0 }}
@@ -3519,7 +3671,7 @@ const Campains: React.FC = () => {
                       {/* Botones a la derecha */}
                       <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
                         {/* Eliminar */}
-                        {index > 0 && (
+                        {horarios.length > 1 && (
                           <Tooltip title="Eliminar" arrow placement="top"
                             componentsProps={{
                               tooltip: {
@@ -5328,6 +5480,7 @@ const Campains: React.FC = () => {
                     value={mensajeTexto}
                     onChange={setMensajeTexto}
                     allowConcatenation={allowConcatenation}
+                    sampleData={sampleData}
                   />
 
                   {/* Opciones adicionales debajo */}
@@ -6370,32 +6523,67 @@ const Campains: React.FC = () => {
       <CustomDateTimePicker
         open={calendarOpen}
         anchorEl={calendarAnchor}
-        onClose={() => setCalendarOpen(false)}
+        initialDate={calendarInitialDate ?? undefined}
+        onClose={() => {
+          setCalendarOpen(false);
+          setCalendarInitialDate(null);
+        }}
         placement="top"
         offset={[100, -200]}
         onApply={(selectedDate, hour, minute) => {
           const fullDate = new Date(selectedDate);
-          fullDate.setHours(hour); fullDate.setMinutes(minute);
-          fullDate.setSeconds(0); fullDate.setMilliseconds(0);
+          fullDate.setHours(hour);
+          fullDate.setMinutes(minute);
+          fullDate.setSeconds(0);
+          fullDate.setMilliseconds(0);
 
           if (currentHorarioIndex !== null && calendarTarget) {
             if (openDuplicateModal) {
               setDuplicateHorarios(prev =>
-                prev.map((h, i) => i === currentHorarioIndex ? { ...h, [calendarTarget]: fullDate } : h)
+                prev.map((h, i) => {
+                  if (i !== currentHorarioIndex) return h;
+
+                  // No permitir que el END sea menor al START
+                  if (calendarTarget === "end" && h.start && fullDate < h.start) {
+                    return h; // deja el valor como estaba (vacío o anterior)
+                  }
+
+                  return { ...h, [calendarTarget]: fullDate };
+                })
               );
             } else if (editActiveStep === -1) {
               setEditHorarios(prev =>
-                prev.map((h, i) => i === currentHorarioIndex ? { ...h, [calendarTarget]: fullDate } : h)
+                prev.map((h, i) => {
+                  if (i !== currentHorarioIndex) return h;
+
+                  if (calendarTarget === "end" && h.start && fullDate < h.start) {
+                    return h;
+                  }
+
+                  return { ...h, [calendarTarget]: fullDate };
+                })
               );
             } else {
               setHorarios(prev =>
-                prev.map((h, i) => i === currentHorarioIndex ? { ...h, [calendarTarget]: fullDate } : h)
+                prev.map((h, i) => {
+                  if (i !== currentHorarioIndex) return h;
+
+                  if (calendarTarget === "end" && h.start && fullDate < h.start) {
+                    return h;
+                  }
+
+                  return { ...h, [calendarTarget]: fullDate };
+                })
               );
             }
           }
+
           setCalendarOpen(false);
+          setCalendarInitialDate(null);
         }}
       />
+
+
 
       <ModalError
         isOpen={isErrorModalOpen}
@@ -7075,6 +7263,7 @@ const Campains: React.FC = () => {
                                   setCalendarOpen(true);
                                   setCalendarTarget("start");
                                   setCurrentHorarioIndex(index);
+                                  setCalendarInitialDate(horario.start ?? null);
                                 }}
                                 size="small"
                                 disabled={isEditNameInvalid}
@@ -7116,6 +7305,7 @@ const Campains: React.FC = () => {
                                   setCalendarOpen(true);
                                   setCalendarTarget("end");
                                   setCurrentHorarioIndex(index);
+                                  setCalendarInitialDate(horario.end ?? null);
                                 }}
                                 size="small"
                                 disabled={isEditNameInvalid}
@@ -7129,7 +7319,7 @@ const Campains: React.FC = () => {
                       />
 
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        {index > 0 && (
+                        {horarios.length > 1 && (
                           <Box sx={{ marginTop: '0px', marginLeft: '0px', }}>
                             <Tooltip title="Eliminar" arrow placement="top"
                               componentsProps={{
@@ -7641,8 +7831,11 @@ const Campains: React.FC = () => {
               </Typography>
               <RadioGroup
                 row
-                value={tipoNumero}
-                onChange={(e) => setTipoNumero(e.target.value)}
+                value={editIsLongNumber ? 'largo' : 'corto'}
+                onChange={(e) => {
+                  const value = e.target.value as 'corto' | 'largo';
+                  setEditIsLongNumber(value === 'largo');
+                }}
                 sx={{ mb: 1 }}
               >
                 <FormControlLabel
@@ -7650,9 +7843,9 @@ const Campains: React.FC = () => {
                   control={
                     <Radio
                       sx={{
-                        color: '#330F1B', // color cuando no está seleccionado
+                        color: '#330F1B',
                         '&.Mui-checked': {
-                          color: '#8F4D63', // color circulito seleccionado
+                          color: '#8F4D63',
                         },
                       }}
                     />
@@ -7662,7 +7855,7 @@ const Campains: React.FC = () => {
                     mr: 4,
                     '& .MuiFormControlLabel-label': {
                       fontFamily: 'Poppins',
-                      color: tipoNumero === 'corto' ? '#8F4D63' : '#330F1B', // texto cambia con selección
+                      color: !editIsLongNumber ? '#8F4D63' : '#330F1B',
                     },
                   }}
                 />
@@ -7682,11 +7875,12 @@ const Campains: React.FC = () => {
                   sx={{
                     '& .MuiFormControlLabel-label': {
                       fontFamily: 'Poppins',
-                      color: tipoNumero === 'largo' ? '#8F4D63' : '#330F1B',
+                      color: editIsLongNumber ? '#8F4D63' : '#330F1B',
                     },
                   }}
                 />
               </RadioGroup>
+
 
               {/* Flash Message */}
               <Box
@@ -7697,8 +7891,8 @@ const Campains: React.FC = () => {
                   border: '1px solid #E6E4E4',
                   borderRadius: '6px',
                   padding: '12px 16px',
-                  opacity: tipoNumero === 'largo' ? 0.5 : 1,
-                  backgroundColor: flashEnabled ? '#FFFFFF' : '#FFFFFF',
+                  opacity: editIsLongNumber ? 0.5 : 1,
+                  backgroundColor: editFlash ? '#FFFFFF' : '#FFFFFF',
                   mb: 2,
                 }}
               >
@@ -7768,9 +7962,9 @@ const Campains: React.FC = () => {
                   </Tooltip>
                 </Box>
                 <Switch
-                  checked={flashEnabled}
-                  disabled={tipoNumero === 'largo'}
-                  onChange={(e) => setFlashEnabled(e.target.checked)}
+                  checked={editFlash}
+                  disabled={editIsLongNumber}
+                  onChange={(e) => setEditFlash(e.target.checked)}
                   sx={{
                     '& .MuiSwitch-switchBase.Mui-checked': {
                       color: '#8F4D63',
@@ -7791,8 +7985,8 @@ const Campains: React.FC = () => {
                   border: '1px solid #E6E4E4',
                   borderRadius: '6px',
                   padding: '12px 16px',
-                  backgroundColor: aniEnabled ? '#FFFFFF' : '#FFFFFF',
-                  opacity: tipoNumero === 'corto' ? 0.5 : 1,
+                  backgroundColor: editCustomAni ? '#FFFFFF' : '#FFFFFF',
+                  opacity: !editIsLongNumber ? 0.5 : 1,
                   mb: 2,
                   gap: 1, // espacio entre los dos bloques
                 }}
@@ -7867,9 +8061,9 @@ const Campains: React.FC = () => {
                   </Box>
 
                   <Switch
-                    checked={aniEnabled}
-                    disabled={tipoNumero === 'corto'}
-                    onChange={(e) => setAniEnabled(e.target.checked)}
+                    checked={editCustomAni}
+                    disabled={!editIsLongNumber}
+                    onChange={(e) => setEditCustomAni(e.target.checked)}
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
                         color: '#8F4D63',
@@ -7882,7 +8076,7 @@ const Campains: React.FC = () => {
                 </Box>
 
                 {/* Segundo bloque: Select, visible solo si el switch está activado */}
-                {aniEnabled && (
+                {editCustomAni && (
                   <Box sx={{ mt: 1 }}>
                     <Select
                       fullWidth
@@ -8232,8 +8426,8 @@ const Campains: React.FC = () => {
                   </Box>
 
                   <Switch
-                    checked={blacklistEnabled}
-                    onChange={(e) => setBlacklistEnabled(e.target.checked)}
+                    checked={editUsarListaNegra}
+                    onChange={(e) => setEditUsarListaNegra(e.target.checked)}
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
                         color: '#8F4D63',
@@ -8246,7 +8440,7 @@ const Campains: React.FC = () => {
                 </Box>
 
                 {/* Segundo Box: Buscador + tabla */}
-                {blacklistEnabled && (
+                {editUsarListaNegra && (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {/* Buscador */}
                     <Box
@@ -8416,6 +8610,7 @@ const Campains: React.FC = () => {
             <Button
               variant="contained"
               onClick={handleContinuarEditar}
+              disabled={isEditNextDisabled}
               sx={{
                 width: "118px",
                 height: "36px",

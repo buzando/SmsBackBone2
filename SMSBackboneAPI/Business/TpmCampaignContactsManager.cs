@@ -110,7 +110,7 @@ namespace Business
     .Select(nombre =>
     {
         var header = headers.FirstOrDefault(h => h.Header == nombre);
-        return header != null ? hoja.Cell(fila, header.Index).GetString()?.Trim() : null;
+        return header != null ? hoja.Cell(fila, header.Index).GetString() : null;
     })
     .Where(v => !string.IsNullOrWhiteSpace(v))
     .Distinct();

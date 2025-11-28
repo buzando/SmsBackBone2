@@ -17,5 +17,6 @@ namespace Contract.Request
         public bool Concatenate { get; set; }
         public bool Flash { get; set; }
         public string SmsType { get; set; }
+        public int? Room {  get; set; }
     }
 }

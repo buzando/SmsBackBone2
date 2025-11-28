@@ -83,11 +83,11 @@ namespace SMSBackboneAPI.Controllers
                 campaign.CreatedDate = DateTime.Now;
 
                 var campaignSaved = manager.CreateCampaign(campaign, campaigns.SaveAsTemplate, campaigns.TemplateName);
-                if (!campaignSaved)
+                if (campaignSaved != "OK")
                 {
                     sw.Stop();
                     _log.Warn($"[{rid}] CreateCampaign not saved ms={sw.ElapsedMilliseconds}");
-                    return BadRequest(new { code = "ErrorSavingCampaign", description = "No se pudo guardar la campaña." });
+                    return BadRequest(new { code = "ErrorSavingCampaign", description = campaignSaved });
                 }
 
                 int campaignId = campaign.Id;

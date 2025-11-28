@@ -1,13 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Typography, Button } from "@mui/material";
 
 type ChipBarProps = {
     message: string;
     buttonText: string;
-    onClose: () => void; // Función para manejar el cierre
+    onClose: () => void;
 };
 
 const ChipBar: React.FC<ChipBarProps> = ({ message, buttonText, onClose }) => {
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onClose();
+        }, 5000); 
+
+        return () => clearTimeout(timer);
+    }, [onClose]);
+
     return (
         <Box
             sx={{
@@ -44,6 +53,7 @@ const ChipBar: React.FC<ChipBarProps> = ({ message, buttonText, onClose }) => {
             >
                 {message}
             </Typography>
+
             <Button
                 onClick={onClose}
                 sx={{

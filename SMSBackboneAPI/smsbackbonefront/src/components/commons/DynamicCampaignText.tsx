@@ -1,20 +1,33 @@
 import React, { useRef, useState } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, Modal } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-
+import SecondaryButton from './SecondaryButton';
 interface Props {
   variables: string[];
   value: string;
   onChange: (value: string) => void;
   allowConcatenation: boolean;
+  onPreview?: (value: string) => void;
+  sampleData?: Record<string, string>;
 }
 
-const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allowConcatenation = false }) => {
+const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allowConcatenation = false, onPreview, sampleData, }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [plainText, setPlainText] = useState("");
   const [isLimitExceeded, setIsLimitExceeded] = useState(false);
+  const [openPreview, setOpenPreview] = useState(false);
+  const [previewMessage, setPreviewMessage] = useState("");
 
   const maxLength = allowConcatenation ? 360 : 160;
+
+  // ✅ Solo letras, números, acentos, espacios, puntuación básica y {}
+  // ❌ Quita emojis y símbolos raros del VALOR que se envía
+  const sanitizeText = (input: string) => {
+    return input.replace(
+      /[^0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-{}\n\r]/g,
+      ''
+    );
+  };
 
   const renderVisualMessage = (raw: string) => {
     if (!editorRef.current) return;
@@ -92,26 +105,45 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
       }
     });
 
-    const isExceeded = text.length > maxLength;
+    const sanitized = sanitizeText(text);
+
+    const isExceeded = sanitized.length > maxLength;
     setIsLimitExceeded(isExceeded);
 
     if (!isExceeded) {
-      onChange(text);
-      setPlainText(text.replace(/\{(.*?)\}/g, ''));
+      onChange(sanitized);
+      setPlainText(sanitized.replace(/\{(.*?)\}/g, ''));
     }
   };
 
   const handleInsertVariable = (variable: string) => {
     if (!editorRef.current) return;
 
+    const editor = editorRef.current;
     const chip = createChip(variable);
     const space = document.createTextNode('\u00A0');
 
     const selection = window.getSelection();
-    if (!selection || !selection.rangeCount) return;
+    let range: Range;
 
-    const range = selection.getRangeAt(0);
-    range.deleteContents();
+    if (selection && selection.rangeCount > 0) {
+      const currentRange = selection.getRangeAt(0);
+
+      if (editor.contains(currentRange.commonAncestorContainer)) {
+        range = currentRange;
+      } else {
+        range = document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(false);
+      }
+    } else {
+      range = document.createRange();
+      range.selectNodeContents(editor);
+      range.collapse(false);
+    }
+
+    selection?.removeAllRanges();
+    selection?.addRange(range);
 
     const fragment = document.createDocumentFragment();
     fragment.appendChild(chip);
@@ -120,7 +152,7 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
     const lastNode = fragment.lastChild;
     range.insertNode(fragment);
 
-    if (lastNode) {
+    if (lastNode && selection) {
       range.setStartAfter(lastNode);
       range.setEndAfter(lastNode);
       selection.removeAllRanges();
@@ -129,6 +161,7 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
 
     updateRawText();
   };
+
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -140,7 +173,18 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
     e.preventDefault();
   };
 
-  const handleBeforeInput = (e: React.FormEvent<HTMLDivElement>) => {
+  const handleBeforeInput = (e: any) => {
+    const input = e.data;
+
+    if (input && input.startsWith("{")) return;
+
+    const allowed = /^[0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-]$/;
+
+    if (input && !allowed.test(input)) {
+      e.preventDefault();
+      return;
+    }
+
     const selection = window.getSelection();
     const selectedTextLength = selection && !selection.isCollapsed
       ? selection.toString().length
@@ -151,6 +195,36 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
       e.preventDefault();
     }
   };
+  const handlePreviewClick = () => {
+    const preview = buildPreviewMessage();
+    if (!preview || preview.trim() === "") return;
+
+    setPreviewMessage(preview);
+    setOpenPreview(true);
+
+    // Si el padre quiere hacer algo extra con el preview
+    if (onPreview) {
+      onPreview(preview);
+    }
+  };
+
+
+  const buildPreviewMessage = () => {
+    if (!value || !value.trim()) return "";
+
+    if (!sampleData || Object.keys(sampleData).length === 0) {
+      return value;
+    }
+
+    let result = value;
+    Object.entries(sampleData).forEach(([colName, colValue]) => {
+      const token = `{${colName}}`;
+      result = result.split(token).join(colValue ?? "");
+    });
+
+    return result;
+  };
+
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2, width: "770px" }}>
@@ -195,10 +269,24 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
               </Typography>
             )}
           </Box>
-
           <Typography sx={{ fontFamily: 'Poppins', fontSize: '12px', color: '#574B4F', mt: 1 }}>
             {value.length}/{maxLength} caracteres para que el mensaje se realice en un sólo envío.
           </Typography>
+          <Box
+            sx={{
+              width: "520px",
+              display: "flex",
+              justifyContent: "flex-end",
+              mt: 1,
+              ml: "5px",
+            }}
+          >
+            <SecondaryButton
+              text="Visualizar"
+              onClick={handlePreviewClick}
+              disabled={!value}
+            />
+          </Box>
         </Box>
 
         <Box sx={{
@@ -262,6 +350,56 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
           </Box>
         </Box>
       </Box>
+      <Modal
+        open={openPreview}
+        onClose={() => setOpenPreview(false)}
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 500,
+            bgcolor: '#FFFFFF',
+            borderRadius: '12px',
+            boxShadow: 24,
+            p: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2
+          }}
+        >
+          <Typography
+            sx={{ fontFamily: 'Poppins', fontSize: '18px', fontWeight: 600, color: '#330F1B' }}
+          >
+            Vista previa del mensaje
+          </Typography>
+
+          <Box
+            sx={{
+              border: '1px solid #CCCFD2',
+              borderRadius: '8px',
+              padding: '16px',
+              fontFamily: 'Poppins',
+              fontSize: '14px',
+              color: '#574B4F',
+              whiteSpace: 'pre-wrap',
+              minHeight: '120px'
+            }}
+          >
+            {previewMessage}
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+            <SecondaryButton
+              text="Cerrar"
+              onClick={() => setOpenPreview(false)}
+            />
+          </Box>
+        </Box>
+      </Modal>
+
     </Box>
   );
 };

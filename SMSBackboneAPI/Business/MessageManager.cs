@@ -17,26 +17,46 @@ namespace Business
 {
     public class MessageManager
     {
-        public bool SendMessage(SendTestSmsRequest smsRequestDto)
+        public string SendMessage(SendTestSmsRequest smsRequestDto)
         {
             var clientacces = new ClientAccess();
 
             if (smsRequestDto.To == null || smsRequestDto.To.Count == 0)
-                return false;
+                return "Debe indicar al menos un destinatario.";
 
             if (string.IsNullOrWhiteSpace(smsRequestDto.Message) && smsRequestDto.TemplateId == null)
-                return false;
+                return "Debe escribir un mensaje o seleccionar una plantilla.";
 
-            // Validar SmsType
+            if (!smsRequestDto.Room.HasValue || smsRequestDto.Room.Value <= 0)
+                return "La sala seleccionada no es válida.";
+
             var isShort = string.Equals(smsRequestDto.SmsType, "short", StringComparison.OrdinalIgnoreCase);
             var senderType = isShort ? "shortcode" : "longcode";
-            var encoding = (isShort && smsRequestDto.Flash) ? 1 : 0; // igual que en campañas :contentReference[oaicite:1]{index=1}
+            var encoding = (isShort && smsRequestDto.Flash) ? 1 : 0;
 
             using var context = new Entities();
             {
+                var roomId = smsRequestDto.Room.Value;
+                var room = context.Rooms.FirstOrDefault(r => r.id == roomId);
+                if (room == null)
+                    return "La sala seleccionada no existe.";
+
+                int qtyToSend = smsRequestDto.To.Count;
+
+                if (isShort)
+                {
+                    if (room.short_sms < qtyToSend)
+                        return "La sala no tiene créditos suficientes para enviar SMS cortos.";
+                }
+                else
+                {
+                    if (room.long_sms < qtyToSend)
+                        return "La sala no tiene créditos suficientes para enviar SMS largos.";
+                }
+
                 clientacces = context.Client_Access.FirstOrDefault(ca => ca.client_id == smsRequestDto.ClientID);
                 if (clientacces == null)
-                    return false;
+                    return "El cliente no tiene acceso configurado para el envío.";
 
                 try
                 {
@@ -45,21 +65,21 @@ namespace Business
                     var pssw = ClientAccessManager.Decrypt(clientacces.password);
                     var loginResponse = api.LoginResponse(clientacces.username, pssw);
                     if (loginResponse == null || loginResponse.Result.token == null)
-                        return false;
+                        return "No se pudo autenticar con el proveedor de SMS.";
 
                     var token = loginResponse.Result.token;
 
                     var credits = api.GetOwnCredit(token).GetAwaiter().GetResult();
-                    int id = JObject.Parse(credits)["credit"].Value<int>();
-                    if (id == 0)
-                        return false;
+                    int backboneCredits = JObject.Parse(credits)["credit"].Value<int>();
+                    if (backboneCredits == 0)
+                        return "No hay créditos disponibles en el proveedor de SMS.";
 
                     string finalMessage = smsRequestDto.Message;
                     if (string.IsNullOrWhiteSpace(finalMessage) && smsRequestDto.TemplateId.HasValue)
                     {
                         var template = context.Template.FirstOrDefault(t => t.Id == smsRequestDto.TemplateId.Value);
                         if (template == null)
-                            return false;
+                            return "La plantilla seleccionada no existe.";
 
                         finalMessage = template.Message;
                     }
@@ -68,21 +88,19 @@ namespace Business
                     {
                         text = finalMessage,
                         phoneNumber = to,
-                        registryClient = "",   
-                        encoding = encoding,    
-                        senderType = senderType 
+                        registryClient = "",
+                        encoding = encoding,
+                        senderType = senderType
                     }).ToList();
 
-                    // Enviar (un destinatario o varios usan el mismo camino)
                     var sendResults = api.SendMessagesAsync(messagesToSend, token).GetAwaiter().GetResult();
 
-                    // Registrar en TestMessage
+
                     foreach (var result in sendResults)
                     {
                         var testMessage = new Modal.Model.Model.TestMessage
                         {
                             CreatedAt = DateTime.Now,
-                            // Antes venía From del front; ahora guardamos el tipo seleccionado
                             FromNumber = senderType,
                             Message = finalMessage,
                             Status = result.status.ToString(),
@@ -95,15 +113,22 @@ namespace Business
                         context.TestMessage.Add(testMessage);
                     }
 
+                    if (isShort)
+                        room.short_sms -= qtyToSend;   
+                    else
+                        room.long_sms -= qtyToSend;    
+
                     context.SaveChanges();
-                    return true;
+
+                    return "OK";
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    return false;
+                    return "Error al enviar el SMS de prueba: " + ex.Message;
                 }
             }
         }
+
 
 
 

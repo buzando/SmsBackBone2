@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Contract;
 using Contract.Request;
 using Contract.Response;
 using Contract.WebHooks;
@@ -14,12 +15,41 @@ namespace Business
 {
     public class CampaignManager
     {
-        public bool CreateCampaign(Campaigns campaign, bool SaveAsTemplate, string TemplateName)
+        private int GetMaxCampaignsPerRoom()
+        {
+            try
+            {
+                var value = Common.ConfigurationManagerJson("MaxCampaignsPerRoom");
+
+                if (int.TryParse(value, out var result) && result > 0)
+                    return result;
+
+                return 0;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+        public string CreateCampaign(Campaigns campaign, bool SaveAsTemplate, string TemplateName)
         {
             try
             {
                 using (var ctx = new Entities())
                 {
+                    int maxCampaignsPerRoom = GetMaxCampaignsPerRoom();
+
+                    if (maxCampaignsPerRoom > 0)
+                    {
+                        var currentCount = ctx.Campaigns
+                            .Count(c => c.RoomId == campaign.RoomId);
+
+                        if (currentCount >= maxCampaignsPerRoom)
+                        {
+                            return $"La sala ya alcanzó el límite de {maxCampaignsPerRoom} campañas activas.";
+                        }
+                    }
+
                     if (SaveAsTemplate && !string.IsNullOrWhiteSpace(TemplateName))
                     {
                         var newTemplate = new Template
@@ -37,17 +67,19 @@ namespace Business
                         campaign.UseTemplate = true;
                     }
 
+                    // 5️⃣ Guardar campaña
                     ctx.Campaigns.Add(campaign);
                     ctx.SaveChanges();
                 }
 
-                return true;
+                return "OK";
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                return "Error inesperado al crear la campaña.";
             }
         }
+
 
 
         public bool EditCampaign(CampaignSaveRequest campaigns)
@@ -509,23 +541,36 @@ namespace Business
 
                     using (var reader = command.ExecuteReader())
                     {
+                        // ============================
                         // Resultset 1: Campaigns
+                        // ============================
                         while (reader.Read())
                         {
                             var campaign = new CampaignFullResponse
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
-                                Message = reader.IsDBNull(reader.GetOrdinal("Message")) ? null : reader.GetString(reader.GetOrdinal("Message")),
+                                Message = reader.IsDBNull(reader.GetOrdinal("Message"))
+                                    ? null
+                                    : reader.GetString(reader.GetOrdinal("Message")),
                                 UseTemplate = reader.GetBoolean(reader.GetOrdinal("UseTemplate")),
-                                TemplateId = reader.IsDBNull(reader.GetOrdinal("TemplateId")) ? null : reader.GetInt32(reader.GetOrdinal("TemplateId")),
+                                TemplateId = reader.IsDBNull(reader.GetOrdinal("TemplateId"))
+                                    ? (int?)null
+                                    : reader.GetInt32(reader.GetOrdinal("TemplateId")),
+                                TemplateName = reader.IsDBNull(reader.GetOrdinal("TemplateName"))
+                                    ? null
+                                    : reader.GetString(reader.GetOrdinal("TemplateName")),
+
                                 AutoStart = reader.GetBoolean(reader.GetOrdinal("AutoStart")),
                                 FlashMessage = reader.GetBoolean(reader.GetOrdinal("FlashMessage")),
                                 CustomANI = reader.GetBoolean(reader.GetOrdinal("CustomANI")),
                                 RecycleRecords = reader.GetBoolean(reader.GetOrdinal("RecycleRecords")),
                                 NumberType = reader.GetByte(reader.GetOrdinal("NumberType")),
                                 CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate")),
-                                StartDate = reader.IsDBNull(reader.GetOrdinal("StartDate")) ? null : reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                StartDate = reader.IsDBNull(reader.GetOrdinal("StartDate"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("StartDate")),
+
                                 numeroActual = reader.GetInt32(reader.GetOrdinal("numeroActual")),
                                 numeroInicial = reader.GetInt32(reader.GetOrdinal("numeroInicial")),
                                 RespondedRecords = reader.GetInt32(reader.GetOrdinal("RespondedRecords")),
@@ -535,17 +580,31 @@ namespace Business
                                 NotSentCount = reader.GetInt32(reader.GetOrdinal("NotSentCount")),
                                 FailedCount = reader.GetInt32(reader.GetOrdinal("FailedCount")),
                                 ExceptionCount = reader.GetInt32(reader.GetOrdinal("ExceptionCount")),
+
                                 BlockedRecords = reader.GetInt32(reader.GetOrdinal("BlockedRecords")),
                                 DeliveryFailRate = reader.GetInt32(reader.GetOrdinal("DeliveryFailRate")),
+                                OutOfScheduleRecords = reader.GetInt32(reader.GetOrdinal("OutOfScheduleRecords")),
+                                NoReceptionRate = reader.GetInt32(reader.GetOrdinal("NoReceptionRate")),
+                                WaitRate = reader.GetInt32(reader.GetOrdinal("WaitRate")),
+                                RejectionRate = reader.GetInt32(reader.GetOrdinal("RejectionRate")),
+                                NoSendRate = reader.GetInt32(reader.GetOrdinal("NoSendRate")),
+                                ExceptionRate = reader.GetInt32(reader.GetOrdinal("ExceptionRate")),
+                                ReceptionRate = reader.GetInt32(reader.GetOrdinal("ReceptionRate")),
+                                RecycleCount = reader.GetInt32(reader.GetOrdinal("RecycleCount")),
+                                ContactCount = reader.GetInt32(reader.GetOrdinal("ContactCount")),
+
                                 Schedules = new List<CampaignScheduleDto>(),
                                 Contacts = new List<CampaignContactDto>(),
-                                CampaignContactScheduleSendDTO = new List<CampaignContactScheduleSendDTO>()
+                                CampaignContactScheduleSendDTO = new List<CampaignContactScheduleSendDTO>(),
+                                BlacklistIds = new List<int>()
                             };
 
                             campaigns.Add(campaign);
                         }
 
+                        // ============================
                         // Resultset 2: Schedules
+                        // ============================
                         reader.NextResult();
                         while (reader.Read())
                         {
@@ -554,7 +613,9 @@ namespace Business
                             {
                                 StartDateTime = reader.GetDateTime(reader.GetOrdinal("StartDateTime")),
                                 EndDateTime = reader.GetDateTime(reader.GetOrdinal("EndDateTime")),
-                                OperationMode = reader.IsDBNull(reader.GetOrdinal("OperationMode")) ? null : reader.GetByte(reader.GetOrdinal("OperationMode")),
+                                OperationMode = reader.IsDBNull(reader.GetOrdinal("OperationMode"))
+                                    ? (byte?)null
+                                    : reader.GetByte(reader.GetOrdinal("OperationMode")),
                                 Order = reader.GetInt32(reader.GetOrdinal("Order"))
                             };
 
@@ -562,14 +623,18 @@ namespace Business
                             campaign?.Schedules.Add(schedule);
                         }
 
+                        // ============================
                         // Resultset 3: RecycleSetting
+                        // ============================
                         reader.NextResult();
                         while (reader.Read())
                         {
                             int campaignId = reader.GetInt32(reader.GetOrdinal("CampaignId"));
                             var recycle = new CampaignRecycleSettingDto
                             {
-                                TypeOfRecords = reader.IsDBNull(reader.GetOrdinal("TypeOfRecords")) ? null : reader.GetString(reader.GetOrdinal("TypeOfRecords")),
+                                TypeOfRecords = reader.IsDBNull(reader.GetOrdinal("TypeOfRecords"))
+                                    ? null
+                                    : reader.GetString(reader.GetOrdinal("TypeOfRecords")),
                                 IncludeNotContacted = reader.GetBoolean(reader.GetOrdinal("IncludeNotContacted")),
                                 NumberOfRecycles = reader.GetInt32(reader.GetOrdinal("NumberOfRecycles"))
                             };
@@ -579,7 +644,9 @@ namespace Business
                                 campaign.RecycleSetting = recycle;
                         }
 
+                        // ============================
                         // Resultset 4: Contacts
+                        // ============================
                         reader.NextResult();
                         while (reader.Read())
                         {
@@ -587,17 +654,27 @@ namespace Business
                             var contact = new CampaignContactDto
                             {
                                 PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
-                                Dato = reader.IsDBNull(reader.GetOrdinal("Dato")) ? null : reader.GetString(reader.GetOrdinal("Dato")),
-                                DatoId = reader.IsDBNull(reader.GetOrdinal("DatoId")) ? null : reader.GetString(reader.GetOrdinal("DatoId")),
-                                Misc01 = reader.IsDBNull(reader.GetOrdinal("Misc01")) ? null : reader.GetString(reader.GetOrdinal("Misc01")),
-                                Misc02 = reader.IsDBNull(reader.GetOrdinal("Misc02")) ? null : reader.GetString(reader.GetOrdinal("Misc02"))
+                                Dato = reader.IsDBNull(reader.GetOrdinal("Dato"))
+                                    ? null
+                                    : reader.GetString(reader.GetOrdinal("Dato")),
+                                DatoId = reader.IsDBNull(reader.GetOrdinal("DatoId"))
+                                    ? null
+                                    : reader.GetString(reader.GetOrdinal("DatoId")),
+                                Misc01 = reader.IsDBNull(reader.GetOrdinal("Misc01"))
+                                    ? null
+                                    : reader.GetString(reader.GetOrdinal("Misc01")),
+                                Misc02 = reader.IsDBNull(reader.GetOrdinal("Misc02"))
+                                    ? null
+                                    : reader.GetString(reader.GetOrdinal("Misc02"))
                             };
 
                             var campaign = campaigns.FirstOrDefault(c => c.Id == campaignId);
                             campaign?.Contacts.Add(contact);
                         }
 
+                        // ============================
                         // Resultset 5: CampaignContactScheduleSendDTO
+                        // ============================
                         reader.NextResult();
                         while (reader.Read())
                         {
@@ -608,14 +685,39 @@ namespace Business
                                 CampaignId = campaignId,
                                 ContactId = reader.GetInt32(reader.GetOrdinal("ContactId")),
                                 ScheduleId = reader.GetInt32(reader.GetOrdinal("ScheduleId")),
-                                SentAt = reader.IsDBNull(reader.GetOrdinal("SentAt")) ? null : reader.GetDateTime(reader.GetOrdinal("SentAt")),
+                                SentAt = reader.IsDBNull(reader.GetOrdinal("SentAt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("SentAt")),
                                 Status = reader.GetString(reader.GetOrdinal("Status")),
-                                ResponseMessage = reader.IsDBNull(reader.GetOrdinal("ResponseMessage")) ? null : reader.GetString(reader.GetOrdinal("ResponseMessage")),
+                                ResponseMessage = reader.IsDBNull(reader.GetOrdinal("ResponseMessage"))
+                                    ? null
+                                    : reader.GetString(reader.GetOrdinal("ResponseMessage")),
                                 State = reader.GetString(reader.GetOrdinal("State"))
                             };
 
                             var campaign = campaigns.FirstOrDefault(c => c.Id == campaignId);
                             campaign?.CampaignContactScheduleSendDTO.Add(sendDto);
+                        }
+
+                        // ============================
+                        // Resultset 6: Blacklists
+                        // ============================
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                int campaignId = reader.GetInt32(reader.GetOrdinal("CampaignId"));
+                                int blacklistId = reader.GetInt32(reader.GetOrdinal("BlacklistId"));
+
+                                var campaign = campaigns.FirstOrDefault(c => c.Id == campaignId);
+                                if (campaign != null)
+                                {
+                                    if (campaign.BlacklistIds == null)
+                                        campaign.BlacklistIds = new List<int>();
+
+                                    campaign.BlacklistIds.Add(blacklistId);
+                                }
+                            }
                         }
                     }
                 }
@@ -623,6 +725,7 @@ namespace Business
 
             return campaigns;
         }
+
 
 
         public CampaignFullResponse FullResponseUpdateCampaignInfo(int IdCampaign)

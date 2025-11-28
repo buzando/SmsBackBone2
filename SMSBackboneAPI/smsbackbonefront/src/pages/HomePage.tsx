@@ -124,7 +124,17 @@ const HomePage: React.FC = () => {
         Handletmppwwd();
 
     }, []);
+    useEffect(() => {
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+            const user = JSON.parse(userDataString);
 
+            // Si el usuario es Root y no está ya en /Clients, redirige
+            if (user.rol === 'Root' && location.pathname !== '/Clients') {
+                navigate('/Clients');
+            }
+        }
+    }, [location.pathname]);
 
     const handleSendNewPassword = async () => {
         setLoadingpssw(true);
@@ -261,10 +271,11 @@ const HomePage: React.FC = () => {
         handleApplyFilters();
     };
     const handleClear = () => {
-        setSelectedOption('');
+
         setShowData(false);
         setAnchorEl(null);
         setenableButtons(false);
+        setSelectedOption('');
     };
 
 
@@ -414,7 +425,7 @@ const HomePage: React.FC = () => {
         } catch (error) {
             setIsErrormodal(true);
         }
-        finally{
+        finally {
             setOpen(false);
         }
     };
@@ -446,9 +457,7 @@ const HomePage: React.FC = () => {
                 Te mostramos el resumen de tu actividad más reciente.
             </Typography>
 
-            {/* Contenedor de botones alineados */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                {/* Botón de filtro */}
                 <Button
                     variant="outlined"
                     sx={buttonStyle}
@@ -930,7 +939,7 @@ const HomePage: React.FC = () => {
                                                         ]
                                                     }}
                                                 >
-                                                    <IconButton sx={{ padding: '0', marginLeft: '5px' }} onClick={() => navigate('/Campaigns')}>
+                                                    <IconButton sx={{ padding: '0', marginLeft: '5px' }} onClick={() => navigate('/Campains')}>
                                                         <img src={smsico} alt="SMS" style={{ width: '22px', height: '22px', marginLeft: "-6px", position: "absolute" }} />
                                                     </IconButton>
                                                 </Tooltip>
