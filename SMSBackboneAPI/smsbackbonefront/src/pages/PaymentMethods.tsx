@@ -6,6 +6,8 @@ import ChipBar from "../components/commons/ChipBar";
 import MainModal from "../components/commons/MainModal"
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
+import openpay from '../assets/OpenPayLogoColor.jpg';
+import IconCloseModal from "../assets/IconCloseModal.svg";
 import Box from '@mui/material/Box';
 import SecondaryButton from '../components/commons/SecondaryButton'
 import MainButton from '../components/commons/MainButton'
@@ -693,53 +695,46 @@ const PaymentMethods: React.FC = () => {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         width: '885px',
-                        maxWidth: '100%',
-                        height: '730px',
+                        height: '756px',
                         bgcolor: 'background.paper',
                         boxShadow: 24,
-                        pt: 1.5,     // 🔥 Padding top reducido
-                        px: 4,     // Conservamos padding lateral
-                        pb: 4,     // Padding bottom igual
+                        p: 4,
                         borderRadius: '8px',
                         overflowY: 'hidden',
                         overflowX: 'hidden',
                     }}
                 >
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            mb: 2,
-                        }}
-                    >
-                        <Typography
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h2
                             id="add-card-modal-title"
-                            sx={{
-                                fontFamily: 'Poppins',
+                            style={{
+                                textAlign: "left",
+                                fontStyle: "normal",
                                 fontWeight: 600,
-                                fontSize: '20px',
-                                color: '#574B4F',
-                                mt: "8px", mb: "5px"
+                                fontSize: "20px",
+                                lineHeight: "54px",
+                                fontFamily: "Poppins",
+                                letterSpacing: "0px",
+                                color: "#574B4F",
+                                opacity: 1,
+                                marginTop: "-18px",
+                                textTransform: "none",
                             }}
                         >
                             Agregar tarjeta
-                        </Typography>
-
-                        <IconButton
-                            onClick={handleCloseModal}
-                            sx={{
-                                position: "absolute", marginTop: "-2px",
-                                color: '#574B4F', marginLeft: "806px"
-                            }}
-                        >
-                            <CloseIcon />
+                        </h2>
+                        <IconButton onClick={handleCloseModal}
+                            sx={{ position: 'absolute', marginTop: "-56px", marginLeft: '805px' }}>
+                            <img
+                                src={IconCloseModal}
+                                alt="x"
+                                width="24"
+                                height="24"
+                            />
                         </IconButton>
-                    </Box>
+                    </div>
 
-                    <Box sx={{ mx: -4 }}>
-                        <Divider sx={{ my: 2, backgroundColor: '#E6E4E4' }} />
-                    </Box>
+                    <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5 }} />
                     <Box
                         sx={{
                             maxWidth: '800px',
@@ -774,12 +769,17 @@ const PaymentMethods: React.FC = () => {
                                     </label>
                                     <TextField name="cardNumber"
                                         value={formData.cardNumber}
-                                        onChange={handleChange}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (/^[0-9]*$/.test(value)) {
+                                                handleChange(e);
+                                            }
+                                        }}
                                         error={Boolean(errors['cardNumber'])}
                                         helperText={Boolean(errors['cardNumber']) ? errors.cardNumber : ' '} fullWidth
                                         InputProps={{
                                             sx: {
-                                                fontFamily: 'Poppins, sans-serif'
+                                                fontFamily: 'Poppins, sans-serif', marginBottom: "8px"
                                             },
                                             endAdornment: (
                                                 <InputAdornment position="end">
@@ -791,6 +791,16 @@ const PaymentMethods: React.FC = () => {
                                                     </WhiteTooltip>
                                                 </InputAdornment>
                                             )
+                                        }}
+                                        sx={{
+                                            "& .MuiFormHelperText-root": {
+                                                position: "absolute",
+                                                marginTop: 7,
+                                                fontFamily: "Poppins, sans-serif",
+                                                fontSize: "13px",
+                                                fontWeight: 400,
+                                                color: "#D01247",
+                                            },
                                         }}
                                     />
                                 </div>
@@ -829,7 +839,18 @@ const PaymentMethods: React.FC = () => {
                                                     </WhiteTooltip>
                                                 </InputAdornment>
                                             ),
-                                        }} />
+                                        }}
+                                        sx={{
+                                            "& .MuiFormHelperText-root": {
+                                                position: "absolute",
+                                                marginTop: 7,
+                                                fontFamily: "Poppins, sans-serif",
+                                                fontSize: "13px",
+                                                fontWeight: 400,
+                                                color: "#D01247",
+                                            },
+                                        }}
+                                    />
                                 </div>
                             </div>
                             <div>
@@ -855,7 +876,7 @@ const PaymentMethods: React.FC = () => {
                                     fullWidth
                                     InputProps={{
                                         sx: {
-                                            fontFamily: 'Poppins, sans-serif'
+                                            fontFamily: 'Poppins, sans-serif', marginBottom: "5px"
                                         },
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -867,7 +888,18 @@ const PaymentMethods: React.FC = () => {
                                                 </WhiteTooltip>
                                             </InputAdornment>
                                         )
-                                    }} />
+                                    }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
+                                    }}
+                                />
                             </div>
                             <div style={{ display: 'flex', gap: '20px' }}>
                                 <div style={{ flex: 1 }}>
@@ -885,10 +917,17 @@ const PaymentMethods: React.FC = () => {
                                     >
                                         Número exterior<span style={{ color: "#D01247" }}>*</span>
                                     </label>
-                                    <TextField type="number"
+                                    <TextField type="text"
+                                        inputMode="numeric"
                                         name="exteriorNumber"
                                         value={formData.exteriorNumber}
-                                        onChange={handleChange}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+
+                                            if (/^[0-9]*$/.test(value)) {
+                                                handleChange(e);
+                                            }
+                                        }}
                                         error={Boolean(errors.exteriorNumber)}
                                         helperText={Boolean(errors.exteriorNumber) ? errors.exteriorNumber : ' '}
                                         fullWidth
@@ -917,7 +956,18 @@ const PaymentMethods: React.FC = () => {
                                                     </WhiteTooltip>
                                                 </InputAdornment>
                                             )
-                                        }} />
+                                        }}
+                                        sx={{
+                                            "& .MuiFormHelperText-root": {
+                                                position: "absolute",
+                                                marginTop: 7,
+                                                fontFamily: "Poppins, sans-serif",
+                                                fontSize: "13px",
+                                                fontWeight: 400,
+                                                color: "#D01247",
+                                            },
+                                        }}
+                                    />
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <label
@@ -934,10 +984,18 @@ const PaymentMethods: React.FC = () => {
                                     >
                                         Número interior
                                     </label>
-                                    <TextField type="number"
+                                    <TextField
+                                        type="text"
+                                        inputMode="numeric"
                                         name="interiorNumber"
                                         value={formData.interiorNumber}
-                                        onChange={handleChange}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+
+                                            if (/^[0-9]*$/.test(value)) {
+                                                handleChange(e);
+                                            }
+                                        }}
                                         error={Boolean(errors.interiorNumber)}
                                         helperText={Boolean(errors.interiorNumber) ? errors.interiorNumber : ' '}
                                         fullWidth
@@ -992,7 +1050,7 @@ const PaymentMethods: React.FC = () => {
                                     fullWidth
                                     InputProps={{
                                         sx: {
-                                            fontFamily: 'Poppins, sans-serif'
+                                            fontFamily: 'Poppins, sans-serif', marginBottom: "8px"
                                         },
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -1004,7 +1062,18 @@ const PaymentMethods: React.FC = () => {
                                                 </WhiteTooltip>
                                             </InputAdornment>
                                         )
-                                    }} />
+                                    }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
+                                    }}
+                                />
                             </div>
                             <div>
                                 <label
@@ -1041,7 +1110,18 @@ const PaymentMethods: React.FC = () => {
                                                 </WhiteTooltip>
                                             </InputAdornment>
                                         )
-                                    }} />
+                                    }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
+                                    }}
+                                />
                             </div>
                             <div>
                                 <label
@@ -1066,7 +1146,7 @@ const PaymentMethods: React.FC = () => {
                                     fullWidth
                                     InputProps={{
                                         sx: {
-                                            fontFamily: 'Poppins, sans-serif'
+                                            fontFamily: 'Poppins, sans-serif', marginBottom: "8px"
                                         },
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -1078,7 +1158,18 @@ const PaymentMethods: React.FC = () => {
                                                 </WhiteTooltip>
                                             </InputAdornment>
                                         )
-                                    }} />
+                                    }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
+                                    }}
+                                />
                             </div>
                             <div>
                                 <label
@@ -1131,6 +1222,16 @@ const PaymentMethods: React.FC = () => {
                                             </InputAdornment>
                                         )
                                     }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
+                                    }}
                                 />
 
                             </div>
@@ -1165,6 +1266,7 @@ const PaymentMethods: React.FC = () => {
                                     >
                                         CVV <span style={{ color: "#D01247" }}>*</span>
                                     </label>
+
                                     <div style={{ display: 'flex', gap: '10px' }}>
                                         <Select
                                             name="month"
@@ -1172,18 +1274,16 @@ const PaymentMethods: React.FC = () => {
                                             onChange={(e) => handleChange(e)}
                                             required
                                             displayEmpty
-                                            IconComponent={() => null}
                                             renderValue={(selected) => {
                                                 if (!selected) {
                                                     return (
-                                                        <span style={{
-                                                            color: "#574B4F",
-                                                            fontFamily: "Poppins",
-                                                            opacity: 0.7,
-                                                            width: "100%",
-                                                            textAlign: "center",
-                                                            display: "block"
-                                                        }}>
+                                                        <span
+                                                            style={{
+                                                                fontFamily: "Poppins, sans-serif",
+                                                                fontSize: "12px",
+                                                                color: "#9B9295",
+                                                            }}
+                                                        >
                                                             Mes
                                                         </span>
                                                     );
@@ -1200,22 +1300,23 @@ const PaymentMethods: React.FC = () => {
                                             }}
                                             sx={{
                                                 background: "#FFFFFF",
-                                                border: "1px solid #9B9295",
                                                 borderRadius: "8px",
-                                                width: "145px",   // te recomiendo subirlo un poco
+                                                width: "87px",
                                                 height: "40px",
-                                                fontFamily: "Poppins",
+                                                fontFamily: "Poppins, sans-serif",
+                                                fontSize: "12px",
 
-                                                // 🔥 Centro y quito ellipsis del texto seleccionado
-                                                '& .MuiSelect-select': {
+                                                "& .MuiSelect-select": {
                                                     display: "flex",
                                                     alignItems: "center",
-                                                    justifyContent: "center",
-                                                    whiteSpace: 'normal',
-                                                    overflow: 'visible',
-                                                    textOverflow: 'unset',
-                                                    textAlign: 'center',
-                                                }
+                                                },
+                                            }}
+                                            MenuProps={{
+                                                PaperProps: {
+                                                    sx: {
+                                                        fontFamily: "Poppins, sans-serif",
+                                                    },
+                                                },
                                             }}
                                         >
                                             {months.map((month, index) => (
@@ -1224,9 +1325,7 @@ const PaymentMethods: React.FC = () => {
                                                     value={(index + 1).toString()}
                                                     sx={{
                                                         fontFamily: "Poppins, sans-serif",
-                                                        fontSize: "14px",
-                                                        color: "#574B4F",
-                                                        textAlign: "center"
+                                                        fontSize: "12px",
                                                     }}
                                                 >
                                                     {month}
@@ -1234,30 +1333,87 @@ const PaymentMethods: React.FC = () => {
                                             ))}
                                         </Select>
 
-
-
-
                                         <Select
                                             name="year"
-                                            value={formData.year} // 🔥 `value` debe coincidir con `formData.year`
-                                            onChange={() => handleChange}
-                                            label="año"
-                                            required
-                                            style={{
+                                            value={formData.year}
+                                            onChange={handleMuiSelectChange}
+                                            displayEmpty
+                                            renderValue={(selected) => {
+                                                if (!selected) {
+                                                    return (
+                                                        <span
+                                                            style={{
+                                                                fontFamily: "Poppins, sans-serif",
+                                                                fontSize: "12px",
+                                                                color: "#9B9295",
+                                                            }}
+                                                        >
+                                                            Año
+                                                        </span>
+                                                    );
+                                                }
+                                                return selected;
+                                            }}
+                                            sx={{
                                                 background: "#FFFFFF",
-                                                border: "1px solid #9B9295",
                                                 borderRadius: "8px",
-                                                width: "95px",
+                                                width: "87px",
                                                 height: "40px",
+                                                fontFamily: "Poppins, sans-serif",
+                                                fontSize: "12px",
+
+                                                "& .MuiSelect-select": {
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                },
                                             }}
                                         >
-                                            <MenuItem value="" disabled>Año</MenuItem>
+                                            {/* <MenuItem value="" disabled>
+                                            Año
+                                            </MenuItem>
                                             {years.map((year, index) => (
-                                                <MenuItem key={index} value={year.toString()}>{year}</MenuItem> // 🔥 Convertimos a `string`
-                                            ))}
+                                                <MenuItem
+                                                    key={index}
+                                                    value={year.toString()}
+                                                    sx={{
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "12px",
+                                                    }}
+                                                >
+                                                    {year}
+                                                </MenuItem>
+                                            ))} */}
+                                            {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map(
+                                                (year) => (
+                                                    <MenuItem
+                                                        key={year}
+                                                        value={year.toString()}
+                                                        sx={{
+                                                            fontFamily: "Poppins, sans-serif",
+                                                            fontSize: "12px",
+                                                        }}
+                                                    >
+                                                        {year}
+                                                    </MenuItem>
+                                                )
+                                            )}
                                         </Select>
 
                                         <TextField
+                                            sx={{
+                                                marginLeft: "25px",
+
+                                                "& .MuiFormHelperText-root": {
+                                                    fontFamily: "Poppins, sans-serif",
+                                                    fontSize: "12px",
+                                                    fontWeight: 400,
+                                                    color: "#D01247",
+                                                    position: "absolute",
+                                                    marginTop: "58px",
+                                                    marginLeft: "0px",
+                                                    whiteSpace: "nowrap",
+                                                },
+                                            }}
                                             type="number"
                                             name="cvv"
                                             value={formData.cvv}
@@ -1337,7 +1493,7 @@ const PaymentMethods: React.FC = () => {
                                                 fontFamily: 'Poppins',
                                                 fontSize: '14px',
                                                 color: '#8F4E63',
-                                                whiteSpace: 'nowrap',       // 🔥 Esto evita que el texto se rompa
+                                                whiteSpace: 'nowrap',
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis',
                                             }}
@@ -1347,7 +1503,51 @@ const PaymentMethods: React.FC = () => {
                                     </Box>
 
                                 </div>
+
                             </div>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    marginTop: 3, marginBottom: "5px",
+                                    flexWrap: "nowrap",
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        fontFamily: "Poppins",
+                                        color: "#574B4F",
+                                        fontSize: "16px",
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
+                                    Pagos procesados de forma segura con
+                                </Typography>
+
+                                <Box sx={{ display: "flex", }}>
+                                    <Box
+                                        sx={{
+                                            position: "absolute",
+                                            border: "1px solid #E1E1E1",
+                                            borderRadius: "8px",
+                                            padding: "10px",
+                                            backgroundColor: "#FFFFFF",
+                                            width: "80px",
+                                            height: "50px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center", marginLeft: "20px", marginTop: "-23px"
+                                        }}
+                                    >
+                                        <img
+                                            src={openpay}
+                                            alt="Openpay"
+                                            style={{ maxHeight: "24px", objectFit: "contain" }}
+                                        />
+                                    </Box>
+                                </Box>
+                            </Box>
+
                         </form>
                         <Box sx={{ mx: '-80px' }}>
                             <Divider sx={{ my: 2, backgroundColor: '#E6E4E4' }} />

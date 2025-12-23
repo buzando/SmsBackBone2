@@ -1467,7 +1467,7 @@ const BlackList: React.FC = () => {
                             </IconButton>
                         </Box>
                         <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5 }} />
-                        {/* Nombre */}
+                        {/*Nombre*/}
                         <Box>
                             <Typography
                                 sx={{

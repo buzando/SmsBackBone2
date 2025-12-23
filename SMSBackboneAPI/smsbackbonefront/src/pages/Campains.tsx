@@ -2307,7 +2307,7 @@ const Campains: React.FC = () => {
                       <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <AutorenewIcon sx={{ fontSize: "16px" }} />
                         <Typography>{selectedCampaign?.recycleCount ?? 0}</Typography>
-                      </Box> 
+                      </Box>
                     </Box>
 
                     <LinearProgress
@@ -3954,7 +3954,7 @@ const Campains: React.FC = () => {
                 }}
               >
 
-                {/* DropZon´t (Cargue un archivo desde su biblioteca.*/}
+                {/* DropZon´t (Cargue un archivo desde su biblioteca*/}
                 {!fileSuccess && (
                   <Box sx={{ width: "320px", display: "flex", flexDirection: "column", alignItems: "center" }}>
                     <Box
