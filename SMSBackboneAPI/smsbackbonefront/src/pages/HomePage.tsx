@@ -434,7 +434,7 @@ const HomePage: React.FC = () => {
     return (
         <Box sx={{
             padding: '30px',
-            width: "1180px",
+            width: "100%",
             minHeight: '800px',
             backgroundColor: '#F2F2F2',
             display: 'flex',

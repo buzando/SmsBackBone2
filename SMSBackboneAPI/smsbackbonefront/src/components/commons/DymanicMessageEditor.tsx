@@ -123,7 +123,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.padding = '4px 10px';
     chip.style.margin = '0 4px 8px 4px';
     chip.style.fontFamily = 'inherit';
-    chip.style.fontSize = '13px';
+    chip.style.fontSize = '12px';
     chip.style.color = '#FFFFFF';
     chip.style.userSelect = 'none';
 
@@ -244,7 +244,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.padding = '4px 10px';
     chip.style.margin = '0 4px 8px 4px';
     chip.style.fontFamily = 'Poppins';
-    chip.style.fontSize = '13px';
+    chip.style.fontSize = '16px';
     chip.style.color = '#FFFFFF';
     chip.style.opacity = '1';
     chip.style.userSelect = 'none';

@@ -184,6 +184,11 @@ const BillingInformation: React.FC = () => {
         const value = e.target.value.toUpperCase();
         setRfc(value);
 
+        if (value.trim() === "") {
+            setRfcError(false);
+            return;
+        }
+
         // Regex para validar el RFC
         const rfcRegex = /^([A-ZÑ&]{3,4})?(\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])([A-Z\d]{2})([A\d])?$/;
         setRfcError(!rfcRegex.test(value)); // Si no pasa el regex, se muestra error
@@ -215,6 +220,11 @@ const BillingInformation: React.FC = () => {
         const value = e.target.value;
         setBusinessName(value);
 
+        if (value.trim() === "") {
+            setBusinessNameError(false);
+            return;
+        }
+
         // Validar y actualizar el estado de error
         setBusinessNameError(!validateBusinessName(value));
     };
@@ -231,14 +241,14 @@ const BillingInformation: React.FC = () => {
                 </Typography>
             </Box>
             <Box sx={{ marginLeft: "32px", }}>
-                <Divider sx={{ marginBottom: "17px", marginTop: "18px", mb: 3.5 }} />
+                <Divider sx={{ marginBottom: "17px", marginTop: "16px", mb: 3.5 }} />
                 <Box
                     style={{
                         backgroundColor: '#FFFFFF',
                         padding: '20px',
                         borderRadius: '8px',
                         minWidth: '850px',
-                        maxHeight: '600px',
+                        maxHeight: '660px',
                         overflowY: 'auto',
                     }}
                 >
@@ -355,7 +365,7 @@ const BillingInformation: React.FC = () => {
                                 onChange={handleRfcChange}
                                 fullWidth
                                 error={rfcError}
-                                helperText={rfcError ? 'Formato Invalido' : ''}
+                                helperText={rfcError ? 'Formato Inválido' : ''}
                                 sx={{
                                     fontFamily: "Poppins",
                                     "& .MuiInputBase-input": {
@@ -438,7 +448,7 @@ const BillingInformation: React.FC = () => {
                     </div>
 
                     <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-                        <div style={{ flex: 1, maxWidth: '400px' }}>
+                        <div style={{ flex: 1, maxWidth: '420px' }}>
                             <Typography
                                 style={{
                                     textAlign: "left",
@@ -457,9 +467,29 @@ const BillingInformation: React.FC = () => {
                                 value={taxRegime}
                                 onChange={(e) => setTaxRegime(e.target.value)}
                                 select
-                                SelectProps={{ displayEmpty: true }}
+                                SelectProps={{
+                                    displayEmpty: true,
+                                    MenuProps: {
+                                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                                        transformOrigin: { vertical: "top", horizontal: "right" },
+                                        PaperProps: {
+                                            sx: {
+                                                width: 420,
+                                                maxHeight: 240,
+                                                mt: -1,
+                                                borderRadius: "8px",
+                                                "& .MuiMenuItem-root": {
+                                                    fontFamily: "Poppins",
+                                                    fontSize: "12px",
+                                                    py: 0.9,
+                                                },
+                                            },
+                                        },
+                                    },
+                                }}
+
                                 sx={{
-                                    width: '400px',
+                                    width: '420px',
                                     height: '40px',
                                     mt: 1,
                                     background: '#FFFFFF',
@@ -473,12 +503,12 @@ const BillingInformation: React.FC = () => {
                                         alignItems: 'center',
                                         height: '100%',
                                         paddingLeft: '12px',
-                                        paddingTop: "8px",   // texto
+                                        paddingTop: "8px",
                                         color: taxRegime === "" ? "#786E71" : "#786E71",
                                     },
 
                                     '& .MuiSelect-icon': {
-                                        top: '45%',           // flecha
+                                        top: '45%',
                                         transform: 'translateY(-50%)',
                                         color: '#786E71',
                                     },
@@ -486,7 +516,6 @@ const BillingInformation: React.FC = () => {
                                     '& fieldset': { border: 'none' },
                                 }}
                             >
-
 
                                 <MenuItem
                                     value=""
@@ -605,81 +634,262 @@ const BillingInformation: React.FC = () => {
                             <TextField
                                 value={cfdi}
                                 onChange={(e) => setCfdi(e.target.value)}
-                                style={{ width: '400px', height: '54px' }}
                                 select
+                                SelectProps={{
+                                    displayEmpty: true,
+                                    MenuProps: {
+                                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                                        transformOrigin: { vertical: "top", horizontal: "right" },
+                                        PaperProps: {
+                                            sx: {
+                                                width: 420,
+                                                maxHeight: 240,
+                                                mt: -1,
+                                                borderRadius: "8px",
+                                                "& .MuiMenuItem-root": {
+                                                    fontFamily: "Poppins",
+                                                    fontSize: "12px",
+                                                    py: 0.9,
+                                                },
+                                            },
+                                        },
+                                    },
+                                }}
+
+                                sx={{
+                                    width: '420px',
+                                    height: '40px',
+                                    mt: 1,
+                                    background: '#FFFFFF',
+                                    border: '1px solid #9B9295',
+                                    borderRadius: '8px',
+
+                                    '& .MuiSelect-select': {
+                                        fontFamily: 'Poppins',
+                                        fontSize: '12px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        height: '100%',
+                                        paddingLeft: '12px',
+                                        paddingTop: "8px",
+                                        color: taxRegime === "" ? "#786E71" : "#786E71",
+                                    },
+
+                                    '& .MuiSelect-icon': {
+                                        top: '45%',
+                                        transform: 'translateY(-50%)',
+                                        color: '#786E71',
+                                    },
+
+                                    '& fieldset': { border: 'none' },
+                                }}
+
                             >
-                                <MenuItem value="G01">G01 - Adquisición de mercancías</MenuItem>
-                                <MenuItem value="G02">G02 - Devoluciones, descuentos o bonificaciones</MenuItem>
-                                <MenuItem value="G03">G03 - Gastos en general</MenuItem>
-                                <MenuItem value="I01">I01 - Construcciones</MenuItem>
-                                <MenuItem value="I02">I02 - Mobiliario y equipo de oficina por inversiones</MenuItem>
-                                <MenuItem value="I03">I03 - Equipo de transporte</MenuItem>
-                                <MenuItem value="I04">I04 - Equipo de cómputo y accesorios</MenuItem>
-                                <MenuItem value="I05">I05 - Dados, troqueles, moldes, matrices y herramental</MenuItem>
-                                <MenuItem value="I06">I06 - Comunicaciones telefónicas</MenuItem>
-                                <MenuItem value="I07">I07 - Comunicaciones satelitales</MenuItem>
-                                <MenuItem value="I08">I08 - Otra maquinaria y equipo</MenuItem>
-                                <MenuItem value="D01">D01 - Honorarios médicos, dentales y gastos hospitalarios</MenuItem>
-                                <MenuItem value="D02">D02 - Gastos médicos por incapacidad o discapacidad</MenuItem>
-                                <MenuItem value="D03">D03 - Gastos funerarios</MenuItem>
-                                <MenuItem value="D04">D04 - Donativos</MenuItem>
-                                <MenuItem value="D05">D05 - Intereses reales efectivamente pagados por créditos hipotecarios (casa habitación)</MenuItem>
-                                <MenuItem value="D06">D06 - Aportaciones voluntarias al SAR</MenuItem>
-                                <MenuItem value="D07">D07 - Primas por seguros de gastos médicos</MenuItem>
-                                <MenuItem value="D08">D08 - Gastos de transportación escolar obligatoria</MenuItem>
-                                <MenuItem value="D09">D09 - Depósitos en cuentas para el ahorro, primas que tengan como base planes de pensiones</MenuItem>
-                                <MenuItem value="D10">D10 - Pagos por servicios educativos (colegiaturas)</MenuItem>
-                                <MenuItem value="P01">P01 - Por definir</MenuItem>
+                                <MenuItem
+                                    value=""
+                                    disabled
+                                    sx={{ display: "none" }}
+                                >
+                                    <span style={{ fontFamily: "Poppins", color: "#9B9295" }}>
+                                        Seleccionar
+                                    </span>
+                                </MenuItem>
+                                <MenuItem value="G01" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>G01 - Adquisición de mercancías</MenuItem>
+                                <MenuItem value="G02" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>G02 - Devoluciones, descuentos o bonificaciones</MenuItem>
+                                <MenuItem value="G03" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>G03 - Gastos en general</MenuItem>
+                                <MenuItem value="I01" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>I01 - Construcciones</MenuItem>
+                                <MenuItem value="I02" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>I02 - Mobiliario y equipo de oficina por inversiones</MenuItem>
+                                <MenuItem value="I03" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>I03 - Equipo de transporte</MenuItem>
+                                <MenuItem value="I04" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>I04 - Equipo de cómputo y accesorios</MenuItem>
+                                <MenuItem value="I05" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>I05 - Dados, troqueles, moldes, matrices y herramental</MenuItem>
+                                <MenuItem value="I06" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>I06 - Comunicaciones telefónicas</MenuItem>
+                                <MenuItem value="I07" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>I07 - Comunicaciones satelitales</MenuItem>
+                                <MenuItem value="I08" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>I08 - Otra maquinaria y equipo</MenuItem>
+                                <MenuItem value="D01" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>D01 - Honorarios médicos, dentales y gastos hospitalarios</MenuItem>
+                                <MenuItem value="D02" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>D02 - Gastos médicos por incapacidad o discapacidad</MenuItem>
+                                <MenuItem value="D03" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>D03 - Gastos funerarios</MenuItem>
+                                <MenuItem value="D04" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>D04 - Donativos</MenuItem>
+                                <MenuItem value="D05" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>D05 - Intereses reales efectivamente pagados por créditos hipotecarios (casa habitación)</MenuItem>
+                                <MenuItem value="D06" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>D06 - Aportaciones voluntarias al SAR</MenuItem>
+                                <MenuItem value="D07" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>D07 - Primas por seguros de gastos médicos</MenuItem>
+                                <MenuItem value="D08" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>D08 - Gastos de transportación escolar obligatoria</MenuItem>
+                                <MenuItem value="D09" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>D09 - Depósitos en cuentas para el ahorro, primas que tengan como base planes de pensiones</MenuItem>
+                                <MenuItem value="D10" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>D10 - Pagos por servicios educativos (colegiaturas)</MenuItem>
+                                <MenuItem value="P01" sx={{
+                                    fontFamily: 'Poppins', fontSize: '12px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>P01 - Por definir</MenuItem>
                             </TextField>
 
                         </div>
                     </div>
 
-                    <div style={{ marginBottom: '20px', maxWidth: '128px' }}>
-                        <Typography
-                            style={{
-                                textAlign: "left",
-                                fontSize: "16px",
-                                fontFamily: "Poppins",
-                                letterSpacing: "0px",
-                                marginBottom: '4px',
-                                color: postalCodeError ? '#D01247' : '#330F1B',
-                                opacity: 1,
-                            }}
-                        >
-                            Código postal
-                            <span style={{ color: "#D01247" }}>*</span>
-                        </Typography>
-                        <TextField
-                            value={postalCode}
-                            onChange={handlePostalCodeChange}
-                            fullWidth
-                            error={postalCodeError}
-                            helperText={postalCodeError ? 'Formato Invalido' : ''}
-                            sx={{
-                                width: '128px', // Cambiar el ancho del input
-                                height: '54px',
-                                borderColor: postalCodeError ? '#D01247' : undefined,
-                                fontFamily: "Poppins",
-                                "& .MuiInputBase-input": {
-                                    fontFamily: "Poppins",
-                                },
-                            }}
-                            inputProps={{
-                                maxLength: 5,
-                            }}
-                        />
-                    </div>
-                    {/* Tipo de persona */}
-                    <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', maxWidth: '400px' }}>
-                        <div style={{ flex: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: 'center', gap: 2, width: "600px", height: "120px", backgroundColor: "withe" }}>
+
+                        <Box style={{
+                            display: 'flex',
+                            flexDirection: 'column', gap: "8px"
+                        }}>
                             <Typography
                                 style={{
                                     textAlign: "left",
                                     fontSize: "16px",
                                     fontFamily: "Poppins",
                                     letterSpacing: "0px",
-                                    color: '#330F1B',
+                                    color: postalCodeError ? '#D01247' : '#330F1B',
+                                    opacity: 1,
+                                }}
+                            >
+                                Código postal
+                                <span style={{ color: "#D01247" }}>*</span>
+                            </Typography>
+                            <TextField
+                                value={postalCode}
+                                onChange={handlePostalCodeChange}
+                                fullWidth
+                                error={postalCodeError}
+                                helperText={postalCodeError ? 'Formato Invalido' : ''}
+                                sx={{
+                                    width: '128px',
+                                    height: '54px',
+                                    borderColor: postalCodeError ? '#D01247' : undefined,
+                                    fontFamily: "Poppins",
+                                    "& .MuiInputBase-input": {
+                                        fontFamily: "Poppins",
+                                    },
+                                    '& .MuiFormHelperText-root': {
+                                        fontFamily: 'Poppins',
+                                        fontSize: '12px',
+                                        lineHeight: '16px',
+                                        marginLeft: "5px",
+                                        marginTop: '3px',
+                                    },
+                                }}
+                                inputProps={{
+                                    maxLength: 5,
+                                }}
+                            />
+                        </Box>
+                        {/* Tipo de persona */}
+                        <Box style={{
+                            display: 'flex',
+                            flexDirection: 'column', gap: "8px"
+                        }}>
+
+                            <Typography
+                                style={{
+                                    textAlign: "left",
+                                    fontSize: "16px",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    color: '#330F1B'
                                 }}
                             >
                                 Tipo de persona
@@ -690,26 +900,104 @@ const BillingInformation: React.FC = () => {
                                 value={personType}
                                 onChange={(e) => setPersonType(e.target.value)}
                                 fullWidth
+                                sx={{
+                                    width: '220px',
+                                    height: '55px',
+                                    background: '#FFFFFF',
+
+                                    '& .MuiSelect-select': {
+                                        fontFamily: 'Poppins',
+                                        color: "#330F1B",
+                                        fontSize: '16px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+
+                                    },
+                                    '& .MuiSelect-icon': {
+                                        display: 'none',
+                                    },
+
+                                }}
                                 SelectProps={{ displayEmpty: true }}
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip title="Selecciona física o moral" arrow>
-                                            <InputAdornment position="end">
-                                                <InfoIcon style={{ color: '#6a6a6a' }} />
-                                            </InputAdornment>
+                                        <Tooltip
+                                            title={
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        Selecciona física o moral
+                                                    </>
+                                                </Box>
+                                            }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <IconButton
+                                                disableRipple
+                                                sx={{
+                                                    backgroundColor: "transparent !important",
+                                                    "&:hover": {
+                                                        backgroundColor: "transparent !important",
+                                                    },
+                                                }}
+                                            >
+                                                <img
+                                                    src={infoicon}
+                                                    alt="info-icon"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                            </IconButton>
                                         </Tooltip>
                                     ),
                                 }}
                             >
-                                <MenuItem value="">
-                                    <span style={{ fontStyle: "normal", color: "#645E60" }}>Seleccionar</span>
+                                <MenuItem
+                                    value=""
+                                    disabled
+                                    sx={{ display: "none" }}
+                                >
+                                    <span style={{ fontFamily: "Poppins", color: "#9B9295" }}>
+                                        Seleccionar
+                                    </span>
                                 </MenuItem>
-                                <MenuItem value="fisica">Persona Física</MenuItem>
-                                <MenuItem value="moral">Persona Moral</MenuItem>
+                                <MenuItem value="fisica" sx={{
+                                    fontFamily: 'Poppins', fontSize: '14px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>Persona Física</MenuItem>
+                                <MenuItem value="moral" sx={{
+                                    fontFamily: 'Poppins', fontSize: '14px',
+                                    color: '#645E60', '&:hover': {
+                                        backgroundColor: '#F2EBED'
+                                    }
+                                }}>Persona Moral</MenuItem>
                             </TextField>
-                        </div>
-                    </div>
-
+                        </Box>
+                    </Box>
                     {/* Calle, Número exterior, Número interior */}
                     <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
                         <div style={{ flex: 2 }}>
@@ -727,12 +1015,64 @@ const BillingInformation: React.FC = () => {
                                 value={street}
                                 onChange={(e) => setStreet(e.target.value)}
                                 fullWidth
+                                sx={{
+                                    '& .MuiInputBase-input': {
+                                        fontFamily: 'Poppins',
+                                        color: '#330F1B',
+                                        fontSize: '16px',
+                                    },
+                                }}
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip title="Nombre de la calle" arrow>
-                                            <InputAdornment position="end">
-                                                <InfoIcon style={{ color: '#6a6a6a' }} />
-                                            </InputAdornment>
+                                        <Tooltip
+                                            title={
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        Nombre de la calle
+                                                    </>
+                                                </Box>
+                                            }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <IconButton
+                                                disableRipple
+                                                sx={{
+                                                    backgroundColor: "transparent !important",
+                                                    "&:hover": {
+                                                        backgroundColor: "transparent !important",
+                                                    },
+                                                }}
+                                            >
+                                                <img
+                                                    src={infoicon}
+                                                    alt="info-icon"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                            </IconButton>
                                         </Tooltip>
                                     ),
                                 }}
@@ -753,12 +1093,64 @@ const BillingInformation: React.FC = () => {
                                 value={extNumber}
                                 onChange={(e) => setExtNumber(e.target.value)}
                                 fullWidth
+                                sx={{
+                                    '& .MuiInputBase-input': {
+                                        fontFamily: 'Poppins',
+                                        color: '#330F1B',
+                                        fontSize: '16px',
+                                    },
+                                }}
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip title="Número exterior del domicilio" arrow>
-                                            <InputAdornment position="end">
-                                                <InfoIcon style={{ color: '#6a6a6a' }} />
-                                            </InputAdornment>
+                                        <Tooltip
+                                            title={
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        Número exterior de domicilio
+                                                    </>
+                                                </Box>
+                                            }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <IconButton
+                                                disableRipple
+                                                sx={{
+                                                    backgroundColor: "transparent !important",
+                                                    "&:hover": {
+                                                        backgroundColor: "transparent !important",
+                                                    },
+                                                }}
+                                            >
+                                                <img
+                                                    src={infoicon}
+                                                    alt="info-icon"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                            </IconButton>
                                         </Tooltip>
                                     ),
                                 }}
@@ -778,12 +1170,64 @@ const BillingInformation: React.FC = () => {
                                 value={intNumber}
                                 onChange={(e) => setIntNumber(e.target.value)}
                                 fullWidth
+                                sx={{
+                                    '& .MuiInputBase-input': {
+                                        fontFamily: 'Poppins',
+                                        color: '#330F1B',
+                                        fontSize: '16px',
+                                    },
+                                }}
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip title="Número interior (opcional)" arrow>
-                                            <InputAdornment position="end">
-                                                <InfoIcon style={{ color: '#6a6a6a' }} />
-                                            </InputAdornment>
+                                        <Tooltip
+                                            title={
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        Número interior (Opcional)
+                                                    </>
+                                                </Box>
+                                            }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <IconButton
+                                                disableRipple
+                                                sx={{
+                                                    backgroundColor: "transparent !important",
+                                                    "&:hover": {
+                                                        backgroundColor: "transparent !important",
+                                                    },
+                                                }}
+                                            >
+                                                <img
+                                                    src={infoicon}
+                                                    alt="info-icon"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                            </IconButton>
                                         </Tooltip>
                                     ),
                                 }}
@@ -808,12 +1252,64 @@ const BillingInformation: React.FC = () => {
                                 value={colony}
                                 onChange={(e) => setColony(e.target.value)}
                                 fullWidth
+                                sx={{
+                                    '& .MuiInputBase-input': {
+                                        fontFamily: 'Poppins',
+                                        color: '#330F1B',
+                                        fontSize: '16px',
+                                    },
+                                }}
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip title="Nombre de la colonia" arrow>
-                                            <InputAdornment position="end">
-                                                <InfoIcon style={{ color: '#6a6a6a' }} />
-                                            </InputAdornment>
+                                        <Tooltip
+                                            title={
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        Nombre de la colonia
+                                                    </>
+                                                </Box>
+                                            }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <IconButton
+                                                disableRipple
+                                                sx={{
+                                                    backgroundColor: "transparent !important",
+                                                    "&:hover": {
+                                                        backgroundColor: "transparent !important",
+                                                    },
+                                                }}
+                                            >
+                                                <img
+                                                    src={infoicon}
+                                                    alt="info-icon"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                            </IconButton>
                                         </Tooltip>
                                     ),
                                 }}
@@ -835,12 +1331,64 @@ const BillingInformation: React.FC = () => {
                                 value={city}
                                 onChange={(e) => setCity(e.target.value)}
                                 fullWidth
+                                sx={{
+                                    '& .MuiInputBase-input': {
+                                        fontFamily: 'Poppins',
+                                        color: '#330F1B',
+                                        fontSize: '16px',
+                                    },
+                                }}
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip title="Ciudad o municipio" arrow>
-                                            <InputAdornment position="end">
-                                                <InfoIcon style={{ color: '#6a6a6a' }} />
-                                            </InputAdornment>
+                                        <Tooltip
+                                            title={
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        Ciudad o municipio
+                                                    </>
+                                                </Box>
+                                            }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <IconButton
+                                                disableRipple
+                                                sx={{
+                                                    backgroundColor: "transparent !important",
+                                                    "&:hover": {
+                                                        backgroundColor: "transparent !important",
+                                                    },
+                                                }}
+                                            >
+                                                <img
+                                                    src={infoicon}
+                                                    alt="info-icon"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                            </IconButton>
                                         </Tooltip>
                                     ),
                                 }}
@@ -866,12 +1414,64 @@ const BillingInformation: React.FC = () => {
                                 value={state}
                                 onChange={(e) => setState(e.target.value)}
                                 fullWidth
+                                sx={{
+                                    '& .MuiInputBase-input': {
+                                        fontFamily: 'Poppins',
+                                        color: '#330F1B',
+                                        fontSize: '16px',
+                                    },
+                                }}
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip title="Estado de la república" arrow>
-                                            <InputAdornment position="end">
-                                                <InfoIcon style={{ color: '#6a6a6a' }} />
-                                            </InputAdornment>
+                                        <Tooltip
+                                            title={
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: "#FFFFFF",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                        padding: "8px 12px",
+                                                        fontSize: "14px",
+                                                        fontFamily: "Poppins",
+                                                        color: "#574B4F",
+                                                        whiteSpace: "pre-line",
+                                                        transform: "translate(-10px, -22px)",
+                                                        borderColor: "#00131F3D",
+                                                        borderStyle: "solid",
+                                                        borderWidth: "1px"
+                                                    }}
+                                                >
+                                                    <>
+                                                        Estado de la república
+                                                    </>
+                                                </Box>
+                                            }
+                                            placement="bottom-end"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "transparent",
+                                                        padding: 0,
+
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <IconButton
+                                                disableRipple
+                                                sx={{
+                                                    backgroundColor: "transparent !important",
+                                                    "&:hover": {
+                                                        backgroundColor: "transparent !important",
+                                                    },
+                                                }}
+                                            >
+                                                <img
+                                                    src={infoicon}
+                                                    alt="info-icon"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                            </IconButton>
                                         </Tooltip>
                                     ),
                                 }}
@@ -898,6 +1498,22 @@ const BillingInformation: React.FC = () => {
                                 error={postalCodeError}
                                 helperText={postalCodeError ? 'Formato inválido' : ''}
                                 fullWidth
+                                sx={{
+                                    width: '128px',
+                                    height: '54px',
+                                    borderColor: postalCodeError ? '#D01247' : undefined,
+                                    fontFamily: "Poppins",
+                                    "& .MuiInputBase-input": {
+                                        fontFamily: "Poppins",
+                                    },
+                                    '& .MuiFormHelperText-root': {
+                                        fontFamily: 'Poppins',
+                                        fontSize: '12px',
+                                        lineHeight: '16px',
+                                        marginLeft: "5px",
+                                        marginTop: '3px',
+                                    },
+                                }}
                                 InputProps={{
                                     style: { height: '54px' },
                                 }}
@@ -906,6 +1522,25 @@ const BillingInformation: React.FC = () => {
                                 }}
                             />
                         </div>
+                    </div>
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'flex-start',
+                            alignItems: 'center',
+                            gap: '16px',
+                            marginTop: '30px',
+                            marginLeft: '0px',
+                            boxSizing: 'border-box',
+                        }}
+                    >
+                        <SecondaryButton onClick={() => setModal(true)} text="CANCELAR" />
+                        <MainButton
+                            onClick={handleSave}
+                            text="GUARDAR"
+                            disabled={!hasChanges()}
+                        />
+
                     </div>
 
                     <Typography
@@ -922,31 +1557,7 @@ const BillingInformation: React.FC = () => {
                         *El asterisco indica los campos obligatorios.
                     </Typography>
                 </Box>
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: '16px',
-                        marginTop: '30px',
-                        maxWidth: '850px',
-                        width: '100%',
-                        marginLeft: 'auto',
-                        marginRight: 'auto',
-                        paddingLeft: '20px',
-                        boxSizing: 'border-box',
-                    }}
-                >
-                    <SecondaryButton onClick={() => setModal(true)} text="CANCELAR" />
-                    <MainButton
-                        onClick={handleSave}
-                        text="GUARDAR"
-                        disabled={!hasChanges()}
-                    />
 
-
-
-                </div>
 
                 {showChipBarAdd && (
                     <ChipBar
