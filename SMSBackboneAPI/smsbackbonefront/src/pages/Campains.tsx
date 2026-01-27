@@ -1700,7 +1700,7 @@ const Campains: React.FC = () => {
                 <Paper
                   sx={{
                     padding: "15px",
-                    borderRadius: "8px 0 0 8px", // borde izquierdo redondeado
+                    borderRadius: "8px 0 0 8px",
                     width: "370px",
                     height: "581px",
                     display: "flex",
@@ -1753,7 +1753,7 @@ const Campains: React.FC = () => {
                           {
                             name: 'offset',
                             options: {
-                              offset: [0, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                              offset: [0, -15]
                             }
                           }
                         ]
@@ -1891,7 +1891,6 @@ const Campains: React.FC = () => {
                   </Select>
 
 
-
                   {filteredCampaigns.length > 0 && (
                     <Box sx={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px", marginLeft: "8px", }}>
                       <Checkbox
@@ -1999,14 +1998,7 @@ const Campains: React.FC = () => {
                     </Box>
 
                   )}
-                  <Divider
-                    sx={{
-                      width: 'calc(100% + 30px)',
-                      marginLeft: '-15px',
-                      marginBottom: '5px',
-                    }}
-                  />
-                  <List sx={{ overflowY: "auto", flexGrow: 1 }}>
+                  <List sx={{ overflowY: "auto", flexGrow: 1, overflowX: "hidden" }}>
                     {filteredCampaigns.length === 0 ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', textAlign: 'center' }}>
                         <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '250px', height: 'auto' }} />
@@ -2103,7 +2095,7 @@ const Campains: React.FC = () => {
                                     fontSize: "12px",
                                     fontWeight: "500",
                                     fontFamily: "Poppins",
-                                    color: isSelected ? "#8E5065" : "#574B4F", // 👈 Cambia de color cuando está seleccionado
+                                    color: isSelected ? "#8E5065" : "#574B4F",
                                     marginBottom: "6px"
                                   }}
                                   >
@@ -3299,7 +3291,7 @@ const Campains: React.FC = () => {
           <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mt: 1.5, mb: 1.5 }} />
 
           {/*Stepper */}
-          <Box sx={{ padding: "0 0px", }}>
+          <Box sx={{ padding: "0 0px" }}>
 
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "24px", width: "100%" }}>
               {["Nombre y horarios", "Registros", "Mensaje", "Configuraciones"].map((label, index) => {
@@ -3972,7 +3964,7 @@ const Campains: React.FC = () => {
                 }}
               >
 
-                {/* DropZon´t (Cargue un archivo desde su biblioteca.*/}
+                {/* DropZon´t (Cargue un archivo desde su biblioteca*/}
                 {!fileSuccess && (
                   <Box sx={{ width: "320px", display: "flex", flexDirection: "column", alignItems: "center" }}>
                     <Box
@@ -5834,7 +5826,10 @@ const Campains: React.FC = () => {
           )}
           {/*Configuraciones Avanzadas en crar campaña SMS*/}
           {activeStep === 2 && (
-            <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', ml: 7 }}>
+            <Box sx={{
+              mt: 2, display: 'flex', flexDirection: 'column', ml: 7,
+              maxHeight: "620px", width: "600px",
+            }}>
               <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '18px', mb: 2 }}>
                 Configuraciones avanzadas
               </Typography>
@@ -5911,7 +5906,7 @@ const Campains: React.FC = () => {
                   >
                     Mensaje flash
                   </Typography>
-                  <Tooltip
+                  {/* <Tooltip
                     placement="right"
                     title={(
                       <Box sx={{
@@ -5952,7 +5947,7 @@ const Campains: React.FC = () => {
                         {
                           name: 'offset',
                           options: {
-                            offset: [104, -260] //  [horizontal, vertical]
+                            offset: [104, -260]
                           }
                         }
                       ]
@@ -5963,7 +5958,7 @@ const Campains: React.FC = () => {
                       alt="info"
                       style={{ width: '24px', height: '24px', pointerEvents: 'auto', cursor: 'default' }}
                     />
-                  </Tooltip>
+                  </Tooltip> */}
                 </Box>
                 <Switch
                   checked={flashEnabled}
@@ -5992,7 +5987,7 @@ const Campains: React.FC = () => {
                   backgroundColor: aniEnabled ? '#FFFFFF' : '#FFFFFF',
                   opacity: tipoNumero === 'corto' ? 0.5 : 1,
                   mb: 2,
-                  gap: 1, // espacio entre los dos bloques
+                  gap: 1,
                 }}
               >
                 {/* Primer bloque: texto + tooltip + switch */}
@@ -6015,14 +6010,15 @@ const Campains: React.FC = () => {
                           fontFamily: 'Poppins', fontSize: '14px',
                           color: '#000000', opacity: 0.7,
                         }}>
-                          · Configuración que define<br />
-                          cuántas veces se reciclarán<br />
-                          automáticamente los registros de<br />
-                          la campaña.<br />
-                          Pueden ser todos los registros o<br />
-                          solo los no contactados,<br />
-                          incluyendo los de máquina/<br />
-                          buzón.
+                          · Configuración para mostrar un teléfono<br />
+                          remitente personalizado (ANI) con un<br />
+                          formato o código de área que es familiar<br />
+                          al destinatario para facilitar el contacto.<br />
+                          El modo rotativo alterna todos los números<br />
+                          ANI configurados. El modo rotativo<br />
+                          regionalizado alterna los números ANI/<br />
+                          configurados que coinciden con el código de<br />
+                          área del destinatario.
                         </Box>
                       )
                       }
@@ -6049,7 +6045,7 @@ const Campains: React.FC = () => {
                           {
                             name: 'offset',
                             options: {
-                              offset: [104, -260] //  [horizontal, vertical]
+                              offset: [175, -35]
                             }
                           }
                         ]
@@ -6100,7 +6096,7 @@ const Campains: React.FC = () => {
                       sx={{
                         backgroundColor: '#FFFFFF',
                         fontFamily: 'Poppins',
-                        fontSize: '12px', // también puedes poner aquí, pero lo controlamos mejor en renderValue
+                        fontSize: '12px',
                         borderRadius: '8px',
                         height: '40px',
                         width: '200px',
@@ -6372,7 +6368,7 @@ const Campains: React.FC = () => {
                     >
                       Listas Negras
                     </Typography>
-                    <Tooltip
+                    {/* <Tooltip
                       placement="right"
                       title={(
                         <Box sx={{
@@ -6424,7 +6420,7 @@ const Campains: React.FC = () => {
                         alt="info"
                         style={{ width: '24px', height: '24px', pointerEvents: 'auto', cursor: 'default' }}
                       />
-                    </Tooltip>
+                    </Tooltip> */}
                   </Box>
 
                   <Switch
@@ -6459,16 +6455,9 @@ const Campains: React.FC = () => {
                       }}
                     >
                       <img
-                        src={seachicon}
+                        src={searchTermBlacklist ? Iconseachred : seachicon}
                         alt="Buscar"
-                        style={{
-                          marginRight: "8px",
-                          width: "18px",
-                          height: "18px",
-                          filter: searchTermBlacklist
-                            ? "invert(19%) sepia(34%) saturate(329%) hue-rotate(312deg) brightness(91%) contrast(85%)"
-                            : "none",
-                        }}
+                        style={{ marginRight: 8, width: 24 }}
                       />
                       <input
                         type="text"
@@ -6488,54 +6477,82 @@ const Campains: React.FC = () => {
                       {searchTermBlacklist && (
                         <img
                           src={iconclose}
-                          alt="Limpiar búsqueda"
-                          style={{
-                            marginLeft: "8px",
-                            width: "16px",
-                            height: "16px",
-                            cursor: "pointer",
-                          }}
+                          alt="Limpiar"
+                          style={{ marginLeft: '8px', width: '24px', height: '24px', cursor: 'pointer' }}
                           onClick={() => setSearchTermBlacklist('')}
                         />
                       )}
                     </Box>
 
-                    {/* Tabla */}
                     <Box sx={{ maxHeight: "191px", overflowY: "auto", border: "1px solid #D6CED2", borderRadius: "8px" }}>
-                      <table style={{ width: "100%", fontFamily: 'Poppins', fontSize: "14px", borderCollapse: 'collapse' }}>
-                        <thead>
-                          <tr>
-                            <th style={{ textAlign: 'left', padding: '2px 4px', width: '30%' }}>Nombre</th>
-                            <th style={{ textAlign: 'left', padding: '4px 6px', width: '35%' }}>Creación</th>
-                            <th style={{ textAlign: 'left', padding: '4px 6px', width: '35%' }}>Expiración</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredBlackLists.map((list) => (
-                            <tr key={list.id}>
-                              <td style={{ padding: '2px 4px' }}>
-                                <Checkbox
-                                  checked={selectedBlackListIds.includes(list.id)}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setSelectedBlackListIds(prev => [...prev, list.id]);
-                                    } else {
-                                      setSelectedBlackListIds(prev => prev.filter(id => id !== list.id));
-                                    }
-                                  }}
-                                  sx={{
-                                    color: '#8F4D63',
-                                    '&.Mui-checked': { color: '#8F4D63' },
-                                  }}
-                                />
-                                {list.name}
-                              </td>
-                              <td style={{ padding: '2px 4px' }}>{list.creationDate || 'NA'}</td>
-                              <td style={{ padding: '2px 4px' }}>{list.expirationDate || 'NA'}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                      <Box sx={{ position: "relative", minHeight: "186px" }}>
+                        {filteredBlackLists.length === 0 ? (
+                          <Typography
+                            sx={{
+                              fontFamily: "Poppins",
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                              fontSize: "14px",
+                              color: "#7B354D",
+                              fontWeight: 500,
+                            }}
+                          >
+                            No se encontraron resultados.
+                          </Typography>
+                        ) : (
+                          <table style={{ width: "100%", fontFamily: 'Poppins', fontSize: "14px", borderCollapse: 'collapse' }}>
+                            <thead>
+                              <tr>
+                                <th style={{ textAlign: 'left', padding: '2px 4px', width: '30%', fontWeight: 500, }}>Nombre</th>
+                                <th style={{ textAlign: 'left', padding: '4px 6px', width: '35%', fontWeight: 500, }}>Creación</th>
+                                <th style={{ textAlign: 'left', padding: '4px 6px', width: '35%', fontWeight: 500, }}>Expiración</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {filteredBlackLists.map((list) => (
+                                <tr key={list.id}>
+                                  <td style={{ padding: '2px 4px' }}>
+                                    <Checkbox
+                                      checked={selectedBlackListIds.includes(list.id)}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          setSelectedBlackListIds(prev => [...prev, list.id]);
+                                        } else {
+                                          setSelectedBlackListIds(prev => prev.filter(id => id !== list.id));
+                                        }
+                                      }}
+                                      sx={{
+                                        color: '#574861',
+                                        '&.Mui-checked': { color: '#574861' },
+                                      }}
+                                      checkedIcon={
+                                        <Box
+                                          sx={{
+                                            width: '24px',
+                                            height: '24px',
+                                            position: 'relative',
+                                          }}
+                                        >
+                                          <img
+                                            src={IconCheckBox1}
+                                            alt="Seleccionado"
+                                            style={{ width: '24px', height: '24px' }}
+                                          />
+                                        </Box>
+                                      }
+                                    />
+                                    {list.name}
+                                  </td>
+                                  <td style={{ padding: '2px 4px' }}>{list.creationDate || 'NA'}</td>
+                                  <td style={{ padding: '2px 4px' }}>{list.expirationDate || 'NA'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </Box>
                     </Box>
                   </Box>
                 )}

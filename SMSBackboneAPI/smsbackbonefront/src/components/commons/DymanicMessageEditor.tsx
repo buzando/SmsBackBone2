@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import Buttonicon from './MainButtonIcon';
 import closeChipIcon from "../../assets/api.svg";
 
+
 interface Props {
   onChange?: (text: string) => void;
   initialMessage?: string;
@@ -41,7 +42,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
   };
 
 
-  
+
   useEffect(() => {
     if (!editorRef.current) return;
     if (didInitFromInitial.current) return; // 👈 evita reescribir después
@@ -93,7 +94,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     pushText(msg.slice(i));
 
     setCharCount(Math.min(total, MAX_CHARACTERS));
-    updateRawMessage(); 
+    updateRawMessage();
     requestAnimationFrame(() => {
       const sel = window.getSelection();
       if (!sel) return;

@@ -684,6 +684,7 @@ const Templates = () => {
                             borderRadius: '8px',
                             boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                             overflowX: 'auto',
+                            overflowY: 'auto',
                             height: "450px",
                             mt: 3.6
                         }}
@@ -696,7 +697,7 @@ const Templates = () => {
                             <thead>
                                 {selectedTemplates.length === 0 ? (
                                     <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', }}>
-                                        <th style={{ padding: '5px' }}>
+                                        <th style={{ padding: '5px', position: 'sticky', }}>
                                             <Box sx={{ marginLeft: "6px" }}>
                                                 <Checkbox
                                                     checked={selectedTemplates.length === templates.length && templates.length > 0}
@@ -713,17 +714,27 @@ const Templates = () => {
                                                     }}
                                                 />
                                             </Box>
-                                        </th><th style={{ padding: '00px', fontWeight: 500 }}>Fecha de creación</th>
-                                        <th style={{ padding: '0px', fontWeight: 500 }}>Nombre</th>
-                                        <th style={{ padding: '0px', fontWeight: 500, borderRight: "1px solid #E6E4E4" }}>Contenido</th>
-                                        <th style={{ padding: '0px', fontWeight: 500 }}></th>
+                                        </th>
+                                        <th style={{ padding: '0px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', }}>Fecha de creación</th>
+                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', }}>Nombre</th>
+                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', borderRight: "1px solid #E6E4E4" }}>Contenido</th>
+                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', }}></th>
                                     </tr>
                                 ) : (
                                     <tr style={{
                                         backgroundColor: '#FFFFFF',
                                         textAlign: 'left', width: '100%'
                                     }}>
-                                        <th colSpan={6} style={{ minWidth: "967px" }}>
+                                        <th
+                                            colSpan={6}
+                                            style={{
+                                                minWidth: "967px",
+                                                position: 'sticky',
+                                                top: 0,
+                                                backgroundColor: '#FFFFFF',
+                                                zIndex: 6, // un poquito arriba del otro
+                                            }}
+                                        >
 
                                             <Box display="flex" alignItems="center" gap={1} pl={2} marginTop={"6px"} marginLeft={"-7px"} marginBottom={"8px"}>
                                                 {/*Checkbox para tablas*/}

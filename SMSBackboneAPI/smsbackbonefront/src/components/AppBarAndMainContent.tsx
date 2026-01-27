@@ -489,7 +489,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                 p: 0,
                                 mr: 2,
                                 "&:hover": {
-                                    backgroundColor: "transparent", // 👈 quita el hover gris/oscuro
+                                    backgroundColor: "transparent",
                                 },
                             }}
                         >

@@ -19,7 +19,7 @@ import Container from "@mui/material/Container";
 import Fab from "@mui/material/Fab";
 import Modal from "@mui/material/Modal";
 import helpicon from "../assets/Iconoayuda.svg";
-import logorq from '../assets/Logo-RQ_2.svg';
+import logorq from '../assets/quantum-logov25.svg';
 import DescriptionIcon from '@mui/icons-material/Description';
 import CloseSession from '../assets/Icon-CerrarSesion.svg';
 import TermsAndConditions from "../pages/TermsAndConditions";
@@ -95,7 +95,20 @@ const AutentificationLayout: React.FC<Props> = (props) => {
                                 aria-label="menu"
                                 onClick={() => navigate("/")}
                             >
-                                <img src={logorq} alt="App Icon" width="170" />
+                                <Box
+                                    component="img"
+                                    src={logorq}
+                                    alt="Quantum"
+                                    sx={{
+                                        position: "absolute",
+                                        display: "block",
+                                        height: { xs: 38, sm: 42, md: 110 },
+                                        width: "auto",
+                                        objectFit: "contain",
+                                        filter: "brightness(0) invert(1)",
+                                        marginLeft: 22
+                                    }}
+                                />
                             </IconButton>
                         </Box>
 

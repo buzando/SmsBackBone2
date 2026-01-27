@@ -11,6 +11,7 @@ import trash from '../assets/Icon-trash-Card.svg'
 import infoicon from '../assets/Icon-info.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
 import CloseIcon from '@mui/icons-material/Close';
+import IconCloseModal from "../assets/IconCloseModal.svg";
 import IconButton from '@mui/material/IconButton';
 import visa from '../assets/visa.png';
 import mastercard from '../assets/masterCard.png';
@@ -496,7 +497,7 @@ const AccountRecharge: React.FC = () => {
                 if (!textRegex.test(value)) error = 'No se permiten caracteres especiales';
                 break;
             case 'exteriorNumber':
-                if (!numberRegex.test(value)) error = 'Solo se permiten números';
+                if (value !== '' && !numberRegex.test(value)) { error = 'Solo se permiten números'; }
                 break;
             case 'interiorNumber':
                 if (value && !numberRegex.test(value)) error = 'Solo se permiten números';
@@ -796,479 +797,487 @@ const AccountRecharge: React.FC = () => {
                 </Box>
             </Modal>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', pl: '0px', mb: 1, marginLeft: '25px' }}>
-                <IconButton
-                    onClick={() => navigate('/')}
-                    sx={{
-                        ml: '-20px',
-                        p: 0,
-                        mr: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <img
-                        src={ArrowBackIosNewIcon}
-                        alt="Regresar"
-                        style={{ width: 24, height: 24, transform: 'rotate(270deg)' }}
-                    />
-                </IconButton>
+            <Box p={3} sx={{ marginTop: "-30px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden', marginLeft: "-32px" }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <IconButton
+                        onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
+                        <img
+                            src={ArrowBackIosNewIcon}
+                            alt="Regresar"
+                            style={{
+                                width: 24,
+                                height: 24,
+                                transform: 'rotate(270deg)',
+                                display: 'block'
+                            }}
+                        />
+                    </IconButton>
 
-                <Typography
-                    variant="h4"
-                    sx={{
-                        color: '#5A2836',
-                        fontFamily: 'Poppins',
-                        fontSize: '26px',
-                    }}
-                >
-                    Recarga de créditos
-                </Typography>
-            </Box>
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            fontWeight: '500',
+                            color: '#330F1B',
+                            fontFamily: 'Poppins',
+                            fontSize: '26px',
+                        }}
+                    >
+                        Recarga de créditos
+                    </Typography>
+                </Box>
+                <Divider sx={{ marginBottom: '17px', marginTop: '16px', marginLeft: "32px" }} />
+                <Box sx={{ marginLeft: "50px", }}>
 
-            <Box sx={{ pl: 5 }}>
-                <Divider sx={{ mb: 3 }} />
 
-                <form onSubmit={(e) => e.preventDefault()}>
-                    <div style={{ marginBottom: '20px', width: '60%' }}>
-                        <Typography
-                            sx={{
-                                textAlign: 'left',
+                    <form onSubmit={(e) => e.preventDefault()}>
+                        <div style={{ marginBottom: '20px', width: '60%' }}> {/* Hacemos más estrecho el recuadro */}
+                            <Typography
+                                sx={{
+                                    textAlign: 'left',
+                                    fontFamily: "Poppins",
+                                    letterSpacing: '0px',
+                                    color: '#330F1B',
+                                    opacity: 1,
+                                    display: 'block',
+                                    marginBottom: '5px',
+                                    fontSize: '18px',
+                                }}>
+                                Canal
+                            </Typography>
+
+                            <Select
+                                id="channel"
+                                value={selectedChannel}
+                                onChange={handleChannelChange}
+                                displayEmpty
+                                renderValue={(selected) => {
+                                    if (!selected) {
+                                        return (
+                                            <span
+                                                style={{
+                                                    textAlign: "left",
+                                                    fontFamily: "Poppins, sans-serif",
+                                                    fontSize: "12px",
+                                                    lineHeight: "40px",
+                                                    letterSpacing: "0px",
+                                                    color: "#786E71",
+                                                    opacity: 1,
+                                                }}
+                                            >
+                                                Seleccionar canal
+                                            </span>
+                                        );
+                                    }
+                                    return selected === "short_sms" ? "SMS, números cortos" : "SMS, números largos";
+                                }}
+                                sx={{
+                                    width: "208px",
+                                    height: "40px",
+                                    border: "1px solid #dcdcdc",
+                                    borderRadius: "5px",
+                                    fontSize: "1rem",
+                                    fontFamily: "Poppins, sans-serif",
+                                    "& .MuiSelect-select": {
+                                        textAlign: "left",
+                                        padding: "10px 14px",
+                                        height: "40px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                    },
+                                }}
+                            >
+                                <MenuItem value="short_sms">SMS, números cortos</MenuItem>
+                                <MenuItem value="long_sms">SMS, números largos</MenuItem>
+                            </Select>
+
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', width: '60%' }}> {/* Ajustamos ancho aquí también */}
+                            <div style={{ flex: 1 }}>
+                                <Typography style={{
+                                    fontSize: '18px',
+                                    fontFamily: "Poppins",
+                                    display: 'block',
+                                    marginBottom: '5px',
+                                    color: '#330F1B',
+                                }}>Cantidad de créditos</Typography>
+
+                                <TextField
+                                    id="credits"
+                                    type="number"
+                                    value={creditAmount}
+                                    onChange={(e) => {
+                                        let value = e.target.value;
+
+                                        value = value.replace(/[^0-9]/g, '');
+
+                                        if (value.length > 1 && value.startsWith('0')) {
+                                            value = value.replace(/^0+/, '');
+                                            if (value === '') value = '0';
+                                        }
+
+                                        setCreditAmount(value);
+                                        calculateCredits(value);
+                                    }}
+
+                                    onKeyDown={(e) => {
+                                        if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    variant="outlined"
+                                    fullWidth
+                                    InputProps={{
+                                        sx: {
+                                            textAlign: "left",
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "16px",
+                                            fontWeight: 500,
+                                            lineHeight: "54px",
+                                            letterSpacing: "0.03px",
+                                            color: "#574B4F",
+                                            opacity: 1,
+                                            height: "54px",
+                                            backgroundColor: "#FFFFFF",
+
+                                            /* AQUÍ SE OCULTAN LOS SPINNERS */
+                                            "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button": {
+                                                WebkitAppearance: "none",
+                                                margin: 0,
+                                            },
+                                            "& input[type=number]": {
+                                                MozAppearance: "textfield",
+                                            },
+                                        },
+                                    }}
+                                    sx={{
+                                        width: "210px",
+                                        "& .MuiOutlinedInput-root": {
+                                            borderRadius: "5px",
+                                            border: "1px solid #dcdcdc",
+                                            "& fieldset": {
+                                                borderColor: "#dcdcdc",
+                                            },
+                                            "&:hover fieldset": {
+                                                borderColor: "#b8b8b8",
+                                            },
+                                            "&.Mui-focused fieldset": {
+                                                borderColor: "#574B4F",
+                                            },
+                                        },
+                                    }}
+                                />
+
+                            </div>
+
+                            <div style={{ flex: 1 }}>
+                                <Typography style={{
+                                    fontSize: '18px',
+                                    fontFamily: "Poppins",
+                                    display: 'block',
+                                    marginBottom: '5px',
+                                    color: '#330F1B',
+                                }}>Monto a recargar + iva</Typography>
+                                <TextField
+                                    id="amount"
+                                    type="text"
+                                    disabled
+                                    value={`${rechargeAmount}`}
+                                    onChange={handleRechargeChange}
+                                    variant="outlined"
+                                    fullWidth
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                        sx: {
+                                            textAlign: "left",
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "16px",
+                                            fontWeight: 500, // medium
+                                            lineHeight: "54px",
+                                            letterSpacing: "0.03px",
+                                            color: "#574B4F",
+                                            opacity: 1,
+                                            height: "54px", // Mantener altura uniforme
+                                            backgroundColor: "#f5f5f5", // Gris de fondo para indicar que está deshabilitado
+                                        },
+                                    }}
+                                    sx={{
+                                        width: "210px", // Ancho según la imagen
+                                        "& .MuiOutlinedInput-root": {
+                                            borderRadius: "5px",
+                                            border: "1px solid #dcdcdc",
+                                            "& fieldset": {
+                                                borderColor: "#dcdcdc",
+                                            },
+                                            "&:hover fieldset": {
+                                                borderColor: "#b8b8b8", // Cambio de color al pasar el mouse
+                                            },
+                                            "&.Mui-focused fieldset": {
+                                                borderColor: "#574B4F", // Color al seleccionar
+                                            },
+                                        },
+                                    }}
+                                />
+
+                            </div>
+                        </div>
+
+                        <div style={{ marginBottom: '20px', width: '60%' }}> {/* Texto del método de pago */}
+                            <Typography style={{
+                                fontSize: '18px',
                                 fontFamily: "Poppins",
-                                letterSpacing: '0px',
-                                color: '#330F1B',
-                                opacity: 1,
                                 display: 'block',
                                 marginBottom: '5px',
-                                fontSize: '18px',
-                            }}>
-                            Canal
+                                color: '#330F1B',
+                            }}>Seleccione el método de pago</Typography>
+                        </div>
+                        <Typography style={{
+                            fontSize: '14px',
+                            fontFamily: "Poppins",
+                            marginBottom: '10px',
+                            color: '#786E71',
+                        }}>
+                            Métodos disponibles
                         </Typography>
 
-                        <Select
-                            id="channel"
-                            value={selectedChannel}
-                            onChange={handleChannelChange}
-                            displayEmpty
-                            renderValue={(selected) => {
-                                if (!selected) {
-                                    return (
-                                        <span
-                                            style={{
-                                                textAlign: "left",
-                                                fontFamily: "Poppins, sans-serif",
-                                                fontSize: "12px",
-                                                lineHeight: "40px",
-                                                letterSpacing: "0px",
-                                                color: "#786E71",
-                                                opacity: 1,
-                                            }}
-                                        >
-                                            Seleccionar canal
-                                        </span>
-                                    );
-                                }
-                                return selected === "short_sms" ? "SMS, números cortos" : "SMS, números largos";
-                            }}
-                            sx={{
-                                width: "208px",
-                                height: "40px",
-                                border: "1px solid #dcdcdc",
-                                borderRadius: "5px",
-                                fontSize: "1rem",
-                                fontFamily: "Poppins, sans-serif",
-                                "& .MuiSelect-select": {
-                                    textAlign: "left",
-                                    padding: "10px 14px",
-                                    height: "40px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                },
-                            }}
-                        >
-                            <MenuItem value="short_sms">SMS, números cortos</MenuItem>
-                            <MenuItem value="long_sms">SMS, números largos</MenuItem>
-                        </Select>
-                    </div>
 
-                    <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', width: '60%' }}>
-                        <div style={{ flex: 1 }}>
-                            <Typography style={{
-                                fontSize: '18px',
-                                fontFamily: "Poppins",
-                                display: 'block',
-                                marginBottom: '5px',
-                                color: '#330F1B',
-                            }}>Cantidad de créditos</Typography>
-
-                            <TextField
-                                id="credits"
-                                type="number"
-                                value={creditAmount}
-                                onChange={(e) => {
-                                    let value = e.target.value;
-
-                                    value = value.replace(/[^0-9]/g, '');
-
-                                    if (value.length > 1 && value.startsWith('0')) {
-                                        value = value.replace(/^0+/, '');
-                                        if (value === '') value = '0';
-                                    }
-
-                                    setCreditAmount(value);
-                                    calculateCredits(value);
-                                }}
-
-                                onKeyDown={(e) => {
-                                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                                        e.preventDefault();
-                                    }
-                                }}
-                                variant="outlined"
-                                fullWidth
-                                InputProps={{
-                                    sx: {
-                                        textAlign: "left",
-                                        fontFamily: "Poppins, sans-serif",
-                                        fontSize: "16px",
-                                        fontWeight: 500,
-                                        lineHeight: "54px",
-                                        letterSpacing: "0.03px",
-                                        color: "#574B4F",
-                                        opacity: 1,
-                                        height: "54px",
-                                        backgroundColor: "#FFFFFF",
-
-                                        "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button": {
-                                            WebkitAppearance: "none",
-                                            margin: 0,
-                                        },
-                                        "& input[type=number]": {
-                                            MozAppearance: "textfield",
-                                        },
-                                    },
-                                }}
-                                sx={{
-                                    width: "210px",
-                                    "& .MuiOutlinedInput-root": {
-                                        borderRadius: "5px",
-                                        border: "1px solid #dcdcdc",
-                                        "& fieldset": {
-                                            borderColor: "#dcdcdc",
-                                        },
-                                        "&:hover fieldset": {
-                                            borderColor: "#b8b8b8",
-                                        },
-                                        "&.Mui-focused fieldset": {
-                                            borderColor: "#574B4F",
-                                        },
-                                    },
-                                }}
-                            />
-                        </div>
-
-                        <div style={{ flex: 1 }}>
-                            <Typography style={{
-                                fontSize: '18px',
-                                fontFamily: "Poppins",
-                                display: 'block',
-                                marginBottom: '5px',
-                                color: '#330F1B',
-                            }}>Monto a recargar + iva</Typography>
-
-                            <TextField
-                                id="amount"
-                                type="text"
-                                disabled
-                                value={`${rechargeAmount}`}
-                                onChange={handleRechargeChange}
-                                variant="outlined"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                    sx: {
-                                        textAlign: "left",
-                                        fontFamily: "Poppins, sans-serif",
-                                        fontSize: "16px",
-                                        fontWeight: 500,
-                                        lineHeight: "54px",
-                                        letterSpacing: "0.03px",
-                                        color: "#574B4F",
-                                        opacity: 1,
-                                        height: "54px",
-                                        backgroundColor: "#f5f5f5",
-                                    },
-                                }}
-                                sx={{
-                                    width: "210px",
-                                    "& .MuiOutlinedInput-root": {
-                                        borderRadius: "5px",
-                                        border: "1px solid #dcdcdc",
-                                        "& fieldset": {
-                                            borderColor: "#dcdcdc",
-                                        },
-                                        "&:hover fieldset": {
-                                            borderColor: "#b8b8b8",
-                                        },
-                                        "&.Mui-focused fieldset": {
-                                            borderColor: "#574B4F",
-                                        },
-                                    },
-                                }}
-                            />
-                        </div>
-                    </div>
-
-                    <div style={{ marginBottom: '20px', width: '60%' }}>
-                        <Typography style={{
-                            fontSize: '18px',
-                            fontFamily: "Poppins",
-                            display: 'block',
-                            marginBottom: '5px',
-                            color: '#330F1B',
-                        }}>Seleccione el método de pago</Typography>
-                    </div>
-
-                    <Typography style={{
-                        fontSize: '14px',
-                        fontFamily: "Poppins",
-                        marginBottom: '10px',
-                        color: '#786E71',
-                    }}>
-                        Métodos disponibles
-                    </Typography>
-
-                    <Box sx={{ display: 'flex', gap: 2, marginBottom: 3 }}>
-                        {[visa, mastercard, amex, spei].map((imgSrc, index) => (
-                            <Box
-                                key={index}
-                                sx={{
-                                    border: '1px solid #E1E1E1',
-                                    borderRadius: '8px',
-                                    padding: '10px',
-                                    backgroundColor: '#FFFFFF',
-                                    width: '80px',
-                                    height: '50px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <img
-                                    src={imgSrc}
-                                    alt={`Método ${index}`}
-                                    style={{ maxHeight: '24px', objectFit: 'contain' }}
-                                />
-                            </Box>
-                        ))}
-                    </Box>
-
-                    <MainButtonIcon onClick={handleOpenModal} text='Agregar Tarjeta' width='210px' />
-
-                    <div style={{
-                        display: 'flex',
-                        gap: '20px',
-                        overflowX: 'auto',
-                        whiteSpace: 'nowrap',
-                        marginTop: '20px',
-                        paddingBottom: '10px',
-                    }}>
-                        {creditCards.map((card) => (
-                            <div
-                                key={card.id}
-                                style={{
-                                    border: selectedCard?.id === card.id ? '2px solid #8d406d' : '1px solid #dcdcdc',
-                                    borderRadius: '8px',
-                                    padding: '15px',
-                                    width: '360px',
-                                    height: '172px',
-                                    position: 'relative',
-                                    backgroundColor: selectedCard?.id === card.id ? '#f3e6f5' : '#fff',
-                                    display: 'inline-block',
-                                    whiteSpace: 'normal',
-                                }}
-                            >
-                                {selectedCard?.id === card.id && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        left: 0,
-                                        top: 0,
-                                        height: '100%',
-                                        width: '8px',
-                                        backgroundColor: '#8F4D63',
-                                        borderTopLeftRadius: '8px',
-                                        borderBottomLeftRadius: '8px',
-                                    }}></div>
-                                )}
-
-                                <div style={{
-                                    marginBottom: '10px',
-                                    fontWeight: 'bold',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px',
-                                    textAlign: "left",
-                                    fontFamily: "Poppins",
-                                    letterSpacing: "0px",
-                                    color: "#330F1B",
-                                    opacity: 1,
-                                    fontSize: "14px"
-                                }}>
-                                    <div>
-                                        {card.type}
-                                    </div>
-                                </div>
-
-                                <div
-                                    style={{
-                                        fontSize: '14px',
-                                        fontFamily: "Poppins",
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '5px',
-                                        lineHeight: '1.2',
-                                    }}
-                                >
-                                    <span style={{ margin: '0', padding: '0' }}>{card.card_name}</span>
-                                    <span style={{ margin: '0', padding: '0' }}>Terminación: •••• {card.card_number.slice(-4)}</span>
-                                    <span style={{ margin: '0', padding: '0' }}>Vencimiento: {card.expiration_month.toString().padStart(2, '0')}/{card.expiration_year.toString().slice(-2)}</span>
-                                </div>
-
-                                <label
-                                    style={{
+                        <Box sx={{ display: 'flex', gap: 2, marginBottom: 3 }}>
+                            {[visa, mastercard, amex, spei].map((imgSrc, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        border: '1px solid #E1E1E1',
+                                        borderRadius: '8px',
+                                        padding: '10px',
+                                        backgroundColor: '#FFFFFF',
+                                        width: '80px',
+                                        height: '50px',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '5px',
-                                        marginBottom: '10px',
-                                        marginTop: '15px',
-                                        cursor: 'pointer',
-                                        marginLeft: '-10px',
+                                        justifyContent: 'center',
                                     }}
-                                    onClick={() => handleSelectCard(card)}
                                 >
-                                    <Radio
-                                        checked={selectedCard?.id === card.id}
-                                        readOnly
-                                        sx={{
-                                            color: '#8F4D63',
-                                            '&.Mui-checked': { color: '#8F4D63' },
-                                        }}
+                                    <img
+                                        src={imgSrc}
+                                        alt={`Método ${index}`}
+                                        style={{ maxHeight: '24px', objectFit: 'contain' }}
                                     />
-                                    <span style={{
+                                </Box>
+                            ))}
+                        </Box>
+
+                        <MainButtonIcon onClick={handleOpenModal} text='Agregar Tarjeta' width='210px' />
+
+                        <div style={{
+                            display: 'flex',
+                            gap: '20px',
+                            overflowX: 'auto',
+                            whiteSpace: 'nowrap',
+                            marginTop: '20px',
+                            paddingBottom: '10px',
+                        }}>
+                            {creditCards.map((card) => (
+                                <div
+                                    key={card.id}
+                                    style={{
+                                        border: selectedCard?.id === card.id ? '2px solid #8d406d' : '1px solid #dcdcdc',
+                                        borderRadius: '8px',
+                                        padding: '15px',
+                                        width: '360px',
+                                        height: '172px',
+                                        position: 'relative',
+                                        backgroundColor: selectedCard?.id === card.id ? '#f3e6f5' : '#fff',
+                                        display: 'inline-block',
+                                        whiteSpace: 'normal',
+                                    }}
+                                >
+                                    {/* Barra lateral de color */}
+                                    {selectedCard?.id === card.id && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            left: 0,
+                                            top: 0,
+                                            height: '100%',
+                                            width: '8px',
+                                            backgroundColor: '#8F4D63',
+                                            borderTopLeftRadius: '8px',
+                                            borderBottomLeftRadius: '8px',
+                                        }}></div>
+                                    )}
+
+                                    {/* Marca de la tarjeta */}
+                                    <div style={{
+                                        marginBottom: '10px',
+                                        fontWeight: 'bold',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '10px',
                                         textAlign: "left",
                                         fontFamily: "Poppins",
                                         letterSpacing: "0px",
-                                        color: "#8F4D63",
+                                        color: "#330F1B",
                                         opacity: 1,
-                                        fontSize: "14px",
-                                    }}>{selectedCard?.id === card.id ? 'Tarjeta seleccionada' : 'Seleccionar tarjeta'}</span>
-                                </label>
+                                        fontSize: "14px"
+                                    }}>
+                                        <div>
+                                            {card.type}
+                                        </div>
+                                    </div>
 
-                                <Tooltip title="Eliminar tarjeta" arrow>
-                                    <button
-                                        onClick={() => openDeleteModal(card)}
+                                    {/* Detalles */}
+
+                                    <div
                                         style={{
-                                            position: 'absolute',
-                                            top: '10px',
-                                            right: '10px',
-                                            backgroundColor: 'transparent',
-                                            border: 'none',
-                                            cursor: 'pointer',
+                                            fontSize: '14px',
+                                            fontFamily: "Poppins",
+                                            display: 'flex',
+                                            flexDirection: 'column', // Distribución en filas
+                                            gap: '5px', // Espacio entre filas
+                                            lineHeight: '1.2', // Compacta las líneas ligeramente
                                         }}
                                     >
-                                        <img src={trash} width='24px' height='24px' />
-                                    </button>
-                                </Tooltip>
-                            </div>
-                        ))}
-                    </div>
+                                        <span style={{ margin: '0', padding: '0' }}>{card.card_name}</span>
+                                        <span style={{ margin: '0', padding: '0' }}>Terminación: •••• {card.card_number.slice(-4)}</span>
+                                        <span style={{ margin: '0', padding: '0' }}>Vencimiento: {card.expiration_month.toString().padStart(2, '0')}/{card.expiration_year.toString().slice(-2)}</span>
+                                    </div>
 
-                    <Box sx={{ width: '100%', marginTop: '24px' }}>
-                        <Box sx={{ marginBottom: '4px' }}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={generateInvoice}
-                                        onChange={(e) => setGenerateInvoice(e.target.checked)}
-                                        checkedIcon={
-                                            <Box
-                                                sx={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    position: 'relative',
-                                                    marginTop: '0px',
-                                                    marginLeft: '0px',
-                                                }}
-                                            >
-                                                <img
-                                                    src={IconCheckBox1}
-                                                    alt="Seleccionado"
-                                                    style={{ width: '24px', height: '24px' }}
-                                                />
-                                            </Box>
-                                        }
-                                    />
-                                }
-                                label={
+                                    {/* Radio para seleccionar */}
+                                    <label
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '5px',
+                                            marginBottom: '10px',
+                                            marginTop: '15px',
+                                            cursor: 'pointer',
+                                            marginLeft: '-10px',
+                                        }}
+                                        onClick={() => handleSelectCard(card)}
+                                    >
+                                        <Radio
+                                            checked={selectedCard?.id === card.id}
+                                            readOnly
+                                            sx={{
+                                                color: '#8F4D63',
+                                                '&.Mui-checked': { color: '#8F4D63' },
+                                            }}
+                                        />
+                                        <span style={{
+                                            textAlign: "left",
+                                            fontFamily: "Poppins",
+                                            letterSpacing: "0px",
+                                            color: "#8F4D63",
+                                            opacity: 1,
+                                            fontSize: "14px",
+                                        }}>{selectedCard?.id === card.id ? 'Tarjeta seleccionada' : 'Seleccionar tarjeta'}</span>
+
+                                    </label>
+
+                                    {/* Botón para eliminar */}
+                                    <Tooltip title="Eliminar tarjeta" arrow>
+                                        <button
+                                            onClick={() => openDeleteModal(card)}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '10px',
+                                                right: '10px',
+                                                backgroundColor: 'transparent',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            <img src={trash} width='24px' height='24px' />
+                                        </button>
+                                    </Tooltip>
+                                </div>
+                            ))}
+                        </div>
+
+                        <Box sx={{ width: '100%', marginTop: '24px' }}>
+                            {/* Checkbox */}
+                            <Box sx={{ marginBottom: '4px' }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={generateInvoice}
+                                            onChange={(e) => setGenerateInvoice(e.target.checked)}
+                                            checkedIcon={
+                                                <Box
+                                                    sx={{
+                                                        width: '24px',
+                                                        height: '24px',
+                                                        position: 'relative',
+                                                        marginTop: '0px',
+                                                        marginLeft: '0px',
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={IconCheckBox1}
+                                                        alt="Seleccionado"
+                                                        style={{ width: '24px', height: '24px' }}
+                                                    />
+                                                </Box>
+                                            }
+                                        />
+                                    }
+                                    label={
+                                        <Typography
+                                            sx={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '14px',
+                                                color: '#786E71',
+                                            }}
+                                        >
+                                            Generar factura automáticamente
+                                        </Typography>
+                                    }
+                                />
+                            </Box>
+
+                            {/* Openpay + Botones */}
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    width: '100%',
+                                    padding: '8px 0',
+                                }}
+                            >
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Typography
                                         sx={{
                                             fontFamily: 'Poppins',
                                             fontSize: '14px',
-                                            color: '#786E71',
+                                            color: '#574B4F',
+                                            fontWeight: 500,
                                         }}
                                     >
-                                        Generar factura automáticamente
+                                        Pagos procesados de forma segura con
                                     </Typography>
-                                }
-                            />
-                        </Box>
+                                    <Box
+                                        component="img"
+                                        src={openpay}
+                                        alt="Openpay"
+                                        sx={{ height: '20px', objectFit: 'contain' }}
+                                    />
+                                </Box>
 
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                width: '100%',
-                                padding: '8px 0',
-                            }}
-                        >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Typography
-                                    sx={{
-                                        fontFamily: 'Poppins',
-                                        fontSize: '14px',
-                                        color: '#574B4F',
-                                        fontWeight: 500,
-                                    }}
-                                >
-                                    Pagos procesados de forma segura con
-                                </Typography>
-                                <Box
-                                    component="img"
-                                    src={openpay}
-                                    alt="Openpay"
-                                    sx={{ height: '20px', objectFit: 'contain' }}
-                                />
-                            </Box>
-
-                            <Box sx={{ display: 'flex', gap: '10px' }}>
-                                <SecondaryButton text="Cancelar" onClick={resetForm} />
-                                <MainButton
-                                    text="Recargar"
-                                    onClick={handleRecharge}
-                                    disabled={isRechargeButtonDisabled()}
-                                    isLoading={Loading}
-                                />
+                                <Box sx={{ display: 'flex', gap: '10px' }}>
+                                    <SecondaryButton text="Cancelar" onClick={resetForm} />
+                                    <MainButton
+                                        text="Recargar"
+                                        onClick={handleRecharge}
+                                        disabled={isRechargeButtonDisabled()}
+                                        isLoading={Loading}
+                                    />
+                                </Box>
                             </Box>
                         </Box>
-                    </Box>
-                </form>
+
+                    </form>
+                </Box>
             </Box>
-
-            {/* --- EL RESTO DEL ARCHIVO SIGUE IGUAL --- */}
-            {/* Modal agregar tarjeta, ChipBars y ModalError final */}
-
             <Modal
                 open={isModalOpen}
                 onClose={(_, reason) => {
@@ -1292,7 +1301,8 @@ const AccountRecharge: React.FC = () => {
                         boxShadow: 24,
                         p: 4,
                         borderRadius: '8px',
-                        overflowY: 'auto',
+                        overflowY: 'hidden',
+                        overflowX: 'hidden',
                     }}
                 >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1308,18 +1318,871 @@ const AccountRecharge: React.FC = () => {
                                 letterSpacing: "0px",
                                 color: "#574B4F",
                                 opacity: 1,
-                                margin: 0
+                                marginTop: "-18px",
+                                textTransform: "none",
                             }}
                         >
                             Agregar tarjeta
                         </h2>
-                        <IconButton onClick={handleCloseModal} style={{ color: "#574B4F" }}>
-                            <CloseIcon />
+                        <IconButton onClick={handleCloseModal}
+                            sx={{ position: 'absolute', marginTop: "-56px", marginLeft: '805px' }}>
+                            <img
+                                src={IconCloseModal}
+                                alt="x"
+                                width="24"
+                                height="24"
+                            />
                         </IconButton>
                     </div>
-                    <hr style={{ width: '100%', border: '1px solid #ccc', margin: '10px 0' }} />
+                    <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5 }} />
+                    <form
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            columnGap: '20px',
+                            rowGap: '15px',
+                        }}
+                        onSubmit={(e) => e.preventDefault()}
+                    >
+                        <div style={{ display: 'flex', gap: '20px', gridColumn: 'span 2' }}>
+                            <div style={{ flex: 1 }}>
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "block",
+                                        marginBottom: "5px"
+                                    }}
+                                >
+                                    Número de tarjeta<span style={{ color: "#D01247" }}>*</span>
+                                </label>
+                                <TextField name="cardNumber"
+                                    value={cardDetails.cardNumber}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (/^[0-9]*$/.test(value)) {
+                                            handleChange(e);
+                                        }
+                                    }}
+                                    error={Boolean(errors['cardNumber'])}
+                                    helperText={errors['cardNumber']}
+                                    fullWidth
+                                    InputProps={{
+                                        sx: {
+                                            fontFamily: 'Poppins, sans-serif'
+                                        },
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <WhiteTooltip title={<>
+                                                    • Solo caracteres numéricos<br />
+                                                    • Longitud min. 14 dígitos, <br />
+                                                    máx. 19 dígitos
+                                                </>}>
+                                                    <img src={errors['cardNumber'] ? infoiconerror : infoicon} alt="info-icon" />
+                                                </WhiteTooltip>
+                                            </InputAdornment>
+                                        ),
+                                        sx: {
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "16px",
+                                            fontWeight: 500,
+                                            color: "#574B4F",
+                                        },
+                                    }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "block",
+                                        marginBottom: "5px"
+                                    }}
+                                >
+                                    Nombre en la tarjeta<span style={{ color: "#D01247" }}>*</span>
+                                </label>
+                                <TextField name="cardName"
+                                    value={cardDetails.cardName}
+                                    onChange={handleChange}
+                                    error={Boolean(errors.cardName)}
+                                    helperText={errors.cardName}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <WhiteTooltip title={<>
+                                                    • Solo caracteres alfabéticos<br />
+                                                    • Longitud máxima de 40<br />
+                                                    caracteres
+                                                </>}>
+                                                    <img src={errors.cardName ? infoiconerror : infoicon} alt="info-icon" />
+                                                </WhiteTooltip>
+                                            </InputAdornment>
+                                        ),
+                                        sx: {
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "16px",
+                                            fontWeight: 500,
+                                            color: "#574B4F",
+                                        },
+                                    }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                style={{
+                                    textAlign: "left",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    color: "#574B4F",
+                                    opacity: 1,
+                                    fontSize: "16px",
+                                    display: "block",
+                                    marginBottom: "5px"
+                                }}
+                            >
+                                Calle<span style={{ color: "#D01247" }}>*</span>
+                            </label>
+                            <TextField name="street"
+                                value={cardDetails.street}
+                                onChange={handleChange}
+                                error={Boolean(errors.street)}
+                                helperText={errors.street}
+                                fullWidth
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <WhiteTooltip title={<>
+                                                <div>• Solo caracteres numéricos</div>
+                                                <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                            </>}>
+                                                <img src={errors.street ? infoiconerror : infoicon} alt="info-icon" />
+                                            </WhiteTooltip>
+                                        </InputAdornment>
+                                    ),
+                                    sx: {
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
+                                        color: "#574B4F",
+                                    },
+                                }}
+                                sx={{
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        marginTop: 7,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "#D01247",
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div style={{ display: 'flex', gap: '20px' }}>
+                            <div style={{ flex: 1 }}>
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "block",
+                                        marginBottom: "5px"
+                                    }}
+                                >
+                                    Número exterior<span style={{ color: "#D01247" }}>*</span>
+                                </label>
+                                <TextField
+                                    type="text"
+                                    inputMode="numeric"
+                                    name="exteriorNumber"
+                                    value={cardDetails.exteriorNumber}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
 
-                    {/* (Todo el contenido del modal y lo demás queda igual que tu archivo original) */}
+                                        if (/^[0-9]*$/.test(value)) {
+                                            handleChange(e);
+                                        }
+                                    }}
+                                    error={Boolean(errors.exteriorNumber)}
+                                    helperText={errors.exteriorNumber}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <WhiteTooltip title={
+                                                    <>
+                                                        <div>• Solo caracteres numéricos</div>
+                                                        <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                    </>
+                                                }>
+                                                    <img
+                                                        src={errors.exteriorNumber ? infoiconerror : infoicon}
+                                                        alt="info-icon"
+                                                    />
+                                                </WhiteTooltip>
+                                            </InputAdornment>
+                                        ),
+                                        sx: {
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "16px",
+                                            fontWeight: 500,
+                                            color: "#574B4F",
+                                        },
+                                    }}
+                                    sx={{
+                                        "& .MuiFormHelperText-root": {
+                                            position: "absolute",
+                                            marginTop: 7,
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "13px",
+                                            fontWeight: 400,
+                                            color: "#D01247",
+                                        },
+                                    }}
+                                />
+
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "block",
+                                        marginBottom: "5px"
+                                    }}
+                                >
+                                    Número interior
+                                </label>
+                                <TextField
+                                    type="text"
+                                    inputMode="numeric"
+                                    name="interiorNumber"
+                                    value={cardDetails.interiorNumber}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+
+                                        if (/^[0-9]*$/.test(value)) {
+                                            handleChange(e);
+                                        }
+                                    }}
+                                    error={Boolean(errors.interiorNumber)}
+                                    helperText={errors.interiorNumber}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <WhiteTooltip title={<>
+                                                    <div>• Solo caracteres numéricos</div>
+                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                </>}>
+                                                    <img src={errors.interiorNumber ? infoiconerror : infoicon} alt="info-icon" />
+                                                </WhiteTooltip>
+                                            </InputAdornment>
+                                        ),
+                                        sx: {
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "16px",
+                                            fontWeight: 500,
+                                            color: "#574B4F",
+                                        },
+                                    }} />
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                style={{
+                                    textAlign: "left",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    color: "#574B4F",
+                                    opacity: 1,
+                                    fontSize: "16px",
+                                    display: "block",
+                                    marginBottom: "5px"
+                                }}
+                            >
+                                Colonia<span style={{ color: "#D01247" }}>*</span>
+                            </label>
+                            <TextField name="neighborhood"
+                                value={cardDetails.neighborhood}
+                                onChange={handleChange}
+                                error={Boolean(errors.neighborhood)}
+                                helperText={errors.neighborhood}
+                                fullWidth
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <WhiteTooltip title={<>
+                                                <div>• Solo caracteres numéricos</div>
+                                                <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                            </>}>
+                                                <img src={errors.neighborhood ? infoiconerror : infoicon} alt="info-icon" />
+                                            </WhiteTooltip>
+                                        </InputAdornment>
+                                    ),
+                                    sx: {
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
+                                        color: "#574B4F",
+                                    },
+                                }}
+                                sx={{
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        marginTop: 7,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "#D01247",
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <label
+                                style={{
+                                    textAlign: "left",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    color: "#574B4F",
+                                    opacity: 1,
+                                    fontSize: "16px",
+                                    display: "block",
+                                    marginBottom: "5px"
+                                }}
+                            >
+                                Ciudad<span style={{ color: "#D01247" }}>*</span>
+                            </label>
+                            <TextField name="city"
+                                value={cardDetails.city}
+                                onChange={handleChange}
+                                error={Boolean(errors.city)}
+                                helperText={errors.city}
+                                fullWidth
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <WhiteTooltip title={<>
+                                                <div>• Solo caracteres numéricos</div>
+                                                <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                            </>}>
+                                                <img src={errors.city ? infoiconerror : infoicon} alt="info-icon" />
+                                            </WhiteTooltip>
+                                        </InputAdornment>
+                                    ),
+                                    sx: {
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
+                                        color: "#574B4F",
+                                    },
+                                }}
+                                sx={{
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        marginTop: 7,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "#D01247",
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <label
+                                style={{
+                                    textAlign: "left",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    color: "#574B4F",
+                                    opacity: 1,
+                                    fontSize: "16px",
+                                    display: "block",
+                                    marginBottom: "5px"
+                                }}
+                            >
+                                Estado<span style={{ color: "#D01247" }}>*</span>
+                            </label>
+                            <TextField name="state"
+                                value={cardDetails.state}
+                                onChange={handleChange}
+                                error={Boolean(errors.state)}
+                                helperText={errors.state}
+                                fullWidth
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <WhiteTooltip title={<>
+                                                <div>• Solo caracteres numéricos</div>
+                                                <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                            </>}>
+                                                <img src={errors.state ? infoiconerror : infoicon} alt="info-icon" />
+                                            </WhiteTooltip>
+                                        </InputAdornment>
+                                    ),
+                                    sx: {
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
+                                        color: "#574B4F",
+                                    },
+                                }}
+                                sx={{
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        marginTop: 7,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "#D01247",
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <label
+                                style={{
+                                    textAlign: "left",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    color: "#574B4F",
+                                    opacity: 1,
+                                    fontSize: "16px",
+                                    display: "block",
+                                    marginBottom: "5px"
+                                }}
+                            >
+                                CP<span style={{ color: "#D01247" }}>*</span>
+                            </label>
+                            <TextField
+                                type="text"
+                                name="postalCode"
+                                value={cardDetails.postalCode}
+                                onChange={(e) => {
+                                    const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 5);
+                                    setCardDetails((prev) => ({
+                                        ...prev,
+                                        postalCode: onlyDigits,
+                                    }));
+                                }}
+                                inputProps={{
+                                    inputMode: "numeric",
+                                    pattern: "[0-9]*",
+                                    maxLength: 5,
+                                }}
+                                error={Boolean(errors.postalCode)}
+                                helperText={errors.postalCode}
+                                fullWidth
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <WhiteTooltip
+                                                title={
+                                                    <>
+                                                        <div>• Solo caracteres numéricos</div>
+                                                        <div>• Longitud exacta: 5 dígitos</div>
+                                                    </>
+                                                }
+                                            >
+                                                <img
+                                                    src={errors.postalCode ? infoiconerror : infoicon}
+                                                    alt="info-icon"
+                                                />
+                                            </WhiteTooltip>
+                                        </InputAdornment>
+                                    ),
+                                    sx: {
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
+                                        color: "#574B4F",
+                                    },
+                                }}
+                                sx={{
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        marginTop: 7,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "#D01247",
+                                    },
+                                }}
+                            />
+
+                        </div>
+                        <Box style={{ display: 'flex', gap: '20px', gridColumn: 'span 2' }}>
+                            <div style={{ flex: 1 }}>
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "inline-block",
+                                        marginBottom: "5px"
+                                    }}
+                                >
+                                    Fecha de vencimiento<span style={{ color: "#D01247" }}>*</span>
+                                </label>
+
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "inline-block",
+                                        marginBottom: "5px",
+                                        marginLeft: "37px"
+                                    }}
+                                >
+                                    CVV <span style={{ color: "#D01247" }}>*</span>
+                                </label>
+
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <Select
+                                        name="month"
+                                        value={cardDetails.month}
+                                        onChange={handleChange}
+                                        required
+                                        displayEmpty
+                                        renderValue={(selected) => {
+                                            if (!selected) {
+                                                return (
+                                                    <span
+                                                        style={{
+                                                            fontFamily: "Poppins, sans-serif",
+                                                            fontSize: "12px",
+                                                            color: "#9B9295",
+                                                        }}
+                                                    >
+                                                        Mes
+                                                    </span>
+                                                );
+                                            }
+                                            return selected;
+                                        }}
+                                        sx={{
+                                            background: "#FFFFFF",
+                                            border: "1px solid #9B9295",
+                                            borderRadius: "8px",
+                                            width: "87px",
+                                            height: "40px",
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "12px",
+
+                                            "& .MuiSelect-select": {
+                                                display: "flex",
+                                                alignItems: "center",
+                                            },
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    fontFamily: "Poppins, sans-serif",
+                                                },
+                                            },
+                                        }}
+                                    >
+                                        {[...Array(12)].map((_, i) => (
+                                            <MenuItem
+                                                key={i + 1}
+                                                value={(i + 1).toString()}
+                                                sx={{
+                                                    fontFamily: "Poppins, sans-serif",
+                                                    fontSize: "12px",
+                                                }}
+                                            >
+                                                {i + 1}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+
+
+                                    <Select
+                                        name="year"
+                                        value={cardDetails.year}
+                                        onChange={handleChange}
+                                        required
+                                        displayEmpty
+                                        renderValue={(selected) => {
+                                            if (!selected) {
+                                                return (
+                                                    <span
+                                                        style={{
+                                                            fontFamily: "Poppins, sans-serif",
+                                                            fontSize: "12px",
+                                                            color: "#9B9295",
+                                                        }}
+                                                    >
+                                                        Año
+                                                    </span>
+                                                );
+                                            }
+                                            return selected;
+                                        }}
+                                        sx={{
+                                            background: "#FFFFFF",
+                                            border: "1px solid #9B9295",
+                                            borderRadius: "8px",
+                                            width: "87px",
+                                            height: "40px",
+                                            fontFamily: "Poppins, sans-serif",
+                                            fontSize: "12px",
+
+                                            "& .MuiSelect-select": {
+                                                display: "flex",
+                                                alignItems: "center",
+                                            },
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    fontFamily: "Poppins, sans-serif",
+                                                },
+                                            },
+                                        }}
+                                    >
+                                        {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map(
+                                            (year) => (
+                                                <MenuItem
+                                                    key={year}
+                                                    value={year.toString()}
+                                                    sx={{
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "12px",
+                                                    }}
+                                                >
+                                                    {year}
+                                                </MenuItem>
+                                            )
+                                        )}
+                                    </Select>
+
+                                    <TextField
+                                        sx={{
+                                            marginLeft: "25px",
+
+                                            "& .MuiFormHelperText-root": {
+                                                fontFamily: "Poppins, sans-serif",
+                                                fontSize: "12px",
+                                                fontWeight: 400,
+                                                color: "#D01247",
+                                                position: "absolute",
+                                                marginTop: "58px",
+                                                marginLeft: "0px",
+                                                whiteSpace: "nowrap",
+                                            },
+                                        }}
+                                        type="text"
+                                        name="cvv"
+                                        value={cardDetails.cvv}
+                                        onChange={(e) => {
+                                            const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 4);
+
+                                            setCardDetails((prev) => ({
+                                                ...prev,
+                                                cvv: onlyDigits,
+                                            }));
+
+                                            if (onlyDigits.length > 0 && onlyDigits.length < 3) {
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    cvv: "CVV no válido. Debe contener 3 o 4 dígitos",
+                                                }));
+                                            } else {
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    cvv: "",
+                                                }));
+                                            }
+                                        }}
+                                        inputProps={{
+                                            inputMode: "numeric",
+                                            pattern: "[0-9]*",
+                                            maxLength: 4,
+                                        }}
+                                        error={Boolean(errors.cvv)}
+                                        helperText={errors.cvv || " "}
+                                        fullWidth
+                                        InputProps={{
+                                            sx: {
+                                                fontFamily: "Poppins, sans-serif",
+                                                fontSize: "12px",
+                                                fontWeight: 500,
+                                                color: "#574B4F",
+                                            },
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <WhiteTooltip
+                                                        title={
+                                                            <>
+                                                                <div>• Solo caracteres numéricos</div>
+                                                                <div>• Longitud: 3 o 4 dígitos</div>
+                                                            </>
+                                                        }
+                                                    >
+                                                        <img
+                                                            src={errors.cvv ? infoiconerror : infoicon}
+                                                            alt="info-icon"
+                                                        />
+                                                    </WhiteTooltip>
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                        style={{
+                                            background: "#FFFFFF",
+                                            borderRadius: "4px",
+                                            width: "132px",
+                                            height: "54px",
+                                        }}
+                                    />
+
+
+
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Checkbox
+                                    name="isDefault"
+                                    checked={cardDetails.isDefault}
+                                    onChange={handleChange}
+                                    sx={{
+
+                                        "& .MuiSvgIcon-root": {
+                                            fontSize: 18,
+                                            border: "2px solid #8F4D63",
+                                            borderRadius: "4px",
+                                            color: "transparent",
+                                        },
+
+
+                                        "&:hover .MuiSvgIcon-root": {
+                                            backgroundColor: "rgba(143, 77, 99, 0.08)",
+                                        },
+
+
+                                        "&.Mui-checked": {
+                                            color: "#8F4D63",
+                                        },
+                                    }}
+                                    checkedIcon={
+                                        <Box
+                                            sx={{
+                                                width: "24px",
+                                                height: "24px",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                            }}
+                                        >
+                                            <img
+                                                src={IconCheckBox1}
+                                                alt="Seleccionado"
+                                                style={{ width: "24px", height: "24px", marginLeft: "5px" }}
+                                            />
+                                        </Box>
+                                    }
+                                />
+
+                                <span style={{
+                                    textAlign: "left",
+                                    font: "normal normal normal 16px/20px Poppins",
+                                    letterSpacing: "0px",
+                                    color: "#8F4D63",
+                                    opacity: 1,
+                                    fontSize: "16px",
+                                }}>Establecer como forma de pago predeterminada.</span>
+                            </div>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 2, marginBottom: 2.5, marginTop: 2 }}>
+                            {[visa, mastercard, amex, spei, openpay].map((imgSrc, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        border: '1px solid #E1E1E1',
+                                        borderRadius: '8px',
+                                        padding: '10px',
+                                        backgroundColor: '#FFFFFF',
+                                        width: '80px',
+                                        height: '50px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                    <img
+                                        src={imgSrc}
+                                        alt={`Método ${index}`}
+                                        style={{ maxHeight: '24px', objectFit: 'contain' }}
+                                    />
+                                </Box>
+                            ))}
+                        </Box>
+                        <Divider sx={{ width: 'calc(100% + 641px)', marginLeft: '-600px', marginTop: "50px" }} />
+                        <div style={{ display: 'flex', gap: '20px', gridColumn: 'span 2', marginTop: "10px" }}>
+                            <div style={{ flex: 1 }}>
+                                <SecondaryButton
+                                    onClick={() => handleCloseModal()}
+                                    text="Cancelar"
+                                />
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <MainButton
+                                    text="Agregar"
+                                    isLoading={Loading}
+                                    onClick={() => addCreditCard()}
+                                    disabled={!areRequiredFieldsFilled()}
+                                />
+                            </div>
+                        </div>
+
+
 
                 </Box>
             </Modal>
