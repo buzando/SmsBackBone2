@@ -253,6 +253,7 @@ const Campains: React.FC = () => {
   const [openDuplicateModal, setOpenDuplicateModal] = useState(false);
   const [duplicateName, setDuplicateName] = useState('');
   const [duplicateAutoStart, setDuplicateAutoStart] = useState(false);
+  const [editSelectedBlackListIds, setEditSelectedBlackListIds] = useState<number[]>([]);
   const [duplicateHorarios, setDuplicateHorarios] = useState<DuplicateHorario[]>([
     {
       start: null,
@@ -320,10 +321,10 @@ const Campains: React.FC = () => {
 
     if (listaIds && listaIds.length > 0) {
       setEditUsarListaNegra(true);
-      setSelectedBlackListIds(listaIds);
+      setEditSelectedBlackListIds(listaIds);
     } else {
       setEditUsarListaNegra(false);
-      setSelectedBlackListIds([]);
+      setEditSelectedBlackListIds([]);
     }
 
     const tieneDato = campaign.contacts.some(c => !!c.dato);
@@ -857,6 +858,7 @@ const Campains: React.FC = () => {
 
 
   const handleCloseModalCampaña = () => {
+    setOpenCreateCampaignModal(false);
     setTelefonos([]);
     setVariables([]);
     setCampaignName('');
@@ -865,8 +867,10 @@ const Campains: React.FC = () => {
     setMensajeAceptado(false);
     setSelectedTemplate(undefined);
     setFlashEnabled(false);
+    setAutoStart(false);
     setAniEnabled(false);
     setRecycleEnabled(false);
+    setIsChecked(false);
     setRecycleType('todos');
     setIncludeUncontacted(false);
     setRecycleCount(1);
@@ -888,7 +892,6 @@ const Campains: React.FC = () => {
     setSelectedVariables([]);
     setCheckedTelefonos([]);
     setEstadisticasCarga(null);
-    setMessageChipBar('');
     sessionIdRef.current = null;
     setFileError(false);
     setFileSuccess(false);
@@ -1073,6 +1076,17 @@ const Campains: React.FC = () => {
   const handleCloseEditModal = () => {
     setOpenEditCampaignModal(false);
     setEditActiveStep(0); // opcional: resetear pasos si es necesario
+    setEditUsarListaNegra(false);
+    setEditSelectedBlackListIds([]);
+    closeCalendar();
+  };
+
+  const closeCalendar = () => {
+    setCalendarOpen(false);
+    setCalendarAnchor(null);
+    setCalendarTarget(null);
+    setCurrentHorarioIndex(null);
+    setCalendarInitialDate(null);
   };
 
   const handleEditCampaign = async () => {
@@ -2307,7 +2321,7 @@ const Campains: React.FC = () => {
                       <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <AutorenewIcon sx={{ fontSize: "16px" }} />
                         <Typography>{selectedCampaign?.recycleCount ?? 0}</Typography>
-                      </Box> 
+                      </Box>
                     </Box>
 
                     <LinearProgress
@@ -3232,8 +3246,9 @@ const Campains: React.FC = () => {
         open={openCreateCampaignModal}
         onClose={(_, reason) => {
           if (reason === "backdropClick") return;
-          setOpenCreateCampaignModal(false);
+          handleCloseModalCampaña();
         }}
+
         maxWidth={false}
         fullWidth
         PaperProps={{
@@ -3792,7 +3807,10 @@ const Campains: React.FC = () => {
                         >
                           <Checkbox
                             checked={autoStart}
-                            onChange={(e) => setAutoStart(e.target.checked)}
+                            onChange={(e) => {
+                              setAutoStart(e.target.checked);
+                              setIsChecked(e.target.checked);
+                            }}
                             icon={
                               <Box
                                 sx={{
@@ -6543,7 +6561,7 @@ const Campains: React.FC = () => {
           {/* Botón Cancelar a la izquierda */}
           <Button
             variant="outlined"
-            onClick={() => setOpenCreateCampaignModal(false)}
+            onClick={handleCloseModalCampaña}
             sx={{
               width: "118px",
               height: "36px",
@@ -6998,7 +7016,7 @@ const Campains: React.FC = () => {
 
       <Dialog
         open={openEditCampaignModal}
-        onClose={() => setOpenEditCampaignModal(false)}
+        onClose={handleCloseEditModal}
         maxWidth={false} // Le quitamos el límite de ancho
         fullWidth // Forzamos que se respete el ancho del Paper
         PaperProps={{
@@ -8575,12 +8593,12 @@ const Campains: React.FC = () => {
                             <tr key={list.id}>
                               <td style={{ padding: '2px 4px' }}>
                                 <Checkbox
-                                  checked={selectedBlackListIds.includes(list.id)}
+                                  checked={editSelectedBlackListIds.includes(list.id)}
                                   onChange={(e) => {
                                     if (e.target.checked) {
-                                      setSelectedBlackListIds(prev => [...prev, list.id]);
+                                      setEditSelectedBlackListIds(prev => [...prev, list.id]);
                                     } else {
-                                      setSelectedBlackListIds(prev => prev.filter(id => id !== list.id));
+                                      setEditSelectedBlackListIds(prev => prev.filter(id => id !== list.id));
                                     }
                                   }}
                                   sx={{

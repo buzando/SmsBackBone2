@@ -58,7 +58,7 @@ namespace Modal.Model.Model
         public List<CampaignContactScheduleSendDTO> CampaignContactScheduleSendDTO { get; set; }
             = new();
 
-        public List<int> BlacklistIds { get; set; } = new(); 
+        public List<int>? BlacklistIds { get; set; } = new(); 
     }
 
     public class CampaignScheduleDto

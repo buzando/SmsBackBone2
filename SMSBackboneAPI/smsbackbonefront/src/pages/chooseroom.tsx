@@ -146,7 +146,7 @@ const Chooseroom: React.FC = () => {
     const handleRoomSelection = (room: Room) => {
 
         localStorage.setItem('selectedRoom', JSON.stringify(room));
-
+        window.dispatchEvent(new Event('storageUpdate'));
         navigate('/');
     };
 

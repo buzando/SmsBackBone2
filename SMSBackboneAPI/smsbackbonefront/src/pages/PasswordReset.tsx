@@ -162,7 +162,7 @@ const TermsAndConditions: React.FC = () => {
             const data = {
                 Email: email,
                 NewPassword: password,
-                TwoFactorAuthentication: enableTwoFactor
+                TwoFactorAuthentication: !enableTwoFactor
             };
 
             const headers = {

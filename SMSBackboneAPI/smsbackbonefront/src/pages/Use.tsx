@@ -23,6 +23,7 @@ import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import { color } from 'd3-color';
 import { overflow } from 'html2canvas/dist/types/css/property-descriptors/overflow';
+import { useSelectedRoom } from "../hooks/useSelectedRoom";
 
 interface UseResponse {
     creditsUsed: number;
@@ -54,16 +55,16 @@ const Use: React.FC = () => {
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
 
-
-    const [buttonText, setButtonText] = useState("SMS # CORTOS");
+    const [noResults, setNoResults] = useState(false);
+    const [buttonText, setButtonText] = useState("CORTOS");
     const [selectedDates, setSelectedDates] = useState<{ start: Date, end: Date, startHour: number, startMinute: number, endHour: number, endMinute: number } | null>(null);
     const [datePickerOpen, setDatePickerOpen] = useState(false)
     const [data, setData] = useState(false);
     const [searchingData, setSearchingData] = useState(true);
     const handleDateClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        closeAllFilters();                 
-        setAnchorEl(event.currentTarget);  
-        setDatePickerOpen(true);           
+        closeAllFilters();
+        setAnchorEl(event.currentTarget);
+        setDatePickerOpen(true);
     };
 
 
@@ -78,6 +79,39 @@ const Use: React.FC = () => {
         setDatePickerOpen(false);
         setAnchorEl(null);
     };
+
+    const selectedRoom = useSelectedRoom();
+
+    const fetchCampaigns = async (roomId: number) => {
+        const smsType = selectedOption === "largo" ? 2 : 1; // 1 = corto, 2 = largo
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_GET_CAMPAIGNSUSE}`, {
+                params: { roomId, smsType }
+            });
+            setCampaigns(response.data || []);
+        } catch (error) {
+            console.error("Error al obtener campañas:", error);
+        }
+    };
+
+    const fetchUsers = async (roomId: number) => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_GET_USERSUSE}`, {
+                params: { roomId }
+            });
+            setUsers(response.data || []);
+        } catch (error) {
+            console.error("Error al obtener usuarios:", error);
+        }
+    };
+
+
+    useEffect(() => {
+        if (!selectedRoom?.id) return;
+        fetchUsers(selectedRoom.id);
+        fetchCampaigns(selectedRoom.id);
+
+    }, [selectedRoom?.id, selectedOption]);
 
 
     const closeAllFilters = () => {
@@ -130,7 +164,7 @@ const Use: React.FC = () => {
         }
 
         setSelectedOption("corto");
-        setButtonText("SMS # CORTOS");
+        setButtonText("CORTOS");
         closeSmsPopper();
     };
 
@@ -240,24 +274,42 @@ const Use: React.FC = () => {
         setCampaignData(selectedCampaigns.map(c => c.name));
     };
 
+    const handleApplyUsers = () => {
+        setUserMenuOpen(false);
+        setUserAnchorEl(null);
+
+        ignoreNextFilterClickRef.current = true;
+    };
+
+
     const handleApply = () => {
         if (selectedOption === "largo") {
-            setButtonText("SMS # LARGOS");
+            setButtonText("LARGOS");
         } else {
-            setButtonText("SMS # CORTOS");
+            setButtonText("CORTOS");
         }
         setAnchorEl(null);
     };
 
-    const handleDateSelectionApply = (start: Date, end: Date, startHour: number, startMinute: number, endHour: number, endMinute: number) => {
+    const handleDateSelectionApply = (
+        start: Date,
+        end: Date,
+        startHour: number,
+        startMinute: number,
+        endHour: number,
+        endMinute: number
+    ) => {
         const newDates = { start, end, startHour, startMinute, endHour, endMinute };
+
         setSelectedDates(newDates);
         setDatePickerOpen(false);
         setAnchorEl(null);
         setSearchingData(false);
         setLoading(true);
-        fetchData();
+
+        fetchData(newDates);
     };
+
 
 
     const formatDateRange = () => {
@@ -268,24 +320,50 @@ const Use: React.FC = () => {
     const open = Boolean(anchorEl);
     const id = open ? 'sms-popper' : undefined;
 
-    const fetchData = async () => {
-        if (!selectedDates) return;
+    const fetchData = async (
+        datesOverride?: {
+            start: Date;
+            end: Date;
+            startHour: number;
+            startMinute: number;
+            endHour: number;
+            endMinute: number;
+        }
+    ) => {
+        const datesToUse = datesOverride ?? selectedDates;
+
+        // ✅ si no hay fechas o no hay sala, corta PERO apaga loading
+        if (!datesToUse || !selectedRoom?.id) {
+            setLoading(false);
+            return;
+        }
 
         setLoading(true);
         try {
             const request = `${import.meta.env.VITE_API_GET_USE}`;
-            const selectedRoom = localStorage.getItem("selectedRoom");
-            const roomId = selectedRoom ? JSON.parse(selectedRoom).id : null;
+
             const response = await axios.post(request, {
-                "RoomId": roomId,
-                "SmsType": selectedOption,
-                "StartDate": selectedDates.start,
-                "EndDate": selectedDates.end,
-                "campaignIds": selectedCampaigns.map(c => c.id),
-                "userIds": selectedUsers.map(u => u.id),
+                RoomId: selectedRoom.id,
+                SmsType: selectedOption,
+                StartDate: datesToUse.start,
+                EndDate: datesToUse.end,
+                campaignIds: selectedCampaigns.map((c) => c.id),
+                userIds: selectedUsers.map((u) => u.id),
             });
 
             const result = response.data;
+
+            const hasAnyData =
+                (result?.creditsUsed ?? 0) > 0 ||
+                (result?.messagesSent ?? 0) > 0 ||
+                (result?.totalRecharges ?? 0) > 0 ||
+                (result?.lastRecharge?.credits ?? 0) > 0 ||
+                (Array.isArray(result?.chartData) &&
+                    result.chartData.some((p: any) => (p?.value ?? 0) > 0));
+
+            setNoResults(!hasAnyData);
+            setData(hasAnyData);
+            setSearchingData(false);
 
             setDetalleResumen([
                 { title: "Total de créditos gastados:", value: result.creditsUsed.toLocaleString() },
@@ -307,43 +385,8 @@ const Use: React.FC = () => {
     };
 
 
-    useEffect(() => {
-        const selectedRoom = localStorage.getItem("selectedRoom");
-        if (!selectedRoom) return;
-
-        const roomId = JSON.parse(selectedRoom).id;
-        const smsType = selectedOption === "largo" ? 2 : 1; // 1 = corto, 2 = largo
-
-        const fetchCampaigns = async () => {
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_API_GET_CAMPAIGNSUSE}`, {
-                    params: { roomId, smsType }
-                });
-                setCampaigns(response.data || []);
-            } catch (error) {
-                console.error("Error al obtener campañas:", error);
-            }
-        };
-
-        const fetchUsers = async () => {
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_API_GET_USERSUSE}`, {
-                    params: { roomId }
-                });
-                setUsers(response.data || []);
-            } catch (error) {
-                console.error("Error al obtener usuarios:", error);
-            }
-        };
-
-        fetchCampaigns();
-        fetchUsers();
-    }, [selectedOption]); // si el tipo de SMS cambia, vuelve a cargar campañas
-
-
-
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1000px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             {/* Encabezado */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -439,8 +482,9 @@ const Use: React.FC = () => {
 
                                                 fontFamily: 'Poppins',
                                                 fontSize: '16px',
-                                                fontWeight: selectedOption === 'largos' ? 500 : 'normal',
-                                                color: selectedOption === 'largos' ? '#8F4D63' : '#574B4F',
+                                                fontWeight: selectedOption === 'largo'
+                                                    ? 500 : 'normal',
+                                                color: selectedOption === 'largo' ? '#8F4D63' : '#574B4F',
                                             }}
                                         >
                                             SMS # largos
@@ -815,7 +859,7 @@ const Use: React.FC = () => {
                                 <Button
                                     variant="contained"
                                     onClick={() => {
-                                        handleApplySelection();
+                                        handleApplyUsers();
                                         fetchData();
                                     }}
                                     style={{ backgroundColor: '#833A53', color: '#fff' }}
@@ -826,45 +870,59 @@ const Use: React.FC = () => {
                         </Paper>
                     </Popper>
 
-                    <Box sx={{ marginLeft: "1220px", gap: 2, position: "absolute" }}>
-                        <Tooltip title="Exportar a PDF"
+                    <Box
+                        sx={{
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: "flex-end", // 👉 lo manda a la derecha
+                            alignItems: "center",
+                            mb: "12px",
+                            px: "10px",
+                        }}
+                    >
+                        <Tooltip
+                            title="Exportar a PDF"
                             placement="top"
                             arrow
-
                             PopperProps={{
                                 modifiers: [
                                     {
-                                        name: 'arrow',
-                                        options: {
-                                            padding: 8,
-                                        },
+                                        name: "arrow",
+                                        options: { padding: 8 },
                                     },
                                 ],
                             }}
                             componentsProps={{
                                 tooltip: {
                                     sx: {
-                                        fontFamily: 'Poppins',
-                                        backgroundColor: '#322D2E',
-                                        color: '#FFFFFF',
-                                        fontSize: '12px',
-                                        borderRadius: '4px',
-                                        padding: '6px 10px',
+                                        fontFamily: "Poppins",
+                                        backgroundColor: "#322D2E",
+                                        color: "#FFFFFF",
+                                        fontSize: "12px",
+                                        borderRadius: "4px",
+                                        padding: "6px 10px",
                                     },
                                 },
                                 arrow: {
-                                    sx: {
-                                        color: '#322D2E',
-                                    },
+                                    sx: { color: "#322D2E" },
                                 },
                             }}
-
                         >
-                            <IconButton>
-                                <img src={IconPDF} alt="pdf" style={{ transform: 'rotate(0deg)', width: 24 }} />
+                            <IconButton
+                                sx={{
+                                    width: "40px",
+                                    height: "40px",
+                                    "&:hover": {
+                                        backgroundColor: "transparent",
+                                    },
+                                }}
+                               
+                            >
+                                <img src={IconPDF} alt="pdf" style={{ width: 24 }} />
                             </IconButton>
                         </Tooltip>
                     </Box>
+
 
                 </Box>
                 <DatePicker
@@ -978,6 +1036,46 @@ const Use: React.FC = () => {
 
                     </Box>
                 )}
+                {!loading && noResults && (
+                    <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        sx={{
+                            width: '100%',
+                            height: '320px',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px dashed #D9D2D5',
+                            mt: 3,
+                        }}
+                    >
+                        <img
+                            src={NoResult}
+                            alt="Sin información"
+                            style={{
+                                width: '280px',
+                                height: '200px',
+                                marginBottom: '16px',
+                            }}
+                        />
+
+                        <Typography
+                            sx={{
+                                fontFamily: 'Poppins',
+                                fontSize: '14px',
+                                color: '#7B354D',
+                                fontWeight: 500,
+                                textAlign: 'center',
+                                maxWidth: '360px',
+                            }}
+                        >
+                            No hay información para mostrar con los filtros seleccionados.
+                        </Typography>
+                    </Box>
+                )}
+
 
             </Box>
         </Box>
