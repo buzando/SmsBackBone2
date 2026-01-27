@@ -30,6 +30,7 @@ using System.Data;
 using Azure;
 using DocumentFormat.OpenXml.InkML;
 using ClosedXML;
+using log4net.Util;
 namespace Business
 {
     public class UserManager
@@ -802,7 +803,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                         Colony = x.Colony,
                         City = x.City,
                         State = x.State
-                    }).FirstOrDefault();
+                    }).Where(x => x.Email == Email).FirstOrDefault();
                 }
                 return billing;
             }
@@ -878,12 +879,13 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                     charge = openpay.ChargeService.Create(tarjeta.token_id_customer, chargeRequest);
 
                 }
-                catch (Exception e)
+                catch (Openpay.OpenpayException e)
                 {
                     using (var ctx = new Entities())
                     {
+                        log.ErrorExt("Error en recarga" + e.RequestId);
                         creditrecharge.Estatus = "Error";
-                        creditrecharge.EstatusError = e.Message;
+                        creditrecharge.EstatusError = e.Message + e.RequestId;
                         ctx.CreditRecharge.Add(creditrecharge);
 
                         ctx.SaveChanges();

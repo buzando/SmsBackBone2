@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -83,7 +84,10 @@ namespace Business
 
                         finalMessage = template.Message;
                     }
-
+                    finalMessage = finalMessage
+    .Replace('\u00A0', ' ')
+    .Replace('\u2007', ' ')
+    .Replace('\u202F', ' ');
                     var messagesToSend = smsRequestDto.To.Select(to => new MessageToSend
                     {
                         text = finalMessage,

@@ -473,8 +473,8 @@ namespace Business
         {
             if (string.IsNullOrWhiteSpace(message)) return string.Empty;
 
-            message = message.Replace("{Dato}", contact.Dato ?? "");
-            message = message.Replace("{DatoId}", contact.DatoId ?? "");
+            message = message.Replace("{{Dato}}", contact.Dato ?? "");
+            message = message.Replace("{{DatoId}}", contact.DatoId ?? "");
 
             if (!string.IsNullOrWhiteSpace(contact.Misc01))
             {
@@ -487,11 +487,14 @@ namespace Business
                     {
                         var key = keyValue[0].Trim();
                         var value = keyValue[1].Trim();
-                        message = message.Replace($"{{{key}}}", value);
+                        message = message.Replace($"{{{key}}}", value + " ");
                     }
                 }
             }
-
+            message = message
+    .Replace('\u00A0', ' ')
+    .Replace('\u2007', ' ')
+    .Replace('\u202F', ' ');
             return message;
         }
 

@@ -24,6 +24,8 @@ import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import { useNavigate } from "react-router-dom";
 import Errormodal from '../components/commons/ModalError'
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
+import { useSelectedRoom } from "../hooks/useSelectedRoom";
+
 export interface Clients {
     id: number;
     nombreCliente: string;
@@ -51,7 +53,6 @@ interface CreditCard {
     type: string;
 }
 
-
 interface FormData {
     cardNumber: string;
     cardName: string;
@@ -69,10 +70,10 @@ interface FormData {
     type: string;
 }
 
-
 type Errors = {
     [K in keyof FormData]?: string;
 };
+
 const AccountRecharge: React.FC = () => {
     const [selectedChannel, setSelectedChannel] = useState('');
     const [creditAmount, setCreditAmount] = useState('');
@@ -104,6 +105,7 @@ const AccountRecharge: React.FC = () => {
     const [MessageErrorModal, setMessageErrorModa] = useState<string>("");
     const [generateInvoice, setGenerateInvoice] = useState(false);
     const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+
     const invoiceData = {
         name: "Nuxiba",
         rfc: "VECJ880326",
@@ -115,6 +117,7 @@ const AccountRecharge: React.FC = () => {
         totalCost: "$0.10",
         paymentMethod: selectedCard ? `${selectedCard.type} **${selectedCard.card_number.slice(-4)}, ${selectedCard.card_name}` : 'No seleccionada'
     };
+
     const [showChipBarAdd, setshowChipBarAdd] = useState(false);
     const [showChipBarCard, setshowChipBarCard] = useState(false);
     const [showChipBarDelete, setshowChipBarDelete] = useState(false);
@@ -126,7 +129,11 @@ const AccountRecharge: React.FC = () => {
     const useQuery = () => {
         return new URLSearchParams(useLocation().search);
     };
+
     const hasRunRef = useRef(false);
+
+    // ✅ Hook para reaccionar al cambio de sala (storageUpdate)
+    const selectedRoom = useSelectedRoom();
 
     const checkRechargeStatus = async (id: string) => {
         try {
@@ -149,21 +156,30 @@ const AccountRecharge: React.FC = () => {
         finally {
             setshowChipBarAdd(true);
             setTimeout(() => setshowChipBarAdd(false), 10000);
-            const storedRoom = localStorage.getItem('selectedRoom');
-            const request = localStorage.getItem('request');
-            if (storedRoom && request) {
-                const room = JSON.parse(storedRoom);
-                const amountParsed = JSON.parse(request);
-                if (amountParsed.Chanel === 'long_sms') {
-                    room.long_sms = (parseFloat(room.long_sms) || 0) + (parseFloat(amountParsed.QuantityCredits));
-                } else {
-                    room.short_sms = (parseFloat(room.short_sms) || 0) + (parseFloat(amountParsed.QuantityCredits));
-                }
-                room.credits = (parseFloat(room.credits) || 0) + (parseFloat(amountParsed.QuantityCredits));
-                localStorage.setItem('selectedRoom', JSON.stringify(room));
-                window.dispatchEvent(new Event('storageUpdate'));
-                localStorage.removeItem('request');
+
+            // ✅ Solo si hay sala seleccionada
+            if (!selectedRoom) return;
+
+            const request = localStorage.getItem("request");
+            if (!request) return;
+
+            // ✅ Clonar (NO mutar selectedRoom)
+            const room = { ...selectedRoom } as any;
+            const amountParsed = JSON.parse(request);
+
+            const qty = Number(amountParsed.QuantityCredits) || 0;
+
+            if (amountParsed.Chanel === 'long_sms') {
+                room.long_sms = (Number(room.long_sms) || 0) + qty;
+            } else {
+                room.short_sms = (Number(room.short_sms) || 0) + qty;
             }
+
+            room.credits = (Number(room.credits) || 0) + qty;
+
+            localStorage.setItem('selectedRoom', JSON.stringify(room));
+            window.dispatchEvent(new Event('storageUpdate'));
+            localStorage.removeItem('request');
         }
     };
 
@@ -202,8 +218,10 @@ const AccountRecharge: React.FC = () => {
             setIsInvoiceModalOpen(true);
         }
     };
+
     const [Loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Errors>({});
+
     const isRechargeButtonDisabled = (): boolean => {
         return !selectedChannel || !creditAmount || !rechargeAmount || !selectedCard;
     };
@@ -247,7 +265,6 @@ const AccountRecharge: React.FC = () => {
         setErrors({});
     };
 
-
     // Funciones para abrir y cerrar el modal
     const handleOpenModal = () => {
         resetAddCardForm();
@@ -289,9 +306,6 @@ const AccountRecharge: React.FC = () => {
         }
     };
 
-
-
-
     const handleRechargeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.value;
 
@@ -306,8 +320,6 @@ const AccountRecharge: React.FC = () => {
 
         setRechargeAmount(value);
     };
-
-
 
     const fetchCreditCards = async () => {
         const usuario = localStorage.getItem("userData");
@@ -345,8 +357,15 @@ const AccountRecharge: React.FC = () => {
         }
 
         try {
-            const storedRoom = localStorage.getItem('selectedRoom');
-            const room = JSON.parse(storedRoom!);
+            // ✅ Ya no leer selectedRoom desde localStorage: usar hook
+            if (!selectedRoom) {
+                setTitleErrorModa("Selecciona una sala");
+                setMessageErrorModa("Antes de recargar, selecciona una sala en el selector.");
+                setOpenErrorModa(true);
+                setLoading(false);
+                return;
+            }
+
             const requestUrl = `${import.meta.env.VITE_API_ADD_RECHARGE}`;
             const payload = {
                 IdCreditCard: selectedCard?.id,
@@ -355,8 +374,9 @@ const AccountRecharge: React.FC = () => {
                 QuantityCredits: creditAmount,
                 QuantityMoney: rechargeAmount,
                 AutomaticInvoice: generateInvoice,
-                room: room.name,
+                room: (selectedRoom as any).name,
             };
+
             localStorage.setItem('request', JSON.stringify(payload));
 
             const response = await axios.post(requestUrl, payload);
@@ -365,7 +385,6 @@ const AccountRecharge: React.FC = () => {
                 if (response.data.startsWith('http'))
                     window.location.href = response.data;
                 return;
-
             }
         } catch (error) {
             console.log(error);
@@ -512,7 +531,6 @@ const AccountRecharge: React.FC = () => {
         return "Desconocida"; // En caso de no coincidir con ningún tipo
     };
 
-
     const areRequiredFieldsFilled = (): boolean => {
         // Verifica que los campos requeridos no estén vacíos
         const requiredFields = [
@@ -533,21 +551,17 @@ const AccountRecharge: React.FC = () => {
         return requiredFields.every((field) => field.trim() !== '') && Object.values(errors).every((error) => !error);
     };
 
-
     const handleDeleteCard = async () => {
         if (!cardToDelete) return;
         try {
             const requestUrl = `${import.meta.env.VITE_API_DELETE_CREDITCARD + cardToDelete.id}`;
             const response = await axios.get(requestUrl);
 
-
             if (response.status === 200) {
                 await fetchCreditCards();
                 setshowChipBarDelete(true);
                 setTimeout(() => setshowChipBarDelete(false), 3000);
             }
-
-
         } catch {
             setErrorModal({
                 title: "Error al eliminar tarjeta",
@@ -557,7 +571,6 @@ const AccountRecharge: React.FC = () => {
             closeDeleteModal();
         }
     };
-
 
     const handleSelectCard = (card: CreditCard) => {
         setSelectedCard(card);
@@ -576,7 +589,6 @@ const AccountRecharge: React.FC = () => {
     const closeErrorModal = () => {
         setErrorModal(null);
     };
-
 
     const resetForm = () => {
         setSelectedChannel('');
@@ -602,7 +614,6 @@ const AccountRecharge: React.FC = () => {
         });
         setErrors({});
     };
-
 
     return (
         <Box
@@ -683,7 +694,9 @@ const AccountRecharge: React.FC = () => {
                 message={MessageErrorModal}
                 buttonText="Cerrar"
                 onClose={() => setOpenErrorModa(false)}
-            />             {/* Modal de error */}
+            />
+
+            {/* Modal de error */}
             {errorModal && (
                 <div style={{
                     position: 'fixed',
@@ -726,7 +739,6 @@ const AccountRecharge: React.FC = () => {
                     </div>
                 </div>
             )}
-
 
             <Modal open={isInvoiceModalOpen} onClose={() => setIsInvoiceModalOpen(false)}>
                 <Box sx={{
@@ -2172,7 +2184,6 @@ const AccountRecharge: React.FC = () => {
 
 
 
-                    </form>
                 </Box>
             </Modal>
 

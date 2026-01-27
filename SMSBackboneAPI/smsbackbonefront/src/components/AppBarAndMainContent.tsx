@@ -409,16 +409,15 @@ const NavBarAndDrawer: React.FC<Props> = props => {
         }
     };
 
-    //const handleMenuClose = () => {
-    //    setAnchorEl(null);
-    //};
-
-
     const handleRoomChange = (room: Room) => {
         setSelectedRoom(room);
         localStorage.setItem('selectedRoom', JSON.stringify(room));
+
+        window.dispatchEvent(new Event("storageUpdate"));
+
         setAnchorEl(null);
     };
+
 
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
