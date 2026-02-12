@@ -445,6 +445,15 @@ const Templates = () => {
 
     const isAcceptDisabled = !templateName.trim() || isTemplateNameInvalid || !mensaje.trim();
 
+    const filteredCampaigns = campaignData
+        .filter(c => c.toLowerCase().includes(campaignSearch.toLowerCase()));
+
+    const paginatedCampaigns = filteredCampaigns.slice(
+        (campaignPage - 1) * 50,
+        campaignPage * 50
+    );
+
+    const hasPageResults = paginatedCampaigns.length > 0;
 
 
     return (
@@ -620,7 +629,7 @@ const Templates = () => {
                             backgroundColor: '#FFFFFF',
                             borderRadius: '8px',
                             padding: '60px 0',
-                            height: '450px',
+                            height: '525px',
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
@@ -650,7 +659,7 @@ const Templates = () => {
                             backgroundColor: '#FFFFFF',
                             borderRadius: '8px',
                             padding: '60px 0',
-                            height: '450px',
+                            height: "525px",
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
@@ -685,7 +694,7 @@ const Templates = () => {
                             boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                             overflowX: 'auto',
                             overflowY: 'auto',
-                            height: "450px",
+                            height: "525px",
                             mt: 3.6
                         }}
                     >
@@ -696,8 +705,8 @@ const Templates = () => {
                         }}>
                             <thead>
                                 {selectedTemplates.length === 0 ? (
-                                    <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', }}>
-                                        <th style={{ padding: '5px', position: 'sticky', }}>
+                                    <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', width: '100%' }}>
+                                        <th style={{ padding: '5px', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                             <Box sx={{ marginLeft: "6px" }}>
                                                 <Checkbox
                                                     checked={selectedTemplates.length === templates.length && templates.length > 0}
@@ -715,24 +724,23 @@ const Templates = () => {
                                                 />
                                             </Box>
                                         </th>
-                                        <th style={{ padding: '0px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', }}>Fecha de creación</th>
-                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', }}>Nombre</th>
-                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', borderRight: "1px solid #E6E4E4" }}>Contenido</th>
-                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', }}></th>
+                                        <th style={{ padding: '0px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Fecha de creación</th>
+                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Nombre</th>
+                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', borderRight: "1px solid #E6E4E4", top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Contenido</th>
+                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}></th>
                                     </tr>
                                 ) : (
                                     <tr style={{
-                                        backgroundColor: '#FFFFFF',
                                         textAlign: 'left', width: '100%'
                                     }}>
                                         <th
                                             colSpan={6}
                                             style={{
-                                                minWidth: "967px",
+                                                //minWidth: "967px",
                                                 position: 'sticky',
                                                 top: 0,
                                                 backgroundColor: '#FFFFFF',
-                                                zIndex: 6, // un poquito arriba del otro
+                                                zIndex: 6,
                                             }}
                                         >
 
@@ -831,6 +839,7 @@ const Templates = () => {
                             <tbody>
                                 {currentItems.map((template) => (
                                     <tr key={template.id} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0' }}>
+                                        {/* Checkbox */}
                                         <td style={{ padding: '0px', width: "60px" }}>
                                             <Box sx={{ marginLeft: "10px" }}>
                                                 <Checkbox
@@ -1057,6 +1066,7 @@ const Templates = () => {
                         />
 
                     )}
+
                     <Box position={'absolute'} marginLeft={'542px'} marginTop={'-210px'}>
                         <Tooltip
                             title={
@@ -1345,32 +1355,40 @@ const Templates = () => {
 
                     <Box sx={{ border: '1px solid #E6E4E4', borderRadius: '6px' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', width: '490px', height: '70px', gap: 4, ml: -0.1 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: 3 }}>
-                                <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#574B4F', minWidth: '80px' }}>
-                                    {Math.min(campaignPage * 50 - 49, campaignData.length)}–{Math.min(campaignPage * 50, campaignData.length)} de {campaignData.length}
-                                </Typography>
 
-                                {/* Flechas */}
-                                <IconButton onClick={() => setCampaignPage(1)} disabled={campaignPage === 1} sx={{ p: 0 }}>
-                                    <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22 }} />
-                                    <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22, marginLeft: '-16px' }} />
-                                </IconButton>
+                            {/*Opción de paginación*/}
+                            {hasPageResults && (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: 3 }}>
+                                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#574B4F', minWidth: '80px' }}>
+                                        {Math.min(campaignPage * 50 - 49, campaignData.length)}–{Math.min(campaignPage * 50, campaignData.length)} de {campaignData.length}
+                                    </Typography>
 
-                                <IconButton onClick={() => setCampaignPage(prev => Math.max(prev - 1, 1))} disabled={campaignPage === 1} sx={{ p: 0 }}>
-                                    <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22 }} />
-                                </IconButton>
+                                    {/* Flechas */}
+                                    <IconButton onClick={() => setCampaignPage(1)} disabled={campaignPage === 1} sx={{ p: 0 }}>
+                                        <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22 }} />
+                                        <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22, marginLeft: '-16px' }} />
+                                    </IconButton>
 
-                                <IconButton onClick={() => setCampaignPage(prev => prev + 1)} disabled={campaignPage * 50 >= campaignData.length} sx={{ p: 0 }}>
-                                    <img src={campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22 }} />
-                                </IconButton>
+                                    <IconButton onClick={() => setCampaignPage(prev => Math.max(prev - 1, 1))} disabled={campaignPage === 1} sx={{ p: 0 }}>
+                                        <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22 }} />
+                                    </IconButton>
 
-                                <IconButton onClick={() => setCampaignPage(Math.ceil(campaignData.length / 50))} disabled={campaignPage * 50 >= campaignData.length} sx={{ p: 0 }}>
-                                    <img src={campaignData.length === 0 || campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22 }} />
-                                    <img src={campaignData.length === 0 || campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22, marginLeft: '-16px' }} />
-                                </IconButton>
-                            </Box>
+                                    <IconButton onClick={() => setCampaignPage(prev => prev + 1)} disabled={campaignPage * 50 >= campaignData.length} sx={{ p: 0 }}>
+                                        <img src={campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22 }} />
+                                    </IconButton>
 
-                            <Box display="flex" alignItems="center" sx={{ backgroundColor: '#FFFFFF', border: campaignSearch ? '1px solid #7B354D' : '1px solid #9B9295', borderRadius: '4px', padding: '6px 10px', width: '220px', height: '40px' }}>
+                                    <IconButton onClick={() => setCampaignPage(Math.ceil(campaignData.length / 50))} disabled={campaignPage * 50 >= campaignData.length} sx={{ p: 0 }}>
+                                        <img src={campaignData.length === 0 || campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22 }} />
+                                        <img src={campaignData.length === 0 || campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22, marginLeft: '-16px' }} />
+                                    </IconButton>
+                                </Box>
+                            )}
+                            {/*Buscador*/}
+                            <Box display="flex" alignItems="center" sx={{
+                                backgroundColor: '#FFFFFF', border: campaignSearch ? '1px solid #7B354D' : '1px solid #9B9295',
+                                borderRadius: '4px', padding: '6px 10px', width: '220px', height: '40px',
+                                position: "absolute", marginLeft: '236px'
+                            }}>
                                 <img
                                     src={campaignSearch ? Iconseachred : seachicon}
                                     alt="Buscar"

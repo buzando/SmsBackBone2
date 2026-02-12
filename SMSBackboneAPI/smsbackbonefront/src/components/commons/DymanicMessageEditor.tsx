@@ -1,13 +1,18 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import Buttonicon from './MainButtonIcon';
 import closeChipIcon from "../../assets/api.svg";
-
+import IconCloseModalRed from "../../assets/IconCloseModalRed.svg";
+import infoicon from '../../assets/Icon-info.svg'
+import IconCloseRedN from "../../assets/IconCloseRedN.svg";
 
 interface Props {
   onChange?: (text: string) => void;
   initialMessage?: string;
 }
+
+const CHIP_BG = '#7B354D';
+const CHIP_BG_ACTIVE = '#7B354DBD';
 
 const MAX_CHARACTERS = 160;
 const MAX_CHIPS = 7;
@@ -116,19 +121,29 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.display = 'inline-flex';
     chip.style.alignItems = 'center';
     chip.style.gap = '6px';
-    chip.style.background = '#AE859599';
-    chip.style.boxShadow = '0px 0px 12px #9D697C';
-    chip.style.border = '1px solid #AD7F8ECC';
+    chip.style.background = CHIP_BG;
+    chip.style.transition = 'background-color 0.15s ease, box-shadow 0.2s ease';
+    chip.style.boxShadow = 'none';
+    chip.style.transition = 'box-shadow 0.2s ease';
+    chip.style.border = '1px solid #A46F80';
     chip.style.borderRadius = '6px';
     chip.style.padding = '4px 10px';
     chip.style.margin = '0 4px 8px 4px';
     chip.style.fontFamily = 'inherit';
-    chip.style.fontSize = '12px';
+    chip.style.fontSize = '16px';
     chip.style.color = '#FFFFFF';
     chip.style.userSelect = 'none';
 
+    chip.addEventListener('mouseenter', () => {
+      chip.style.boxShadow = '0px 0px 12px #9D697C';
+    });
+
+    chip.addEventListener('mouseleave', () => {
+      chip.style.boxShadow = 'none';
+    });
+
     const left = document.createElement('span');
-    left.textContent = '{';
+    left.textContent = '{{';
     left.contentEditable = 'false';
 
     const center = document.createElement('span');
@@ -141,6 +156,14 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     center.style.textAlign = 'center';
     center.style.fontFamily = 'inherit';
 
+    center.addEventListener('focus', () => {
+      chip.style.background = CHIP_BG_ACTIVE;
+    });
+
+    center.addEventListener('blur', () => {
+      chip.style.background = CHIP_BG;
+    });
+
     center.addEventListener('blur', () => {
       if ((center.textContent || '').trim().length === 0) center.textContent = 'Variable';
     });
@@ -148,14 +171,14 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     center.addEventListener('input', () => { updateRawMessage(); });
 
     const right = document.createElement('span');
-    right.textContent = '}';
+    right.textContent = '}}';
     right.contentEditable = 'false';
 
     const closeIcon = document.createElement('img');
-    closeIcon.src = closeChipIcon;
+    closeIcon.src = IconCloseRedN;
     closeIcon.alt = 'Eliminar';
-    closeIcon.style.width = '16px';
-    closeIcon.style.height = '16px';
+    closeIcon.style.width = '24px';
+    closeIcon.style.height = '24px';
     closeIcon.style.cursor = 'pointer';
     closeIcon.contentEditable = 'false';
     closeIcon.onclick = (e) => { e.stopPropagation(); chip.remove(); updateRawMessage(); };
@@ -185,7 +208,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     return count;
   };
 
-  const ALLOWED_EDITOR_WHITELIST = /^[\p{L}0-9\.,\$\s{}]+$/u;
+  const ALLOWED_EDITOR_WHITELIST = /^[A-Za-zñÑ0-9\.,\$\s{}]+$/;
   const CLEAN_EDITOR = /[^\p{L}0-9\.,\$\s{}]/gu;
 
   const ALLOWED_VAR = /[^A-Za-z0-9_]/g;
@@ -237,9 +260,11 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.display = 'inline-flex';
     chip.style.alignItems = 'center';
     chip.style.gap = '6px';
-    chip.style.background = '#AE859599 0% 0% no-repeat padding-box';
-    chip.style.boxShadow = '0px 0px 12px #9D697C';
-    chip.style.border = '1px solid #AD7F8ECC';
+    chip.style.background = CHIP_BG;
+    chip.style.transition = 'background-color 0.15s ease, box-shadow 0.2s ease';
+    chip.style.boxShadow = 'none';
+    chip.style.transition = 'box-shadow 0.2s ease';
+    chip.style.border = '1px solid #A46F80';
     chip.style.borderRadius = '6px';
     chip.style.padding = '4px 10px';
     chip.style.margin = '0 4px 8px 4px';
@@ -249,9 +274,17 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.opacity = '1';
     chip.style.userSelect = 'none';
 
+    chip.addEventListener('mouseenter', () => {
+      chip.style.boxShadow = '0px 0px 12px #9D697C';
+    });
+
+    chip.addEventListener('mouseleave', () => {
+      chip.style.boxShadow = 'none';
+    });
+
     // Partes del chip
     const left = document.createElement('span');
-    left.textContent = '{';
+    left.textContent = '{{';
     left.contentEditable = 'false';
 
     const center = document.createElement('span');
@@ -262,6 +295,14 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     center.style.userSelect = 'text';
     center.style.minWidth = '40px';
     center.style.textAlign = 'center';
+
+    center.addEventListener('focus', () => {
+      chip.style.background = CHIP_BG_ACTIVE;
+    });
+
+    center.addEventListener('blur', () => {
+      chip.style.background = CHIP_BG;
+    });
 
     center.addEventListener('blur', () => {
       if ((center.textContent || '').trim().length === 0) center.textContent = 'Variable';
@@ -307,14 +348,14 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.ondrop = (e) => e.preventDefault();
 
     const right = document.createElement('span');
-    right.textContent = '}';
+    right.textContent = '}}';
     right.contentEditable = 'false';
 
     const closeIcon = document.createElement('img');
-    closeIcon.src = closeChipIcon;
+    closeIcon.src = IconCloseRedN;
     closeIcon.alt = 'Eliminar';
-    closeIcon.style.width = '16px';
-    closeIcon.style.height = '16px';
+    closeIcon.style.width = '24px';
+    closeIcon.style.height = '24px';
     closeIcon.style.cursor = 'pointer';
     closeIcon.contentEditable = 'false';
     closeIcon.onclick = (e) => {
@@ -326,10 +367,10 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     const refreshChipStyle = () => {
       const currentValue = center.textContent?.trim() || '';
       if (currentValue && currentValue !== 'Variable') {
-        chip.style.background = '#A20C40BD 0% 0% no-repeat padding-box';
+        chip.style.background = '#BA4B71 0% 0% no-repeat padding-box';
         chip.style.border = '1px solid #A74262';
       } else {
-        chip.style.background = '#AE859599 0% 0% no-repeat padding-box';
+        chip.style.background = '#BA4B71 0% 0% no-repeat padding-box';
         chip.style.boxShadow = '0px 0px 12px #9D697C';
         chip.style.border = '1px solid #AD7F8ECC';
       }
@@ -516,7 +557,9 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
             fontFamily: 'Poppins',
             fontSize: '14px',
           },
+          paddingRight: "38px"
         }}
+
       />
 
       <Typography
