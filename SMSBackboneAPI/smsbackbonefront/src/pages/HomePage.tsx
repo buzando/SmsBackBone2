@@ -416,7 +416,8 @@ const HomePage: React.FC = () => {
                 TemplateId: null,
                 ClientID: clientId.idCliente || null,
                 UserID: clientId.id,
-                Flash: isFlashMessage
+                Flash: isFlashMessage,
+                Room: roomId
             };
 
             const requestUrl = `${import.meta.env.VITE_API_MESSAGE_SENDQUICK}`;

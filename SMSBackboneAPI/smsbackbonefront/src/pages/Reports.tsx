@@ -247,7 +247,6 @@ const Reports: React.FC = () => {
         setReports(undefined);
     };
 
-    const selectedRoom = useSelectedRoom();
 
 
     const getUsers = async () => {

@@ -79,7 +79,16 @@ namespace SMSBackboneAPI.Controllers
 
                 sw.Stop();
                 _log.Info($"[{rid}] SendMessageQuick ok ms={sw.ElapsedMilliseconds}");
-                return Ok(result);
+                if (result == "OK")
+                {
+                    return Ok(result);
+
+                }
+                else
+                {
+                    return BadRequest(result);
+
+                }
             }
             catch (Exception ex)
             {

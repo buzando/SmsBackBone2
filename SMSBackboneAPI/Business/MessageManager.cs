@@ -33,7 +33,7 @@ namespace Business
 
             var isShort = string.Equals(smsRequestDto.SmsType, "short", StringComparison.OrdinalIgnoreCase);
             var senderType = isShort ? "shortcode" : "longcode";
-            var encoding = (isShort && smsRequestDto.Flash) ? 1 : 0;
+            var encoding = (isShort && smsRequestDto.Flash.Value) ? 1 : 0;
 
             using var context = new Entities();
             {

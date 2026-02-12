@@ -14,9 +14,9 @@ namespace Contract.Request
         public int? TemplateId { get; set; }
         public int ClientID { get; set; }
         public int UserID { get; set; }
-        public bool Concatenate { get; set; }
-        public bool Flash { get; set; }
-        public string SmsType { get; set; }
+        public bool? Concatenate { get; set; }
+        public bool? Flash { get; set; }
+        public string? SmsType { get; set; }
         public int? Room {  get; set; }
     }
 }
