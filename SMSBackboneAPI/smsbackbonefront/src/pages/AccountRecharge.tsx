@@ -2181,7 +2181,7 @@ const AccountRecharge: React.FC = () => {
                                 />
                             </div>
                         </div>
-
+                    </form>
 
 
                 </Box>
