@@ -14,6 +14,8 @@ using System.Xml.Linq;
 using System.Globalization;
 using System.Data.SqlTypes;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
+using System.Net;
 
 namespace Business
 {
@@ -150,6 +152,17 @@ namespace Business
 
                 string resultadoXml = response.Body.GenerarFacturaDirectaResult;
 
+                if (LooksLikeVillanettError(resultadoXml))
+                {
+                    MarkRechargeFacturaError(idRecarga, resultadoXml);
+
+                    return new FacturaResult
+                    {
+                        Success = false,
+                        ErrorMessage = CleanVillanettMessage(resultadoXml)
+                    };
+                }
+
                 if (string.IsNullOrWhiteSpace(resultadoXml))
                     throw new ArgumentException("Cadena vacía.");
 
@@ -175,14 +188,17 @@ namespace Business
                     if (tip == "7") xml = p;
                     else if (tip == "8") pdf = p;
                 }
-
                 if (string.IsNullOrEmpty(xml) || string.IsNullOrEmpty(pdf))
                 {
-                    result.Success = false;
-                    result.ErrorMessage = "No se pudieron obtener las URLs de XML o PDF.";
-                    return result;
-                }
+                    var msg = $"Villanett no devolvió URLs válidas de XML/PDF. Respuesta: {CleanVillanettMessage(resultadoXml)}";
+                    MarkRechargeFacturaError(idRecarga, msg);
 
+                    return new FacturaResult
+                    {
+                        Success = false,
+                        ErrorMessage = "No se pudo generar la factura. Verifica tus datos fiscales (RFC/nombre/régimen/uso CFDI) e inténtalo nuevamente."
+                    };
+                }
                 using (var httpClient = new System.Net.Http.HttpClient())
                 {
                     var xmlBytes = await httpClient.GetByteArrayAsync(xml);
@@ -492,6 +508,90 @@ namespace Business
 
             return articulos;
         }
+
+
+        private static bool LooksLikeVillanettError(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return true;
+
+            // Muchas veces viene como HTML con <br /> y "código CFDIxxxx"
+            var lowered = raw.ToLowerInvariant();
+
+            if (lowered.Contains("no se pudo completar")) return true;
+            if (lowered.Contains("código cfdi") || lowered.Contains("codigo cfdi")) return true;
+            if (lowered.Contains("cfdi4") || lowered.Contains("cfdi")) // fallback
+            {
+                // si no hay ninguna URL, lo tratamos como error
+                if (!ContainsAnyUrl(raw)) return true;
+            }
+
+            // Si no hay URLs y trae pipes, casi seguro es error con cadena original
+            if (!ContainsAnyUrl(raw) && raw.Contains("|")) return true;
+
+            return false;
+        }
+
+        private static bool ContainsAnyUrl(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return false;
+            // detecta http/https en cualquier parte
+            return Regex.IsMatch(raw, @"https?://[^\s|<>]+", RegexOptions.IgnoreCase);
+        }
+
+        private static string CleanVillanettMessage(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+                return "Error desconocido al generar factura.";
+
+            // Decodifica entidades HTML: c&#243;digo -> código
+            var decoded = WebUtility.HtmlDecode(raw);
+
+            // Quita tags HTML
+            decoded = Regex.Replace(decoded, "<.*?>", string.Empty);
+
+            // Tomar solo el mensaje antes del primer pipe
+            var pipeIndex = decoded.IndexOf('|');
+            if (pipeIndex > 0)
+            {
+                decoded = decoded.Substring(0, pipeIndex);
+            }
+
+            // Normaliza espacios
+            decoded = decoded.Replace("\r", " ").Replace("\n", " ");
+            decoded = Regex.Replace(decoded, @"\s{2,}", " ").Trim();
+
+            return decoded;
+        }
+
+
+        private static string ExtractCfdiCode(string cleanMessage)
+        {
+            if (string.IsNullOrWhiteSpace(cleanMessage)) return null;
+
+            // Ej: "código CFDI40145:" o "codigo CFDI40145:"
+            var m = Regex.Match(cleanMessage, @"CFDI\d{5}", RegexOptions.IgnoreCase);
+            return m.Success ? m.Value.ToUpperInvariant() : null;
+        }
+
+        private void MarkRechargeFacturaError(int idRecarga, string rawVillanettResult)
+        {
+            var clean = CleanVillanettMessage(rawVillanettResult);
+            var code = ExtractCfdiCode(clean);
+            _logger.Error(clean);
+            using (var ctx = new Entities())
+            {
+                var r = ctx.CreditRecharge.FirstOrDefault(x => x.Id == idRecarga);
+                if (r == null) return;
+
+                r.EstatusError = clean;                 
+                r.FechaFacturacion = DateTime.Now;     
+
+
+                ctx.SaveChanges();
+            }
+        }
+
+
         public class FacturaResult
         {
             public bool Success { get; set; }

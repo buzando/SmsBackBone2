@@ -1,5 +1,5 @@
 ﻿using Business;
-using Contract;
+using Contract.Other;
 using Contract.Request;
 using Contract.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -321,5 +321,24 @@ namespace SMSBackboneAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { code = "ServerError", description = "Ocurrió un error." });
             }
         }
+
+        [HttpPost("UpdateSectionVisibility")]
+        public async Task<IActionResult> UpdateSectionVisibility(UpdateCampaignSectionVisibilityRequest req)
+        {
+            if (req == null || req.CampaignId <= 0 || string.IsNullOrWhiteSpace(req.Section))
+                return BadRequest("Request inválido.");
+
+            try
+            {
+                var campaign = new CampaignManager();
+                campaign.UpdateSectionVisibility(req.CampaignId, req.Section, req.Enabled);
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
     }
 }

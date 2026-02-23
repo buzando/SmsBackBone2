@@ -40,7 +40,7 @@ namespace SmsDeliveryWorker
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var minutosEjecucion = int.TryParse(Common.ConfigurationManagerJson("MinutosEjecucion"), out int d) ? d : 10;
+                   var minutosEjecucion = int.TryParse(Common.ConfigurationManagerJson("MinutosEjecucion"), out int d) ? d : 10;
 
                 try
                 {

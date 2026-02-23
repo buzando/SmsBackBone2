@@ -25,6 +25,10 @@ namespace Modal.Model.Model
         public DateTime? StartDate { get; set; }
         public bool ShouldConcatenate { get; set; } = false;
         public bool ShouldShortenUrls { get; set; } = false;
+        public bool ShowSchedules { get; set; } = false;
+        public bool ShowTestSend { get; set; } = false;
+        public bool ShowRecordsManager { get; set; } = false;
+        public bool ShowCharts { get; set; } = false;
 
     }
 

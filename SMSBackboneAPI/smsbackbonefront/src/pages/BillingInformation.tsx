@@ -242,7 +242,16 @@ const BillingInformation: React.FC = () => {
             </Box>
             <Box sx={{ marginLeft: "32px", }}>
                 <Divider sx={{ marginBottom: "17px", marginTop: "16px", mb: 3.5 }} />
-                <Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden", pr: 1 }}>
+
+
+                <Box
+                    sx={{
+                        height: "calc(100vh - 260px)",
+                        display: "flex",
+                        flexDirection: "column",
+                        minWidth: 0,
+                    }}
+                >
 
                     <Box
                         sx={{
@@ -251,7 +260,7 @@ const BillingInformation: React.FC = () => {
                             borderRadius: "8px",
                             width: "100%",
                             minWidth: 0,
-                            height: "calc(100vh - 220px)", // ajusta si tu header ocupa más/menos
+                            flex: 1,
                             overflow: "auto",
                             display: "flex",
                             flexDirection: "column",
@@ -1529,25 +1538,6 @@ const BillingInformation: React.FC = () => {
                                 />
                             </div>
                         </div>
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'flex-start',
-                                alignItems: 'center',
-                                gap: '16px',
-                                marginTop: '30px',
-                                marginLeft: '0px',
-                                boxSizing: 'border-box',
-                            }}
-                        >
-                            <SecondaryButton onClick={() => setModal(true)} text="CANCELAR" />
-                            <MainButton
-                                onClick={handleSave}
-                                text="GUARDAR"
-                                disabled={!hasChanges()}
-                            />
-
-                        </div>
 
                         <Typography
                             style={{
@@ -1564,7 +1554,26 @@ const BillingInformation: React.FC = () => {
                         </Typography>
                     </Box>
 
+                    <Divider sx={{ mt: 2, mb: 2 }} />
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            alignItems: "center",
+                            gap: "16px",
+                            mt: 2,
+                        }}
+                    >
+                        <SecondaryButton onClick={() => setModal(true)} text="CANCELAR" />
+                        <MainButton
+                            onClick={handleSave}
+                            text="GUARDAR"
+                            disabled={!hasChanges()}
+                        />
+                    </Box>
                 </Box>
+
+
                 {showChipBarAdd && (
                     <ChipBar
                         message="Los datos de facturación han sido agregados correctamente"
@@ -1592,6 +1601,7 @@ const BillingInformation: React.FC = () => {
         </Box>
 
     );
+
 };
 
 export default BillingInformation;

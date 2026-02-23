@@ -246,7 +246,7 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
 
       <Box
         ref={editableRef}
-        contentEditable
+        contentEditable={false}
         suppressContentEditableWarning
         onInput={(e) => {
           const container = e.currentTarget;

@@ -592,7 +592,10 @@ namespace Business
                                 ReceptionRate = reader.GetInt32(reader.GetOrdinal("ReceptionRate")),
                                 RecycleCount = reader.GetInt32(reader.GetOrdinal("RecycleCount")),
                                 ContactCount = reader.GetInt32(reader.GetOrdinal("ContactCount")),
-
+                                ShowSchedules = reader.GetBoolean(reader.GetOrdinal("ShowSchedules")),
+                                ShowTestSend = reader.GetBoolean(reader.GetOrdinal("ShowTestSend")),
+                                ShowRecordsManager = reader.GetBoolean(reader.GetOrdinal("ShowRecordsManager")),
+                                ShowCharts = reader.GetBoolean(reader.GetOrdinal("ShowCharts")),
                                 Schedules = new List<CampaignScheduleDto>(),
                                 Contacts = new List<CampaignContactDto>(),
                                 CampaignContactScheduleSendDTO = new List<CampaignContactScheduleSendDTO>(),
@@ -987,6 +990,40 @@ namespace Business
                 return null;
             }
         }
+
+        public void UpdateSectionVisibility(int campaignId, string section, bool enabled)
+        {
+            using (var ctx = new Entities())
+            {
+                var c = ctx.Campaigns.FirstOrDefault(x => x.Id == campaignId);
+                if (c == null) throw new Exception("Campaña no encontrada.");
+
+                switch ((section ?? "").Trim().ToLowerInvariant())
+                {
+                    case "schedules":
+                        c.ShowSchedules = enabled;
+                        break;
+
+                    case "testsend":
+                        c.ShowTestSend = enabled;
+                        break;
+
+                    case "records":
+                        c.ShowRecordsManager = enabled;
+                        break;
+
+                    case "charts":
+                        c.ShowCharts = enabled;
+                        break;
+
+                    default:
+                        throw new Exception("Sección inválida.");
+                }
+
+                ctx.SaveChanges();
+            }
+        }
+
 
         //public bool Updatecampaign(WebhookStatusDto status)
         //{

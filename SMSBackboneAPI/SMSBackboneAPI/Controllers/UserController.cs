@@ -1835,7 +1835,7 @@ namespace SMSBackboneAPI.Controllers
                 sw.Stop();
                 if (!data.Success)
                 {
-                    log.Warn($"[{rid}] GenerateInvoice gateway-fail creditId={invoice?.IdCredit} ms={sw.ElapsedMilliseconds}");
+                    log.Warn($"[{rid}] GenerateInvoice gateway-fail creditId={invoice?.IdCredit} ms={sw.ElapsedMilliseconds} error = {data.ErrorMessage}");
                     return StatusCode(502, false);
                 }
 

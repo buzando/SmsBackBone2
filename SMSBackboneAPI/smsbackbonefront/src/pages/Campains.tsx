@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Typography,
   Divider,
@@ -159,6 +159,10 @@ export interface CampaignFullResponse {
   templateName: String;
   campaignContactScheduleSendDTO?: CampaignContactScheduleSendDTO[];
   isPinned: boolean;
+  showSchedules: boolean;
+  showTestSend: boolean;
+  showRecordsManager: boolean;
+  showCharts: boolean;
 }
 
 export interface CampaignContactScheduleSendDTO {
@@ -282,6 +286,10 @@ const Campains: React.FC = () => {
     field: '',
   });
 
+
+  const [pinnedCampaignId, setPinnedCampaignId] = useState<number | null>(null);
+
+
   const handleChangeHorario = (
     index: number,
     date: Date,
@@ -397,7 +405,11 @@ const Campains: React.FC = () => {
     { name: "No enviados", value: 90, color: "#A6A6A6" },
     { name: "Excepciones", value: 90, color: "#7DD584" }
   ];
-  const aniOptions = ['Regionalizado', 'Centralizado',];
+  const aniOptions = [
+    { value: "", label: "Seleccionar" },
+    { value: "nacional", label: "Nacional" },
+    { value: "vallarta_registrable", label: "Vallarta registrable" }
+  ];
   const filteredBlackLists = blackLists.filter((item) =>
     item.name.toLowerCase().includes(searchTermBlacklist.toLowerCase())
   );
@@ -610,6 +622,131 @@ const Campains: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!selectedCampaign) return;
+
+    setInfoChecks({
+      "Horarios": !!selectedCampaign.showSchedules,
+      "Prueba de envío de mensaje": !!selectedCampaign.showTestSend,
+      "Registros": !!selectedCampaign.showRecordsManager,
+      "Mapa de concentración de mensajes": !!selectedCampaign.showCharts,
+      "Resultados de envío por día": !!selectedCampaign.showCharts,
+    });
+  }, [selectedCampaign?.id]);
+
+  const handleCloseSection = async (
+    section: "schedules" | "testsend" | "records" | "charts"
+  ) => {
+    if (!selectedCampaign) return;
+
+    const prevCampaign = selectedCampaign;
+
+    const next = { ...prevCampaign };
+    if (section === "schedules") next.showSchedules = false;
+    if (section === "testsend") next.showTestSend = false;
+    if (section === "records") next.showRecordsManager = false;
+    if (section === "charts") next.showCharts = false;
+
+    setSelectedCampaign(next);
+
+    setInfoChecks(prev => ({
+      ...prev,
+      ...(section === "schedules" ? { "Horarios": false } : {}),
+      ...(section === "testsend" ? { "Prueba de envío de mensaje": false } : {}),
+      ...(section === "records" ? { "Registros": false } : {}),
+      ...(section === "charts"
+        ? {
+          "Mapa de concentración de mensajes": false,
+          "Resultados de envío por día": false,
+        }
+        : {}),
+    }));
+
+    try {
+      const url = `${import.meta.env.VITE_API_UPDATE_CAMPAIGNSHOW}`;
+
+      const payload = {
+        campaignId: next.id,
+        section,
+        enabled: false,
+      };
+
+      await axios.post(url, payload);
+
+    } catch (e) {
+      setSelectedCampaign(prevCampaign);
+      setInfoChecks({
+        "Horarios": !!prevCampaign.showSchedules,
+        "Prueba de envío de mensaje": !!prevCampaign.showTestSend,
+        "Registros": !!prevCampaign.showRecordsManager,
+        "Mapa de concentración de mensajes": !!prevCampaign.showCharts,
+        "Resultados de envío por día": !!prevCampaign.showCharts,
+      });
+    }
+  };
+
+  const mapChecksToSections = (checks: Record<string, boolean>) => ({
+    schedules: !!checks["Horarios"],
+    testsend: !!checks["Prueba de envío de mensaje"],
+    records: !!checks["Registros"],
+    charts:
+      !!checks["Mapa de concentración de mensajes"] ||
+      !!checks["Resultados de envío por día"],
+  });
+
+  const handleSaveInfoModal = async () => {
+    if (!selectedCampaign) return;
+
+    const prevCampaign = selectedCampaign;
+    const prevChecks = { ...infoChecks };
+
+    const desired = mapChecksToSections(infoChecks);
+
+    const current = {
+      schedules: !!prevCampaign.showSchedules,
+      testsend: !!prevCampaign.showTestSend,
+      records: !!prevCampaign.showRecordsManager,
+      charts: !!prevCampaign.showCharts,
+    };
+
+    const changedSections = (Object.keys(desired) as Array<keyof typeof desired>)
+      .filter(section => desired[section] !== current[section]);
+
+    if (changedSections.length === 0) {
+      setOpenInfoModal(false);
+      return;
+    }
+
+    const nextCampaign = {
+      ...prevCampaign,
+      showSchedules: desired.schedules,
+      showTestSend: desired.testsend,
+      showRecordsManager: desired.records,
+      showCharts: desired.charts,
+    };
+    setSelectedCampaign(nextCampaign);
+
+    try {
+      const url = `${import.meta.env.VITE_API_UPDATE_CAMPAIGNSHOW}`;
+
+      await Promise.all(
+        changedSections.map(section =>
+          axios.post(url, {
+            campaignId: prevCampaign.id,
+            section,
+            enabled: desired[section],
+          })
+        )
+      );
+
+      setOpenInfoModal(false);
+    } catch (e) {
+      // rollback si falla el backend
+      setSelectedCampaign(prevCampaign);
+      setInfoChecks(prevChecks);
+    }
+  };
+
+  useEffect(() => {
     const currentSet = selectedTab === 'telefonos' ? selectedTelefonos : selectedVariables;
     setDragColumns(columns.filter(col =>
       !selectedTelefonos.includes(col) || selectedTab === 'telefonos'
@@ -812,6 +949,7 @@ const Campains: React.FC = () => {
       return true;
     } catch (error) {
       console.error(error);
+      setOpenCreateCampaignModal(false);
       setIsErrorModalOpen(true);
       setTitleErrorModal('Error al cargar archivo');
       setMessageErrorModal('Ocurrió un error al intentar cargar el archivo. Inténtalo más tarde.');
@@ -933,6 +1071,15 @@ const Campains: React.FC = () => {
   };
 
 
+  useEffect(() => {
+    if (!campaigns?.length) return;
+    if (!pinnedCampaignId) return;
+
+    const pinned = campaigns.find(c => c.id === pinnedCampaignId);
+    if (!pinned) return;
+
+    setSelectedCampaign(pinned);
+  }, [campaigns, pinnedCampaignId]);
   const handleSaveCampaign = async () => {
     setLoading(true);
     try {
@@ -1067,6 +1214,14 @@ const Campains: React.FC = () => {
   const handleSelectCampaign = (selected: CampaignFullResponse) => {
     if (selectedCampaign?.id === selected.id) return;
     setSelectedCampaignId(selected.id);
+
+    setInfoChecks({
+      "Horarios": !!selected.showSchedules,
+      "Prueba de envío de mensaje": !!selected.showTestSend,
+      "Registros": !!selected.showRecordsManager,
+      "Mapa de concentración de mensajes": !!selected.showCharts,
+      "Resultados de envío por día": !!selected.showCharts,
+    });
 
     setSelectedCampaign(selected);
     setPhone('');
@@ -1329,6 +1484,101 @@ const Campains: React.FC = () => {
     setStateRespondedCounts(mappedResponded);
   }, [campaigns]);
 
+
+  useEffect(() => {
+    const room = localStorage.getItem("selectedRoom");
+    if (!room) return;
+
+    const parsed = JSON.parse(room);
+    const roomId = parsed?.id;
+    if (!roomId) return;
+
+    const saved = localStorage.getItem(`o2c_pinnedCampaignId_${roomId}`);
+    setPinnedCampaignId(saved ? Number(saved) : null);
+  }, []);
+
+  const handleTogglePinCampaign = (campaignId: number) => {
+    const roomId = getRoomIdFromStorage();
+    if (!roomId) return;
+
+    const key = pinnedKey(roomId);
+
+    setPinnedCampaignIds(prev => {
+      const exists = prev.includes(campaignId);
+      const next = exists ? prev.filter(id => id !== campaignId) : [...prev, campaignId];
+
+      localStorage.setItem(key, JSON.stringify(next));
+      return next;
+    });
+  };
+
+
+
+  const getRoomIdFromStorage = (): number | null => {
+    try {
+      const raw = localStorage.getItem("selectedRoom");
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed?.id ? Number(parsed.id) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const pinnedKey = (roomId: number) => `o2c_pinnedCampaignIds_${roomId}`;
+
+  const [pinnedCampaignIds, setPinnedCampaignIds] = useState<number[]>([]);
+
+  const orderedCampaigns = useMemo(() => {
+    if (!campaigns?.length) return [];
+    if (!pinnedCampaignIds.length) return campaigns;
+
+    const pinned = pinnedCampaignIds
+      .map(id => campaigns.find(c => c.id === id))
+      .filter(Boolean) as typeof campaigns;
+
+    const rest = campaigns.filter(c => !pinnedCampaignIds.includes(c.id));
+    return [...pinned, ...rest];
+  }, [campaigns, pinnedCampaignIds]);
+
+  useEffect(() => {
+    const roomId = getRoomIdFromStorage();
+    if (!roomId) return;
+
+    const raw = localStorage.getItem(pinnedKey(roomId));
+    if (!raw) {
+      setPinnedCampaignIds([]);
+      return;
+    }
+
+    try {
+      const arr = JSON.parse(raw);
+      setPinnedCampaignIds(Array.isArray(arr) ? arr.map(Number) : []);
+    } catch {
+      setPinnedCampaignIds([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    const room = localStorage.getItem("selectedRoom");
+    if (!room) return;
+
+    const parsed = JSON.parse(room);
+    const roomId = parsed?.id;
+    if (!roomId) return;
+
+    const saved = localStorage.getItem(`o2c_pinnedCampaignId_${roomId}`);
+    setPinnedCampaignId(saved ? Number(saved) : null);
+  }, [campaigns]);
+
+  useEffect(() => {
+    const roomId = getRoomIdFromStorage();
+    if (!roomId) return;
+
+    const saved = localStorage.getItem(`o2c_pinnedCampaignId_${roomId}`);
+    setPinnedCampaignId(saved ? Number(saved) : null);
+  }, [campaigns]);
+
   useEffect(() => {
     if (!selectedCampaign?.id || !selectedCampaign.schedules) return;
 
@@ -1469,7 +1719,13 @@ const Campains: React.FC = () => {
           hasAtLeastOnePhone
         );
       }
-
+    case 1: {
+      if (!tipoMensaje) return true;
+      if (tipoMensaje === "plantilla") {
+        return !selectedTemplate || mensajeTexto.trim() === "";
+      }
+      return mensajeTexto.trim() === "";
+    }
 
       default:
         return false;
@@ -2007,9 +2263,10 @@ const Campains: React.FC = () => {
                         </Typography>
                       </Box>
                     ) : (
-                      filteredCampaigns.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0))
+                      orderedCampaigns
                         .map((campaign, index) => {
                           const isSelected = selectedCampaigns.includes(index);
+                          const isPinned = pinnedCampaignIds.includes(campaign.id);
                           const progreso = campaign.numeroInicial > 0
                             ? Math.round((campaign.numeroActual / campaign.numeroInicial) * 100)
                             : 0;
@@ -2122,18 +2379,11 @@ const Campains: React.FC = () => {
                                   sx={{ padding: 0 }}
                                 >
                                   <PushPinIcon
-                                    onClick={(e) => {
-                                      e.stopPropagation(); // evita seleccionar campaña
-                                      setCampaigns(prev =>
-                                        prev.map(c =>
-                                          c.id === campaign.id ? { ...c, isPinned: !c.isPinned } : c
-                                        )
-                                      );
-                                    }}
+                                    onClick={() => handleTogglePinCampaign(campaign.id)}
                                     sx={{
-                                      color: campaign.isPinned ? "#8E5065" : "#574B4F",
+                                      color: isPinned ? "#8E5065" : "#574B4F",
                                       fontSize: "20px",
-                                      transform: campaign.isPinned ? "rotate(45deg)" : "none",
+                                      transform: isPinned ? "rotate(45deg)" : "none",
                                       transition: "transform 0.3s ease, color 0.3s ease",
                                       cursor: "pointer"
                                     }}
@@ -2231,6 +2481,7 @@ const Campains: React.FC = () => {
                   }}
                 >
                   <IconButton
+                    onClick={() => setOpenInfoModal(true)}
                     style={{
                       backgroundColor: "#FFFFFF",
                       border: '1px solid #CCCFD2',
@@ -2404,7 +2655,7 @@ const Campains: React.FC = () => {
                           ]
                         }}
                       >
-                        <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, Horarios: false }))}>
+                        <IconButton onClick={() => handleCloseSection("schedules")}>
                           <CloseIcon />
                         </IconButton>
                       </Tooltip>
@@ -2530,7 +2781,7 @@ const Campains: React.FC = () => {
                           ]
                         }}
                       >
-                        <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, "Prueba de envío de mensaje": false }))}>
+                        <IconButton onClick={() => handleCloseSection("testsend")}>
                           <CloseIcon />
                         </IconButton>
                       </Tooltip>
@@ -2719,7 +2970,7 @@ const Campains: React.FC = () => {
                           ]
                         }}
                       >
-                        <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, Registros: false }))}>
+                        <IconButton onClick={() => handleCloseSection("records")}>
                           <CloseIcon />
                         </IconButton>
                       </Tooltip>
@@ -2842,7 +3093,7 @@ const Campains: React.FC = () => {
                           ]
                         }}
                       >
-                        <IconButton onClick={() => setInfoChecks(prev => ({ ...prev, "Resultados de envío por día": false }))}>
+                        <IconButton onClick={() => handleCloseSection("charts")}>
                           <CloseIcon />
                         </IconButton>
                       </Tooltip>
@@ -3095,7 +3346,6 @@ const Campains: React.FC = () => {
               "Horarios",
               "Prueba de envío de mensaje",
               "Registros",
-              "Mapa de concentración de mensajes",
               "Resultados de envío por día"
             ].map((text, i) => (
               <ListItem key={i} disablePadding sx={{ marginBottom: "4px" }}>
@@ -3213,7 +3463,7 @@ const Campains: React.FC = () => {
           </Button>
           <Button
             variant="contained"
-            onClick={() => setOpenInfoModal(false)}
+            onClick={handleSaveInfoModal}
             sx={{
               background: "#833A53 0% 0% no-repeat padding-box",
               border: "1px solid #D4D1D1",
@@ -5581,7 +5831,7 @@ const Campains: React.FC = () => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, overflowX: "hidden", }}>
                   {/* Componente editor de mensaje */}
                   <DynamicCampaignText
-                    variables={variables}
+                    variables={selectedVariables}
                     value={mensajeTexto}
                     onChange={setMensajeTexto}
                     allowConcatenation={allowConcatenation}
@@ -6080,60 +6330,33 @@ const Campains: React.FC = () => {
                     <Select
                       fullWidth
                       value={selectedAni}
-                      onChange={(e) => setSelectedAni(e.target.value)}
+                      onChange={(e) => setSelectedAni(e.target.value as string)}
                       displayEmpty
-                      renderValue={(selected) =>
-                        selected ? (
+                      renderValue={(selected) => {
+                        const opt = aniOptions.find(o => o.value === selected);
+                        return (
                           <span style={{ fontFamily: 'Poppins', fontSize: '12px', color: '#786E71' }}>
-                            {selected}
+                            {opt?.label ?? "Seleccionar"}
                           </span>
-                        ) : (
-                          <span style={{ fontFamily: 'Poppins', fontSize: '12px', color: '#786E71' }}>
-                            Seleccionar
-                          </span>
-                        )
-                      }
-                      sx={{
-                        backgroundColor: '#FFFFFF',
-                        fontFamily: 'Poppins',
-                        fontSize: '12px',
-                        borderRadius: '8px',
-                        height: '40px',
-                        width: '200px',
-                        border: '1px solid #9B9295',
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#D6CED2',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#D6CED2',
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#D6CED2',
-                          borderWidth: '1px',
-                        },
+                        );
                       }}
+                      sx={{ /* tu sx igual */ }}
                     >
                       {aniOptions.map((option) => (
                         <MenuItem
-                          key={option}
-                          value={option}
+                          key={option.value}
+                          value={option.value}
                           sx={{
                             fontFamily: 'Poppins',
                             fontSize: '12px',
                             color: '#786E71',
-                            '&:hover': {
-                              backgroundColor: '#F2EBED',
-                            },
+                            '&:hover': { backgroundColor: '#F2EBED' },
                           }}
                         >
-                          {option}
+                          {option.label}
                         </MenuItem>
                       ))}
                     </Select>
-
-
-
-
                   </Box>
                 )}
               </Box>
@@ -6506,7 +6729,6 @@ const Campains: React.FC = () => {
                             <thead>
                               <tr>
                                 <th style={{ textAlign: 'left', padding: '2px 4px', width: '30%', fontWeight: 500, }}>Nombre</th>
-                                <th style={{ textAlign: 'left', padding: '4px 6px', width: '35%', fontWeight: 500, }}>Creación</th>
                                 <th style={{ textAlign: 'left', padding: '4px 6px', width: '35%', fontWeight: 500, }}>Expiración</th>
                               </tr>
                             </thead>
@@ -6545,7 +6767,6 @@ const Campains: React.FC = () => {
                                     />
                                     {list.name}
                                   </td>
-                                  <td style={{ padding: '2px 4px' }}>{list.creationDate || 'NA'}</td>
                                   <td style={{ padding: '2px 4px' }}>{list.expirationDate || 'NA'}</td>
                                 </tr>
                               ))}
@@ -8178,34 +8399,26 @@ const Campains: React.FC = () => {
                     <Select
                       fullWidth
                       value={selectedAni}
-                      onChange={(e) => setSelectedAni(e.target.value)}
-                      disabled={!aniEnabled}
+                      onChange={(e) => setSelectedAni(e.target.value as string)}
+                      disabled={aniEnabled}
                       displayEmpty
-                      renderValue={(selected) =>
-                        selected ? (
+                      renderValue={(selected) => {
+                        const opt = aniOptions.find(o => o.value === selected);
+                        return (
                           <span style={{ fontFamily: 'Poppins', fontSize: '12px', color: '#786E71' }}>
-                            {selected}
+                            {opt?.label ?? "Seleccionar"}
                           </span>
-                        ) : (
-                          <span style={{ fontFamily: 'Poppins', fontSize: '12px', color: '#786E71' }}>
-                            Seleccionar
-                          </span>
-                        )
-                      }
+                        );
+                      }}
                       sx={{
                         backgroundColor: '#FFFFFF',
                         fontFamily: 'Poppins',
-                        fontSize: '12px', // también puedes poner aquí, pero lo controlamos mejor en renderValue
                         borderRadius: '8px',
                         height: '40px',
                         width: '200px',
                         border: '1px solid #9B9295',
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#D6CED2',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#D6CED2',
-                        },
+                        '& .MuiOutlinedInput-notchedOutline': { borderColor: '#D6CED2' },
+                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#D6CED2' },
                         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                           borderColor: '#D6CED2',
                           borderWidth: '1px',
@@ -8214,25 +8427,19 @@ const Campains: React.FC = () => {
                     >
                       {aniOptions.map((option) => (
                         <MenuItem
-                          key={option}
-                          value={option}
+                          key={option.value}
+                          value={option.value}
                           sx={{
                             fontFamily: 'Poppins',
                             fontSize: '12px',
                             color: '#786E71',
-                            '&:hover': {
-                              backgroundColor: '#F2EBED',
-                            },
+                            '&:hover': { backgroundColor: '#F2EBED' },
                           }}
                         >
-                          {option}
+                          {option.label}
                         </MenuItem>
                       ))}
                     </Select>
-
-
-
-
                   </Box>
                 )}
               </Box>

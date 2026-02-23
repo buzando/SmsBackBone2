@@ -15,7 +15,13 @@ namespace Modal.Model.Model
 
         public bool UseTemplate { get; set; }
         public int? TemplateId { get; set; }
-        public string? TemplateName { get; set; }  
+        public string? TemplateName { get; set; }
+
+        public bool ShowSchedules { get; set; }
+        public bool ShowTestSend { get; set; }
+        public bool ShowRecordsManager { get; set; }
+        public bool ShowCharts { get; set; }
+
 
         public bool AutoStart { get; set; }
         public bool FlashMessage { get; set; }

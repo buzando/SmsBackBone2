@@ -217,9 +217,15 @@ const PaymentHistoric: React.FC = () => {
                 setIsInvoiceModalOpen(false);
                 setShowChipBarInvoice(true);
             } else {
+                setTitleErrorModal("Error en facturación");
+                setBodyErrorModal("Intente más tarde");
+                 setIsInvoiceModalOpen(false);
                 setIsErrorModalOpen(true);
             }
         } catch {
+               setTitleErrorModal("Error en facturación");
+                setBodyErrorModal("Intente más tarde");
+             setIsInvoiceModalOpen(false);
             setIsErrorModalOpen(true);
         } finally {
             setCreatingInvoice(false);
