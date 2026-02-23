@@ -117,6 +117,9 @@ const PaymentMethods: React.FC = () => {
         },
     }));
 
+    {/*Estado inicial*/ }
+
+
     const validateField = (name: string, value: string) => {
         let error = '';
         const cardRegex = /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})$/;
@@ -342,6 +345,12 @@ const PaymentMethods: React.FC = () => {
     };
 
     const handleConfirmAccept = () => {
+        clearForm();
+        setIsConfirmModalOpen(false); // Cierra el modal de confirmación
+        setIsAddCardModalOpen(false); // Cierra el modal principal
+    };
+
+    const clearForm = () => {
         setFormData({
             cardNumber: '',
             cardName: '',
@@ -357,9 +366,8 @@ const PaymentMethods: React.FC = () => {
             state: '',
             postalCode: '',
             type: '',
-        }); // Limpia los datos
-        setIsConfirmModalOpen(false); // Cierra el modal de confirmación
-        setIsAddCardModalOpen(false); // Cierra el modal principal
+        });
+        setErrors({});
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -723,7 +731,10 @@ const PaymentMethods: React.FC = () => {
                         >
                             Agregar tarjeta
                         </h2>
-                        <IconButton onClick={handleCloseModal}
+                        <IconButton onClick={() => {
+                            clearForm();
+                            setIsAddCardModalOpen(false);
+                        }}
                             sx={{ position: 'absolute', marginTop: "-56px", marginLeft: '805px' }}>
                             <img
                                 src={IconCloseModal}
@@ -1288,18 +1299,11 @@ const PaymentMethods: React.FC = () => {
                                                         </span>
                                                     );
                                                 }
-                                                return (
-                                                    <span style={{
-                                                        width: "100%",
-                                                        textAlign: "center",
-                                                        display: "block"
-                                                    }}>
-                                                        {months[Number(selected) - 1]}
-                                                    </span>
-                                                );
+                                                return selected;
                                             }}
                                             sx={{
                                                 background: "#FFFFFF",
+                                                border: "1px solid #9B9295",
                                                 borderRadius: "8px",
                                                 width: "87px",
                                                 height: "40px",
@@ -1319,16 +1323,16 @@ const PaymentMethods: React.FC = () => {
                                                 },
                                             }}
                                         >
-                                            {months.map((month, index) => (
+                                            {[...Array(12)].map((_, i) => (
                                                 <MenuItem
-                                                    key={index}
-                                                    value={(index + 1).toString()}
+                                                    key={i + 1}
+                                                    value={(i + 1).toString()}
                                                     sx={{
                                                         fontFamily: "Poppins, sans-serif",
                                                         fontSize: "12px",
                                                     }}
                                                 >
-                                                    {month}
+                                                    {i + 1}
                                                 </MenuItem>
                                             ))}
                                         </Select>

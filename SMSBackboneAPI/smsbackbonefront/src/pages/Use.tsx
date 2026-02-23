@@ -314,7 +314,8 @@ const Use: React.FC = () => {
 
     const formatDateRange = () => {
         if (!selectedDates) return 'FECHA';
-        return `${format(selectedDates.start, "dd MMM", { locale: es })}, ${String(selectedDates.startHour).padStart(2, '0')}:${String(selectedDates.startMinute).padStart(2, '0')} - ${format(selectedDates.end, "d MMM", { locale: es })} ${String(selectedDates.endHour).padStart(2, '0')}:${String(selectedDates.endMinute).padStart(2, '0')}`;
+
+        return `${format(selectedDates.start, "dd MMM", { locale: es })} - ${format(selectedDates.end, "dd MMM", { locale: es })}`;
     };
 
     const open = Boolean(anchorEl);
@@ -386,7 +387,7 @@ const Use: React.FC = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1000px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             {/* Encabezado */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -870,59 +871,60 @@ const Use: React.FC = () => {
                         </Paper>
                     </Popper>
 
-                    <Box
-                        sx={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "flex-end", // 👉 lo manda a la derecha
-                            alignItems: "center",
-                            mb: "12px",
-                            px: "10px",
-                        }}
-                    >
-                        <Tooltip
-                            title="Exportar a PDF"
-                            placement="top"
-                            arrow
-                            PopperProps={{
-                                modifiers: [
-                                    {
-                                        name: "arrow",
-                                        options: { padding: 8 },
-                                    },
-                                ],
-                            }}
-                            componentsProps={{
-                                tooltip: {
-                                    sx: {
-                                        fontFamily: "Poppins",
-                                        backgroundColor: "#322D2E",
-                                        color: "#FFFFFF",
-                                        fontSize: "12px",
-                                        borderRadius: "4px",
-                                        padding: "6px 10px",
-                                    },
-                                },
-                                arrow: {
-                                    sx: { color: "#322D2E" },
-                                },
+                    {!loading && data && (
+                        <Box
+                            sx={{
+                                width: "100%",
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                alignItems: "center",
+                                mb: "0px",
+                                px: "10px",
                             }}
                         >
-                            <IconButton
-                                sx={{
-                                    width: "40px",
-                                    height: "40px",
-                                    "&:hover": {
-                                        backgroundColor: "transparent",
+                            <Tooltip
+                                title="Exportar a PDF"
+                                placement="top"
+                                arrow
+                                PopperProps={{
+                                    modifiers: [
+                                        {
+                                            name: "arrow",
+                                            options: { padding: 8 },
+                                        },
+                                    ],
+                                }}
+                                componentsProps={{
+                                    tooltip: {
+                                        sx: {
+                                            fontFamily: "Poppins",
+                                            backgroundColor: "#322D2E",
+                                            color: "#FFFFFF",
+                                            fontSize: "12px",
+                                            borderRadius: "4px",
+                                            padding: "6px 10px",
+                                        },
+                                    },
+                                    arrow: {
+                                        sx: { color: "#322D2E" },
                                     },
                                 }}
-                               
                             >
-                                <img src={IconPDF} alt="pdf" style={{ width: 24 }} />
-                            </IconButton>
-                        </Tooltip>
-                    </Box>
+                                <IconButton
+                                    sx={{
+                                        width: "40px",
+                                        height: "40px",
+                                        "&:hover": {
+                                            backgroundColor: "transparent",
+                                        },
+                                    }}
 
+                                >
+                                    <img src={IconPDF} alt="pdf" style={{ width: 24 }} />
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+                    )}
 
                 </Box>
                 <DatePicker
@@ -957,7 +959,13 @@ const Use: React.FC = () => {
                                 Detalle de consumo
                             </Typography>
 
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', }}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    gap: 14, // controla separación entre elementos
+                                }}
+                            >
                                 {detalleResumen.map((item, index) => (
                                     <Box key={index} sx={boxStyle}>
                                         <Typography sx={titleBoxStyle}>{item.title}</Typography>
@@ -1045,9 +1053,7 @@ const Use: React.FC = () => {
                         sx={{
                             width: '100%',
                             height: '320px',
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: '12px',
-                            border: '1px dashed #D9D2D5',
+                            backgroundColor: '#F2F2F2',
                             mt: 3,
                         }}
                     >
@@ -1087,14 +1093,17 @@ const buttonStyle = {
     background: '#F6F6F6',
     border: '1px solid #C6BFC2',
     borderRadius: '18px',
-    padding: '8px 16px',
+    padding: '8px 28px',
     fontWeight: 500,
     color: '#330F1B',
-    minWidth: "96px", height: "36px",
+    minWidth: "96px",
+    height: "36px",
     textTransform: "uppercase",
     fontFamily: "Poppins",
     letterSpacing: "1.12px",
     opacity: 0.8,
+    whiteSpace: "nowrap",
+
     '&:hover': {
         background: '#F2F2F2',
         border: '1px solid #8F4E63CC',
@@ -1147,7 +1156,7 @@ const paperStyle = {
     border: '1px solid #E6E4E44D',
     padding: '20px',
     borderRadius: '10px',
-    width: '1100px',
+    width: '1250px',
     height: '212px'
 };
 
@@ -1160,7 +1169,7 @@ const graphPaperStyle = {
     border: '1px solid #E6E4E44D',
     padding: '20px',
     borderRadius: '10px',
-    width: '1100px',
+    width: '1250px',
     height: '330px',
     marginTop: '20px'
 };

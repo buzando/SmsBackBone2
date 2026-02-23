@@ -12,7 +12,7 @@ interface Props {
 }
 
 const CHIP_BG = '#7B354D';
-const CHIP_BG_ACTIVE = '#7B354DBD';
+const CHIP_BG_ACTIVE = '#7B354D';
 
 const MAX_CHARACTERS = 160;
 const MAX_CHIPS = 7;
@@ -135,7 +135,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.userSelect = 'none';
 
     chip.addEventListener('mouseenter', () => {
-      chip.style.boxShadow = '0px 0px 12px #9D697C';
+      chip.style.boxShadow = 'none';
     });
 
     chip.addEventListener('mouseleave', () => {
@@ -143,7 +143,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     });
 
     const left = document.createElement('span');
-    left.textContent = '{{';
+    left.textContent = '';
     left.contentEditable = 'false';
 
     const center = document.createElement('span');
@@ -171,7 +171,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     center.addEventListener('input', () => { updateRawMessage(); });
 
     const right = document.createElement('span');
-    right.textContent = '}}';
+    right.textContent = '';
     right.contentEditable = 'false';
 
     const closeIcon = document.createElement('img');
@@ -275,7 +275,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.userSelect = 'none';
 
     chip.addEventListener('mouseenter', () => {
-      chip.style.boxShadow = '0px 0px 12px #9D697C';
+      chip.style.boxShadow = 'none';
     });
 
     chip.addEventListener('mouseleave', () => {
@@ -284,7 +284,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
 
     // Partes del chip
     const left = document.createElement('span');
-    left.textContent = '{{';
+    left.textContent = '';
     left.contentEditable = 'false';
 
     const center = document.createElement('span');
@@ -348,7 +348,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.ondrop = (e) => e.preventDefault();
 
     const right = document.createElement('span');
-    right.textContent = '}}';
+    right.textContent = '';
     right.contentEditable = 'false';
 
     const closeIcon = document.createElement('img');
@@ -367,12 +367,11 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     const refreshChipStyle = () => {
       const currentValue = center.textContent?.trim() || '';
       if (currentValue && currentValue !== 'Variable') {
-        chip.style.background = '#BA4B71 0% 0% no-repeat padding-box';
-        chip.style.border = '1px solid #A74262';
+        chip.style.background = '#7B354D';
+        chip.style.border = '1px solid #A46F80';
       } else {
-        chip.style.background = '#BA4B71 0% 0% no-repeat padding-box';
-        chip.style.boxShadow = '0px 0px 12px #9D697C';
-        chip.style.border = '1px solid #AD7F8ECC';
+        chip.style.background = '#7B354D';
+        chip.style.border = '1px solid #A46F80';
       }
     };
     center.addEventListener('input', () => {

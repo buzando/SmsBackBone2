@@ -320,6 +320,11 @@ const Templates = () => {
         }
     };
 
+    const handleCloseInspectModal = () => {
+        setIsInspectModalOpen(false);
+        setCampaignSearch(''); // 🔴 limpia el buscador al cerrar
+    };
+
 
     const fetchTemplates = async () => {
 
@@ -1292,7 +1297,7 @@ const Templates = () => {
                 </MenuItem>
             </Menu>
 
-            <Modal open={isInspectModalOpen} onClose={() => setIsInspectModalOpen(false)}>
+            <Modal open={isInspectModalOpen} onClose={handleCloseInspectModal}>
 
                 <Box sx={{
                     position: 'absolute',
@@ -1313,8 +1318,13 @@ const Templates = () => {
                             Inspeccionar plantilla
                         </Typography>
                         <Box sx={{ marginTop: '-34px', marginRight: '-24px' }}>
-                            <IconButton onClick={() => setIsInspectModalOpen(false)}>
-                                <CloseIcon sx={{ color: '#A6A6A6' }} />
+                            <IconButton onClick={handleCloseInspectModal}>
+                                <img
+                                    src={IconCloseModal}
+                                    alt="x"
+                                    width="24"
+                                    height="24"
+                                />
                             </IconButton>
                         </Box>
                     </Box>

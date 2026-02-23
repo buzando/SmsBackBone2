@@ -5824,11 +5824,11 @@ const Campains: React.FC = () => {
               )}
             </>
           )}
-          {/*Configuraciones Avanzadas en crar campaña SMS*/}
+          {/*Configuraciones Avanzadas en crear campaña SMS*/}
           {activeStep === 2 && (
             <Box sx={{
-              mt: 2, display: 'flex', flexDirection: 'column', ml: 7,
-              maxHeight: "620px", width: "600px",
+              mt: 4, display: 'flex', flexDirection: 'column', ml: 7,
+              maxHeight: "820px", width: "660px", overflowY: 'auto'
             }}>
               <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '18px', mb: 2 }}>
                 Configuraciones avanzadas
@@ -5980,7 +5980,7 @@ const Campains: React.FC = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   width: "584px",
-                  minHeight: "57px",
+                  minHeight: "60px",
                   border: '1px solid #E6E4E4',
                   borderRadius: '6px',
                   padding: '12px 16px',
@@ -6352,7 +6352,7 @@ const Campains: React.FC = () => {
                   padding: '12px 16px',
                   backgroundColor: '#FFFFFF',
                   mb: 2,
-                  gap: 2,
+                  gap: 2, //mt: 6
                 }}
               >
                 {/* Primer Box: Título + tooltip + switch */}
