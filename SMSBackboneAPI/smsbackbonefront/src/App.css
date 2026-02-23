@@ -3,7 +3,7 @@
     height: 100vh; /* 🔥 Ocupa toda la altura */
     margin: 0;
     padding: 0;
-    background-color: #F2F2F2 !important; /* 🔥 Asegura que el fondo sea gris */
+    background-color: #f2f2f2 !important; /* 🔥 Asegura que el fondo sea gris */
     display: flex;
     flex-direction: column;
     align-items: stretch;

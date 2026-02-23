@@ -1622,220 +1622,222 @@ const ManageAccounts: React.FC = () => {
 
                         <Divider sx={{ my: 2, backgroundColor: "#F2F2F2" }} />
 
-                        <Box p={2}>
-                            <Typography variant="h6" mb={2} mt={-2} sx={{ fontFamily: "Poppins", fontSize: "16px" }}>
-                                Salas a las que podrá acceder <span style={{ color: "red", }}>*</span>
-                            </Typography>
-                            <Typography variant="body2" mb={2} mt={-1} sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "14px" }}>
-                                Seleccione las salas a las que el usuario tendrá acceso.
-                            </Typography>
+                        {formData.profile && (
+                            <Box p={2}>
+                                <Typography variant="h6" mb={2} mt={-2} sx={{ fontFamily: "Poppins", fontSize: "16px" }}>
+                                    Salas a las que podrá acceder <span style={{ color: "red", }}>*</span>
+                                </Typography>
+                                <Typography variant="body2" mb={2} mt={-1} sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "14px" }}>
+                                    Seleccione las salas a las que el usuario tendrá acceso.
+                                </Typography>
 
-                            <Box display="flex" flexDirection="column" gap={2}>
+                                <Box display="flex" flexDirection="column" gap={2}>
 
-                                <Box display="flex" alignItems="center" gap={2}>
+                                    <Box display="flex" alignItems="center" gap={2}>
 
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                checked={areAllRoomsSelected}
-                                                onChange={(e) => handleSelectAll(e.target.checked)}
-                                                indeterminate={selectedRooms.length > 0 && selectedRooms.length < rooms.length}
-                                                checkedIcon={
-                                                    <Box
-                                                        sx={{
-                                                            width: '24px',
-                                                            height: '24px',
-                                                            position: 'relative',
-                                                            marginTop: '0px',
-                                                            marginLeft: '0px',
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={IconCheckBox1}
-                                                            alt="Seleccionado"
-                                                            style={{ width: '24px', height: '24px' }}
-                                                        />
-                                                    </Box>
-                                                }
-                                                indeterminateIcon={
-                                                    <Box
-                                                        sx={{
-                                                            width: '24px',
-                                                            height: '24px',
-                                                            position: 'relative',
-                                                            marginTop: '0px',
-                                                            marginLeft: '0px',
-                                                            color: "#574B4FCC"
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={IconCheckBox2}
-                                                            alt="Indeterminado"
-                                                            style={{ width: '24px', height: '24px' }}
-                                                        />
-                                                    </Box>
-                                                }
-                                            />
-                                        }
-                                        label={
-                                            <Typography
-                                                sx={{
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: '16px',
-                                                    fontWeight: 500,
-                                                    color: areAllRoomsSelected ? "#8F4D63" : "#574B4FCC"
-                                                }}
-                                            >
-                                                Todas
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                checked={formData.allAndFuture}
-                                                onChange={(e) => handleSelectAllAndFuture(e.target.checked)}
-                                                checkedIcon={
-                                                    <Box
-                                                        sx={{
-                                                            width: '24px',
-                                                            height: '24px',
-                                                            position: 'relative',
-                                                            marginTop: '0px',
-                                                            marginLeft: '0px',
-                                                            color: "#574B4FCC"
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={IconCheckBox1}
-                                                            alt="Seleccionado"
-                                                            style={{ width: '24px', height: '24px' }}
-                                                        />
-                                                    </Box>
-                                                }
-                                            />
-                                        }
-                                        label={
-                                            <Typography
-                                                sx={{
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: '16px',
-                                                    fontWeight: 500,
-                                                    color: formData.allAndFuture ? "#8F4D63" : "#574B4FCC"
-                                                }}
-                                            >
-                                                Todas y futuras
-                                            </Typography>
-                                        }
-                                    />
-                                </Box>
-
-
-                                {rooms.map((room) => (
-                                    <Box
-                                        key={room.id}
-                                        sx={{
-                                            position: "relative",
-                                            marginBottom: 1,
-                                            fontFamily: "Poppins",
-                                            marginLeft: "18px",
-                                        }}
-                                    >
-
-                                        <Checkbox
-                                            checked={selectedRooms.includes(room.id)}
-                                            onChange={() => handleCheckboxChange(room.id)}
-                                            sx={{
-                                                position: "absolute",
-                                                left: -30,
-                                                top: "50%",
-                                                transform: "translateY(-50%)",
-                                                mt: 1,
-                                                color: "#574B4FCC",
-                                                '&.Mui-checked': { color: '#6C3A52' },
-
-                                            }}
-                                            checkedIcon={
-                                                <Box
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={areAllRoomsSelected}
+                                                    onChange={(e) => handleSelectAll(e.target.checked)}
+                                                    indeterminate={selectedRooms.length > 0 && selectedRooms.length < rooms.length}
+                                                    checkedIcon={
+                                                        <Box
+                                                            sx={{
+                                                                width: '24px',
+                                                                height: '24px',
+                                                                position: 'relative',
+                                                                marginTop: '0px',
+                                                                marginLeft: '0px',
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={IconCheckBox1}
+                                                                alt="Seleccionado"
+                                                                style={{ width: '24px', height: '24px' }}
+                                                            />
+                                                        </Box>
+                                                    }
+                                                    indeterminateIcon={
+                                                        <Box
+                                                            sx={{
+                                                                width: '24px',
+                                                                height: '24px',
+                                                                position: 'relative',
+                                                                marginTop: '0px',
+                                                                marginLeft: '0px',
+                                                                color: "#574B4FCC"
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={IconCheckBox2}
+                                                                alt="Indeterminado"
+                                                                style={{ width: '24px', height: '24px' }}
+                                                            />
+                                                        </Box>
+                                                    }
+                                                />
+                                            }
+                                            label={
+                                                <Typography
                                                     sx={{
-                                                        width: '24px',
-                                                        height: '24px',
-                                                        position: 'relative',
-                                                        marginTop: '0px',
-                                                        marginLeft: '0px',
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '16px',
+                                                        fontWeight: 500,
+                                                        color: areAllRoomsSelected ? "#8F4D63" : "#574B4FCC"
                                                     }}
                                                 >
-                                                    <img
-                                                        src={IconCheckBox1}
-                                                        alt="Seleccionado"
-                                                        style={{ width: '24px', height: '24px' }}
-                                                    />
-                                                </Box>
+                                                    Todas
+                                                </Typography>
                                             }
                                         />
+
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={formData.allAndFuture}
+                                                    onChange={(e) => handleSelectAllAndFuture(e.target.checked)}
+                                                    checkedIcon={
+                                                        <Box
+                                                            sx={{
+                                                                width: '24px',
+                                                                height: '24px',
+                                                                position: 'relative',
+                                                                marginTop: '0px',
+                                                                marginLeft: '0px',
+                                                                color: "#574B4FCC"
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={IconCheckBox1}
+                                                                alt="Seleccionado"
+                                                                style={{ width: '24px', height: '24px' }}
+                                                            />
+                                                        </Box>
+                                                    }
+                                                />
+                                            }
+                                            label={
+                                                <Typography
+                                                    sx={{
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: '16px',
+                                                        fontWeight: 500,
+                                                        color: formData.allAndFuture ? "#8F4D63" : "#574B4FCC"
+                                                    }}
+                                                >
+                                                    Todas y futuras
+                                                </Typography>
+                                            }
+                                        />
+                                    </Box>
+
+
+                                    {rooms.map((room) => (
                                         <Box
+                                            key={room.id}
                                             sx={{
-                                                display: "flex",
-                                                marginLeft: "15px",
-                                                alignItems: "center",
-                                                padding: 2,
-                                                border: selectedRooms.includes(room.id)
-                                                    ? "1px solid #83395366"
-                                                    : "1px solid #CED2D5CC",
-                                                backgroundColor: selectedRooms.includes(room.id)
-                                                    ? "#EFEAEC"
-                                                    : "#FFFFFF",
-                                                borderRadius: "8px",
-                                                flex: 1,
-                                                width: "229px",
-                                                height: "47px",
-                                                mb: -1.5
+                                                position: "relative",
+                                                marginBottom: 1,
+                                                fontFamily: "Poppins",
+                                                marginLeft: "18px",
                                             }}
                                         >
-                                            <Grid container alignItems="center" flex={1}>
-                                                <Grid item display="flex" alignItems="center">
+
+                                            <Checkbox
+                                                checked={selectedRooms.includes(room.id)}
+                                                onChange={() => handleCheckboxChange(room.id)}
+                                                sx={{
+                                                    position: "absolute",
+                                                    left: -30,
+                                                    top: "50%",
+                                                    transform: "translateY(-50%)",
+                                                    mt: 1,
+                                                    color: "#574B4FCC",
+                                                    '&.Mui-checked': { color: '#6C3A52' },
+
+                                                }}
+                                                checkedIcon={
                                                     <Box
                                                         sx={{
-                                                            backgroundColor: selectedRooms.includes(room.id)
-                                                                ? "#833953"
-                                                                : "#796E71",
-                                                            borderRadius: "50%",
-                                                            width: "26px",
-                                                            height: "26px",
-                                                            color: "white",
-                                                            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-                                                            marginRight: "16px",
-                                                            display: "flex",
-                                                            alignItems: "center",
-                                                            justifyContent: "center",
+                                                            width: '24px',
+                                                            height: '24px',
+                                                            position: 'relative',
+                                                            marginTop: '0px',
+                                                            marginLeft: '0px',
                                                         }}
                                                     >
                                                         <img
-                                                            src={IconHouse}
-                                                            alt="HouseIcon"
-                                                            width="14px"
-                                                            height="14px"
-                                                            color="#FFFFFF"
-                                                            style={{ display: 'block' }}
+                                                            src={IconCheckBox1}
+                                                            alt="Seleccionado"
+                                                            style={{ width: '24px', height: '24px' }}
                                                         />
                                                     </Box>
-                                                    <Typography sx={{
-                                                        fontWeight: "bold",
-                                                        color: selectedRooms.includes(room.id)
-                                                            ? "#833953"
-                                                            : "#574B4F",
-                                                    }}>
-                                                        {room.name}
-                                                    </Typography>
+                                                }
+                                            />
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    marginLeft: "15px",
+                                                    alignItems: "center",
+                                                    padding: 2,
+                                                    border: selectedRooms.includes(room.id)
+                                                        ? "1px solid #83395366"
+                                                        : "1px solid #CED2D5CC",
+                                                    backgroundColor: selectedRooms.includes(room.id)
+                                                        ? "#EFEAEC"
+                                                        : "#FFFFFF",
+                                                    borderRadius: "8px",
+                                                    flex: 1,
+                                                    width: "229px",
+                                                    height: "47px",
+                                                    mb: -1.5
+                                                }}
+                                            >
+                                                <Grid container alignItems="center" flex={1}>
+                                                    <Grid item display="flex" alignItems="center">
+                                                        <Box
+                                                            sx={{
+                                                                backgroundColor: selectedRooms.includes(room.id)
+                                                                    ? "#833953"
+                                                                    : "#796E71",
+                                                                borderRadius: "50%",
+                                                                width: "26px",
+                                                                height: "26px",
+                                                                color: "white",
+                                                                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                                                                marginRight: "16px",
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                justifyContent: "center",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={IconHouse}
+                                                                alt="HouseIcon"
+                                                                width="14px"
+                                                                height="14px"
+                                                                color="#FFFFFF"
+                                                                style={{ display: 'block' }}
+                                                            />
+                                                        </Box>
+                                                        <Typography sx={{
+                                                            fontWeight: "bold",
+                                                            color: selectedRooms.includes(room.id)
+                                                                ? "#833953"
+                                                                : "#574B4F",
+                                                        }}>
+                                                            {room.name}
+                                                        </Typography>
+                                                    </Grid>
                                                 </Grid>
-                                            </Grid>
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                ))}
+                                    ))}
 
+                                </Box>
                             </Box>
-                        </Box>
+                        )}
                     </Box>
                     <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5 }} />
                     <Box

@@ -117,13 +117,13 @@ button {
     visibility: hidden;
 }
 
-/* Estilo para el título centrado */
+/* Estilo para el tï¿½tulo centrado */
 .centered-title {
     text-align: center; /* Centrado del texto */
-    font-family: 'Poppins', sans-serif; /* Familia tipográfica Poppins */
+    font-family: 'Poppins', sans-serif; /* Familia tipogrï¿½fica Poppins */
     font-weight: 500; /* Peso de la fuente */
-    font-size: 28px; /* Tamaño de la fuente */
-    line-height: 55px; /* Altura de línea */
+    font-size: 28px; /* Tamaï¿½o de la fuente */
+    line-height: 55px; /* Altura de lï¿½nea */
     letter-spacing: 0; /* Espaciado entre letras */
     color: #330F1B; /* Color del texto */
     opacity: 1; /* Opacidad */

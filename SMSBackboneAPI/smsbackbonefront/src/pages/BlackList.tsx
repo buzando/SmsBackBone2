@@ -23,6 +23,7 @@ import IconEyeOpen from '../assets/IconEyeOpen.svg'
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import IconCheckBox2 from "../assets/IconCheckBox2.svg";
 import IconNegativeCircle from '../assets/IconNegativeCircle.svg'
+import IconCloseModal from "../assets/IconCloseModal.svg";
 import IconReUpdate1 from '../assets/IconReUpdate1.svg'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import IconCloudError from '../assets/IconCloudError.svg'
@@ -1091,7 +1092,7 @@ const BlackList: React.FC = () => {
                                 backgroundColor: '#FFFFFF',
                                 borderRadius: '8px',
                                 padding: '60px 0',
-                                height: '450px',
+                                height: '525px',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
@@ -1124,13 +1125,13 @@ const BlackList: React.FC = () => {
                                 backgroundColor: '#FFFFFF',
                                 borderRadius: '8px',
                                 padding: '60px 0',
-                                height: '450px',
+                                height: '526px',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                                mt: 1,
+                                mt: 1.1,
                             }}
                         >
                             <img src={Emptybox} style={{ width: 240, marginBottom: 16 }} />
@@ -1153,7 +1154,7 @@ const BlackList: React.FC = () => {
                                 width: '100%',
                                 backgroundColor: '#FFFFFF',
                                 borderRadius: '8px',
-                                height: '450px',
+                                height: '525px',
                                 boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                                 overflowX: 'auto',
                                 mt: 1.2
@@ -1167,7 +1168,7 @@ const BlackList: React.FC = () => {
                                 <thead>
                                     {selectedRows.length === 0 ? (
                                         <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', width: '100%' }}>
-                                            <th style={{ padding: '5px' }}>
+                                            <th style={{ padding: '5px', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6 }}>
                                                 <Box sx={{ marginLeft: "7px" }}>
                                                     <Checkbox
                                                         sx={{
@@ -1181,11 +1182,11 @@ const BlackList: React.FC = () => {
                                                     />
                                                 </Box>
                                             </th>
-                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500' }}>Fecha de creación</th>
-                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500' }}>Nombre de lista</th>
-                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500' }}>Fecha de expiración</th>
-                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', borderRight: '1px solid #E0E0E0', }}>Cantidad de registros</th>
-                                            <th style={{ padding: '0px' }}></th>
+                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Fecha de creación</th>
+                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Nombre de lista</th>
+                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Fecha de expiración</th>
+                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', borderRight: '1px solid #E0E0E0', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Cantidad de registros</th>
+                                            <th style={{ padding: '0px', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}></th>
                                         </tr>
                                     ) : (
                                         <tr style={{
@@ -1418,7 +1419,7 @@ const BlackList: React.FC = () => {
                 <Box
                     sx={{
                         position: 'absolute',
-                        top: '5%',
+                        top: '8%',
                         left: '35%',
                         transform: 'none',
                         width: '580px',
@@ -1461,9 +1462,13 @@ const BlackList: React.FC = () => {
                                     marginTop: '-16px',
                                     marginLeft: '504px',
                                     zIndex: 10
-                                }}
-                            >
-                                <CloseIcon sx={{ color: '#A6A6A6' }} />
+                                }}>
+                                <img
+                                    src={IconCloseModal}
+                                    alt="x"
+                                    width="24"
+                                    height="24"
+                                />
                             </IconButton>
                         </Box>
                         <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5 }} />
@@ -2220,8 +2225,14 @@ const BlackList: React.FC = () => {
                             Editar lista negra
                         </Typography>
                         <Box sx={{ marginTop: "-36px", marginLeft: "35px" }}>
-                            <IconButton onClick={() => setIsEditModalOpen(false)}>
-                                <CloseIcon sx={{ color: '#A6A6A6' }} />
+                            <IconButton onClick={() => setIsEditModalOpen(false)}
+                                sx={{ position: 'absolute', marginTop: "-28px", marginLeft: '-10px' }}>
+                                <img
+                                    src={IconCloseModal}
+                                    alt="x"
+                                    width="24"
+                                    height="24"
+                                />
                             </IconButton>
                         </Box>
                     </Box>
@@ -2465,8 +2476,14 @@ const BlackList: React.FC = () => {
                         }}>
                             Inspeccionar lista negra
                         </Typography>
-                        <IconButton onClick={() => setIsInspectModalOpen(false)}>
-                            <CloseIcon sx={{ color: '#A6A6A6', marginTop: "-34px", marginRight: "-24px" }} />
+                        <IconButton onClick={() => setIsInspectModalOpen(false)}
+                            sx={{ position: 'absolute', marginTop: "-40px", marginLeft: '472px' }}>
+                            <img
+                                src={IconCloseModal}
+                                alt="x"
+                                width="24"
+                                height="24"
+                            />
                         </IconButton>
                     </Box>
 
@@ -2518,7 +2535,7 @@ const BlackList: React.FC = () => {
                     <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 3, mt: -2.3 }} />
                     {inspectTab === 'campañas' && (
                         <Box
-                            sx={{ border: "1px solid #E6E4E4", borderRadius: "6px" }}
+                            sx={{ border: "1px solid #E6E4E4", borderRadius: "6px", }}
                         >
                             <Box sx={{
                                 display: 'flex',
