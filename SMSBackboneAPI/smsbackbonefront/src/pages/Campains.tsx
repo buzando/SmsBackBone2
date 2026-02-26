@@ -1044,8 +1044,11 @@ const Campains: React.FC = () => {
     setBase64File('');
     setUploadedFileBase64('');
     setOpenCreateCampaignModal(false);
+    closeCalendar();
+    setAnchorEl(null);
     resetUploadState();
   };
+
 
   const handleRemoveUploadedFile = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -1719,13 +1722,7 @@ const Campains: React.FC = () => {
           hasAtLeastOnePhone
         );
       }
-    case 1: {
-      if (!tipoMensaje) return true;
-      if (tipoMensaje === "plantilla") {
-        return !selectedTemplate || mensajeTexto.trim() === "";
-      }
-      return mensajeTexto.trim() === "";
-    }
+
 
       default:
         return false;
@@ -1882,6 +1879,8 @@ const Campains: React.FC = () => {
     setSampleData(sample);
   }, [excelData, selectedVariables, columns, omitHeaders]);
 
+  const MAX_CAMPAIGNS = 200;
+  const isLimitReached = campaigns.length >= MAX_CAMPAIGNS;
 
   return (
 
@@ -1985,7 +1984,14 @@ const Campains: React.FC = () => {
                     >
                       Listado de campañas
                     </Typography>
-                    <Tooltip title="Crear" arrow placement="top"
+                    <Tooltip
+                      title={
+                        isLimitReached
+                          ? "Has alcanzado el límite de 200 campañas. Elimina una para poder crear una nueva."
+                          : "Crear"
+                      }
+                      arrow
+                      placement="top"
                       componentsProps={{
                         tooltip: {
                           sx: {
@@ -2007,7 +2013,7 @@ const Campains: React.FC = () => {
                       PopperProps={{
                         modifiers: [
                           {
-                            name: 'offset',
+                            name: "offset",
                             options: {
                               offset: [0, -15]
                             }
@@ -2015,9 +2021,22 @@ const Campains: React.FC = () => {
                         ]
                       }}
                     >
-                      <IconButton onClick={handleOpenModal} sx={{}}>
-                        <img src={iconplus} alt="Agregar" style={{ width: "20px", height: "20px", }} />
-                      </IconButton>
+                      <span>
+                        <IconButton
+                          onClick={handleOpenModal}
+                          disabled={isLimitReached}
+                          sx={{
+                            opacity: isLimitReached ? 0.5 : 1,
+                            cursor: isLimitReached ? "not-allowed" : "pointer"
+                          }}
+                        >
+                          <img
+                            src={iconplus}
+                            alt="Agregar"
+                            style={{ width: "20px", height: "20px" }}
+                          />
+                        </IconButton>
+                      </span>
                     </Tooltip>
                   </Box>
 
@@ -6074,11 +6093,11 @@ const Campains: React.FC = () => {
               )}
             </>
           )}
-          {/*Configuraciones Avanzadas en crear campaña SMS*/}
+          {/*Configuraciones Avanzadas en crar campaña SMS*/}
           {activeStep === 2 && (
             <Box sx={{
-              mt: 4, display: 'flex', flexDirection: 'column', ml: 7,
-              maxHeight: "820px", width: "660px", overflowY: 'auto'
+              mt: 2, display: 'flex', flexDirection: 'column', ml: 7,
+              maxHeight: "620px", width: "600px",
             }}>
               <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '18px', mb: 2 }}>
                 Configuraciones avanzadas
@@ -6230,7 +6249,7 @@ const Campains: React.FC = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   width: "584px",
-                  minHeight: "60px",
+                  minHeight: "57px",
                   border: '1px solid #E6E4E4',
                   borderRadius: '6px',
                   padding: '12px 16px',
@@ -6575,7 +6594,7 @@ const Campains: React.FC = () => {
                   padding: '12px 16px',
                   backgroundColor: '#FFFFFF',
                   mb: 2,
-                  gap: 2, //mt: 6
+                  gap: 2,
                 }}
               >
                 {/* Primer Box: Título + tooltip + switch */}

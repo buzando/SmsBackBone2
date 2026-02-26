@@ -26,6 +26,29 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useSelectedRoom } from "../hooks/useSelectedRoom";
 
+// Preferimos declarar primero el objeto y luego el type (evita "used before declaration")
+const defaultSettings = {
+    campanasActivas: true,
+    smsEnviados: true,
+    promedioSMS: true,
+    consumoCreditos: true,
+    listadoCampanas: true,
+    resultadosEnvio: true,
+};
+
+type DashboardSettings = typeof defaultSettings;
+
+const getDashboardSettingsKey = (userId?: number, roomId?: number) =>
+    `dashboard_settings_v1:${userId ?? 0}:${roomId ?? 0}`;
+
+const safeParse = <T,>(raw: string | null): T | null => {
+    if (!raw) return null;
+    try {
+        return JSON.parse(raw) as T;
+    } catch {
+        return null;
+    }
+};
 
 interface CampaignKPIResponse {
     activeCampaigns: number;
@@ -67,14 +90,9 @@ const HomePage: React.FC = () => {
     const [enableButtons, setenableButtons] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [client, setClient] = useState<Clients | null>(null);
-    const [settings, setSettings] = useState({
-        campanasActivas: true,
-        smsEnviados: true,
-        promedioSMS: true,
-        consumoCreditos: true,
-        listadoCampanas: true,
-        resultadosEnvio: true,
-    });
+    const [settings, setSettings] = useState<DashboardSettings>(defaultSettings);
+
+    const [savedSettings, setSavedSettings] = useState<DashboardSettings>(defaultSettings);
     const [firstname, setFirstname] = useState<string>('');
     const [pssw, setPssw] = useState('');
     const [psswconfirm, setPsswconfirm] = useState('');
@@ -88,13 +106,18 @@ const HomePage: React.FC = () => {
     const [data, setdata] = useState<
         { label: string; value: number; color: string; tooltip: string }[]
     >([]);
-    const hasChanges = settings.listadoCampanas || settings.resultadosEnvio;
+
+    const hasChanges =
+        settings.listadoCampanas !== savedSettings.listadoCampanas ||
+        settings.resultadosEnvio !== savedSettings.resultadosEnvio;
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSettings({
-            ...settings,
-            [event.target.name]: event.target.checked,
-        });
+        const { name, checked } = event.target;
+
+        setSettings((prev) => ({
+            ...prev,
+            [name]: checked,
+        }));
     };
 
     const [openWelcomeModal, setOpenWelcomeModal] = useState(false);
@@ -111,6 +134,21 @@ const HomePage: React.FC = () => {
 
     const selectedRoom = useSelectedRoom();
     const roomId = selectedRoom?.id;
+
+    useEffect(() => {
+        const user = safeParse<{ id?: number }>(localStorage.getItem("userData"));
+        const userId = user?.id;
+
+        if (!roomId) return;
+
+        const key = getDashboardSettingsKey(userId, roomId);
+        const stored = safeParse<Partial<DashboardSettings>>(localStorage.getItem(key));
+
+        const merged: DashboardSettings = { ...defaultSettings, ...(stored ?? {}) };
+
+        setSettings(merged);
+        setSavedSettings(merged);
+    }, [roomId]);
 
     const Handletmppwwd = async () => {
         try {
@@ -261,14 +299,10 @@ const HomePage: React.FC = () => {
                 }
             ]);
 
-
-
-
         } catch (error) {
             console.error("Error al obtener KPI:", error);
         }
     };
-
 
     const handleApply = () => {
         setShowData(true);
@@ -284,10 +318,8 @@ const HomePage: React.FC = () => {
         setSelectedOption('');
     };
 
-
     const isPopperOpen = Boolean(anchorEl);
     const id = isPopperOpen ? 'popper-id' : undefined;
-
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         if (anchorEl) {
@@ -296,7 +328,6 @@ const HomePage: React.FC = () => {
             setAnchorEl(event.currentTarget);
         }
     };
-
 
     // Manejar cambios en los inputs
     const handleInputChange = (index: number, value: string) => {
@@ -337,19 +368,30 @@ const HomePage: React.FC = () => {
         setMessage(value);
     };
 
-
-
-
     const isFormValid = phoneNumbers.every(phone => phoneRegex.test(phone)) && message.trim().length > 0;
 
     const handleSave = () => {
         setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 2000); // Simula la carga por 2 segundos
-        setOpenControlModal(false);
-    };
 
+        try {
+            const user = safeParse<{ id?: number }>(localStorage.getItem("userData"));
+            const userId = user?.id;
+
+            if (roomId) {
+                const key = getDashboardSettingsKey(userId, roomId);
+                localStorage.setItem(key, JSON.stringify(settings));
+                setSavedSettings(settings);
+            }
+        } catch (e) {
+            // si falla el storage, de todas formas cerramos el modal
+            console.error("No se pudo guardar dashboard_settings", e);
+        } finally {
+            setTimeout(() => {
+                setIsLoading(false);
+                setOpenControlModal(false);
+            }, 400);
+        }
+    };
 
     const CustomTooltip = styled(
         ({ className, ...props }: any) => (
@@ -371,7 +413,6 @@ const HomePage: React.FC = () => {
             color: '#E0E0E0 !important',
         },
     }));
-
 
     useEffect(() => {
         const userData = localStorage.getItem("userData");
@@ -443,6 +484,13 @@ const HomePage: React.FC = () => {
         setErrors([false]);
         setMessage("");
         setIsFlashMessage(false);
+    };
+
+    const setDashboardToggle = (name: "listadoCampanas" | "resultadosEnvio", checked: boolean) => {
+        setSettings((prev) => ({
+            ...prev,
+            [name]: checked,
+        }));
     };
 
     return (
@@ -1580,7 +1628,7 @@ const HomePage: React.FC = () => {
                                                     src={IconCheckBox1}
                                                     alt="Seleccionado"
                                                     style={{ width: '24px', height: '24px' }}
-                                                />
+                                            />
                                             }
                                         />
                                     }

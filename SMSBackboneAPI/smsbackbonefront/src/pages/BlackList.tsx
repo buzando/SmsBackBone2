@@ -899,7 +899,10 @@ const BlackList: React.FC = () => {
 
     const [showColumnOptions, setShowColumnOptions] = useState(true);
 
-
+    const isValidPhone = (phone: string) => {
+        const clean = phone.replace(/\D/g, "");
+        return /^\d{10}$/.test(clean);
+    };
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
@@ -2050,7 +2053,7 @@ const BlackList: React.FC = () => {
                                                     >
                                                         <IconButton
                                                             onClick={handleAddPhone}
-                                                            disabled={phone.length < 10}
+                                                            disabled={!isValidPhone(formData.Phones[formData.Phones.length - 1])}
                                                             sx={{ p: 0 }}
                                                         >
                                                             <img
@@ -4774,11 +4777,21 @@ const BlackList: React.FC = () => {
                                                                 justifyContent: "center"
                                                             }}
                                                         >
-                                                            <IconButton onClick={handleAddIndividualPhone}>
+                                                            <IconButton
+                                                                onClick={handleAddIndividualPhone}
+                                                                disabled={!isValidPhone(individualPhones[individualPhones.length - 1])}
+                                                                sx={{
+                                                                    opacity: !isValidPhone(individualPhones[individualPhones.length - 1]) ? 0.4 : 1,
+                                                                    filter: !isValidPhone(individualPhones[individualPhones.length - 1])
+                                                                        ? "grayscale(100%)"
+                                                                        : "none",
+                                                                    transition: "all 0.2s ease",
+                                                                }}
+                                                            >
                                                                 <img
                                                                     src={IconPlus2}
                                                                     alt="Agregar teléfono"
-                                                                    style={{ width: 21, height: 21, }}
+                                                                    style={{ width: 21, height: 21 }}
                                                                 />
                                                             </IconButton>
                                                         </Box>
@@ -4786,7 +4799,7 @@ const BlackList: React.FC = () => {
 
                                                 )}
 
-                                                {(formData.Phones.length > 1) && (
+                                                {(individualPhones.length > 1) && (
                                                     <Tooltip title="Eliminar teléfono">
                                                         <IconButton onClick={() => handleRemoveIndividualPhone(index)}>
                                                             <img src={Thrashicon} alt="Eliminar" style={{ width: 24, height: 24 }} />
