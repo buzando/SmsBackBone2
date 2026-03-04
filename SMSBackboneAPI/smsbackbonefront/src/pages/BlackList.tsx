@@ -202,6 +202,7 @@ const BlackList: React.FC = () => {
     const [selectedBlackListName, setSelectedBlackListName] = useState<string>('');
     const [selectedRows, setSelectedRows] = useState<BlackList[]>([]);
     const [originalExpiration, setOriginalExpiration] = useState<Date | null>(null);
+    const [openSelectId, setOpenSelectId] = useState<string | null>(null);
 
     const [allRows, setAllRows] = useState<BlackList[]>([]);
     useEffect(() => {
@@ -645,6 +646,10 @@ const BlackList: React.FC = () => {
         setColumns(jsonData[0] as string[]);
     };
 
+    const isSheetOpen = openSelectId === "sheet";
+    const isColumnTelOpen = openSelectId === "columntel";
+    const isColumnIdOpen = openSelectId === "columnid";
+    const isFilterTelOpen = openSelectId === "filtertel";
 
     const handlePhoneChange = (index: number, value: string) => {
         const numericOnly = value.replace(/\D/g, '');
@@ -2903,7 +2908,13 @@ const BlackList: React.FC = () => {
                 </Box>
             </Modal>
 
-            <Modal open={isManageModalOpen} onClose={handleCloseManageModal}>
+            <Modal
+                open={isManageModalOpen}
+                onClose={(event, reason) => {
+                    if (reason === "backdropClick") return;
+                    handleCloseManageModal();
+                }}
+            >
                 <Box sx={{
                     width: '600px',
                     height: '592px',
@@ -2926,14 +2937,14 @@ const BlackList: React.FC = () => {
 
                         <IconButton
                             onClick={handleCloseManageModal}
-                            sx={{
-                                position: 'absolute',
-                                marginTop: '-46px',
-                                marginLeft: '500px',
-                                zIndex: 10
-                            }}
+                            sx={{ position: 'absolute', marginTop: "-48px", marginLeft: '524px' }}
                         >
-                            <CloseIcon sx={{ color: '#A6A6A6' }} />
+                            <img
+                                src={IconCloseModal}
+                                alt="x"
+                                width="24"
+                                height="24"
+                            />
                         </IconButton>
 
                         <Divider sx={{
@@ -3203,7 +3214,7 @@ const BlackList: React.FC = () => {
                             px: 3,
                             py: 0,
                             mt: -3,
-                            maxHeight: 'calc(85vh - 200px)', // 🔥 ajusta el espacio restante después del header y los botones
+                            maxHeight: 'calc(85vh - 200px)',
                         }}
                     >
                         <Box
@@ -3211,8 +3222,8 @@ const BlackList: React.FC = () => {
                                 flex: 1,
                                 px: 4,
                                 py: 3,
-                                maxHeight: 'calc(90vh - 180px)', // o lo que uses
-                                overflowX: 'hidden', // 🔥 Esto evita scroll lateral
+                                maxHeight: 'calc(90vh - 180px)',
+                                overflowX: 'hidden',
                             }}
                         >
                             <Typography fontWeight="500" fontSize="18px" mb={1} fontFamily={"Poppins"}
@@ -3251,7 +3262,7 @@ const BlackList: React.FC = () => {
                             {manageByList && (
                                 <>
                                     {manageOperation === 'agregar' && (
-                                        <Box display="flex" alignItems="flex-start" gap={3} mt={2} flexWrap="wrap">
+                                        <Box sx={{ display: 'flex', gap: 2, mt: 2, alignItems: 'flex-start' }}>
 
                                             <Box
                                                 marginBottom={'0px'}
@@ -3259,7 +3270,7 @@ const BlackList: React.FC = () => {
                                                 onDragOver={(e) => e.preventDefault()}
                                                 onDrop={(e) => {
                                                     e.preventDefault();
-                                                    if (hasPhoneInput) return; // 🔒 prevenir carga
+                                                    if (hasPhoneInput) return;
                                                     const file = e.dataTransfer.files?.[0];
                                                     if (file) handleFile(file);
                                                 }}
@@ -3267,12 +3278,12 @@ const BlackList: React.FC = () => {
                                                     border: fileError
                                                         ? '2px solid #EF5466'
                                                         : fileSuccess
-                                                            ? '2px solid #8F4E63CC' // ✅ borde éxito
+                                                            ? '2px solid #8F4E63CC'
                                                             : '2px dashed #D9B4C3',
                                                     backgroundColor: fileError
                                                         ? '#FFF4F5'
                                                         : fileSuccess
-                                                            ? '#E5CBD333'           // ✅ fondo éxito
+                                                            ? '#E5CBD333'
                                                             : 'transparent',
                                                     borderRadius: '8px',
                                                     width: '160px',
@@ -3281,7 +3292,7 @@ const BlackList: React.FC = () => {
                                                     flexDirection: 'column',
                                                     justifyContent: 'center',
                                                     alignItems: fileSuccess ? 'flex-start' : 'center',
-                                                    transition: 'all 0.3s ease', // animación suave
+                                                    transition: 'all 0.3s ease',
                                                     marginLeft: fileSuccess ? '20px' : 'auto',
                                                     marginRight: fileSuccess ? '10px' : 'auto',
                                                     textAlign: 'center',
@@ -3348,7 +3359,7 @@ const BlackList: React.FC = () => {
                                                                 {
                                                                     name: 'offset',
                                                                     options: {
-                                                                        offset: [35, -180] // 👉 [horizontal, vertical]
+                                                                        offset: [35, -180]
                                                                     }
                                                                 }
                                                             ]
@@ -3389,7 +3400,7 @@ const BlackList: React.FC = () => {
                                                                     {
                                                                         name: 'offset',
                                                                         options: {
-                                                                            offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                            offset: [0, -8]
                                                                         }
                                                                     }
                                                                 ]
@@ -3406,7 +3417,7 @@ const BlackList: React.FC = () => {
                                                                     setBase64File('');
                                                                     setUploadedFileBase64('');
                                                                     setFormData(prev => ({ ...prev, File: '' }));
-                                                                    setShowColumnOptions(false); // 🔥 ocultar secciones de columnas
+                                                                    setShowColumnOptions(false);
                                                                     if (fileInputRef.current) {
                                                                         fileInputRef.current.value = '';
                                                                     }
@@ -3471,8 +3482,8 @@ const BlackList: React.FC = () => {
                                                             color: '#574B4F',
                                                             opacity: 0.7,
                                                             textAlign: 'center',
-                                                            wordBreak: 'break-word', // para dividir texto largo
-                                                            maxWidth: '142px' // asegúrate de limitar ancho si el nombre del archivo es largo
+                                                            wordBreak: 'break-word',
+                                                            maxWidth: '142px'
                                                         }}
                                                     >
                                                         {fileSuccess && uploadedFile
@@ -3507,23 +3518,43 @@ const BlackList: React.FC = () => {
 
                                                 />
 
-
-
                                             </Box>
 
                                             {columns.length > 0 && showColumnOptions && (
 
                                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                    {/* Seleccionar hoja */}
+                                                    {/* Seleccionar hoja En Cargar */}
                                                     <Box>
                                                         <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '16px', mb: 1 }}>
                                                             Seleccionar hoja
+                                                            <span style={{ color: "#D01247" }}>*</span>
                                                         </Typography>
                                                         <FormControl fullWidth size="small">
                                                             <Select
                                                                 displayEmpty
+                                                                open={isSheetOpen}
                                                                 value={selectedSheet}
-                                                                onChange={handleSheetChange}
+                                                                onChange={(e) => {
+                                                                    handleSheetChange(e);
+                                                                    setOpenSelectId(null);
+                                                                }}
+                                                                onOpen={() => setOpenSelectId("sheet")}
+                                                                onClose={() => setOpenSelectId(null)}
+                                                                IconComponent={() => (
+                                                                    <img
+                                                                        src={ArrowBackIosNewIcon}
+                                                                        alt="arrow"
+                                                                        style={{
+                                                                            position: "absolute",
+                                                                            right: "12px",
+                                                                            pointerEvents: "none",
+                                                                            width: 24,
+                                                                            height: 24,
+                                                                            transition: "transform 0.2s ease",
+                                                                            transform: isSheetOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                        }}
+                                                                    />
+                                                                )}
                                                                 sx={{ borderRadius: '8px' }}
                                                                 renderValue={(selected) =>
                                                                     selected ? (
@@ -3556,7 +3587,7 @@ const BlackList: React.FC = () => {
                                                                             color: '#645E60',
                                                                             opacity: 0.8,
                                                                             '&:hover': {
-                                                                                backgroundColor: '#F2EBED', // 💥 color al pasar el mouse
+                                                                                backgroundColor: '#F2EBED',
                                                                             },
                                                                             '&.Mui-selected': {
                                                                                 backgroundColor: '#F2EBED',
@@ -3571,52 +3602,38 @@ const BlackList: React.FC = () => {
                                                                 ))}
                                                             </Select>
                                                         </FormControl>
-
-
                                                     </Box>
 
                                                     {/* Seleccionar columnas */}
-
                                                     <Box>
                                                         <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '16px', mb: 1, color: '#330F1B' }}>
                                                             Seleccionar columnas
                                                         </Typography>
                                                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                            {/* Seleccionar columna Telefono */}
                                                             <FormControl fullWidth size="small">
                                                                 <Select
                                                                     displayEmpty
-                                                                    value={selectedDatoCol}
-                                                                    onChange={(e) => setSelectedDatoCol(e.target.value as string)}
-                                                                    sx={{ borderRadius: '8px' }}
-                                                                    renderValue={(selected) =>
-                                                                        selected ? (
-                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
-                                                                                {selected as string}
-                                                                            </span>
-                                                                        ) : (
-                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
-                                                                                Seleccionar columna ID
-                                                                            </span>
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    {columns
-                                                                        .filter((col) => col !== selectedTelefonoCol)
-                                                                        .map((col, idx) => (
-                                                                            <MenuItem key={idx} value={col}>
-                                                                                {col}
-                                                                            </MenuItem>
-                                                                        ))}
-                                                                </Select>
-                                                            </FormControl>
-
-
-
-                                                            <FormControl fullWidth size="small">
-                                                                <Select
-                                                                    displayEmpty
+                                                                    open={isColumnTelOpen}
                                                                     value={selectedTelefonoCol}
                                                                     onChange={(e) => setSelectedTelefonoCol(e.target.value as string)}
+                                                                    onOpen={() => setOpenSelectId("columntel")}
+                                                                    onClose={() => setOpenSelectId(null)}
+                                                                    IconComponent={() => (
+                                                                        <img
+                                                                            src={ArrowBackIosNewIcon}
+                                                                            alt="arrow"
+                                                                            style={{
+                                                                                position: "absolute",
+                                                                                right: "12px",
+                                                                                pointerEvents: "none",
+                                                                                width: 24,
+                                                                                height: 24,
+                                                                                transition: "transform 0.2s ease",
+                                                                                transform: isColumnTelOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                            }}
+                                                                        />
+                                                                    )}
                                                                     sx={{ borderRadius: '8px' }}
                                                                     renderValue={(selected) =>
                                                                         selected ? (
@@ -3626,7 +3643,7 @@ const BlackList: React.FC = () => {
                                                                         ) : (
                                                                             <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
                                                                                 Seleccionar columna Teléfono
-                                                                                <span style={{ color: '#D32F2F', marginLeft: 4 }}>*</span>
+                                                                                <span style={{ color: '#D32F2F' }}>*</span>
                                                                             </span>
                                                                         )
                                                                     }
@@ -3634,13 +3651,88 @@ const BlackList: React.FC = () => {
                                                                     {columns
                                                                         .filter((col) => col !== selectedDatoCol)
                                                                         .map((col, idx) => (
-                                                                            <MenuItem key={idx} value={col}>
+                                                                            <MenuItem key={idx} value={col}
+                                                                                sx={{
+                                                                                    fontSize: '12px',
+                                                                                    fontFamily: 'Poppins',
+                                                                                    color: '#645E60',
+                                                                                    opacity: 0.8,
+                                                                                    '&:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    }
+                                                                                }}>
                                                                                 {col}
                                                                             </MenuItem>
                                                                         ))}
                                                                 </Select>
                                                             </FormControl>
-
+                                                            {/* Seleccionar columna Id */}
+                                                            <FormControl fullWidth size="small">
+                                                                <Select
+                                                                    displayEmpty
+                                                                    value={selectedDatoCol}
+                                                                    open={isColumnIdOpen}
+                                                                    onChange={(e) => setSelectedDatoCol(e.target.value as string)}
+                                                                    onOpen={() => setOpenSelectId("columnid")}
+                                                                    onClose={() => setOpenSelectId(null)}
+                                                                    IconComponent={() => (
+                                                                        <img
+                                                                            src={ArrowBackIosNewIcon}
+                                                                            alt="arrow"
+                                                                            style={{
+                                                                                position: "absolute",
+                                                                                right: "12px",
+                                                                                pointerEvents: "none",
+                                                                                width: 24,
+                                                                                height: 24,
+                                                                                transition: "transform 0.2s ease",
+                                                                                transform: isColumnIdOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                    sx={{ borderRadius: '8px' }}
+                                                                    renderValue={(selected) =>
+                                                                        selected ? (
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                                {selected as string}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
+                                                                                Seleccionar columna 2
+                                                                            </span>
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {columns
+                                                                        .filter((col) => col !== selectedTelefonoCol)
+                                                                        .map((col, idx) => (
+                                                                            <MenuItem key={idx} value={col}
+                                                                                sx={{
+                                                                                    fontSize: '12px',
+                                                                                    fontFamily: 'Poppins',
+                                                                                    color: '#645E60',
+                                                                                    opacity: 0.8,
+                                                                                    '&:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    }
+                                                                                }}>
+                                                                                {col}
+                                                                            </MenuItem>
+                                                                        ))}
+                                                                </Select>
+                                                            </FormControl>
 
                                                             <Box mt={-1} mb={0}>
                                                                 {/* Checkbox Omitir encabezados */}
@@ -3650,11 +3742,28 @@ const BlackList: React.FC = () => {
                                                                             checked={omitHeaders}
                                                                             onChange={(e) => setOmitHeaders(e.target.checked)}
                                                                             sx={{
-                                                                                color: '#7B354D',
+                                                                                color: '#574861',
                                                                                 '&.Mui-checked': {
-                                                                                    color: '#7B354D',
+                                                                                    color: '#7B354D'
                                                                                 },
+                                                                                '&.MuiCheckbox-indeterminate': {
+                                                                                    color: '#7B354D'
+                                                                                }
                                                                             }}
+                                                                            checkedIcon={
+                                                                                <Box
+                                                                                    sx={{
+                                                                                        width: '24px',
+                                                                                        height: '24px',
+                                                                                    }}
+                                                                                >
+                                                                                    <img
+                                                                                        src={IconCheckBox1}
+                                                                                        alt="Seleccionado"
+                                                                                        style={{ width: '24px', height: '24px' }}
+                                                                                    />
+                                                                                </Box>
+                                                                            }
                                                                         />
                                                                     }
                                                                     label={
@@ -3680,9 +3789,27 @@ const BlackList: React.FC = () => {
 
                                                                 <FormControl fullWidth size="small">
                                                                     <Select
+                                                                        displayEmpty
+                                                                        open={isFilterTelOpen}
                                                                         value={telefonoFilter}
                                                                         onChange={(e) => setTelefonoFilter(e.target.value)}
-                                                                        displayEmpty
+                                                                        onOpen={() => setOpenSelectId("filtertel")}
+                                                                        onClose={() => setOpenSelectId(null)}
+                                                                        IconComponent={() => (
+                                                                            <img
+                                                                                src={ArrowBackIosNewIcon}
+                                                                                alt="arrow"
+                                                                                style={{
+                                                                                    position: "absolute",
+                                                                                    right: "12px",
+                                                                                    pointerEvents: "none",
+                                                                                    width: 24,
+                                                                                    height: 24,
+                                                                                    transition: "transform 0.2s ease",
+                                                                                    transform: isFilterTelOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                                }}
+                                                                            />
+                                                                        )}
                                                                         sx={{ borderRadius: '8px' }}
                                                                         renderValue={(selected) =>
                                                                             selected ? (
@@ -3848,7 +3975,7 @@ const BlackList: React.FC = () => {
                                                                 {
                                                                     name: 'offset',
                                                                     options: {
-                                                                        offset: [35, -180] // 👉 [horizontal, vertical]
+                                                                        offset: [35, -180]
                                                                     }
                                                                 }
                                                             ]
@@ -3889,7 +4016,7 @@ const BlackList: React.FC = () => {
                                                                     {
                                                                         name: 'offset',
                                                                         options: {
-                                                                            offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                            offset: [0, -8]
                                                                         }
                                                                     }
                                                                 ]
@@ -3906,7 +4033,7 @@ const BlackList: React.FC = () => {
                                                                     setBase64File('');
                                                                     setUploadedFileBase64('');
                                                                     setFormData(prev => ({ ...prev, File: '' }));
-                                                                    setShowColumnOptions(false); // 🔥 ocultar secciones de columnas
+                                                                    setShowColumnOptions(false);
                                                                     if (fileInputRef.current) {
                                                                         fileInputRef.current.value = '';
                                                                     }
@@ -3971,8 +4098,8 @@ const BlackList: React.FC = () => {
                                                             color: '#574B4F',
                                                             opacity: 0.7,
                                                             textAlign: 'center',
-                                                            wordBreak: 'break-word', // para dividir texto largo
-                                                            maxWidth: '142px' // asegúrate de limitar ancho si el nombre del archivo es largo
+                                                            wordBreak: 'break-word',
+                                                            maxWidth: '142px'
                                                         }}
                                                     >
                                                         {fileSuccess && uploadedFile
@@ -4014,7 +4141,7 @@ const BlackList: React.FC = () => {
                                             {!uploadedFileBase64 && (
                                                 <>
                                                     <Box sx={{ flex: 1 }}>
-                                                        <Typography fontWeight={600} fontSize="16px" mb={1} fontFamily={'Poppins'}>
+                                                        <Typography fontWeight={500} fontSize="16px" mb={1} fontFamily={'Poppins'} ml={1.5}>
                                                             O seleccionar archivos actuales
                                                         </Typography>
                                                         <Paper
@@ -4043,17 +4170,35 @@ const BlackList: React.FC = () => {
                                                                                 setSelectedBlackListName(prev => prev === bl.name ? null : bl.name)
                                                                             }
                                                                             dense
-                                                                        >                                                                            <Checkbox
+                                                                        >
+                                                                            <Checkbox
                                                                                 edge="start"
                                                                                 tabIndex={-1}
                                                                                 disableRipple
                                                                                 checked={selectedBlackListName === bl.name}
                                                                                 sx={{
-                                                                                    color: '#8F4E63',
+                                                                                    color: '#574861',
                                                                                     '&.Mui-checked': {
-                                                                                        color: '#8F4E63',
+                                                                                        color: '#7B354D'
+                                                                                    },
+                                                                                    '&.MuiCheckbox-indeterminate': {
+                                                                                        color: '#7B354D'
                                                                                     }
                                                                                 }}
+                                                                                checkedIcon={
+                                                                                    <Box
+                                                                                        sx={{
+                                                                                            width: '24px',
+                                                                                            height: '24px',
+                                                                                        }}
+                                                                                    >
+                                                                                        <img
+                                                                                            src={IconCheckBox1}
+                                                                                            alt="Seleccionado"
+                                                                                            style={{ width: '24px', height: '24px' }}
+                                                                                        />
+                                                                                    </Box>
+                                                                                }
                                                                             />
                                                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                                                                                 <ListItemText
@@ -4080,135 +4225,387 @@ const BlackList: React.FC = () => {
                                             )}
 
                                             {uploadedFileBase64 && (
-                                                <Box mt={0} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                    <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '16px', mb: 1 }}>
-                                                        Seleccionar hoja
-                                                    </Typography>
-                                                    <Select
-                                                        fullWidth
-                                                        value={selectedSheet}
-                                                        onChange={handleSheetChange}
-                                                        displayEmpty
-                                                        sx={{ fontFamily: 'Poppins', fontSize: '12px', color: "#645E60", opacity: 0.8 }}
-                                                    >
-                                                        <MenuItem disabled value="">Seleccione una hoja</MenuItem>
-                                                        {sheetNames.map((name, index) => (
-                                                            <MenuItem key={index} value={name}>
-                                                                {name}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                    {/* Columna de DATO */}
-                                                    <FormControl fullWidth size="small">
-                                                        <Select
-                                                            displayEmpty
-                                                            value={selectedDatoCol}
-                                                            onChange={(e) => setSelectedPhoneColumn(e.target.value as string)}   // ✅ corregido
-                                                            sx={{ borderRadius: '8px' }}
-                                                            renderValue={(selected) =>
-                                                                selected ? (
-                                                                    <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
-                                                                        {selected as string}
-                                                                    </span>
-                                                                ) : (
-                                                                    <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
-                                                                        Seleccionar columna Teléfono
-                                                                        <span style={{ color: '#D32F2F', marginLeft: 4 }}>*</span>
-                                                                    </span>
-                                                                )
-                                                            }
-                                                        >
-                                                            {/* opción para quitar selección */}
-                                                            <MenuItem value="" >— Quitar selección —</MenuItem>
 
-                                                            {columns
-                                                                .filter((col) => col !== selectedTelefonoCol)
-                                                                .map((col, idx) => (
-                                                                    <MenuItem key={idx} value={col} >
-                                                                        {col}
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                    {/* Seleccionar hoja En Eliminar */}
+                                                    <Box>
+                                                        <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '16px', mb: 1 }}>
+                                                            Seleccionar hoja
+                                                            <span style={{ color: "#D01247" }}>*</span>
+                                                        </Typography>
+                                                        <FormControl fullWidth size="small">
+                                                            <Select
+                                                                displayEmpty
+                                                                value={selectedSheet}
+                                                                open={isSheetOpen}
+                                                                onChange={handleSheetChange}
+                                                                onOpen={() => setOpenSelectId("sheet")}
+                                                                onClose={() => setOpenSelectId(null)}
+                                                                IconComponent={() => (
+                                                                    <img
+                                                                        src={ArrowBackIosNewIcon}
+                                                                        alt="arrow"
+                                                                        style={{
+                                                                            position: "absolute",
+                                                                            right: "12px",
+                                                                            pointerEvents: "none",
+                                                                            width: 24,
+                                                                            height: 24,
+                                                                            transition: "transform 0.2s ease",
+                                                                            transform: isSheetOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                                sx={{ borderRadius: '8px' }}
+                                                                renderValue={(selected) =>
+                                                                    selected ? (
+                                                                        <span style={{
+                                                                            fontSize: "12px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#645E60"
+                                                                        }}>
+                                                                            {selected}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span style={{
+                                                                            fontSize: "12px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#645E60",
+                                                                            opacity: 0.8
+                                                                        }}>
+                                                                            Seleccionar hoja
+                                                                        </span>
+                                                                    )
+                                                                }
+                                                            >
+                                                                {sheetNames.map((name, index) => (
+                                                                    <MenuItem
+                                                                        key={index}
+                                                                        value={name}
+                                                                        sx={{
+                                                                            fontSize: '12px',
+                                                                            fontFamily: 'Poppins',
+                                                                            color: '#645E60',
+                                                                            opacity: 0.8,
+                                                                            '&:hover': {
+                                                                                backgroundColor: '#F2EBED',
+                                                                            },
+                                                                            '&.Mui-selected': {
+                                                                                backgroundColor: '#F2EBED',
+                                                                            },
+                                                                            '&.Mui-selected:hover': {
+                                                                                backgroundColor: '#F2EBED',
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {name}
                                                                     </MenuItem>
                                                                 ))}
-                                                        </Select>
-                                                    </FormControl>
-                                                    {/* Columna de TELÉFONO */}
-                                                    <FormControl fullWidth size="small">
-                                                        <Select
-                                                            displayEmpty
-                                                            value={selectedTelefonoCol}
-                                                            onChange={(e) => setSelectedDataColumn(e.target.value as string)}   // ✅ corregido
-                                                            sx={{ borderRadius: '8px' }}
-                                                            renderValue={(selected) =>
-                                                                selected ? (
-                                                                    <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
-                                                                        {selected as string}
-                                                                    </span>
-                                                                ) : (
-                                                                    <span style={{
-                                                                        fontSize: 12,
+                                                            </Select>
+                                                        </FormControl>
+                                                    </Box>
+
+                                                    {/* Seleccionar columnas */}
+                                                    <Box>
+                                                        <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '16px', mb: 1, color: '#330F1B' }}>
+                                                            Seleccionar columnas
+                                                        </Typography>
+                                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                            {/* Seleccionar columna Telefono */}
+                                                            <FormControl fullWidth size="small">
+                                                                <Select
+                                                                    displayEmpty
+                                                                    open={isColumnTelOpen}
+                                                                    value={selectedTelefonoCol}
+                                                                    onChange={(e) => setSelectedDataColumn(e.target.value as string)}
+                                                                    onOpen={() => setOpenSelectId("columntel")}
+                                                                    onClose={() => setOpenSelectId(null)}
+                                                                    IconComponent={() => (
+                                                                        <img
+                                                                            src={ArrowBackIosNewIcon}
+                                                                            alt="arrow"
+                                                                            style={{
+                                                                                position: "absolute",
+                                                                                right: "12px",
+                                                                                pointerEvents: "none",
+                                                                                width: 24,
+                                                                                height: 24,
+                                                                                transition: "transform 0.2s ease",
+                                                                                transform: isColumnTelOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                    sx={{ borderRadius: '8px' }}
+                                                                    renderValue={(selected) =>
+                                                                        selected ? (
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                                {selected as string}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span style={{
+                                                                                fontSize: 12,
+                                                                                fontFamily: 'Poppins',
+                                                                                color: '#645E60',
+                                                                                opacity: 0.8
+                                                                            }}>
+                                                                                Seleccionar columna Teléfono
+                                                                                <span style={{ color: '#D32F2F' }}>*</span>
+                                                                            </span>
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {columns
+                                                                        .filter((col) => col !== selectedDatoCol)
+                                                                        .map((col, idx) => (
+                                                                            <MenuItem key={idx} value={col}
+                                                                                sx={{
+                                                                                    fontSize: '12px',
+                                                                                    fontFamily: 'Poppins',
+                                                                                    color: '#645E60',
+                                                                                    opacity: 0.8,
+                                                                                    '&:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    }
+                                                                                }}>
+                                                                                {col}
+                                                                            </MenuItem>
+                                                                        ))}
+                                                                </Select>
+                                                            </FormControl>
+                                                            {/* Seleccionar columna Id */}
+                                                            <FormControl fullWidth size="small">
+                                                                <Select
+                                                                    displayEmpty
+                                                                    value={selectedDatoCol}
+                                                                    open={isColumnIdOpen}
+                                                                    onChange={(e) => setSelectedPhoneColumn(e.target.value as string)}
+                                                                    onOpen={() => setOpenSelectId("columnid")}
+                                                                    onClose={() => setOpenSelectId(null)}
+                                                                    IconComponent={() => (
+                                                                        <img
+                                                                            src={ArrowBackIosNewIcon}
+                                                                            alt="arrow"
+                                                                            style={{
+                                                                                position: "absolute",
+                                                                                right: "12px",
+                                                                                pointerEvents: "none",
+                                                                                width: 24,
+                                                                                height: 24,
+                                                                                transition: "transform 0.2s ease",
+                                                                                transform: isColumnIdOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                    sx={{ borderRadius: '8px' }}
+                                                                    renderValue={(selected) =>
+                                                                        selected ? (
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                                {selected as string}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
+                                                                                Seleccionar columna 2
+                                                                            </span>
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {columns
+                                                                        .filter((col) => col !== selectedTelefonoCol)
+                                                                        .map((col, idx) => (
+                                                                            <MenuItem key={idx} value={col}
+                                                                                sx={{
+                                                                                    fontSize: '12px',
+                                                                                    fontFamily: 'Poppins',
+                                                                                    color: '#645E60',
+                                                                                    opacity: 0.8,
+                                                                                    '&:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    }
+                                                                                }}>
+                                                                                {col}
+                                                                            </MenuItem>
+                                                                        ))}
+                                                                </Select>
+                                                            </FormControl>
+
+                                                            <Box mt={-1} mb={0}>
+                                                                {/* Checkbox Omitir encabezados */}
+                                                                <FormControlLabel
+                                                                    control={
+                                                                        <Checkbox
+                                                                            checked={omitHeaders}
+                                                                            onChange={(e) => setOmitHeaders(e.target.checked)}
+                                                                            sx={{
+                                                                                color: '#574861',
+                                                                                '&.Mui-checked': {
+                                                                                    color: '#7B354D'
+                                                                                },
+                                                                                '&.MuiCheckbox-indeterminate': {
+                                                                                    color: '#7B354D'
+                                                                                }
+                                                                            }}
+                                                                            checkedIcon={
+                                                                                <Box
+                                                                                    sx={{
+                                                                                        width: '24px',
+                                                                                        height: '24px',
+                                                                                    }}
+                                                                                >
+                                                                                    <img
+                                                                                        src={IconCheckBox1}
+                                                                                        alt="Seleccionado"
+                                                                                        style={{ width: '24px', height: '24px' }}
+                                                                                    />
+                                                                                </Box>
+                                                                            }
+                                                                        />
+                                                                    }
+                                                                    label={
+                                                                        <Typography sx={{ color: '#574B4FCC', fontSize: '16px', fontFamily: 'Poppins' }}>
+                                                                            Omitir encabezados de columna
+                                                                        </Typography>
+                                                                    }
+                                                                />
+
+                                                                {/* Select filtrado de teléfonos */}
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontWeight: 500,
+                                                                        fontSize: '16px',
+                                                                        color: '#330F1B',
                                                                         fontFamily: 'Poppins',
-                                                                        color: '#645E60',
-                                                                        opacity: 0.8
-                                                                    }}>
-                                                                        Seleccionar columna ID
-                                                                    </span>
-                                                                )
-                                                            }
-                                                        >
-                                                            {/* opción para quitar selección */}
-                                                            <MenuItem value="" >— Quitar selección —</MenuItem>
+                                                                        mt: 1,
+                                                                        mb: 1,
+                                                                    }}
+                                                                >
+                                                                    Seleccionar filtrado de teléfonos
+                                                                </Typography>
 
-                                                            {columns
-                                                                .filter((col) => col !== selectedDatoCol)
-                                                                .map((col, idx) => (
-                                                                    <MenuItem key={idx} value={col} >
-                                                                        {col}
-                                                                    </MenuItem>
-                                                                ))}
-                                                        </Select>
-                                                    </FormControl>
+                                                                <FormControl fullWidth size="small">
+                                                                    <Select
+                                                                        displayEmpty
+                                                                        open={isFilterTelOpen}
+                                                                        value={selectedPhoneFilter}
+                                                                        onChange={(e) => setSelectedPhoneFilter(e.target.value)}
+                                                                        onOpen={() => setOpenSelectId("filtertel")}
+                                                                        onClose={() => setOpenSelectId(null)}
+                                                                        IconComponent={() => (
+                                                                            <img
+                                                                                src={ArrowBackIosNewIcon}
+                                                                                alt="arrow"
+                                                                                style={{
+                                                                                    position: "absolute",
+                                                                                    right: "12px",
+                                                                                    pointerEvents: "none",
+                                                                                    width: 24,
+                                                                                    height: 24,
+                                                                                    transition: "transform 0.2s ease",
+                                                                                    transform: isFilterTelOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                                }}
+                                                                            />
+                                                                        )}
+                                                                        sx={{ borderRadius: '8px' }}
+                                                                        renderValue={(selected) =>
+                                                                            selected ? (
+                                                                                <span style={{ fontSize: "12px", fontFamily: "Poppins", color: "#645E60" }}>
+                                                                                    {selected === "verificar" ? "Verificar" : "Limpiar"}
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span style={{ fontSize: "12px", fontFamily: "Poppins", color: "#645E60", opacity: 0.8 }}>
+                                                                                    Seleccionar filtro
+                                                                                </span>
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <MenuItem
+                                                                            value="limpiar"
+                                                                            sx={{
+                                                                                fontSize: '12px',
+                                                                                fontFamily: 'Poppins',
+                                                                                color: '#645E60',
+                                                                                opacity: 0.8,
+                                                                                '&:hover': {
+                                                                                    backgroundColor: '#F2EBED',
+                                                                                },
+                                                                                '&.Mui-selected': {
+                                                                                    backgroundColor: '#F2EBED',
+                                                                                },
+                                                                                '&.Mui-selected:hover': {
+                                                                                    backgroundColor: '#F2EBED',
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            Limpiar
+                                                                        </MenuItem>
+                                                                        <MenuItem
+                                                                            value="limpiar"
+                                                                            sx={{
+                                                                                fontSize: '12px',
+                                                                                fontFamily: 'Poppins',
+                                                                                color: '#645E60',
+                                                                                opacity: 0.8,
+                                                                                '&:hover': {
+                                                                                    backgroundColor: '#F2EBED',
+                                                                                },
+                                                                                '&.Mui-selected': {
+                                                                                    backgroundColor: '#F2EBED',
+                                                                                },
+                                                                                '&.Mui-selected:hover': {
+                                                                                    backgroundColor: '#F2EBED',
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            Remover guiones
+                                                                        </MenuItem>
+                                                                        <MenuItem
+                                                                            value="limpiar"
+                                                                            sx={{
+                                                                                fontSize: '12px',
+                                                                                fontFamily: 'Poppins',
+                                                                                color: '#645E60',
+                                                                                opacity: 0.8,
+                                                                                '&:hover': {
+                                                                                    backgroundColor: '#F2EBED',
+                                                                                },
+                                                                                '&.Mui-selected': {
+                                                                                    backgroundColor: '#F2EBED',
+                                                                                },
+                                                                                '&.Mui-selected:hover': {
+                                                                                    backgroundColor: '#F2EBED',
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            Formato de 10 dígitos
+                                                                        </MenuItem>
+                                                                    </Select>
+                                                                </FormControl>
 
+                                                            </Box>
 
-                                                    <FormControlLabel
-                                                        control={
-                                                            <Checkbox
-                                                                checked={omitHeaders}
-                                                                onChange={(e) => setOmitHeaders(e.target.checked)}
-                                                                sx={{
-                                                                    color: '#8F4E63',
-                                                                    '&.Mui-checked': {
-                                                                        color: '#8F4E63',
-                                                                    },
-                                                                }}
-                                                            />
-                                                        }
-                                                        label={
-                                                            <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#330F1B' }}>
-                                                                Omitir encabezados de columna
-                                                            </Typography>
-                                                        }
-                                                    />
+                                                        </Box>
+                                                    </Box>
 
-                                                    <Typography fontSize="14px" fontWeight={600}>Seleccionar filtrado de teléfonos</Typography>
-                                                    <Select
-                                                        fullWidth
-                                                        value={selectedPhoneFilter}
-                                                        onChange={(e) => setSelectedPhoneFilter(e.target.value)}
-                                                        displayEmpty
-                                                        sx={{ fontFamily: 'Poppins', fontSize: '14px' }}
-                                                    >
-                                                        <MenuItem value="limpiar">Limpiar</MenuItem>
-                                                        <MenuItem value="remover guiones">Remover guiones</MenuItem>
-                                                        <MenuItem value="formato 10 dígitos">Formato 10 dígitos</MenuItem>
-                                                    </Select>
                                                 </Box>
-                                            )}
 
+                                            )}
 
                                         </Box>
 
                                     )}
                                     {manageOperation === 'actualizar' && (
-                                        <Box display="flex" alignItems="flex-start" gap={3} mt={2} flexWrap="wrap">
+                                        <Box sx={{ display: 'flex', gap: 2, mt: 2, alignItems: 'flex-start' }}>
 
                                             <Box
                                                 marginBottom={'0px'}
@@ -4238,7 +4635,7 @@ const BlackList: React.FC = () => {
                                                     flexDirection: 'column',
                                                     justifyContent: 'center',
                                                     alignItems: fileSuccess ? 'flex-start' : 'center',
-                                                    transition: 'all 0.3s ease', // animación suave
+                                                    transition: 'all 0.3s ease',
                                                     marginLeft: fileSuccess ? '20px' : 'auto',
                                                     marginRight: fileSuccess ? '10px' : 'auto',
                                                     textAlign: 'center',
@@ -4304,7 +4701,7 @@ const BlackList: React.FC = () => {
                                                                 {
                                                                     name: 'offset',
                                                                     options: {
-                                                                        offset: [35, -180] // 👉 [horizontal, vertical]
+                                                                        offset: [35, -180]
                                                                     }
                                                                 }
                                                             ]
@@ -4345,7 +4742,7 @@ const BlackList: React.FC = () => {
                                                                     {
                                                                         name: 'offset',
                                                                         options: {
-                                                                            offset: [0, -8] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                                                            offset: [0, -8]
                                                                         }
                                                                     }
                                                                 ]
@@ -4362,7 +4759,7 @@ const BlackList: React.FC = () => {
                                                                     setBase64File('');
                                                                     setUploadedFileBase64('');
                                                                     setFormData(prev => ({ ...prev, File: '' }));
-                                                                    setShowColumnOptions(false); // 🔥 ocultar secciones de columnas
+                                                                    setShowColumnOptions(false);
                                                                     if (fileInputRef.current) {
                                                                         fileInputRef.current.value = '';
                                                                     }
@@ -4462,141 +4859,352 @@ const BlackList: React.FC = () => {
 
                                                 />
 
-
-
                                             </Box>
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                {/* Seleccionar hoja */}
-
+                                                {/* Seleccionar hoja En Actualizar */}
 
                                                 {columns.length > 0 && (
+
                                                     <Box>
-                                                        <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '15px', mb: 1 }}>
+                                                        <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '16px', mb: 1 }}>
                                                             Seleccionar hoja
+                                                            <span style={{ color: "#D01247" }}>*</span>
                                                         </Typography>
                                                         <FormControl fullWidth size="small">
                                                             <Select
                                                                 displayEmpty
+                                                                open={isSheetOpen}
                                                                 value={selectedSheet}
-                                                                onChange={handleSheetChange}
+                                                                onChange={(e) => {
+                                                                    handleSheetChange(e);
+                                                                    setOpenSelectId(null);
+                                                                }}
+                                                                onOpen={() => setOpenSelectId("sheet")}
+                                                                onClose={() => setOpenSelectId(null)}
+                                                                IconComponent={() => (
+                                                                    <img
+                                                                        src={ArrowBackIosNewIcon}
+                                                                        alt="arrow"
+                                                                        style={{
+                                                                            position: "absolute",
+                                                                            right: "12px",
+                                                                            pointerEvents: "none",
+                                                                            width: 24,
+                                                                            height: 24,
+                                                                            transition: "transform 0.2s ease",
+                                                                            transform: isSheetOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                        }}
+                                                                    />
+                                                                )}
                                                                 sx={{ borderRadius: '8px' }}
+                                                                renderValue={(selected) =>
+                                                                    selected ? (
+                                                                        <span style={{
+                                                                            fontSize: "12px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#645E60"
+                                                                        }}>
+                                                                            {selected}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span style={{
+                                                                            fontSize: "12px",
+                                                                            fontFamily: "Poppins",
+                                                                            color: "#645E60",
+                                                                            opacity: 0.8
+                                                                        }}>
+                                                                            Seleccionar hoja
+                                                                        </span>
+                                                                    )
+                                                                }
                                                             >
                                                                 {sheetNames.map((name, index) => (
-                                                                    <MenuItem key={index} value={name}>{name}</MenuItem>
+                                                                    <MenuItem
+                                                                        key={index}
+                                                                        value={name}
+                                                                        sx={{
+                                                                            fontSize: '12px',
+                                                                            fontFamily: 'Poppins',
+                                                                            color: '#645E60',
+                                                                            opacity: 0.8,
+                                                                            '&:hover': {
+                                                                                backgroundColor: '#F2EBED',
+                                                                            },
+                                                                            '&.Mui-selected': {
+                                                                                backgroundColor: '#F2EBED',
+                                                                            },
+                                                                            '&.Mui-selected:hover': {
+                                                                                backgroundColor: '#F2EBED',
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {name}
+                                                                    </MenuItem>
                                                                 ))}
                                                             </Select>
                                                         </FormControl>
-                                                        <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '15px', mb: 1 }}>
-                                                            Seleccionar columnas
-                                                        </Typography>
-                                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                            <FormControl fullWidth size="small">
-                                                                <Select
-                                                                    displayEmpty
-                                                                    value={selectedDatoCol}
-                                                                    onChange={(e) => setSelectedPhoneColumn(e.target.value as string)}
-                                                                    sx={{ borderRadius: '8px' }}
-                                                                    renderValue={(selected) =>
-                                                                        selected ? (
-                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
-                                                                                {selected as string}
-                                                                            </span>
-                                                                        ) : (
-                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
-                                                                                Seleccionar columna Teléfono
-                                                                                <span style={{ color: '#D32F2F', marginLeft: 4 }}>*</span>
-                                                                            </span>
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <MenuItem value="" >— Quitar selección —</MenuItem>
-                                                                    {columns
-                                                                        .filter((col) => col !== selectedTelefonoCol)
-                                                                        .map((col, idx) => (
-                                                                            <MenuItem key={idx} value={col} >
-                                                                                {col}
-                                                                            </MenuItem>
-                                                                        ))}
-                                                                </Select>
-                                                            </FormControl>
 
-                                                            <FormControl fullWidth size="small">
-                                                                <Select
-                                                                    displayEmpty
-                                                                    value={selectedTelefonoCol}
-                                                                    onChange={(e) => setSelectedDataColumn(e.target.value as string)}
-                                                                    sx={{ borderRadius: '8px' }}
-                                                                    renderValue={(selected) =>
-                                                                        selected ? (
-                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
-                                                                                {selected as string}
-                                                                            </span>
-                                                                        ) : (
-                                                                            <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
-                                                                                Seleccionar columna ID
-                                                                            </span>
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <MenuItem value="" >— Quitar selección —</MenuItem>
-                                                                    {columns
-                                                                        .filter((col) => col !== selectedDatoCol)
-                                                                        .map((col, idx) => (
-                                                                            <MenuItem key={idx} value={col} >
-                                                                                {col}
-                                                                            </MenuItem>
-                                                                        ))}
-                                                                </Select>
-                                                            </FormControl>
-                                                            <Box mt={3}>
-                                                                {/* Checkbox Omitir encabezados */}
-                                                                <FormControlLabel
-                                                                    control={
-                                                                        <Checkbox
-                                                                            checked={omitHeaders}
-                                                                            onChange={(e) => setOmitHeaders(e.target.checked)}
-                                                                            sx={{
-                                                                                color: '#7B354D',
-                                                                                '&.Mui-checked': {
-                                                                                    color: '#7B354D',
-                                                                                },
-                                                                            }}
-                                                                        />
-                                                                    }
-                                                                    label={
-                                                                        <Typography sx={{ color: '#330F1B', fontSize: '14px' }}>
-                                                                            Omitir encabezados de columna
-                                                                        </Typography>
-                                                                    }
-                                                                />
-
-                                                                {/* Select filtrado de teléfonos en actualizar*/}
-                                                                <Typography
-                                                                    sx={{
-                                                                        fontWeight: 500,
-                                                                        fontSize: '16px',
-                                                                        color: '#330F1B',
-                                                                        mt: 2,
-                                                                        mb: 1,
-                                                                    }}
-                                                                >
-                                                                    Seleccionar filtrado de teléfonos
-                                                                </Typography>
+                                                        <Box>
+                                                            <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '16px', mb: 1, color: '#330F1B', marginTop: '16px' }}>
+                                                                Seleccionar columnas
+                                                            </Typography>
+                                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                                <FormControl fullWidth size="small">
+                                                                    <Select
+                                                                        displayEmpty
+                                                                        open={isColumnTelOpen}
+                                                                        value={selectedTelefonoCol}
+                                                                        onChange={(e) => setSelectedTelefonoCol(e.target.value as string)}
+                                                                        onOpen={() => setOpenSelectId("columntel")}
+                                                                        onClose={() => setOpenSelectId(null)}
+                                                                        IconComponent={() => (
+                                                                            <img
+                                                                                src={ArrowBackIosNewIcon}
+                                                                                alt="arrow"
+                                                                                style={{
+                                                                                    position: "absolute",
+                                                                                    right: "12px",
+                                                                                    pointerEvents: "none",
+                                                                                    width: 24,
+                                                                                    height: 24,
+                                                                                    transition: "transform 0.2s ease",
+                                                                                    transform: isColumnTelOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                                }}
+                                                                            />
+                                                                        )}
+                                                                        sx={{ borderRadius: '8px' }}
+                                                                        renderValue={(selected) =>
+                                                                            selected ? (
+                                                                                <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                                    {selected as string}
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
+                                                                                    Seleccionar columna Teléfono
+                                                                                    <span style={{ color: '#D32F2F' }}>*</span>
+                                                                                </span>
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {columns
+                                                                            .filter((col) => col !== selectedDatoCol)
+                                                                            .map((col, idx) => (
+                                                                                <MenuItem key={idx} value={col}
+                                                                                    sx={{
+                                                                                        fontSize: '12px',
+                                                                                        fontFamily: 'Poppins',
+                                                                                        color: '#645E60',
+                                                                                        opacity: 0.8,
+                                                                                        '&:hover': {
+                                                                                            backgroundColor: '#F2EBED',
+                                                                                        },
+                                                                                        '&.Mui-selected': {
+                                                                                            backgroundColor: '#F2EBED',
+                                                                                        },
+                                                                                        '&.Mui-selected:hover': {
+                                                                                            backgroundColor: '#F2EBED',
+                                                                                        }
+                                                                                    }}>
+                                                                                    {col}
+                                                                                </MenuItem>
+                                                                            ))}
+                                                                    </Select>
+                                                                </FormControl>
 
                                                                 <FormControl fullWidth size="small">
                                                                     <Select
-                                                                        value={telefonoFilter}
-                                                                        onChange={(e) => setTelefonoFilter(e.target.value)}
                                                                         displayEmpty
+                                                                        value={selectedDatoCol}
+                                                                        open={isColumnIdOpen}
+                                                                        onChange={(e) => setSelectedDatoCol(e.target.value as string)}
+                                                                        onOpen={() => setOpenSelectId("columnid")}
+                                                                        onClose={() => setOpenSelectId(null)}
+                                                                        IconComponent={() => (
+                                                                            <img
+                                                                                src={ArrowBackIosNewIcon}
+                                                                                alt="arrow"
+                                                                                style={{
+                                                                                    position: "absolute",
+                                                                                    right: "12px",
+                                                                                    pointerEvents: "none",
+                                                                                    width: 24,
+                                                                                    height: 24,
+                                                                                    transition: "transform 0.2s ease",
+                                                                                    transform: isColumnIdOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                                }}
+                                                                            />
+                                                                        )}
                                                                         sx={{ borderRadius: '8px' }}
+                                                                        renderValue={(selected) =>
+                                                                            selected ? (
+                                                                                <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60' }}>
+                                                                                    {selected as string}
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span style={{ fontSize: 12, fontFamily: 'Poppins', color: '#645E60', opacity: 0.8 }}>
+                                                                                    Seleccionar columna 2
+                                                                                </span>
+                                                                            )
+                                                                        }
                                                                     >
-                                                                        <MenuItem value="">Limpiar</MenuItem>
-                                                                        <MenuItem value="10">Verificar</MenuItem>
-                                                                        {/* Agrega más reglas si las tienes definidas */}
+                                                                        {columns
+                                                                            .filter((col) => col !== selectedTelefonoCol)
+                                                                            .map((col, idx) => (
+                                                                                <MenuItem key={idx} value={col}
+                                                                                    sx={{
+                                                                                        fontSize: '12px',
+                                                                                        fontFamily: 'Poppins',
+                                                                                        color: '#645E60',
+                                                                                        opacity: 0.8,
+                                                                                        '&:hover': {
+                                                                                            backgroundColor: '#F2EBED',
+                                                                                        },
+                                                                                        '&.Mui-selected': {
+                                                                                            backgroundColor: '#F2EBED',
+                                                                                        },
+                                                                                        '&.Mui-selected:hover': {
+                                                                                            backgroundColor: '#F2EBED',
+                                                                                        }
+                                                                                    }}>
+                                                                                    {col}
+                                                                                </MenuItem>
+                                                                            ))}
                                                                     </Select>
                                                                 </FormControl>
-                                                            </Box>
+                                                                <Box mt={-1} mb={0}>
+                                                                    {/* Checkbox Omitir encabezados */}
+                                                                    <FormControlLabel
+                                                                        control={
+                                                                            <Checkbox
+                                                                                checked={omitHeaders}
+                                                                                onChange={(e) => setOmitHeaders(e.target.checked)}
+                                                                                sx={{
+                                                                                    color: '#574861',
+                                                                                    '&.Mui-checked': {
+                                                                                        color: '#7B354D'
+                                                                                    },
+                                                                                    '&.MuiCheckbox-indeterminate': {
+                                                                                        color: '#7B354D'
+                                                                                    }
+                                                                                }}
+                                                                                checkedIcon={
+                                                                                    <Box
+                                                                                        sx={{
+                                                                                            width: '24px',
+                                                                                            height: '24px',
+                                                                                        }}
+                                                                                    >
+                                                                                        <img
+                                                                                            src={IconCheckBox1}
+                                                                                            alt="Seleccionado"
+                                                                                            style={{ width: '24px', height: '24px' }}
+                                                                                        />
+                                                                                    </Box>
+                                                                                }
+                                                                            />
+                                                                        }
+                                                                        label={
+                                                                            <Typography sx={{ color: '#574B4FCC', fontSize: '16px', fontFamily: 'Poppins' }}>
+                                                                                Omitir encabezados de columna
+                                                                            </Typography>
+                                                                        }
+                                                                    />
 
+                                                                    {/* Select filtrado de teléfonos en actualizar*/}
+                                                                    <Typography
+                                                                        sx={{
+                                                                            fontWeight: 500,
+                                                                            fontSize: '16px',
+                                                                            color: '#330F1B',
+                                                                            fontFamily: 'Poppins',
+                                                                            mt: 1,
+                                                                            mb: 1,
+                                                                        }}
+                                                                    >
+                                                                        Seleccionar filtrado de teléfonos
+                                                                    </Typography>
+
+                                                                    <FormControl fullWidth size="small">
+                                                                        <Select
+                                                                            displayEmpty
+                                                                            open={isFilterTelOpen}
+                                                                            value={telefonoFilter}
+                                                                            onChange={(e) => setTelefonoFilter(e.target.value)}
+                                                                            onOpen={() => setOpenSelectId("filtertel")}
+                                                                            onClose={() => setOpenSelectId(null)}
+                                                                            IconComponent={() => (
+                                                                                <img
+                                                                                    src={ArrowBackIosNewIcon}
+                                                                                    alt="arrow"
+                                                                                    style={{
+                                                                                        position: "absolute",
+                                                                                        right: "12px",
+                                                                                        pointerEvents: "none",
+                                                                                        width: 24,
+                                                                                        height: 24,
+                                                                                        transition: "transform 0.2s ease",
+                                                                                        transform: isFilterTelOpen ? "rotate(0deg)" : "rotate(180deg)"
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                            sx={{ borderRadius: '8px' }}
+                                                                            renderValue={(selected) =>
+                                                                                selected ? (
+                                                                                    <span style={{ fontSize: "12px", fontFamily: "Poppins", color: "#645E60" }}>
+                                                                                        {selected === "verificar" ? "Verificar" : "Limpiar"}
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    <span style={{ fontSize: "12px", fontFamily: "Poppins", color: "#645E60", opacity: 0.8 }}>
+                                                                                        Seleccionar filtro
+                                                                                    </span>
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <MenuItem
+                                                                                value="limpiar"
+                                                                                sx={{
+                                                                                    fontSize: '12px',
+                                                                                    fontFamily: 'Poppins',
+                                                                                    color: '#645E60',
+                                                                                    opacity: 0.8,
+                                                                                    '&:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    }
+                                                                                }}
+                                                                            >
+                                                                                Limpiar
+                                                                            </MenuItem>
+                                                                            <MenuItem
+                                                                                value="verificar"
+                                                                                sx={{
+                                                                                    fontSize: '12px',
+                                                                                    fontFamily: 'Poppins',
+                                                                                    color: '#645E60',
+                                                                                    opacity: 0.8,
+                                                                                    '&:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    },
+                                                                                    '&.Mui-selected:hover': {
+                                                                                        backgroundColor: '#F2EBED',
+                                                                                    }
+                                                                                }}
+                                                                            >
+                                                                                Verificar
+                                                                            </MenuItem>
+                                                                        </Select>
+                                                                    </FormControl>
+                                                                </Box>
+
+                                                            </Box>
                                                         </Box>
                                                     </Box>
                                                 )}
@@ -4615,8 +5223,8 @@ const BlackList: React.FC = () => {
                                         px: 4,
                                         mt: 2,
                                         mb: 1,
-                                        maxHeight: 'calc(90vh - 180px)', // o lo que uses
-                                        overflowX: 'hidden', // 🔥 Esto evita scroll lateral
+                                        maxHeight: 'calc(90vh - 180px)',
+                                        overflowX: 'hidden',
                                     }}
                                 >
                                     <Box
@@ -4919,7 +5527,9 @@ const BlackList: React.FC = () => {
                     }}
                 >
                     <ListIcon fontSize="small" sx={{ mr: 1, color: '#5F5064', width: 24, height: 24 }} />
-                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F" }}>Gestionar registros</Typography>
+                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F" }}>
+                        Gestionar registros
+                    </Typography>
                 </MenuItem>
                 <MenuItem
                     onClick={() => {

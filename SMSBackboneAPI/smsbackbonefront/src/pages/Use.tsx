@@ -18,6 +18,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from "../components/commons/AxiosInstance";
 import seachicon from '../assets/icon-lupa.svg';
 import Iconseachred from "../assets/Iconseachred.svg";
+import SpinnerTop from "../assets/SpinnerTop.svg";
+import SpinnerBottom from "../assets/SpinnerBottom.svg";
 import iconclose from '../assets/icon-close.svg';
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
@@ -52,6 +54,8 @@ const Use: React.FC = () => {
             return;
         }
 
+        setCampaignMenuOpen(false);
+        setUserMenuOpen(false);
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
 
@@ -142,6 +146,26 @@ const Use: React.FC = () => {
     const [campaigns, setCampaigns] = useState<{ id: number; name: string }[]>([]);
     const ignoreNextFilterClickRef = useRef(false);
 
+    {/*Estado spinnerimg*/ }
+    const [isPdfLoading, setIsPdfLoading] = useState(false);
+
+    const handlePdfClick = async () => {
+        if (isPdfLoading) return; // evita doble click
+
+        try {
+            setIsPdfLoading(true);
+
+            // Aquí va tu lógica real
+            // await descargarPDF();
+            // Simulación
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsPdfLoading(false);
+        }
+    };
 
     const closeSmsPopper = () => setAnchorEl(null);
 
@@ -909,18 +933,71 @@ const Use: React.FC = () => {
                                         sx: { color: "#322D2E" },
                                     },
                                 }}
+                                PopperProps={{
+                                    modifiers: [
+                                        {
+                                            name: 'offset',
+                                            options: {
+                                                offset: [0, -12]
+                                            }
+                                        }
+                                    ]
+                                }}
                             >
                                 <IconButton
+                                    onClick={handlePdfClick}
+                                    disabled={isPdfLoading}
                                     sx={{
                                         width: "40px",
                                         height: "40px",
+                                        position: "relative",
                                         "&:hover": {
                                             backgroundColor: "transparent",
                                         },
+                                        "@keyframes spin": {
+                                            from: { transform: "rotate(0deg)" },
+                                            to: { transform: "rotate(360deg)" },
+                                        },
                                     }}
-
                                 >
-                                    <img src={IconPDF} alt="pdf" style={{ width: 24 }} />
+                                    {isPdfLoading ? (
+                                        <Box
+                                            sx={{
+                                                position: "relative",
+                                                width: 24,
+                                                height: 24,
+                                            }}
+                                        >
+                                            {/* Spinner base */}
+                                            <img
+                                                src={SpinnerBottom}
+                                                alt="loading-base"
+                                                style={{
+                                                    width: 24,
+                                                    height: 24,
+                                                    position: "absolute",
+                                                    top: 0,
+                                                    left: 0,
+                                                }}
+                                            />
+
+                                            {/* Spinner que gira */}
+                                            <img
+                                                src={SpinnerTop}
+                                                alt="loading-top"
+                                                style={{
+                                                    width: 24,
+                                                    height: 24,
+                                                    position: "absolute",
+                                                    top: 0,
+                                                    left: 0,
+                                                    animation: "spin 1s linear infinite",
+                                                }}
+                                            />
+                                        </Box>
+                                    ) : (
+                                        <img src={IconPDF} alt="pdf" style={{ width: 24 }} />
+                                    )}
                                 </IconButton>
                             </Tooltip>
                         </Box>
