@@ -9102,7 +9102,7 @@ const Campains: React.FC = () => {
               onClick={handleContinuarEditar}
               disabled={isEditNextDisabled}
               sx={{
-                width: "118px",
+                minWidth: "118px",
                 height: "36px",
                 background: "#833A53",
                 border: "1px solid #D4D1D1",
@@ -9114,7 +9114,7 @@ const Campains: React.FC = () => {
                 letterSpacing: "1.12px",
               }}
             >
-              {editActiveStep === 2 || (editActiveStep === 0) ? "Cargar" : "Siguiente"}
+              {editActiveStep === 2 || (editActiveStep === 0) ? "Guardar Cambios" : "Siguiente"}
 
             </Button>
           </Box>
