@@ -2914,6 +2914,9 @@ const BlackList: React.FC = () => {
                     if (reason === "backdropClick") return;
                     handleCloseManageModal();
                 }}
+                disableEnforceFocus
+                disableAutoFocus
+                disableRestoreFocus
             >
                 <Box sx={{
                     width: '600px',
@@ -3814,7 +3817,7 @@ const BlackList: React.FC = () => {
                                                                         renderValue={(selected) =>
                                                                             selected ? (
                                                                                 <span style={{ fontSize: "12px", fontFamily: "Poppins", color: "#645E60" }}>
-                                                                                    {selected === "verificar" ? "Verificar" : "Limpiar"}
+                                                                                    {selected === "limpiar" ? "Limpiar" : selected === "remover_guiones" ? "Remover guiones" : "Formato de 10 dígitos"}
                                                                                 </span>
                                                                             ) : (
                                                                                 <span style={{ fontSize: "12px", fontFamily: "Poppins", color: "#645E60", opacity: 0.8 }}>
@@ -3824,7 +3827,7 @@ const BlackList: React.FC = () => {
                                                                         }
                                                                     >
                                                                         <MenuItem
-                                                                            value="limpiar"
+                                                                                value="remover_guiones"
                                                                             sx={{
                                                                                 fontSize: '12px',
                                                                                 fontFamily: 'Poppins',
@@ -4236,11 +4239,15 @@ const BlackList: React.FC = () => {
                                                         <FormControl fullWidth size="small">
                                                             <Select
                                                                 displayEmpty
-                                                                value={selectedSheet}
                                                                 open={isSheetOpen}
-                                                                onChange={handleSheetChange}
+                                                                value={selectedSheet}
+                                                                onChange={(e) => {
+                                                                    handleSheetChange(e);
+                                                                    setOpenSelectId(null);
+                                                                }}
                                                                 onOpen={() => setOpenSelectId("sheet")}
                                                                 onClose={() => setOpenSelectId(null)}
+                                                                MenuProps={{ disablePortal: true }}
                                                                 IconComponent={() => (
                                                                     <img
                                                                         src={ArrowBackIosNewIcon}
@@ -4282,6 +4289,7 @@ const BlackList: React.FC = () => {
                                                                     <MenuItem
                                                                         key={index}
                                                                         value={name}
+                                                                        onClick={() => setOpenSelectId(null)}
                                                                         sx={{
                                                                             fontSize: '12px',
                                                                             fontFamily: 'Poppins',
@@ -4317,7 +4325,7 @@ const BlackList: React.FC = () => {
                                                                     displayEmpty
                                                                     open={isColumnTelOpen}
                                                                     value={selectedTelefonoCol}
-                                                                    onChange={(e) => setSelectedDataColumn(e.target.value as string)}
+                                                                    onChange={(e) => setSelectedTelefonoCol(e.target.value as string)}
                                                                     onOpen={() => setOpenSelectId("columntel")}
                                                                     onClose={() => setOpenSelectId(null)}
                                                                     IconComponent={() => (
@@ -4384,7 +4392,7 @@ const BlackList: React.FC = () => {
                                                                     displayEmpty
                                                                     value={selectedDatoCol}
                                                                     open={isColumnIdOpen}
-                                                                    onChange={(e) => setSelectedPhoneColumn(e.target.value as string)}
+                                                                    onChange={(e) => setSelectedDatoCol(e.target.value as string)}
                                                                     onOpen={() => setOpenSelectId("columnid")}
                                                                     onClose={() => setOpenSelectId(null)}
                                                                     IconComponent={() => (
@@ -4530,7 +4538,7 @@ const BlackList: React.FC = () => {
                                                                         }
                                                                     >
                                                                         <MenuItem
-                                                                            value="limpiar"
+                                                                                value="formato_10"
                                                                             sx={{
                                                                                 fontSize: '12px',
                                                                                 fontFamily: 'Poppins',
