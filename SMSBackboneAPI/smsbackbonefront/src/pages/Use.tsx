@@ -1016,7 +1016,41 @@ const Use: React.FC = () => {
                 <Divider sx={{ marginBottom: '20px', marginTop: "-5px" }} />
                 {loading && (
                     <Box sx={loadingStyle}>
-                        <CircularProgress sx={{ color: '#8F4D63' }} size={80} />
+                        <Box
+                            sx={{
+                                marginTop: "60px",
+                                position: "relative",
+                                width: 100,
+                                height: 100,
+                            }}
+                        >
+                            {/* Spinner base */}
+                            <img
+                                src={SpinnerBottom}
+                                alt="loading-base"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                }}
+                            />
+
+                            {/* Spinner que gira */}
+                            <img
+                                src={SpinnerTop}
+                                alt="loading-top"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    animation: "spin 1s linear infinite",
+                                }}
+                            />
+                        </Box>
                     </Box>
                 )}
 

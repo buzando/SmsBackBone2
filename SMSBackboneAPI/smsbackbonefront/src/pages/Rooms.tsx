@@ -24,6 +24,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import HomeIcon from "@mui/icons-material/Home";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import IconCloseModal from "../assets/IconCloseModal.svg";
 import axios from "../components/commons/AxiosInstance";
 import iconlupa from "../assets/icon-lupa.svg";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -662,7 +663,12 @@ const Rooms: React.FC = () => {
                                 zIndex: 10
                             }}
                         >
-                            <CloseIcon sx={{ color: '#A6A6A6' }} />
+                            <img
+                                src={IconCloseModal}
+                                alt="x"
+                                width="24"
+                                height="24"
+                            />
                         </IconButton>
                         <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 2 }} />
                         <Box sx={{

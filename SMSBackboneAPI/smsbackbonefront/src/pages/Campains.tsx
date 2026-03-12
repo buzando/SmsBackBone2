@@ -40,6 +40,8 @@ import welcome from '../assets/icon-welcome.svg'
 import PushPinIcon from "@mui/icons-material/PushPin";
 import iconplus from "../assets/Icon-plus.svg";
 import IconArrowDown1 from "../assets/IconArrowDown1.svg";
+import SpinnerTop from "../assets/SpinnerTop.svg";
+import SpinnerBottom from "../assets/SpinnerBottom.svg";
 import CloseIcon from '@mui/icons-material/Close';
 import IconCloseModal from "../assets/IconCloseModal.svg";
 import IconCheckedCircle1 from "../assets/IconCheckedCircle1.svg";
@@ -1620,6 +1622,7 @@ const Campains: React.FC = () => {
           }
         });
 
+
         const mappedSent = Object.entries(sentCounts).map(([stateName, messages]) => ({ stateName, messages }));
         const mappedResponded = Object.entries(respondedCounts).map(([stateName, messages]) => ({ stateName, messages }));
 
@@ -1898,14 +1901,40 @@ const Campains: React.FC = () => {
           justifyContent: 'center',
           zIndex: 9999
         }}>
-          <Box sx={{
-            width: '80px',
-            height: '80px',
-            border: '8px solid #f3f3f3',
-            borderTop: '8px solid #8F4D63',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }} />
+          <Box
+            sx={{
+              position: "relative",
+              width: 80,
+              height: 80
+            }}
+          >
+            {/* Spinner base */}
+            <img
+              src={SpinnerBottom}
+              alt="loading-base"
+              style={{
+                width: "100%",
+                height: "100%",
+                position: "absolute",
+                top: 0,
+                left: 0
+              }}
+            />
+
+            {/* Spinner que gira */}
+            <img
+              src={SpinnerTop}
+              alt="loading-top"
+              style={{
+                width: "100%",
+                height: "100%",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                animation: "spin 1s linear infinite"
+              }}
+            />
+          </Box>
           <style>{`
       @keyframes spin {
         0% { transform: rotate(0deg); }
@@ -7358,11 +7387,19 @@ const Campains: React.FC = () => {
                 const isActive = index === editActiveStep + 1;
                 const isCompleted = index < editActiveStep + 1;
                 const isLast = index === 3;
+                const handleStepClick = (stepIndex) => {
+                  setEditActiveStep(stepIndex - 1);
+                };
 
                 return (
                   <React.Fragment key={label}>
                     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "90px" }}>
                       <Box
+                        onClick={() => {
+                          if (index !== 1) {
+                            handleStepClick(index);
+                          }
+                        }}
                         sx={{
                           width: "28px",
                           height: "28px",
@@ -7371,7 +7408,8 @@ const Campains: React.FC = () => {
                           backgroundColor: isActive ? "#8F4D63" : isCompleted ? "#8F4D63" : "#FFFFFF",
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "center", marginTop: "0px"
+                          justifyContent: "center", marginTop: "0px",
+                          cursor: index !== 1 ? "pointer" : "default"
                         }}
                       >
                         {isActive ? (

@@ -39,6 +39,7 @@ import usrMon from "../assets/usrMon.svg"
 import Nousers from "../assets/Nousers.svg"
 import { Divider } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import IconCloseModal from "../assets/IconCloseModal.svg";
 import infoicon from '../assets/Icon-info.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
 import EditIcon from '@mui/icons-material/Edit';
@@ -926,7 +927,12 @@ const ManageAccounts: React.FC = () => {
                             color: (theme) => theme.palette.grey[500],
                         }}
                     >
-                        <CloseIcon />
+                        <img
+                            src={IconCloseModal}
+                            alt="x"
+                            width="24"
+                            height="24"
+                        />
                     </IconButton>
                     <Typography sx={{
                         textAlign: "left",

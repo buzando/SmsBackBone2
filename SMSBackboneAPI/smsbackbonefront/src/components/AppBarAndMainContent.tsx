@@ -1533,7 +1533,9 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                             {/* Menú de Reportes */}
                             <ListItem disablePadding>
-                                <ListItemButton onClick={() => navigate('/ReportsAdmin')} sx={{ borderRadius: '8px' }}>
+                                <ListItemButton
+                                    onClick={() => navigate('/ReportsAdmin')}
+                                    sx={{ borderRadius: '8px' }}>
                                     <img alt="Iconreports" src={Iconreports} style={{ width: 35, height: 20, transform: "rotate(-90deg)" }} />
                                     <ListItemText
                                         primary="Reportes"
@@ -1932,7 +1934,13 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                                     {/* Menú de Reportes */}
                                     <ListItem disablePadding>
-                                        <ListItemButton onClick={() => navigate('/reports')} sx={{ borderRadius: '8px' }}>
+                                        <ListItemButton
+                                            onClick={() => {
+                                                setSelectedLink("reportsAdmin");
+                                                setActiveSubMenu(null);
+                                                navigate('/reports');
+                                            }}
+                                            sx={{ borderRadius: '8px' }}>
                                             <img alt="Iconreports" src={Iconreports} style={{ width: 35, height: 20, transform: "rotate(-90deg)" }} />
                                             <ListItemText
                                                 primary="Reportes"
@@ -2083,7 +2091,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                         fontFamily: "Poppins",
                                                         marginLeft: '30px',
                                                         fontSize: '14px',
-                                                        color: '#9F94A5',
+                                                        color: selectedLink === 'Ajustes de pago' ? '#FFFFFF' : '#9F94A5',
                                                         marginBottom: "-5px",
                                                         marginTop: "-5px"
                                                     }} />
@@ -2147,7 +2155,13 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                                     {/* Menú de Ayuda */}
                                     <ListItem disablePadding>
-                                        <ListItemButton onClick={() => navigate('/help')} sx={{ borderRadius: '8px' }}>
+                                        <ListItemButton
+                                            onClick={() => {
+                                                setSelectedLink("reportsAdmin");
+                                                setActiveSubMenu(null);
+                                                navigate('/help');
+                                            }}
+                                            sx={{ borderRadius: '8px' }}>
                                             <img alt="Iconhelpu" src={Iconhelpu} style={{ width: 35, height: 20, filter: "brightness(0) invert(1)" }} />
                                             <ListItemText
                                                 primary="Ayuda"

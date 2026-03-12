@@ -89,173 +89,173 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
   return (
     <>
       <GlobalStyles
-  styles={{
-    /* =========================
-       MESES: minúsculas + sin negritas (FIX)
-       ========================= */
-    ".rdrMonthAndYearWrapper": {
-      fontFamily: "Poppins, sans-serif",
-      fontWeight: "400 !important",
-      textTransform: "lowercase !important",
-    },
-    ".rdrMonthAndYearWrapper span": {
-      fontWeight: "400 !important",
-      textTransform: "lowercase !important",
-    },
+        styles={{
+          /* =========================
+             MESES: minúsculas + sin negritas (FIX)
+             ========================= */
+          ".rdrMonthAndYearWrapper": {
+            fontFamily: "Poppins, sans-serif",
+            fontWeight: "400 !important",
+            textTransform: "lowercase !important",
+          },
+          ".rdrMonthAndYearWrapper span": {
+            fontWeight: "400 !important",
+            textTransform: "lowercase !important",
+          },
 
-    /* OJO: .rdrMonthName es el título del mes (el que ves como MAR 2026) */
-    ".rdrMonthName": {
-      fontFamily: "Poppins, sans-serif",
-      fontSize: "12px",
-      fontWeight: "400 !important",
-      color: "#574B4F",
-      textTransform: "lowercase !important",
-      letterSpacing: "1px",
-      paddingBottom: "8px",
-      marginBottom: "8px",
-      borderBottom: "1px solid #E6E4E4CC",
-    },
+          /* OJO: .rdrMonthName es el título del mes (el que ves como MAR 2026) */
+          ".rdrMonthName": {
+            fontFamily: "Poppins, sans-serif",
+            fontSize: "12px",
+            fontWeight: "400 !important",
+            color: "#574B4F",
+            textTransform: "lowercase !important",
+            letterSpacing: "1px",
+            paddingBottom: "8px",
+            marginBottom: "8px",
+            borderBottom: "1px solid #E6E4E4CC",
+          },
 
-    /* =========================
-       HOY: quitar estilo especial SOLO cuando NO está seleccionado
-       ========================= */
-    ".rdrDayToday": { background: "transparent !important" },
-    ".rdrDayToday .rdrDayNumber": { background: "transparent !important" },
-    ".rdrDayToday .rdrDayNumber span": {
-      background: "transparent !important",
-      fontWeight: "500 !important",
-      color: "#574B4F !important",
-      boxShadow: "none !important",
-    },
-    ".rdrDayToday .rdrDayNumber span:after": {
-      display: "none !important",
-      content: '""',
-      background: "transparent !important",
-    },
+          /* =========================
+             HOY: quitar estilo especial SOLO cuando NO está seleccionado
+             ========================= */
+          ".rdrDayToday": { background: "transparent !important" },
+          ".rdrDayToday .rdrDayNumber": { background: "transparent !important" },
+          ".rdrDayToday .rdrDayNumber span": {
+            background: "transparent !important",
+            fontWeight: "500 !important",
+            color: "#574B4F !important",
+            boxShadow: "none !important",
+          },
+          ".rdrDayToday .rdrDayNumber span:after": {
+            display: "none !important",
+            content: '""',
+            background: "transparent !important",
+          },
 
-    /* =========================
-       CONTENEDOR
-       ========================= */
-    ".date-picker-container": {
-      borderRadius: "8px",
-      border: "1px solid #C6BFC2",
-      boxShadow: "0px 8px 16px #00131F29",
-      padding: "12px 12px 10px 12px",
-      fontFamily: "Poppins, sans-serif",
-    },
+          /* =========================
+             CONTENEDOR
+             ========================= */
+          ".date-picker-container": {
+            borderRadius: "8px",
+            border: "1px solid #C6BFC2",
+            boxShadow: "0px 8px 16px #00131F29",
+            padding: "12px 12px 10px 12px",
+            fontFamily: "Poppins, sans-serif",
+          },
 
-    /* =========================
-       HEADER (layout del mes)
-       ========================= */
-    ".rdrMonth": { padding: "0 10px 6px 10px" },
+          /* =========================
+             HEADER (layout del mes)
+             ========================= */
+          ".rdrMonth": { padding: "0 10px 6px 10px" },
 
-    /* =========================
-       TIPOGRAFÍA
-       ========================= */
-    ".rdrWeekDay": {
-      fontFamily: "Poppins, sans-serif",
-      color: "#807D7E",
-      fontSize: "11px",
-      fontWeight: 500,
-    },
-    ".rdrDayNumber span": {
-      fontFamily: "Poppins, sans-serif",
-      color: "#574B4F",
-      fontSize: "12px",
-      fontWeight: 500,
-    },
+          /* =========================
+             TIPOGRAFÍA
+             ========================= */
+          ".rdrWeekDay": {
+            fontFamily: "Poppins, sans-serif",
+            color: "#807D7E",
+            fontSize: "11px",
+            fontWeight: 500,
+          },
+          ".rdrDayNumber span": {
+            fontFamily: "Poppins, sans-serif",
+            color: "#574B4F",
+            fontSize: "12px",
+            fontWeight: 500,
+          },
 
-    /* =========================
-       BASE DÍA
-       ========================= */
-    ".rdrDay": {
-      outline: "none !important",
-      background: "transparent !important",
-    },
+          /* =========================
+             BASE DÍA
+             ========================= */
+          ".rdrDay": {
+            outline: "none !important",
+            background: "transparent !important",
+          },
 
-    /* Mata inline azul (style="color: rgb(61,145,255)") */
-    ".date-picker-container .rdrDay": {
-      color: "#574B4F !important",
-    },
+          /* Mata inline azul (style="color: rgb(61,145,255)") */
+          ".date-picker-container .rdrDay": {
+            color: "#574B4F !important",
+          },
 
-    /* Hover */
-    ".rdrDayHovered .rdrDayNumber span": {
-      color: "#8F4D63 !important",
-    },
+          /* Hover */
+          ".rdrDayHovered .rdrDayNumber span": {
+            color: "#8F4D63 !important",
+          },
 
-    /* Quitar preview azul */
-    ".date-picker-container .rdrDayStartPreview, .date-picker-container .rdrDayEndPreview, .date-picker-container .rdrDayInPreview": {
-      border: "none !important",
-      color: "transparent !important",
-      opacity: "0 !important",
-    },
+          /* Quitar preview azul */
+          ".date-picker-container .rdrDayStartPreview, .date-picker-container .rdrDayEndPreview, .date-picker-container .rdrDayInPreview": {
+            border: "none !important",
+            color: "transparent !important",
+            opacity: "0 !important",
+          },
 
-    /* =========================
-       SELECCIÓN REAL
-       ========================= */
-    ".date-picker-container .rdrDay .rdrSelected": {
-      background: "#8F4D63 !important",
-      opacity: "1 !important",
-      zIndex: "1 !important",
-      width: "32px !important",
-      height: "32px !important",
-      left: "50% !important",
-      top: "50% !important",
-      transform: "translate(-50%, -40%) !important",
-      borderRadius: "50% !important",
-    },
+          /* =========================
+             SELECCIÓN REAL
+             ========================= */
+          ".date-picker-container .rdrDay .rdrSelected": {
+            background: "#8F4D63 !important",
+            opacity: "1 !important",
+            zIndex: "1 !important",
+            width: "32px !important",
+            height: "32px !important",
+            left: "50% !important",
+            top: "50% !important",
+            transform: "translate(-50%, -40%) !important",
+            borderRadius: "50% !important",
+          },
 
-    ".date-picker-container .rdrDay .rdrSelected ~ .rdrDayNumber": {
-      position: "relative",
-      zIndex: "2 !important",
-    },
-    ".date-picker-container .rdrDay .rdrSelected ~ .rdrDayNumber span": {
-      color: "#FFFFFF !important",
-      fontWeight: "700 !important",
-    },
+          ".date-picker-container .rdrDay .rdrSelected ~ .rdrDayNumber": {
+            position: "relative",
+            zIndex: "2 !important",
+          },
+          ".date-picker-container .rdrDay .rdrSelected ~ .rdrDayNumber span": {
+            color: "#FFFFFF !important",
+            fontWeight: "700 !important",
+          },
 
-    /* Hoy seleccionado */
-    ".date-picker-container .rdrDay.rdrDayToday .rdrSelected ~ .rdrDayNumber span": {
-      color: "#FFFFFF !important",
-      fontWeight: "700 !important",
-    },
+          /* Hoy seleccionado */
+          ".date-picker-container .rdrDay.rdrDayToday .rdrSelected ~ .rdrDayNumber span": {
+            color: "#FFFFFF !important",
+            fontWeight: "700 !important",
+          },
 
-    /* =========================
-       PASSIVE (otro mes)
-       ========================= */
-    ".date-picker-container .rdrDay.rdrDayPassive .rdrDayNumber span": {
-      color: "#C6BFC2 !important",
-      fontWeight: "400 !important",
-    },
-    ".date-picker-container .rdrDay.rdrDayPassive .rdrSelected ~ .rdrDayNumber span": {
-      color: "#FFFFFF !important",
-      fontWeight: "700 !important",
-    },
+          /* =========================
+             PASSIVE (otro mes)
+             ========================= */
+          ".date-picker-container .rdrDay.rdrDayPassive .rdrDayNumber span": {
+            color: "#C6BFC2 !important",
+            fontWeight: "400 !important",
+          },
+          ".date-picker-container .rdrDay.rdrDayPassive .rdrSelected ~ .rdrDayNumber span": {
+            color: "#FFFFFF !important",
+            fontWeight: "700 !important",
+          },
 
-    /* =========================
-       FIX FINAL: que no se bajen los números
-       ========================= */
-    ".date-picker-container .rdrDayNumber": {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100%",
-    },
-    ".date-picker-container .rdrDayNumber span": {
-      lineHeight: "12px !important",
-      display: "inline-block",
-      position: "relative",
-      top: "-1px",
-    },
+          /* =========================
+             FIX FINAL: que no se bajen los números
+             ========================= */
+          ".date-picker-container .rdrDayNumber": {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+          },
+          ".date-picker-container .rdrDayNumber span": {
+            lineHeight: "12px !important",
+            display: "inline-block",
+            position: "relative",
+            top: "-1px",
+          },
 
-    /* =========================
-       OCULTAR PICKERS
-       ========================= */
-    ".rdrCalendarWrapper": {
-      fontFamily: "Poppins, sans-serif",
-    },
-  }}
-/>
+          /* =========================
+             OCULTAR PICKERS
+             ========================= */
+          ".rdrCalendarWrapper": {
+            fontFamily: "Poppins, sans-serif",
+          },
+        }}
+      />
       <Popper
         open={open}
         anchorEl={anchorEl}
@@ -386,7 +386,7 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                       readOnly
                       style={{
                         textAlign: "center",
-                        width: "56px",
+                        width: "42px",
                         height: "42px",
                         border: hour !== 0 ? "1px solid #8C3F56" : "1px solid #C6BFC2",
                         borderRadius: "8px",
@@ -507,7 +507,7 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                       readOnly
                       style={{
                         textAlign: "center",
-                        width: "56px",
+                        width: "42px",
                         height: "42px",
                         border: minute !== 0 ? "1px solid #8C3F56" : "1px solid #C6BFC2",
                         borderRadius: "8px",
