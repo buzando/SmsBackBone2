@@ -36,6 +36,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ListItemIcon from '@mui/material/ListItemIcon';
+import IconCloseModal from "../assets/IconCloseModal.svg";
 import CloseIcon from '@mui/icons-material/Close';
 import ListItemText from '@mui/material/ListItemText';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
@@ -472,11 +473,17 @@ const Clients: React.FC = () => {
     const paginatedData = visibleData.slice(startIndex, endIndex);
 
     const handleAddClient = () => {
-
+        resetClientModalState();
         setIsEditClient(false);
         setSelectedClient(null);
         setStep(0);
         setOpenClientModal(true);
+
+        setClientNameError(false);
+        setFirstNameError(false);
+        setLastNameError(false);
+        setPhoneError(false);
+
         setEmail('');
         setConfirmEmail('');
         setEmailError(false);
@@ -597,8 +604,8 @@ const Clients: React.FC = () => {
             );
             const message =
                 newStatus === 0
-                    ? 'El cliente ha sido dado de baja exitosamente'
-                    : 'El cliente ha sido activado exitosamente';
+                    ? 'El cliente ha sido activado exitosamente'
+                    : 'El cliente ha sido dado de baja exitosamente';
 
             setMessageSnack(message);
             setShowSnackBar(true);
@@ -630,8 +637,8 @@ const Clients: React.FC = () => {
     const handleActivateClient = () => {
         if (menuRowId === null) return;
 
-        setMainModalTitle("¿Estás seguro que deseas dar de alta este cliente?");
-        setMainModalMessage("Estas Seguro que desea dar de alta al cliente seleccionado?.");
+        setMainModalTitle("Dar de alta cliente");
+        setMainModalMessage("¿Está seguro de que desea dar de alta al cliente seleccionado?.");
         setModalAction(() => () => handleDeactivateClient(menuRowId));
         setMainModal(true);
     };
@@ -679,8 +686,20 @@ const Clients: React.FC = () => {
 
 
     const getRoomsList = () => {
-        return currentClient?.roomName?.split(',').map(r => r.trim()) || [];
+        //Before
+        //return currentClient?.roomName?.split(',').map(r => r.trim()) || [];
+
+        //After
+        return selectedClient?.roomName?.split(',').map(r => r.trim()) || [];
     };
+
+    const isRechargeDisabled =
+        !rechargeData.smsType ||
+        rechargeData.roomsSelected.length === 0 ||
+        !rechargeData.amount ||
+        !rechargeData.paymentType ||
+        !rechargeData.billingDate;
+
 
     const handleOpenRechargeModal = (client: Clients) => {
         setSelectedClient(client);
@@ -697,9 +716,9 @@ const Clients: React.FC = () => {
             tax: 0,
             totalWithTax: 0,
             paymentType: '',
-            billingDate: ''
-        }));
+            billingDate: '',
 
+        }));
 
         setRechargeModalOpen(true);
     };
@@ -844,9 +863,10 @@ const Clients: React.FC = () => {
         setLongStandardPrice('');
         setLongCustomQty('');
 
-
-        setNewRooms(['']);
+        setNewRooms(['Default']);
+        setRoomCount(1);
     };
+
 
     const handleCloseClientModal = () => {
         resetClientModalState();
@@ -888,7 +908,7 @@ const Clients: React.FC = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             {/* Header con título y flecha */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -898,7 +918,7 @@ const Clients: React.FC = () => {
                     Clientes
                 </Typography>
             </Box>
-            <Box sx={{ marginLeft: "32px", }}>
+            <Box sx={{ marginLeft: "32px" }}>
                 <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
                 {/* Controles de acción */}
                 <Box
@@ -1203,16 +1223,43 @@ const Clients: React.FC = () => {
                         alignItems="center"
                         justifyContent="center"
                         sx={{
-                            width: '100%',
-                            minHeight: '450px',
-                            backgroundColor: '#F9F9F9',
-                            padding: 4,
-                            borderRadius: '12px',
-                            border: '1px solid #E0E0E0',
-                            mt: 2,
+                            backgroundColor: '#fff',
+                            borderRadius: '8px',
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            overflowX: 'auto',
+                            overflowY: 'auto',
+                            height: "525px",
                         }}
                     >
-                        <img src={NoResult} alt="No resultados" style={{ width: '240px', marginBottom: '16px' }} />
+                        <img src={BoxEmpty} alt="No resultados" style={{ width: '240px', marginBottom: '16px' }} />
+                        <Typography
+                            sx={{
+                                fontFamily: 'Poppins',
+                                fontSize: '16px',
+                                color: '#7B354D',
+                                fontWeight: 500,
+                            }}
+                        >
+                            No hay clientes registrados.
+                        </Typography>
+                    </Box>
+                ) : clientsList.length === 0 ? (
+                    // Caja abierta - no hay coincidencias con los filtros
+                    <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        sx={{
+                            backgroundColor: '#fff',
+                            borderRadius: '8px',
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            overflowX: 'auto',
+                            overflowY: 'auto',
+                            height: "525px",
+                        }}
+                    >
+                        <img src={NoResult} alt="Caja vacía" style={{ width: '240px', marginBottom: '16px' }} />
                         <Typography
                             sx={{
                                 fontFamily: 'Poppins',
@@ -1224,128 +1271,58 @@ const Clients: React.FC = () => {
                             No se encontraron resultados.
                         </Typography>
                     </Box>
-                ) : clientsList.length === 0 ? (
-                    // Caja abierta - no hay coincidencias con los filtros
-                    <Box
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                        justifyContent="center"
-                        sx={{
-                            width: '100%',
-                            minHeight: '450px',
-                            backgroundColor: '#FFFFFF',
-                            padding: 4,
-                            borderRadius: '12px',
-                            border: '1px solid #E0E0E0',
-                        }}
-                    >
-                        <img src={BoxEmpty} alt="Caja vacía" style={{ width: '240px', marginBottom: '16px' }} />
-                        <Typography
-                            sx={{
-                                fontFamily: 'Poppins',
-                                fontSize: '16px',
-                                color: '#7B354D',
-                                fontWeight: 500,
-                            }}
-                        >
-                            Da de alta un cliente para comenzar.
-                        </Typography>
-                    </Box>
                 ) : (
                     <Box
                         sx={{
-                            backgroundColor: '#FFFFFF',
+                            backgroundColor: '#fff',
                             borderRadius: '8px',
-                            padding: '8px 2px',
                             boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                             overflowX: 'auto',
-                            maxHeight: "472px"
+                            overflowY: 'auto',
+                            height: "525px",
                         }}
                     >
-                        <table style={{ minWidth: '1180px', borderCollapse: 'collapse', }}>
+                        <table style={{
+                            width: '100%', minWidth: '1080px',
+                            borderCollapse: 'collapse',
+                            fontFamily: 'Poppins',
+                        }}>
                             <thead>
-                                <tr style={{
-                                    textAlign: 'left', fontFamily: 'Poppins', fontSize: '13px',
-                                    color: '#330F1B', fontWeight: 500, borderBottom: '1px solid #E0E0E0',
-                                    height: "45px",
-                                }}
-                                >
-                                    <th style={{
-                                        textAlign: 'left', padding: '0 15px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Fecha de alta</th>
-                                    <th style={{
-                                        textAlign: 'left', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Cliente</th>
-                                    <th style={{
-                                        textAlign: 'left', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Nombre</th>
-                                    <th style={{
-                                        textAlign: 'left', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Apellidos</th>
-                                    <th style={{
-                                        textAlign: 'left', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Teléfono</th>
-                                    <th style={{
-                                        textAlign: 'left', padding: '0 0px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Extensión</th>
-                                    <th style={{
-                                        textAlign: 'left', padding: '0 46px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Correo electrónico</th>
-                                    <th style={{
-                                        textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Tarifa SMS # Cortos</th>
-                                    <th style={{
-                                        textAlign: 'left', fontSize: "13px", padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", whiteSpace: 'nowrap'
-                                    }}>Tarifa SMS # Largos</th>
-                                    <th style={{
-                                        textAlign: 'left', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Salas</th>
-                                    <th style={{
-                                        textAlign: 'left', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Estatus</th>
-                                    <th style={{
-                                        textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Créditos Globales</th>
-                                    <th style={{
-                                        textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Créditos SMS # Cortos</th>
-                                    <th style={{
-                                        textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Créditos SMS # Largos</th>
-                                    <th style={{
-                                        textAlign: 'left', whiteSpace: 'nowrap', padding: '0 24px',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Fecha de desactivación</th>
-                                    <td style={{
-                                        position: 'sticky', textAlign: "center",
-                                        right: -2,
-                                        background: '#fff',
-                                        padding: '3.5px', width: '75px', height: "30px", whiteSpace: 'nowrap', overflow: 'hidden',
-                                        textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F",
-                                    }}>
-                                        <Divider sx={{
-                                            marginTop: "-51px", marginLeft: "-3px",
-                                            position: "absolute",
-                                            height: '90px',
-                                            width: "0px",
-                                            borderLeft: "1px solid #E0E0E0"
-                                        }} />
-                                    </td>
+                                <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', width: '100%', borderBottom: '1px solid #E0E0E0' }}>
+
+                                    <th style={{ padding: '10px 10px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Fecha de alta</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Cliente</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Nombre</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Apellidos</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Teléfono</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Extensión</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Correo electrónico</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Tarifa SMS # Cortos</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Tarifa SMS # Largos</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Salas</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Estatus</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Créditos Globales</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Créditos SMS # Cortos</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Créditos SMS # Largos</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, borderRight: "1px solid #E6E4E4" }}>
+                                        Fecha de desactivación</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1354,101 +1331,107 @@ const Clients: React.FC = () => {
                                         borderBottom: '1px solid #E0E0E0',
                                         backgroundColor: Client.estatus === 0 ? '#FFFFFF' : '#F2F2F2',
                                         color: Client.estatus === 0 ? '#574B4F' : '#9D9696',
+                                        textAlign: 'left', width: '100%'
                                     }}>
                                         <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 14px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.creationDate}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.nombreCliente}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.firstName}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.lastName}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.phoneNumber}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px', maxWidth: '100px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.extension}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 46px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.email}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.rateForShort}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.rateForLong}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 24px', maxWidth: '100px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.roomName}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 28px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.estatus === 0 ? 'Activo' : 'Inactivo'}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.totalCredits}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
-                                        }}>{Client.totalShortSmsCredits}</td>
-
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins',
-                                            fontSize: "13px"
-
-                                        }}>{Client.totalLongSmsCredits}</td>
-                                        <td style={{
-                                            whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 26px',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins',
-                                            fontSize: "13px"
-
-                                        }}>{Client.deactivationDate}</td>
-                                        <td style={{
-                                            position: 'sticky', textAlign: "center",
-                                            right: -2,
-                                            background: '#fff',
-                                            padding: '3.5px', width: '75px', height: "51px", whiteSpace: 'nowrap', overflow: 'hidden',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', fontSize: "13px"
+                                            padding: '5px 5px', width: '220px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            textOverflow: 'ellipsis', textAlign: "left",
+                                            fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins',
                                         }}>
+                                            {Client.creationDate}</td>
+
+                                        <td style={{
+                                            padding: '0px 7px', width: '140px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.nombreCliente}</td>
+
+                                        <td style={{
+                                            padding: '0px 7px', width: '140px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.firstName}</td>
+
+                                        <td style={{
+                                            padding: '0px 7px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.lastName}</td>
+
+                                        <td style={{
+                                            padding: '0px 7px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.phoneNumber}</td>
+
+                                        <td style={{
+                                            padding: '0px 7px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.extension}</td>
+
+                                        <td style={{
+                                            padding: '0px 7px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.email}</td>
+
+                                        <td style={{
+                                            padding: '0px 80px', width: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.rateForShort}</td>
+
+                                        <td style={{
+                                            padding: '0px 80px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.rateForLong}</td>
+
+                                        <td style={{
+                                            padding: '0px 5px', maxWidth: '80px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px",
+                                        }}>
+                                            {Client.roomName}</td>
+
+                                        <td style={{
+                                            padding: '0px 12px', width: '80px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.estatus === 0 ? 'Activo' : 'Inactivo'}</td>
+
+                                        <td style={{
+                                            padding: '0px 65px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.totalCredits}</td>
+
+                                        <td style={{
+                                            padding: '0px 85px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.totalShortSmsCredits}</td>
+
+                                        <td style={{
+                                            padding: '0px 85x', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "center",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.totalLongSmsCredits}</td>
+                                        <td style={{
+                                            padding: '0px 20px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
+                                        }}>
+                                            {Client.deactivationDate}</td>
+                                        <td
+                                            style={{
+                                                padding: '0px 0px', width: '50px',
+                                                borderLeft: '1px solid #E0E0E0',
+                                                textAlign: 'center',
+                                            }}
+                                        >
                                             <IconButton onClick={(event) => handleMenuOpen(event, Client.id as number)}>
                                                 <MoreVertIcon />
                                             </IconButton>
-                                            <Divider sx={{
-                                                marginTop: "-51px", marginLeft: "-3px",
-                                                position: "absolute",
-                                                height: '60px',
-                                                width: "0px",
-                                                borderLeft: "1px solid #E0E0E0"
-                                            }} />
                                         </td>
                                     </tr>
                                 ))}
@@ -1494,8 +1477,8 @@ const Clients: React.FC = () => {
                         const clientToEdit = clientsList.find(c => c.id === menuRowId);
                         if (clientToEdit) {
                             handleOpenRechargeModal(clientToEdit);
+                            handleMenuClose();
                         }
-
                     }}
                     sx={{
                         fontFamily: 'Poppins',
@@ -1567,7 +1550,6 @@ const Clients: React.FC = () => {
                         </Typography>
                     </MenuItem>
                 )}
-
 
 
                 <MenuItem
@@ -1902,7 +1884,18 @@ const Clients: React.FC = () => {
 
 
             {/* Modal para añadir o editar cliente */}
-            <Dialog open={openClientModal} onClose={handleCloseClientModal} maxWidth="md" fullWidth sx={{ overflowX: "hidden" }}>
+            <Dialog
+                open={openClientModal}
+                onClose={(event, reason) => {
+                    if (reason === "backdropClick" || reason === "escapeKeyDown") {
+                        return;
+                    }
+                    handleCloseClientModal();
+                }}
+                maxWidth="md"
+                fullWidth
+                sx={{ overflowX: "hidden" }}
+            >
                 <DialogTitle sx={{
                     fontFamily: 'Poppins', fontSize: '20px', fontWeight: 600,
                     color: '#574B4F', textTransform: 'none', mt: 1, mb: 1, marginLeft: "10px"
@@ -1918,7 +1911,12 @@ const Clients: React.FC = () => {
                         zIndex: 10
                     }}
                 >
-                    <CloseIcon sx={{ color: '#A6A6A6' }} />
+                    <img
+                        src={IconCloseModal}
+                        alt="x"
+                        width="24"
+                        height="24"
+                    />
                 </IconButton>
                 <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: -1.5 }} />
 
@@ -2021,9 +2019,14 @@ const Clients: React.FC = () => {
                 <DialogContent>
                     <Box px={3} pt={1} sx={{ overflowX: "hidden" }}>
                         {step === 0 && (
-                            <Box display="flex" flexDirection="column" gap={2} sx={{
-                                overflowX: "hidden", justifyContent: "center", alignItems: "left", marginLeft: "25px"
-                            }}>
+                            <Box display="flex" flexDirection="column" gap={2}
+                                sx={{
+                                    overflow: "hidden",
+                                    justifyContent: "center",
+                                    alignItems: "left",
+                                    marginLeft: "25px",
+                                    marginTop: '-10px',
+                                }}>
                                 <Grid item xs={12} md={6} marginLeft={"10px"} mt={1} mb={1}>
                                     <Typography
                                         sx={{
@@ -2163,15 +2166,27 @@ const Clients: React.FC = () => {
                                                 onChange={(e) => {
                                                     const v = e.target.value;
                                                     setSelectedClient(prev => ({ ...(prev as Clients), firstName: v }));
-                                                    setFirstNameError(v.trim().length > 0 && !rePersonName.test(v));
+                                                    const invalidChars = /[^a-zA-Z]/.test(v);
+                                                    const tooLong = v.length > 40;
+                                                    setFirstNameError(invalidChars || tooLong);
                                                 }}
                                                 error={firstNameError}
                                                 helperText={firstNameError ? "Formato inválido" : ""}
                                                 sx={{
-                                                    fontFamily: "Poppins",
                                                     "& .MuiInputBase-input": {
-                                                        fontFamily: "Poppins",
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "16px",
+                                                        fontWeight: 500,
+                                                        color: "#574B4F",
                                                     },
+                                                    "& .MuiFormHelperText-root": {
+                                                        position: "absolute",
+                                                        marginTop: "54px",
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "13px",
+                                                        fontWeight: 400,
+                                                        color: "#D01247",
+                                                    }
                                                 }}
                                                 InputProps={{
                                                     endAdornment: (
@@ -2222,16 +2237,16 @@ const Clients: React.FC = () => {
                                                                     }}
                                                                 >
                                                                     <img
-                                                                        src={infoicon}
+                                                                        src={firstNameError ? infoiconerror : infoicon}
                                                                         alt="info-icon"
                                                                         style={{ width: 24, height: 24 }}
                                                                     />
                                                                 </IconButton>
                                                             </Tooltip>
-
                                                         </InputAdornment>
-                                                    ),
+                                                    )
                                                 }}
+                                                fullWidth
                                             />
                                         </Box>
                                         <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"} width={"340px"}>
@@ -2254,10 +2269,28 @@ const Clients: React.FC = () => {
                                                 onChange={(e) => {
                                                     const v = e.target.value;
                                                     setSelectedClient(prev => ({ ...(prev as Clients), lastName: v }));
-                                                    setLastNameError(v.trim().length > 0 && !rePersonName.test(v));
+                                                    const invalidChars = /[^a-zA-Z]/.test(v);
+                                                    const tooLong = v.length > 40;
+                                                    setLastNameError(invalidChars || tooLong);
                                                 }}
                                                 error={lastNameError}
                                                 helperText={lastNameError ? "Formato inválido" : ""}
+                                                sx={{
+                                                    "& .MuiInputBase-input": {
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "16px",
+                                                        fontWeight: 500,
+                                                        color: "#574B4F",
+                                                    },
+                                                    "& .MuiFormHelperText-root": {
+                                                        position: "absolute",
+                                                        marginTop: "54px",
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "13px",
+                                                        fontWeight: 400,
+                                                        color: "#D01247",
+                                                    }
+                                                }}
                                                 InputProps={{
                                                     endAdornment: (
                                                         <InputAdornment position="end">
@@ -2307,13 +2340,12 @@ const Clients: React.FC = () => {
                                                                     }}
                                                                 >
                                                                     <img
-                                                                        src={infoicon}
+                                                                        src={lastNameError ? infoiconerror : infoicon}
                                                                         alt="info-icon"
                                                                         style={{ width: 24, height: 24 }}
                                                                     />
                                                                 </IconButton>
                                                             </Tooltip>
-
                                                         </InputAdornment>
                                                     ),
                                                 }}
@@ -2351,32 +2383,20 @@ const Clients: React.FC = () => {
                                                 /* --- apariencia alineada a otros inputs --- */
                                                 fullWidth
                                                 sx={{
-                                                    mt: 1,
-                                                    width: "324px",
-                                                    height: "54px",
-                                                    background: "#FFFFFF",
-                                                    border: "1px solid #9B9295",
-                                                    borderRadius: "4px",
-                                                    "& .MuiOutlinedInput-root": {
-                                                        background: "#FFFFFF",
-                                                        height: "54px",
-                                                        borderRadius: "4px",
-                                                        "& fieldset": {
-                                                            borderColor: phoneError ? "#d32f2f" : "#9B9295",
-                                                        },
-                                                    },
                                                     "& .MuiInputBase-input": {
-                                                        fontFamily: "Poppins",
+                                                        fontFamily: "Poppins, sans-serif",
                                                         fontSize: "16px",
-                                                        color: "#330F1B",
+                                                        fontWeight: 500,
+                                                        color: "#574B4F",
                                                     },
                                                     "& .MuiFormHelperText-root": {
-                                                        marginLeft: 0,
-                                                        fontFamily: "Poppins",
+                                                        position: "absolute",
+                                                        marginTop: "54px",
+                                                        fontFamily: "Poppins, sans-serif",
                                                         fontSize: "13px",
-                                                        color: "#d32f2f",
-                                                        fontWeight: 500,
-                                                    },
+                                                        fontWeight: 400,
+                                                        color: "#D01247",
+                                                    }
                                                 }}
                                                 InputProps={{
                                                     endAdornment: (
@@ -2419,8 +2439,6 @@ const Clients: React.FC = () => {
                                                     ),
                                                 }}
                                             />
-
-
                                         </Box>
                                         <Box display="flex" flexDirection="column" mb={2} marginLeft={"20px"} width={"340px"}>
                                             <Typography
@@ -2450,10 +2468,20 @@ const Clients: React.FC = () => {
                                                 error={extError}
                                                 helperText={extError ? "Formato inválido" : ""}
                                                 sx={{
-                                                    fontFamily: "Poppins",
                                                     "& .MuiInputBase-input": {
-                                                        fontFamily: "Poppins",
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "16px",
+                                                        fontWeight: 500,
+                                                        color: "#574B4F",
                                                     },
+                                                    "& .MuiFormHelperText-root": {
+                                                        position: "absolute",
+                                                        marginTop: "54px",
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "13px",
+                                                        fontWeight: 400,
+                                                        color: "#D01247",
+                                                    }
                                                 }}
                                                 InputProps={{
                                                     endAdornment: (
@@ -2477,8 +2505,8 @@ const Clients: React.FC = () => {
                                                                         }}
                                                                     >
                                                                         <>
-                                                                            • Solo caracteres alfabéticos<br />
-                                                                            • Longitud máxima de 40<br />
+                                                                            • Solo caracteres numéricos<br />
+                                                                            • Longitud máxima de 5<br />
                                                                             caracteres
                                                                         </>
                                                                     </Box>
@@ -2544,10 +2572,20 @@ const Clients: React.FC = () => {
                                                 error={emailError}
                                                 helperText={emailError ? "Ingrese un correo electrónico válido" : ""}
                                                 sx={{
-                                                    fontFamily: "Poppins",
                                                     "& .MuiInputBase-input": {
-                                                        fontFamily: "Poppins",
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "16px",
+                                                        fontWeight: 500,
+                                                        color: "#574B4F",
                                                     },
+                                                    "& .MuiFormHelperText-root": {
+                                                        position: "absolute",
+                                                        marginTop: "54px",
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "13px",
+                                                        fontWeight: 400,
+                                                        color: "#D01247",
+                                                    }
                                                 }}
                                                 InputProps={{
                                                     endAdornment: (
@@ -2596,7 +2634,7 @@ const Clients: React.FC = () => {
                                                                     }}
                                                                 >
                                                                     <img
-                                                                        src={infoicon}
+                                                                        src={emailError ? infoiconerror : infoicon}
                                                                         alt="info-icon"
                                                                         style={{ width: 24, height: 24 }}
                                                                     />
@@ -2633,10 +2671,20 @@ const Clients: React.FC = () => {
                                                 error={confirmEmailError}
                                                 helperText={confirmEmailError ? "Los correos electrónicos deben coincidir" : ""}
                                                 sx={{
-                                                    fontFamily: "Poppins",
                                                     "& .MuiInputBase-input": {
-                                                        fontFamily: "Poppins",
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "16px",
+                                                        fontWeight: 500,
+                                                        color: "#574B4F",
                                                     },
+                                                    "& .MuiFormHelperText-root": {
+                                                        position: "absolute",
+                                                        marginTop: "54px",
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "13px",
+                                                        fontWeight: 400,
+                                                        color: "#D01247",
+                                                    }
                                                 }}
                                                 InputProps={{
                                                     endAdornment: (
@@ -2685,7 +2733,7 @@ const Clients: React.FC = () => {
                                                                     }}
                                                                 >
                                                                     <img
-                                                                        src={infoicon}
+                                                                        src={confirmEmailError ? infoiconerror : infoicon}
                                                                         alt="info-icon"
                                                                         style={{ width: 24, height: 24 }}
                                                                     />
@@ -3348,7 +3396,7 @@ const Clients: React.FC = () => {
                                         }}
                                         disabled={roomCount === 0}
                                         sx={{
-                                            border: 0,
+                                            border: '1px solid #C4B2B9',
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
@@ -3631,7 +3679,13 @@ const Clients: React.FC = () => {
                 onPrimaryClick={() => handleDeleteClient(selectedClient?.id ?? 0)}
                 onSecondaryClick={() => setMainModalDelete(false)}
             />
-            <Modal open={rechargeModalOpen} onClose={() => setRechargeModalOpen(false)}>
+            <Modal
+                open={rechargeModalOpen}
+                onClose={(event, reason) => {
+                    if (reason === "backdropClick") return;
+                    setRechargeModalOpen(false);
+                }}
+            >
                 <Box sx={{
                     background: '#fff', padding: 4, width: "556px", height: "656px", margin: '100px auto',
                     borderRadius: 2, overflowX: "hidden", overflowY: "hidden"
@@ -3655,7 +3709,12 @@ const Clients: React.FC = () => {
                             zIndex: 10
                         }}
                     >
-                        <CloseIcon sx={{ color: '#A6A6A6' }} />
+                        <img
+                            src={IconCloseModal}
+                            alt="x"
+                            width="24"
+                            height="24"
+                        />
                     </IconButton>
 
                     <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: 1, mt: 0.5 }} />
@@ -3741,7 +3800,7 @@ const Clients: React.FC = () => {
                                 flexWrap: 'wrap',
                                 gap: 2,
                                 height: '140px',
-                                overflowY: 'auto',
+                                overflow: 'hidden',
                                 width: '480px', marginLeft: "15px"
                             }}
                         >
@@ -3992,7 +4051,10 @@ const Clients: React.FC = () => {
                             </Typography>
                             <Box sx={{ mb: 2 }}>
                                 <TextField
-                                    value={selectedDate ? selectedDate.toLocaleDateString('es-MX') : ''}
+                                    value={rechargeData.billingDate
+                                        ? new Date(rechargeData.billingDate).toLocaleDateString('es-MX')
+                                        : ''
+                                    }
                                     onClick={handleOpenDatePicker}
                                     placeholder="Seleccionar fecha"
                                     fullWidth
@@ -4018,7 +4080,11 @@ const Clients: React.FC = () => {
 
                     <Box mt={3} display="flex" gap={31.5}>
                         <SecondaryButton text='Cancelar' onClick={() => setRechargeModalOpen(false)} />
-                        <MainButton text='Recargar' onClick={handleSaveRecharge} isLoading={isSavingClient} />
+                        <MainButton text='Recargar'
+                            onClick={handleSaveRecharge}
+                            isLoading={isSavingClient}
+                            disabled={isRechargeDisabled}
+                        />
                     </Box>
                 </Box>
             </Modal >
