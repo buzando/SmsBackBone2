@@ -228,11 +228,7 @@ const Reports: React.FC = () => {
     const [selectedSmsOption, setSelectedSmsOption] = useState<string>("SMS");
     const smsOptions = [
         "SMS",
-        "Global",
-        "Mensajes entrantes",
-        "Mensajes enviados",
-        "Mensajes no enviados",
-        "Mensajes rechazados"
+        "Global"
     ];
     //Función abrir /cerrar SMS
     const handleSmsClick = (event: React.MouseEvent<HTMLDivElement>) => {

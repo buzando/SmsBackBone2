@@ -885,7 +885,11 @@ const Clients: React.FC = () => {
     };
 
 
+    const stepLabels = isEditClient
+        ? ['Información', 'Tarifas']
+        : ['Información', 'Tarifas', 'Salas'];
 
+    const lastStepIndex = stepLabels.length - 1;
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
@@ -1925,11 +1929,11 @@ const Clients: React.FC = () => {
                 <Box
                     display="flex"
                     justifyContent="center"
-                    gap="140px"
+                    gap={isEditClient ? "220px" : "140px"}
                     mb={1.5}
                     mt={3}
                 >
-                    {['Información', 'Tarifas', 'Salas'].map((label, index) => (
+                    {stepLabels.map((label, index) => (
                         <Box key={label} textAlign="center">
                             <Box
                                 sx={{
@@ -1947,7 +1951,7 @@ const Clients: React.FC = () => {
                             >
                                 {index < step && (
                                     <img
-                                        src={index < step ? IconCheckedCircle2 : IconCheckedCircle1}
+                                        src={IconCheckedCircle2}
                                         alt="Completado"
                                         style={{
                                             width: '28px',
@@ -1971,49 +1975,50 @@ const Clients: React.FC = () => {
                             >
                                 {label}
                             </Typography>
-
                         </Box>
                     ))}
-
                 </Box>
                 {/*Guiones fake*/}
                 <Box>
                     <Divider
                         sx={{
-                            width: '170px',
+                            width: isEditClient ? '220px' : '170px',
                             position: "absolute",
                             mt: "-53px",
-                            ml: "286px",
+                            ml: isEditClient ? "310px" : "286px",
                             border: '1.5px solid',
                             borderColor: getStepColor(1),
                         }}
                     />
                 </Box>
 
-                <Box sx={{ position: "absolute", mt: "78px", ml: "545px" }}>
-                    <Typography
-                        fontSize="10px"
-                        mt={1}
-                        color={getStepColor(2)}
-                        fontFamily="Poppins"
-                    >
-                        Opcional
-                    </Typography>
-                </Box>
+                {!isEditClient && (
+                    <>
+                        <Box sx={{ position: "absolute", mt: "78px", ml: "545px" }}>
+                            <Typography
+                                fontSize="10px"
+                                mt={1}
+                                color={getStepColor(2)}
+                                fontFamily="Poppins"
+                            >
+                                Opcional
+                            </Typography>
+                        </Box>
 
-                <Box>
-                    <Divider
-                        sx={{
-                            width: '150px',
-                            position: "absolute",
-                            mt: "-54px",
-                            ml: "484px",
-                            border: '2px dashed',
-                            borderColor: getStepColor(2),
-                        }}
-                    />
-                </Box>
-
+                        <Box>
+                            <Divider
+                                sx={{
+                                    width: '150px',
+                                    position: "absolute",
+                                    mt: "-54px",
+                                    ml: "484px",
+                                    border: '2px dashed',
+                                    borderColor: getStepColor(2),
+                                }}
+                            />
+                        </Box>
+                    </>
+                )}
 
 
                 <Divider sx={{ width: 'calc(100% + 32px)', marginLeft: '-32px', mb: 0 }} />
@@ -3330,7 +3335,7 @@ const Clients: React.FC = () => {
 
                             </Box>
                         )}
-                        {step === 2 && (
+                        {!isEditClient && step === 2 && (
                             <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
                                 <Typography fontWeight={500} sx={{ fontSize: '18px', color: '#330F1B', fontFamily: "Poppins" }}>
                                     Elegir cantidad de salas
@@ -3559,7 +3564,7 @@ const Clients: React.FC = () => {
                                 isLoading={isSavingClient}
                                 disabled={!isStepValid()}
                                 text={
-                                    step === 2 || (step === 1 && isEditClient)
+                                    step === lastStepIndex
                                         ? isEditClient ? 'Guardar cambios' : 'Guardar'
                                         : 'Siguiente'
                                 }
@@ -3574,12 +3579,7 @@ const Clients: React.FC = () => {
                                         if (!isEmailValid || !isMatch) return;
                                     }
 
-                                    if (step === 1 && isEditClient) {
-                                        handleSubmit();
-                                        return;
-                                    }
-
-                                    if (step === 2) {
+                                    if (step === lastStepIndex) {
                                         handleSubmit();
                                     } else {
                                         setStep(step + 1);

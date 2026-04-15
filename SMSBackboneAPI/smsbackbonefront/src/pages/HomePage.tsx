@@ -170,17 +170,21 @@ const HomePage: React.FC = () => {
         Handletmppwwd();
 
     }, []);
-    useEffect(() => {
-        const userDataString = localStorage.getItem('userData');
-        if (userDataString) {
-            const user = JSON.parse(userDataString);
 
-            // Si el usuario es Root y no está ya en /Clients, redirige
-            if (user.rol === 'Root' && location.pathname !== '/Clients') {
-                navigate('/Clients');
-            }
+    useEffect(() => {
+    const userDataString = localStorage.getItem('userData');
+    if (!userDataString) return;
+
+    try {
+        const user = JSON.parse(userDataString);
+
+        if (user?.rol === 'Root') {
+            navigate('/Clients', { replace: true });
         }
-    }, [location.pathname]);
+    } catch (error) {
+        console.error('Error al leer userData del localStorage', error);
+    }
+}, [navigate]);
 
     const handleSendNewPassword = async () => {
         setLoadingpssw(true);

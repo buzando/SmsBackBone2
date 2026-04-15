@@ -350,7 +350,7 @@ const ClientRoomPicker: React.FC = () => {
                     cursor: "pointer",
                     backgroundColor:
                       selectedClient?.id === c.id &&
-                      selectedClient?.email === c.email
+                        selectedClient?.email === c.email
                         ? "#F6EEF1"
                         : "transparent",
                   }}
@@ -494,12 +494,32 @@ const ClientRoomPicker: React.FC = () => {
                       >
                         {r.name}
                       </Typography>
+
+               
+                        <Typography
+                          sx={{
+                            fontFamily: "Poppins",
+                            color: "#796E71",
+                            fontSize: 13,
+                            lineHeight: "18px",
+                            mt: 0.3,
+                            maxWidth: "320px",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {r.description}
+                        </Typography>
+                      
+
                       {typeof r.credits === "number" && (
                         <Typography
                           sx={{
                             fontFamily: "Poppins",
                             color: "#796E71",
                             fontSize: 13,
+                            mt: 0.3,
                           }}
                         >
                           Créditos: {r.credits}

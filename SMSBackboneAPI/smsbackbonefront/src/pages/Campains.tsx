@@ -31,6 +31,7 @@ import {
   FormGroup,
   Popover
 } from "@mui/material";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import axios from "../components/commons/AxiosInstance";
 import AddIcon from '@mui/icons-material/Add';
 import seachicon from '../assets/icon-lupa.svg'
@@ -100,6 +101,7 @@ import Chipbar from '../components/commons/ChipBar'
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import IconCheckBox2 from "../assets/IconCheckBox2.svg";
 import DynamicCampaignEditText from '../components/commons/DynamicCampaignEditText';
+import { getSelectedRoom, getSelectedRoomId, SelectedRoom } from "../utils/roomHelper";
 interface Horario {
   titulo: string;
   start: Date | null;
@@ -291,7 +293,7 @@ const Campains: React.FC = () => {
 
 
   const [pinnedCampaignId, setPinnedCampaignId] = useState<number | null>(null);
-
+  const [selectedRoom, setSelectedRoom] = useState<SelectedRoom | null>(getSelectedRoom());
 
   const handleChangeHorario = (
     index: number,
@@ -303,6 +305,20 @@ const Campains: React.FC = () => {
     );
   };
 
+
+  useEffect(() => {
+    const syncRoom = () => {
+      setSelectedRoom(getSelectedRoom());
+    };
+
+    syncRoom();
+
+    window.addEventListener("storageUpdate", syncRoom);
+
+    return () => {
+      window.removeEventListener("storageUpdate", syncRoom);
+    };
+  }, []);
 
   const handleOpenEditCampaignModal = (campaign: CampaignFullResponse) => {
     setSelectedCampaign(campaign);
@@ -417,8 +433,13 @@ const Campains: React.FC = () => {
     item.name.toLowerCase().includes(searchTermBlacklist.toLowerCase())
   );
 
-  const fetchTemplates = async () => {
-    const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
+  const fetchTemplates = async (roomId?: number | null) => {
+    const salaId = roomId ?? selectedRoom?.id;
+    if (!salaId) {
+      setTemplates([]);
+      return;
+    }
+
     try {
       setLoadingTemplates(true);
       const requestUrl = `${import.meta.env.VITE_API_GET_GETTEMPLATESBYROOM}${salaId}`;
@@ -431,20 +452,31 @@ const Campains: React.FC = () => {
     }
   };
 
-  const fetchBlackLists = async () => {
-    const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
-    if (!salaId) return;
+  const fetchBlackLists = async (roomId?: number | null) => {
+    const salaId = roomId ?? selectedRoom?.id;
+    if (!salaId) {
+      setBlackLists([]);
+      return;
+    }
 
     try {
-
       const requestUrl = `${import.meta.env.VITE_API_GET_BLACKLIST}${salaId}`;
       const response = await axios.get(requestUrl);
       if (response.status === 200) {
         setBlackLists(response.data);
       }
-    } finally {
+    } catch (error) {
+      console.error(error);
     }
   };
+
+  useEffect(() => {
+    if (!selectedRoom?.id) return;
+
+    fetchCampaigns(selectedRoom.id);
+    fetchTemplates(selectedRoom.id);
+    fetchBlackLists(selectedRoom.id);
+  }, [selectedRoom?.id]);
 
   const validatePhone = (value: string) => {
     const phoneRegex = /^\d{10,12}$/; // Acepta entre 10 y 12 dígitos
@@ -800,10 +832,6 @@ const Campains: React.FC = () => {
 
 
   useEffect(() => {
-    fetchCampaigns();
-  }, []);
-
-  useEffect(() => {
     if (!selectedCampaign?.startDate) return;
 
     const interval = setInterval(() => {
@@ -823,14 +851,22 @@ const Campains: React.FC = () => {
   }, [selectedCampaign?.startDate]);
 
 
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = async (roomId?: number | null) => {
     setLoadingPage(true);
-    const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
-    if (!salaId) return;
+
+    const salaId = roomId ?? selectedRoom?.id;
+    if (!salaId) {
+      setCampaigns([]);
+      setSelectedCampaign(null);
+      setSelectedCampaignId(null);
+      setLoadingPage(false);
+      return;
+    }
 
     try {
-      const url = `${import.meta.env.VITE_API_GET_CAMPAIGN + salaId}`;
+      const url = `${import.meta.env.VITE_API_GET_CAMPAIGN}${salaId}`;
       const response = await axios.get(url);
+
       if (response.status === 200) {
         setCampaigns(response.data);
 
@@ -840,18 +876,16 @@ const Campains: React.FC = () => {
           const exists = response.data.some((c: { id: number }) => c.id === selectedCampaignId);
           if (!exists) {
             setSelectedCampaignId(firstCampaign?.id || null);
-            setSelectedCampaign(firstCampaign);
+            setSelectedCampaign(firstCampaign || null);
           }
         } else {
           setSelectedCampaignId(firstCampaign?.id || null);
-          setSelectedCampaign(firstCampaign);
+          setSelectedCampaign(firstCampaign || null);
         }
-
       }
     } catch (error) {
-      console.error("Error al traer campañas:", error);
-    }
-    finally {
+      console.error(error);
+    } finally {
       setLoadingPage(false);
     }
   };
@@ -1089,8 +1123,8 @@ const Campains: React.FC = () => {
   const handleSaveCampaign = async () => {
     setLoading(true);
     try {
-      const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
-
+      const salaId = selectedRoom?.id;
+      if (!salaId) return;
       const payload = {
         campaigns: {
           name: campaignName,
@@ -1254,7 +1288,8 @@ const Campains: React.FC = () => {
     try {
       if (!selectedCampaign?.id) return;
 
-      const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
+      const salaId = selectedRoom?.id;
+      if (!salaId) return;
 
       const payload = {
         campaigns: {
@@ -1491,18 +1526,6 @@ const Campains: React.FC = () => {
   }, [campaigns]);
 
 
-  useEffect(() => {
-    const room = localStorage.getItem("selectedRoom");
-    if (!room) return;
-
-    const parsed = JSON.parse(room);
-    const roomId = parsed?.id;
-    if (!roomId) return;
-
-    const saved = localStorage.getItem(`o2c_pinnedCampaignId_${roomId}`);
-    setPinnedCampaignId(saved ? Number(saved) : null);
-  }, []);
-
   const handleTogglePinCampaign = (campaignId: number) => {
     const roomId = getRoomIdFromStorage();
     if (!roomId) return;
@@ -1566,24 +1589,17 @@ const Campains: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const room = localStorage.getItem("selectedRoom");
-    if (!room) return;
+    const roomId = selectedRoom?.id;
 
-    const parsed = JSON.parse(room);
-    const roomId = parsed?.id;
-    if (!roomId) return;
-
-    const saved = localStorage.getItem(`o2c_pinnedCampaignId_${roomId}`);
-    setPinnedCampaignId(saved ? Number(saved) : null);
-  }, [campaigns]);
-
-  useEffect(() => {
-    const roomId = getRoomIdFromStorage();
-    if (!roomId) return;
+    if (!roomId) {
+      setPinnedCampaignId(null);
+      return;
+    }
 
     const saved = localStorage.getItem(`o2c_pinnedCampaignId_${roomId}`);
     setPinnedCampaignId(saved ? Number(saved) : null);
-  }, [campaigns]);
+
+  }, [selectedRoom?.id]);
 
   useEffect(() => {
     if (!selectedCampaign?.id || !selectedCampaign.schedules) return;
@@ -1755,8 +1771,8 @@ const Campains: React.FC = () => {
   useEffect(() => {
     const readCredits = () => {
       try {
-        const room = JSON.parse(localStorage.getItem('selectedRoom') || '{}');
-        const credits = Number(room?.credits ?? room?.credit ?? 0);
+        const room = getSelectedRoom();
+        const credits = Number((room as any)?.credits ?? (room as any)?.credit ?? 0);
         setRoomCredits(isNaN(credits) ? 0 : credits);
       } catch {
         setRoomCredits(0);
@@ -1765,11 +1781,11 @@ const Campains: React.FC = () => {
 
     readCredits();
 
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === 'selectedRoom') readCredits();
+    window.addEventListener("storageUpdate", readCredits);
+
+    return () => {
+      window.removeEventListener("storageUpdate", readCredits);
     };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
   const canSendQuickTest = !!phone && !error && roomCredits > 0;
@@ -8084,6 +8100,55 @@ const Campains: React.FC = () => {
             <Box
               sx={{ maxHeight: "342px", ml: "0px" }}
             >
+              <Box
+                sx={{
+                  width: "100%",
+                  background: "#F3F1F2",
+                  borderRadius: "4px",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "10px",
+                  px: 2,
+                  py: 1.5,
+                  mb: 2,
+                }}
+              >
+                <InfoOutlinedIcon
+                  sx={{
+                    color: "#8F4D63",
+                    width: 18,
+                    height: 18,
+                    mt: "2px",
+                  }}
+                />
+
+                <Box>
+                  <Typography
+                    sx={{
+                      fontFamily: "Poppins",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      color: "#574B4F",
+                      lineHeight: "18px",
+                    }}
+                  >
+                    Sólo consulta: Este mensaje no puede editarse en este paso.
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      fontFamily: "Poppins",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      color: "#574B4F",
+                      lineHeight: "18px",
+                      mt: 0.5,
+                    }}
+                  >
+                    Tipo de mensaje: Plantilla
+                  </Typography>
+                </Box>
+              </Box>
               <DynamicCampaignEditText
                 value={EditMensaje}
                 onChange={setEditMensaje}

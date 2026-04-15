@@ -336,7 +336,11 @@ namespace Business
 
                                     // El flash solo aplica si es número corto
                                     int encoding = (campaign.NumberType == 1 && campaign.FlashMessage) ? 1 : 0;
+                                    if (campaign.FlashMessage)
+                                    {
 
+                                        encoding = 5;
+                                    }
 
                                     messagesToSend.Add(new MessageToSend
                                     {
@@ -727,8 +731,8 @@ namespace Business
                             var record = ctx.TestMessage.FirstOrDefault(x => x.Id == msg.Id);
                             if (record != null)
                             {
-                                record.Status = st.status.ToString();                   
-                                                                             
+                                record.Status = st.status.ToString();
+
                             }
                         }
                         catch (Exception ex)

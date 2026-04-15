@@ -99,13 +99,12 @@ namespace Business
                 {
                     usuario = ctx.Users.Where(x => x.Id == creditCard.user_id).FirstOrDefault();
 
-                    bool yaExiste =
-ctx.creditcards.Any(cc =>
-cc.user_id == creditCard.user_id &&
-cc.card_number.EndsWith(lastFour) &&
-cc.expiration_year == creditCard.expiration_year
-
-);
+                    bool yaExiste = ctx.creditcards.Any(cc =>
+            cc.user_id == creditCard.user_id &&
+            cc.card_number.EndsWith(lastFour) &&
+            cc.expiration_month == creditCard.expiration_month &&
+            cc.expiration_year == creditCard.expiration_year
+        );
 
 
 

@@ -51,21 +51,7 @@ const DynamicCampaignEditText: React.FC<Props> = ({
         const variableText = document.createElement('span');
         variableText.textContent = `{{${token.variable}}}`;
 
-        const closeBtn = document.createElement('span');
-        closeBtn.textContent = '✕';
-        closeBtn.style.cursor = 'pointer';
-        closeBtn.style.marginLeft = '4px';
-
-        closeBtn.onclick = (e) => {
-          e.stopPropagation();
-          const currentText = getTextFromContentEditable();
-          const updatedText = currentText.replace(`{${token.variable}}`, '');
-          onChange(updatedText);
-          renderMessage(updatedText);
-        };
-
         span.appendChild(variableText);
-        span.appendChild(closeBtn);
         editableRef.current!.appendChild(span);
       }
     });
@@ -73,44 +59,18 @@ const DynamicCampaignEditText: React.FC<Props> = ({
     setCharCount(val.length);
   };
 
-  const getTextFromContentEditable = () => {
-    const children = editableRef.current?.childNodes;
-    let text = '';
-    children?.forEach((node) => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        text += node.textContent;
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const span = node as HTMLElement;
-        const variableText = span.textContent?.replace('✕', '').replace(/[{}]/g, '') ?? '';
-        text += `{${variableText.trim()}}`;
-      }
-    });
-    return text;
-  };
-
-  const handleInput = () => {
-    const updatedText = getTextFromContentEditable();
-    setCharCount(updatedText.length);
-    onChange(updatedText);
-  };
-
   useEffect(() => {
     renderMessage(value);
-  }, []);
+  }, [value]);
 
   return (
     <Box>
-      <Typography sx={{ fontFamily: 'Poppins', fontSize: '18px', color: '#330F1B', fontWeight: 600 }}>
-        Editar mensaje
-      </Typography>
       <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '16px', color: '#330F1B', mb: 1 }}>
         Mensaje
       </Typography>
+
       <Box
         ref={editableRef}
-        contentEditable
-        suppressContentEditableWarning
-        onInput={handleInput}
         sx={{
           border: '1px solid #ccc',
           borderRadius: '6px',
@@ -122,8 +82,11 @@ const DynamicCampaignEditText: React.FC<Props> = ({
           outline: 'none',
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
+          cursor: 'default',
+          userSelect: 'text',
         }}
       />
+
       <Typography variant="body2" sx={{ mt: 1, color: '#5A3D42', fontFamily: 'Poppins' }}>
         {charCount}/{maxChars} caracteres para que el mensaje se realice en un sólo envío.
       </Typography>
