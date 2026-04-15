@@ -317,7 +317,7 @@ const RoomsAdmin: React.FC = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             {/* Header con título y flecha */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -628,13 +628,12 @@ const RoomsAdmin: React.FC = () => {
                         alignItems="center"
                         justifyContent="center"
                         sx={{
-                            width: '100%',
-                            minHeight: '450px',
-                            backgroundColor: '#F9F9F9',
-                            padding: 4,
-                            borderRadius: '12px',
-                            border: '1px solid #E0E0E0',
-                            mt: 2,
+                            backgroundColor: '#fff',
+                            borderRadius: '8px',
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            overflowX: 'auto',
+                            overflowY: 'auto',
+                            height: "525px",
                         }}
                     >
                         <img src={BoxEmpty} alt="Empty" width={240} />
@@ -657,13 +656,12 @@ const RoomsAdmin: React.FC = () => {
                         alignItems="center"
                         justifyContent="center"
                         sx={{
-                            width: '100%',
-                            minHeight: '450px',
-                            backgroundColor: '#F9F9F9',
-                            padding: 4,
-                            borderRadius: '12px',
-                            border: '1px solid #E0E0E0',
-                            mt: 2,
+                            backgroundColor: '#fff',
+                            borderRadius: '8px',
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            overflowX: 'auto',
+                            overflowY: 'auto',
+                            height: "525px",
                         }}
                     >
                         <img src={NoResult} alt="No results" width={240} />
@@ -681,51 +679,41 @@ const RoomsAdmin: React.FC = () => {
                 ) : (
                     <Box
                         sx={{
-                            backgroundColor: '#FFFFFF',
+                            backgroundColor: '#fff',
                             borderRadius: '8px',
-                            padding: '8px 2px',
                             boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                             overflowX: 'auto',
-                            maxHeight: "465px"
+                            overflowY: 'auto',
+                            height: "525px",
                         }}
                     >
-                        <table style={{ minWidth: '1140px', borderCollapse: 'collapse', }}>
+                        <table style={{
+                            width: '100%', minWidth: '1080px',
+                            borderCollapse: 'collapse',
+                            fontFamily: 'Poppins',
+                        }}>
                             <thead>
-                                <tr style={{
-                                    textAlign: 'left', fontFamily: 'Poppins', fontSize: '13px',
-                                    color: '#330F1B', fontWeight: 500, borderBottom: '1px solid #E0E0E0'
-                                }}>
-                                    <th style={{
-                                        padding: '6px', textAlign: 'left',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Fecha de alta</th>
-                                    <th style={{
-                                        padding: '6px', textAlign: 'left',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Cliente</th>
-                                    <th style={{
-                                        padding: '6px', textAlign: 'left',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Nombre de sala</th>
-                                    <th style={{
-                                        padding: '6px', textAlign: 'left', whiteSpace: 'nowrap',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Créditos globales</th>
-                                    <th style={{
-                                        padding: '6px', textAlign: 'left', whiteSpace: 'nowrap',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Créditos SMS # cortos</th>
-                                    <th style={{
-                                        padding: '6px', textAlign: 'left', whiteSpace: 'nowrap',
-                                        fontWeight: 500, color: "#330F1B", fontSize: "13px"
-                                    }}>Créditos SMS # Largos</th>
+                                <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'center', width: '100%', borderBottom: '1px solid #E0E0E0' }}>
+                                    <th style={{ padding: '10px 10px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Fecha de alta</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Cliente</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Nombre de la sala</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Créditos globales</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Créditos SMS # Cortos</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                        Créditos SMS # Largos</th>
+                                    <th style={{ padding: '5px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredRooms.map((room) => (
-                                    <tr key={room.id} style={{ borderBottom: '1px solid #E0E0E0' }}>
+                                    <tr key={room.id} style={{ borderBottom: '1px solid #E0E0E0', textAlign: 'center', width: '100%' }}>
                                         <td style={{
-                                            padding: '5px', width: '180px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            padding: '6px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{room.fechaAlta}</td>
                                         <td style={{
@@ -733,7 +721,7 @@ const RoomsAdmin: React.FC = () => {
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{room.nombrecliente}</td>
                                         <td style={{
-                                            padding: '6px', width: '100px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                            padding: '6px', width: '120px', whiteSpace: 'nowrap', overflow: 'hidden',
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                         }}>{room.nombreSala}</td>
                                         <td style={{
@@ -749,15 +737,13 @@ const RoomsAdmin: React.FC = () => {
                                             textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                             , borderRight: '1px solid #E0E0E0',
                                         }}>{room.creditosSmsLargos}</td>
-                                        <td style={{
-                                            position: 'sticky',
-                                            right: 0,
-                                            background: '#fff', borderLeft: '1px solid #E0E0E0',
-                                            boxShadow: '-2px 0 4px -2px rgba(0, 0, 0, 0.1)',
-                                            zIndex: 2,
-                                            padding: '6px', width: '20px', whiteSpace: 'nowrap', overflow: 'hidden',
-                                            textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
-                                        }}>
+                                        <td
+                                            style={{
+                                                padding: '0px', width: '40px',
+                                                borderLeft: '1px solid #E0E0E0',
+                                                textAlign: 'center',
+                                            }}
+                                        >
                                             <IconButton
                                                 onClick={(event) => {
                                                     setAnchorEl(event.currentTarget);
@@ -962,7 +948,40 @@ const RoomsAdmin: React.FC = () => {
                     horizontal: 'right',
                 }}
             >
-                <Tooltip title={selectedRow?.canBeDeleted ? '' : 'La sala tiene campañas activas'}>
+                <Tooltip
+                    title={
+                        !selectedRow?.canBeDeleted ? (
+                            <Box
+                                sx={{
+                                    backgroundColor: "#FFFFFF",
+                                    borderRadius: "8px",
+                                    boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+                                    padding: "8px 12px",
+                                    fontSize: "14px",
+                                    fontFamily: "Poppins",
+                                    color: "#574B4F",
+                                    whiteSpace: "pre-line",
+                                    transform: "translate(-10px, -22px)",
+                                    border: "1px solid #00131F3D",
+                                    display: 'flex'
+                                }}
+                            >
+                                No se puede eliminar la sala<br />
+                                porque tiene campañas<br />
+                                asociadas.
+                            </Box>
+                        ) : ""
+                    }
+                    placement="bottom-end"
+                    componentsProps={{
+                        tooltip: {
+                            sx: {
+                                backgroundColor: "transparent",
+                                padding: 0
+                            }
+                        }
+                    }}
+                >
                     <span>
                         <MenuItem
                             onClick={() => {
@@ -974,12 +993,13 @@ const RoomsAdmin: React.FC = () => {
                             }}
                             disabled={!selectedRow?.canBeDeleted}
                             sx={{
-                                fontFamily: 'Poppins', width: "198px",
-                                fontSize: '14px',
+                                fontFamily: "Poppins",
+                                width: "180px", height: '36px',
+                                fontSize: "14px",
                                 opacity: selectedRow?.canBeDeleted ? 1 : 0.5,
-                                cursor: selectedRow?.canBeDeleted ? 'pointer' : 'not-allowed',
-                                '&:hover': {
-                                    backgroundColor: selectedRow?.canBeDeleted ? '#F2EBED' : 'transparent'
+                                cursor: selectedRow?.canBeDeleted ? "pointer" : "not-allowed",
+                                "&:hover": {
+                                    backgroundColor: selectedRow?.canBeDeleted ? "#F2EBED" : "transparent"
                                 }
                             }}
                         >
@@ -990,24 +1010,32 @@ const RoomsAdmin: React.FC = () => {
                                     style={{
                                         width: 24,
                                         height: 24,
-                                        filter: selectedRow?.canBeDeleted ? 'none' : 'grayscale(1)',
+                                        filter: selectedRow?.canBeDeleted ? "none" : "grayscale(1)"
                                     }}
                                 />
-                                <Typography sx={{
-                                    fontFamily: 'Poppins',
-                                    fontSize: '14px',
-                                    color: selectedRow?.canBeDeleted ? "#574B4F" : "#AFA1A5"
-                                }}>
+
+                                <Typography
+                                    sx={{
+                                        fontFamily: "Poppins",
+                                        fontSize: "14px",
+                                        color: selectedRow?.canBeDeleted ? "#574B4F" : "#AFA1A5"
+                                    }}
+                                >
                                     Eliminar
                                 </Typography>
-                                {!selectedRow?.canBeDeleted && (
-                                    <Typography>
 
-                                    </Typography>
-                                )}
                             </Box>
+                            {!selectedRow?.canBeDeleted && (
+                                <IconButton sx={{ marginLeft: "20px" }}
+                                >
+                                    <img
+                                        src={infoicon}
+                                        alt="info-icon"
+                                        style={{ width: 24, height: 24 }}
+                                    />
+                                </IconButton>
+                            )}
                         </MenuItem>
-
                     </span>
                 </Tooltip>
 

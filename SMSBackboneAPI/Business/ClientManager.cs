@@ -201,7 +201,9 @@ namespace Business
                                     Extension = reader.IsDBNull(reader.GetOrdinal("extension"))
     ? (int?)null
     : reader.GetInt32(reader.GetOrdinal("extension")),
-                                    RoomName = reader["RoomName"] as string ?? "",
+                                    RoomName = reader["RoomName"] == DBNull.Value
+    ? string.Empty
+    : Convert.ToString(reader["RoomName"]) ?? string.Empty,
                                     TotalCredits = reader.GetDouble(reader.GetOrdinal("TotalCredits")),
                                     TotalLongSmsCredits = reader.GetDouble(reader.GetOrdinal("TotalLongSmsCredits")),
                                     TotalShortSmsCredits = reader.GetDouble(reader.GetOrdinal("TotalShortSmsCredits")),

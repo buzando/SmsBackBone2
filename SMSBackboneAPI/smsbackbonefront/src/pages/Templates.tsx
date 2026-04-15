@@ -491,7 +491,7 @@ const Templates = () => {
                 </Typography>
             </Box>
 
-            <Box sx={{ marginLeft: "32px", }}>
+            <Box sx={{ marginLeft: "32px" }}>
                 <Divider sx={{ marginBottom: '17px', marginTop: '16px' }} />
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '25px', marginBottom: '20px' }}>
@@ -729,10 +729,15 @@ const Templates = () => {
                                                 />
                                             </Box>
                                         </th>
-                                        <th style={{ padding: '0px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Fecha de creación</th>
-                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Nombre</th>
-                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', borderRight: "1px solid #E6E4E4", top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Contenido</th>
-                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}></th>
+                                        <th style={{ padding: '0px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                            Fecha de creación</th>
+                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                            Nombre</th>
+                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', borderRight: "1px solid #E6E4E4", top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                            Contenido</th>
+                                        <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+
+                                        </th>
                                     </tr>
                                 ) : (
                                     <tr style={{
@@ -901,7 +906,8 @@ const Templates = () => {
                                         <td style={{
                                             padding: '10px 0px', width: '480px', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
                                             textOverflow: 'ellipsis', display: 'inline-block', fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins'
-                                        }}>{template.message}</td>
+                                        }}>
+                                            {template.message}</td>
 
                                         {/* Menú de acciones */}
                                         <td

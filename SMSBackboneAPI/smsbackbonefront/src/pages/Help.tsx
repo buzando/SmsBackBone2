@@ -99,6 +99,9 @@ const Help: React.FC = () => {
                 <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '10px', fontFamily: 'Poppins' }}>
                     Soporte: cwsoporte@nuxiba.com
                 </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '10px', fontFamily: 'Poppins' }}>
+                    Soporte Facturación: cuentasporcobrar@nuxiba.com
+                </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '100px', fontFamily: 'Poppins', overflow: "hidden" }}>
                     Dirección: Eugenia 197, Narvarte Poniente, Benito Juárez, 03020 Ciudad de México, CDMX
                 </Typography>

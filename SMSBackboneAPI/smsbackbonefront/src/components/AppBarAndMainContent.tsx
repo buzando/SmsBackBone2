@@ -1441,7 +1441,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                 pl: 4,
                                                 position: 'relative',
                                                 '&.Mui-selected': {
-                                                    backgroundColor: '#290013',
                                                     color: '#FFFFFF',
                                                     '&::before': {
                                                         content: '""',
@@ -1449,8 +1448,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                         left: 0,
                                                         top: 0,
                                                         bottom: 0,
-                                                        width: '4px',
-                                                        backgroundColor: '#FFFFFF',
                                                     },
                                                 },
                                             }}
@@ -1488,7 +1485,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                 pl: 4,
                                                 position: 'relative',
                                                 '&.Mui-selected': {
-                                                    backgroundColor: '#290013',
                                                     color: '#FFFFFF',
                                                     '&::before': {
                                                         content: '""',
@@ -1496,8 +1492,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                         left: 0,
                                                         top: 0,
                                                         bottom: 0,
-                                                        width: '4px',
-                                                        backgroundColor: '#FFFFFF',
                                                     },
                                                 },
                                             }}
@@ -1534,7 +1528,11 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                             {/* Menú de Reportes */}
                             <ListItem disablePadding>
                                 <ListItemButton
-                                    onClick={() => navigate('/ReportsAdmin')}
+                                    onClick={() => {
+                                        setSelectedLink("reportsAdmin");
+                                        setActiveSubMenu(null);
+                                        navigate('/ReportsAdmin');
+                                    }}
                                     sx={{ borderRadius: '8px' }}>
                                     <img alt="Iconreports" src={Iconreports} style={{ width: 35, height: 20, transform: "rotate(-90deg)" }} />
                                     <ListItemText
