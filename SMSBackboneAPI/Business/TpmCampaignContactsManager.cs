@@ -29,7 +29,7 @@ namespace Business
                     if (hoja == null) return resultado;
 
                     // Obtener encabezados
-                    var headers = hoja.Row(1).Cells().Select((c, i) => new HeaderInfo { Header = c.GetString()?.Trim(), Index = i + 1 }).ToList();
+                    var headers = hoja.Row(1).Cells().Select((c, i) => new HeaderInfo { Header = c.GetString(), Index = i + 1 }).ToList();
                     var rowCount = hoja.LastRowUsed().RowNumber();
 
                     for (int fila = 2; fila <= rowCount; fila++)

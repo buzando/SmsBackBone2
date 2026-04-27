@@ -35,7 +35,18 @@ namespace Business
             { "TotalCredits", "Créditos totales" },
             { "TotalLongSmsCredits", "Créditos SMS\nlargos" },
             { "TotalShortSmsCredits", "Créditos SMS\ncortos" },
-            { "DeactivationDate", "Fecha de baja" }
+            { "DeactivationDate", "Fecha de baja" },  { "Campaign", "Campaña" },
+    { "CampaignId", "ID campaña" },
+    { "Cost", "Costo" },
+    { "Date", "Fecha" },
+    { "Message", "Mensaje" },
+    { "MessageId", "ID mensaje" },
+    { "Phone", "Teléfono" },
+    { "ReceivedAt", "Fecha de recepción" },
+    { "Room", "Sala" },
+    { "Status", "Estatus" },
+    { "Type", "Tipo" },
+    { "User", "Usuario" }
         };
 
         public static byte[] GenerateGenericExcel<T>(IEnumerable<T> data)
@@ -151,7 +162,19 @@ namespace Business
     { "TotalCredits", 1.3 },
     { "TotalLongSmsCredits", 1.3 },
     { "TotalShortSmsCredits", 1.3 },
-    { "DeactivationDate", 1.4 }
+    { "DeactivationDate", 1.4 },
+      { "Date", 1.8 },
+    { "Phone", 2.0 },
+    { "Room", 1.4 },
+    { "Campaign", 2.0 },
+    { "CampaignId", 1.5 },
+    { "User", 3.8 },
+    { "MessageId", 1.5 },
+    { "Message", 5.2 },
+    { "Status", 1.2 },
+    { "ReceivedAt", 1.9 },
+    { "Cost", 1.3 },
+    { "Type", 1.8 }
 };
 
             var properties = GetReadableProperties<T>();
@@ -257,7 +280,7 @@ namespace Business
             return typeof(T)
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => p.CanRead)
-                .Where(p => !p.Name.Equals("id", StringComparison.OrdinalIgnoreCase)) 
+                .Where(p => !p.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
 
@@ -307,7 +330,8 @@ namespace Business
                     _ => "Desconocido"
                 };
             }
-            if (propertyName.Equals("PhoneNumber", StringComparison.OrdinalIgnoreCase))
+            if (propertyName.Equals("PhoneNumber", StringComparison.OrdinalIgnoreCase) ||
+       propertyName.Equals("Phone", StringComparison.OrdinalIgnoreCase))
             {
                 var phone = value.ToString() ?? string.Empty;
 
@@ -316,7 +340,6 @@ namespace Business
 
                 return phone.Replace(" ", "\u00A0");
             }
-
             if (propertyName.Equals("Email", StringComparison.OrdinalIgnoreCase))
             {
                 var email = value.ToString() ?? string.Empty;

@@ -609,7 +609,12 @@ export default function TestSMS() {
           }}
           isLoading={Loading}
           disabled={
-            toNumberError || messageError || message.length === 0
+            toNumberError ||
+            messageError ||
+            (
+              !selectedTemplateId &&
+              message.trim().length === 0
+            )
           }
         />
       </Box>

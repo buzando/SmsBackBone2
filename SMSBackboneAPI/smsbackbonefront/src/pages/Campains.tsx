@@ -426,8 +426,8 @@ const Campains: React.FC = () => {
   ];
   const aniOptions = [
     { value: "", label: "Seleccionar" },
-    { value: "nacional", label: "Nacional" },
-    { value: "vallarta_registrable", label: "Vallarta registrable" }
+    { value: "rotativo", label: "Rotativo" },
+    { value: "rotativo_regionalizado", label: "Rotativo Regionalizado" }
   ];
   const filteredBlackLists = blackLists.filter((item) =>
     item.name.toLowerCase().includes(searchTermBlacklist.toLowerCase())
@@ -778,6 +778,7 @@ const Campains: React.FC = () => {
       // rollback si falla el backend
       setSelectedCampaign(prevCampaign);
       setInfoChecks(prevChecks);
+      setOpenInfoModal(false);
     }
   };
 
@@ -892,13 +893,15 @@ const Campains: React.FC = () => {
 
   const [selectedCampaigns, setSelectedCampaigns] = useState<number[]>([]);
 
-  const filteredCampaigns = campaigns.filter(c => {
-    if (campaignFilter === 'encendidas') return c.autoStart;
-    if (campaignFilter === 'detenidas') return !c.autoStart;
-    return true; // 'todas'
-  }).filter((c) =>
-    c.name.toLowerCase().includes(Serchterm.toLowerCase())
-  );
+  const filteredCampaigns = campaigns
+    .filter(c => {
+      if (campaignFilter === 'encendidas') return c.autoStart;
+      if (campaignFilter === 'detenidas') return !c.autoStart;
+      return true;
+    })
+    .filter(c =>
+      c.name.toLowerCase().includes(Serchterm.toLowerCase())
+    );
 
 
   const [pinnedCampaigns, setPinnedCampaigns] = useState<number[]>([]);
@@ -1347,7 +1350,6 @@ const Campains: React.FC = () => {
   const handleDeleteCampaign = async (ids?: number | number[]) => {
     setLoading(true);
     try {
-      // 🔄 Normaliza el parámetro a un array
       const idArray = Array.isArray(ids) ? ids : ids ? [ids] : [];
 
       if (idArray.length === 0) {
@@ -1355,20 +1357,22 @@ const Campains: React.FC = () => {
         return;
       }
 
-      // Validación: si alguna campaña está encendida
-      const encendidas = idArray
-        .map(id => campaigns.find(c => c.id === id))
-        .filter(c => c?.autoStart);
 
-      if (encendidas.length > 0) {
+      const campanasBloqueadas = idArray
+        .map(id => campaigns.find(c => c.id === id))
+        .filter((c): c is CampaignFullResponse => !!c)
+        .filter(c => isCampaignRunning(c));
+
+      if (campanasBloqueadas.length > 0) {
         setTitleErrorModal("Error al eliminar campaña");
-        setMessageErrorModal("No ha sido posible eliminar una o más campañas debido a que se encuentran encendidas.");
+        setMessageErrorModal(
+          "No ha sido posible eliminar una o más campañas porque se encuentran iniciadas y dentro de un horario vigente."
+        );
         setIsErrorModalOpen(true);
         setOpenDeleteModal(false);
         return;
       }
 
-      // Enviar al backend (ajusta según tu endpoint)
       await axios.post(
         `${import.meta.env.VITE_API_DELETE_CAMPAIGN}`,
         idArray,
@@ -1377,7 +1381,7 @@ const Campains: React.FC = () => {
 
       setOpenDeleteModal(false);
       setCampaignToDelete(null);
-      setMessageChipBar("Campaña(s) Eliminada(s) con Exito");
+      setMessageChipBar("Campaña(s) eliminada(s) con éxito");
       setShowChipBarAdd(true);
       setTimeout(() => setShowChipBarAdd(false), 3000);
       setSelectedCampaigns([]);
@@ -1387,8 +1391,7 @@ const Campains: React.FC = () => {
       setMessageErrorModal("No ha sido posible eliminar la campaña. Intente más tarde.");
       setIsErrorModalOpen(true);
       setOpenDeleteModal(false);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -2307,7 +2310,13 @@ const Campains: React.FC = () => {
                           ]
                         }}
                       >
-                        <IconButton>
+                        <IconButton
+                          onClick={() => {
+                            if (selectedCampaigns.length === 0) return;
+                            setCampaignToDelete(null);
+                            setOpenDeleteModal(true);
+                          }}
+                          disabled={selectedCampaigns.length === 0}>
                           <Box
                             component="img"
                             src={IconTrash}

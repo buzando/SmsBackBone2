@@ -26,6 +26,8 @@ import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import { color } from 'd3-color';
 import { overflow } from 'html2canvas/dist/types/css/property-descriptors/overflow';
 import { useSelectedRoom } from "../hooks/useSelectedRoom";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface UseResponse {
     creditsUsed: number;
@@ -40,6 +42,7 @@ interface UseResponse {
 
 
 const Use: React.FC = () => {
+    const reportRef = useRef<HTMLDivElement | null>(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedOption, setSelectedOption] = useState("corto");
     const [loading, setLoading] = useState(false);
@@ -148,24 +151,6 @@ const Use: React.FC = () => {
 
     {/*Estado spinnerimg*/ }
     const [isPdfLoading, setIsPdfLoading] = useState(false);
-
-    const handlePdfClick = async () => {
-        if (isPdfLoading) return; // evita doble click
-
-        try {
-            setIsPdfLoading(true);
-
-            // Aquí va tu lógica real
-            // await descargarPDF();
-            // Simulación
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsPdfLoading(false);
-        }
-    };
 
     const closeSmsPopper = () => setAnchorEl(null);
 
@@ -409,6 +394,65 @@ const Use: React.FC = () => {
         }
     };
 
+    const chartRef = useRef<HTMLDivElement | null>(null);
+
+    const handlePdfClick = async () => {
+        setIsPdfLoading(true);
+        if (!chartRef.current) return;
+
+        const canvas = await html2canvas(chartRef.current, {
+            scale: 2,
+            backgroundColor: "#ffffff",
+            useCORS: true,
+        });
+
+        const campaignText =
+            selectedCampaigns?.length > 0
+                ? selectedCampaigns.map(c => c.name).join(", ")
+                : "Todas";
+
+        const userText =
+            selectedUsers?.length > 0
+                ? selectedUsers.map(u => u.name).join(", ")
+                : "Todos";
+
+        const formatShortDate = (date: Date) => {
+            const day = date.toLocaleDateString("es-MX", { day: "2-digit" });
+            const month = date
+                .toLocaleDateString("es-MX", { month: "short" })
+                .replace(".", "")
+                .toUpperCase();
+            setIsPdfLoading(false);
+            return `${day} ${month}`;
+
+            setLoading(false);
+        };
+
+        const dateRangeLabel =
+            selectedDates?.start && selectedDates?.end
+                ? `${formatShortDate(selectedDates.start)} - ${formatShortDate(selectedDates.end)}`
+                : "Todo";
+
+        const imgData = canvas.toDataURL("image/png");
+
+        const pdf = new jsPDF("l", "mm", "a4");
+
+        pdf.setFontSize(16);
+        pdf.text("Reporte de consumo", 14, 15);
+
+        pdf.setFontSize(10);
+        pdf.text(`Tipo: ${selectedOption}`, 14, 25);
+        pdf.text(`Rango: ${dateRangeLabel}`, 14, 31);
+        pdf.text(`Campaña: ${campaignText}`, 14, 37);
+        pdf.text(`Usuario: ${userText}`, 14, 43);
+
+        const imgWidth = 260;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        pdf.addImage(imgData, "PNG", 14, 50, imgWidth, imgHeight);
+
+        pdf.save("reporte-consumo.pdf");
+    };
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
@@ -1085,62 +1129,66 @@ const Use: React.FC = () => {
                                 ))}
                             </Box>
                         </Paper>
-                        <Paper sx={graphPaperStyle}>
-                            <Typography variant="h6" sx={graphTitleStyle}>
-                                Promedio de consumo
-                            </Typography>
-                            <Typography sx={{ textAlign: 'center', fontSize: '12px', color: '#574B4F', opacity: 0.8, fontFamily: "Poppins" }}>
-                                Información de los últimos 20 días
-                            </Typography>
-                            <ResponsiveContainer width="100%" height={250}>
-                                <AreaChart data={dataChart}>
-                                    <defs>
-                                        <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#833A53" stopOpacity={0.8} />
-                                            <stop offset="100%" stopColor="#833A53" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="date"
-                                        tick={{ fontFamily: 'Poppins', fontSize: "10px", fill: '#574B4F' }}
-                                    />
-                                    <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`}
-                                        tick={{ fontFamily: 'Poppins', fontSize: "12px", fill: '#574B4F' }}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{
-                                            fontFamily: 'Poppins',
-                                            fontSize: '15px',
-                                            color: '#574B4F',
-                                            borderRadius: '6px', minWidth: "100px", minHeight: "40px",
-                                            border: '1px solid #C6BFC2',
-                                            boxShadow: '0px 8px 16px rgba(0, 19, 31, 0.16)',
-                                        }}
-                                        itemStyle={{
-                                            fontFamily: 'Poppins',
-                                            color: '#8F4D63',
-                                        }}
-                                        labelStyle={{
-                                            fontFamily: 'Poppins',
-                                            fontWeight: 500,
-                                            color: '#574B4F',
-                                        }}
-                                    />
-
-                                    {/* Línea con Sombreado */}
-                                    <Area
-                                        type="monotone"
-                                        dataKey="value"
-                                        stroke="#833A53"
-                                        strokeWidth={2}
-                                        fill="url(#colorGradient)"
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
+                        <div ref={chartRef}>
 
 
-                        </Paper>
+                            <Paper sx={graphPaperStyle}>
+                                <Typography variant="h6" sx={graphTitleStyle}>
+                                    Promedio de consumo
+                                </Typography>
+                                <Typography sx={{ textAlign: 'center', fontSize: '12px', color: '#574B4F', opacity: 0.8, fontFamily: "Poppins" }}>
+                                    Información de los últimos 20 días
+                                </Typography>
+                                <ResponsiveContainer width="100%" height={250}>
+                                    <AreaChart data={dataChart}>
+                                        <defs>
+                                            <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#833A53" stopOpacity={0.8} />
+                                                <stop offset="100%" stopColor="#833A53" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="date"
+                                            tick={{ fontFamily: 'Poppins', fontSize: "10px", fill: '#574B4F' }}
+                                        />
+                                        <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`}
+                                            tick={{ fontFamily: 'Poppins', fontSize: "12px", fill: '#574B4F' }}
+                                        />
+                                        <Tooltip
+                                            contentStyle={{
+                                                fontFamily: 'Poppins',
+                                                fontSize: '15px',
+                                                color: '#574B4F',
+                                                borderRadius: '6px', minWidth: "100px", minHeight: "40px",
+                                                border: '1px solid #C6BFC2',
+                                                boxShadow: '0px 8px 16px rgba(0, 19, 31, 0.16)',
+                                            }}
+                                            itemStyle={{
+                                                fontFamily: 'Poppins',
+                                                color: '#8F4D63',
+                                            }}
+                                            labelStyle={{
+                                                fontFamily: 'Poppins',
+                                                fontWeight: 500,
+                                                color: '#574B4F',
+                                            }}
+                                        />
+
+                                        {/* Línea con Sombreado */}
+                                        <Area
+                                            type="monotone"
+                                            dataKey="value"
+                                            stroke="#833A53"
+                                            strokeWidth={2}
+                                            fill="url(#colorGradient)"
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+
+
+                            </Paper>
+                        </div>
                     </>
                 )}
                 {/* Imagen de vacío y mensaje */}
