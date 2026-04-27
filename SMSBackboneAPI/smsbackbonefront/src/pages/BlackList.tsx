@@ -1337,7 +1337,8 @@ const BlackList: React.FC = () => {
                                             <td style={{
                                                 padding: '0px', fontFamily: 'Poppins',
                                                 color: "#574B4F", fontSize: "13px", width: '210px',
-                                            }}>{formatDate(black.creationDate)}</td>
+                                            }}>
+                                                {formatDate(black.creationDate)}</td>
 
                                             <td style={{
                                                 padding: '0px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden',
@@ -1346,8 +1347,10 @@ const BlackList: React.FC = () => {
                                                 {black.name}
                                             </td>
 
-                                            <td style={{ padding: '0px', width: '200px', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px" }}>{formatDate(black.expirationDate)}</td>
-                                            <td style={{ padding: '0px', width: '200px', textAlign: 'left', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px", }}>{black.quantity}</td>
+                                            <td style={{ padding: '0px', width: '200px', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px" }}>
+                                                {formatDate(black.expirationDate)}</td>
+                                            <td style={{ padding: '0px', width: '200px', textAlign: 'left', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px", }}>
+                                                {black.quantity}</td>
                                             <td style={{
                                                 padding: '0px', width: '50px',
                                                 borderLeft: '1px solid #E0E0E0',
@@ -3827,7 +3830,7 @@ const BlackList: React.FC = () => {
                                                                         }
                                                                     >
                                                                         <MenuItem
-                                                                                value="remover_guiones"
+                                                                            value="remover_guiones"
                                                                             sx={{
                                                                                 fontSize: '12px',
                                                                                 fontFamily: 'Poppins',
@@ -4538,7 +4541,7 @@ const BlackList: React.FC = () => {
                                                                         }
                                                                     >
                                                                         <MenuItem
-                                                                                value="formato_10"
+                                                                            value="formato_10"
                                                                             sx={{
                                                                                 fontSize: '12px',
                                                                                 fontFamily: 'Poppins',
@@ -5451,7 +5454,7 @@ const BlackList: React.FC = () => {
                             text='Guardar cambios'
                             disabled={
                                 !(
-                                    (fileSuccess && selectedSheet !== '') ||
+                                    (fileSuccess && selectedSheet?.length > 0) ||
                                     individualPhones.some(p => /^\d{10}$/.test(p.trim()))
                                 )
                             }
