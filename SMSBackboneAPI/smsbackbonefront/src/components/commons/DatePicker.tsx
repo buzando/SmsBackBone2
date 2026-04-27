@@ -9,6 +9,7 @@ import Iconarrow from '../../assets/icon-punta-flecha-bottom.svg'
 import MainButton from '../commons/MainButton'
 import SecondaryButton from '../commons/SecondaryButton'
 import { GlobalStyles } from "@mui/material";
+import { addMonths, subMonths } from "date-fns";
 import { startOfDay } from 'date-fns';
 interface DatePickerProps {
     open: boolean;
@@ -23,6 +24,8 @@ interface DatePickerProps {
     | 'top'
     | 'top-end';
     resetSignal?: boolean;
+    minDate?: Date;
+    maxDate?: Date;
 }
 
 const DatePicker: React.FC<DatePickerProps> = ({
@@ -31,7 +34,10 @@ const DatePicker: React.FC<DatePickerProps> = ({
     onApply,
     onClose,
     placement = 'bottom-start',
-    resetSignal }) => {
+    resetSignal,
+    minDate,
+    maxDate
+}) => {
     const [dateRange, setDateRange] = useState([
         {
             startDate: new Date(),
@@ -40,12 +46,21 @@ const DatePicker: React.FC<DatePickerProps> = ({
         },
     ]);
 
+    const handleNextMonth = () => {
+        setShownDate(prev => addMonths(prev, 1));
+    };
+
+    const handlePrevMonth = () => {
+        setShownDate(prev => subMonths(prev, 1));
+    };
+
     // Estados para las horas y minutos de inicio y fin
     const [startHours, setStartHours] = useState(0);
     const [startMinutes, setStartMinutes] = useState(0);
     const [endHours, setEndHours] = useState(0);
     const [endMinutes, setEndMinutes] = useState(0);
     const [shownDate, setShownDate] = useState(new Date());
+    console.log("shownDate:", shownDate); // 👈 aquí
     const handleApply = () => {
         onApply(dateRange[0].startDate, dateRange[0].endDate, startHours, startMinutes, endHours, endMinutes);
         onClose();
@@ -301,15 +316,16 @@ const DatePicker: React.FC<DatePickerProps> = ({
                 }}>
                     <Paper elevation={3} className="custom-datepicker-scale">
                         <div className="date-picker-divider"></div>
-                        <div style={{ position: 'relative' }}>
+                        <div style={{ position: 'relative', zIndex: 20 }}>
                             <img
                                 src={Iconarrow}
                                 alt="Mes anterior"
-                                onClick={() => {
+                                /*onClick={() => {
                                     const newDate = new Date(shownDate);
                                     newDate.setMonth(shownDate.getMonth() - 1);
                                     setShownDate(newDate);
-                                }}
+                                }}*/
+                                onClick={handlePrevMonth}
                                 style={{
                                     position: 'absolute',
                                     top: '8px',
@@ -318,18 +334,20 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                     width: '20px',
                                     height: '20px',
                                     cursor: 'pointer',
-                                    zIndex: 10,
+                                    zIndex: 999,
+                                    pointerEvents: 'auto',
                                 }}
                             />
 
                             <img
                                 src={Iconarrow}
                                 alt="Mes siguiente"
-                                onClick={() => {
+                                /*onClick={() => {
                                     const newDate = new Date(shownDate);
                                     newDate.setMonth(shownDate.getMonth() + 1);
                                     setShownDate(newDate);
-                                }}
+                                }}*/
+                                onClick={handleNextMonth}
                                 style={{
                                     position: 'absolute',
                                     top: '8px',
@@ -338,7 +356,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                     width: '20px',
                                     height: '20px',
                                     cursor: 'pointer',
-                                    zIndex: 10,
+                                    zIndex: 999,
+                                    pointerEvents: 'auto',
                                 }}
                             />
 
@@ -346,7 +365,10 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
                         {/* Selector de Fecha */}
                         <DateRange
-                            key={shownDate.toString()}
+                            minDate={minDate}
+                            maxDate={maxDate}
+                            //key={shownDate.toString()}
+                            key={`${shownDate.getFullYear()}-${shownDate.getMonth()}`}
                             locale={es}
                             editableDateInputs={true}
                             onChange={(item) => {
@@ -361,14 +383,18 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
                                 setIsValidRange(!!start && !!end);
                             }}
+                            //moveRangeOnFirstSelection={false}
                             moveRangeOnFirstSelection={false}
+                            retainEndDateOnFirstSelection={true}
+                            preventSnapRefocus={true}
                             ranges={dateRange}
                             months={2}
                             direction="horizontal"
                             showDateDisplay={false}
                             showMonthAndYearPickers={false}
                             shownDate={shownDate}
-                            onShownDateChange={(date) => setShownDate(date)}
+                            //onShownDateChange={(date) => setShownDate(date)}
+                            onShownDateChange={() => { }}
                         />
 
                         <Box

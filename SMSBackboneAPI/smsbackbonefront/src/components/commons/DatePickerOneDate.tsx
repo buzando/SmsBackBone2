@@ -17,6 +17,7 @@ interface DatePickerProps {
   anchorEl: HTMLElement | null;
   onApply: (date: Date, hour: number, minute: number) => void;
   onClose: () => void;
+  label?: string;
   placement?:
   | "bottom-start"
   | "bottom"
@@ -39,6 +40,7 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
   modifiers,
   offset = [0, 10],
   initialDate,
+  label = "HORA FINAL",
 }) => {
   const base = useMemo(() => initialDate ?? new Date(), [initialDate]);
 
@@ -359,7 +361,7 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                   mt: 0,
                 }}
               >
-                HORA FINAL
+                {label}
               </Box>
 
               <Box

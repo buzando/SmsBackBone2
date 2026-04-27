@@ -41,6 +41,9 @@ import jsPDF from 'jspdf';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+import SpinnerTop from "../assets/SpinnerTop.svg";
+import SpinnerBottom from "../assets/SpinnerBottom.svg";
+import ChipBar from "../components/commons/ChipBar";
 
 
 interface Reports {
@@ -137,6 +140,8 @@ const Reports: React.FC = () => {
     const [reportDatasms, setReportDatasms] = useState<ReporteSMS[] | undefined | null>(undefined);
     const [users, setUsers] = useState<User[]>([]);
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+    const [showChipBar, setShowChipBar] = useState(false);
+    const [messageChipBar, setMessageChipBar] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
     const [totalCount, settotalCount] = useState(0);
     const [totalXPage, settotalXPage] = useState(0);
@@ -160,7 +165,6 @@ const Reports: React.FC = () => {
     const handleCancelDatePicker = () => {
         setDatePickerOpen(false);
     };
-
 
 
     // Abre o cierra el menú de campañas
@@ -417,12 +421,27 @@ const Reports: React.FC = () => {
         setThisLoading: React.Dispatch<React.SetStateAction<boolean>>
     ) => {
         setThisLoading(true);
+
         try {
-            await new Promise<void>((resolve) => {
-                exportReport2(format, () => {
-                    resolve();
+            await new Promise<void>((resolve, reject) => {
+                exportReport2(format, (success?: boolean) => {
+                    if (success === false) {
+                        reject();
+                    } else {
+                        resolve();
+                    }
                 });
             });
+
+            //Éxito
+            setMessageChipBar('El archivo ha sido descargado exitosamente');
+            setShowChipBar(true);
+
+        } catch (error) {
+            //Error
+            setMessageChipBar('Ocurrió un error al descargar el archivo');
+            setShowChipBar(true);
+
         } finally {
             setThisLoading(false);
         }
@@ -560,6 +579,8 @@ const Reports: React.FC = () => {
         }
     };
 
+    const hasData = Array.isArray(reportData) && reportData.length > 0;
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as Node;
@@ -593,7 +614,7 @@ const Reports: React.FC = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
@@ -618,7 +639,7 @@ const Reports: React.FC = () => {
                 </Typography>
             </Box>
             <Box sx={{ marginLeft: "32px" }}>
-                <Divider sx={{ mt: 2, mb: 0, maxWidth: "1180px" }} />
+                <Divider sx={{ marginTop: '16px' }} />
                 <Tabs value={selectedTab} onChange={handleTabChange} >
                     <Box
                         onClick={handleSmsClick}
@@ -648,7 +669,7 @@ const Reports: React.FC = () => {
                     </Box>
 
                     <Popper open={smsMenuOpen} anchorEl={smsAnchorEl} placement="bottom-start">
-                        <Paper sx={{ width: 379 }}>
+                        <Paper sx={{ width: 330 }}>
                             {smsOptions
                                 .filter((option) => option !== "SMS")
                                 .map((option) => (
@@ -673,30 +694,45 @@ const Reports: React.FC = () => {
                     </Popper>
 
                 </Tabs>
-                <Divider sx={{ mt: 1, mb: 2, marginTop: "-5px", maxWidth: "1180px" }} />
+                <Divider sx={{ mt: 1, mb: 2, marginTop: "-5px", }} />
 
                 {/* Filtros de Fecha, Campaña y Usuario */}
 
                 <Box display="flex" gap={2} mb={4} marginBottom={2}>
-                    <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleDateClick}>
-                        {selectedDates ? `${selectedDates.start.toLocaleDateString()} - ${selectedDates.end.toLocaleDateString()}` : 'FECHA'}
+                    <Button
+                        disabled={selectedSmsOption === "SMS"}
+                        variant="outlined"
+                        sx={buttonStyle}
+                        onClick={handleDateClick}
+                    >
+                        {selectedDates
+                            ? `${selectedDates.start.toLocaleString('en-GB', {
+                                day: 'numeric',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            })} - ${selectedDates.end.toLocaleString('en-GB', {
+                                day: 'numeric',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            })}`
+                            : 'FECHA'}
                     </Button>
 
-                    {/* Mostrar solo si no es "Global" */}
-                    {selectedSmsOption !== "Global" && (
-                        <>
-                            <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleCampaignClick}>
-                                {selectedCampaigns.length > 0
-                                    ? `${selectedCampaigns.length} campaña${selectedCampaigns.length > 1 ? 's' : ''}`
-                                    : 'CAMPAÑA'}
-                            </Button>
-                            <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleUserClick}>
-                                {selectedUsers.length > 0
-                                    ? `${selectedUsers.length} usuario${selectedUsers.length > 1 ? 's' : ''}`
-                                    : 'USUARIO'}
-                            </Button>
-                        </>
-                    )}
+                    <>
+                        <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleCampaignClick}>
+                            {selectedCampaigns.length > 0
+                                ? `${selectedCampaigns.length} campaña${selectedCampaigns.length > 1 ? 's' : ''}`
+                                : 'CAMPAÑA'}
+                        </Button>
+                        <Button disabled={selectedSmsOption === "SMS"} variant="outlined" sx={buttonStyle} onClick={handleUserClick}>
+                            {selectedUsers.length > 0
+                                ? `${selectedUsers.length} usuario${selectedUsers.length > 1 ? 's' : ''}`
+                                : 'USUARIO'}
+                        </Button>
+                    </>
+
                 </Box>
 
                 {/* Popper Campañas */}
@@ -852,8 +888,6 @@ const Reports: React.FC = () => {
                                 }}
                             >LIMPIAR
                             </Button>
-
-
 
                             <Button variant="contained"
                                 onClick={() => {
@@ -1050,7 +1084,7 @@ const Reports: React.FC = () => {
 
                 </Popper>
 
-                <Divider sx={{ mb: 4, maxWidth: "1180px" }} />
+                <Divider sx={{ mb: 3 }} />
 
 
                 {selectedDates?.start && selectedDates?.end && (
@@ -1111,7 +1145,7 @@ const Reports: React.FC = () => {
                                 </IconButton>
                             </Box>
                             {/* Botones de CSV / Excel y PDF */}
-                            <Box sx={{ display: "flex", justifyContent: "flex-end", flex: 1, marginLeft: "770px", gap: 2 }}>
+                            <Box sx={{ display: "flex", justifyContent: "flex-end", flex: 1, marginLeft: "940px", gap: 2 }}>
                                 <IconButton sx={{ p: 0, opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
                                     onClick={() => handleExportClick('csv', setIsExportingCSV)}
                                     disabled={anyExporting && !isExportingCSV}
@@ -1159,8 +1193,6 @@ const Reports: React.FC = () => {
                                     onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
                                     disabled={anyExporting && !isExportingXLSX}
                                 >
-
-
                                     <Tooltip title="Exportar a Excel"
                                         placement="top"
                                         arrow
@@ -1201,7 +1233,6 @@ const Reports: React.FC = () => {
                                         )}
                                     </Tooltip>
                                 </IconButton>
-
 
                                 <IconButton sx={{ p: 0, opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
                                     onClick={() => handleExportClick('pdf', setIsExportingPDF)}
@@ -1248,8 +1279,6 @@ const Reports: React.FC = () => {
                                     </Tooltip>
                                 </IconButton>
 
-
-
                             </Box>
 
                         </Box>
@@ -1257,34 +1286,92 @@ const Reports: React.FC = () => {
                 )}
 
                 {loading ? (
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            height: '512px'
-                        }}
-                    >
-                        <CircularProgress sx={{ color: '#7B354D' }} size={60} />
+                    <Box sx={{
+                        position: 'fixed',
+                        top: 0, left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999
+                    }}>
+                        <Box
+                            sx={{
+                                position: "relative",
+                                width: 80,
+                                height: 80
+                            }}
+                        >
+                            {/* Spinner base */}
+                            <img
+                                src={SpinnerBottom}
+                                alt="loading-base"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0
+                                }}
+                            />
+
+                            {/* Spinner que gira */}
+                            <img
+                                src={SpinnerTop}
+                                alt="loading-top"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    animation: "spin 1s linear infinite"
+                                }}
+                            />
+                        </Box>
+                        <style>{`
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `}</style>
                     </Box>
                 ) : (reportData === undefined && reportDatasms === undefined) ? (
 
                     <Box>
+                        <Box
+                            sx={{
+                                width: '100%',
+                                backgroundColor: '#FFFFFF',
+                                borderRadius: '8px',
+                                height: '525px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                                mt: 3,
+                            }}
+                        >
 
-                        <Card sx={{
-                            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", p: 5, textAlign: "center",
-                            maxWidth: "1180px", maxHeight: "400px", marginBottom: "150px"
-                        }}>
-                            <CardContent>
-                                <Box component="img" src={BoxEmpty} alt="Caja Vacía" sx={{ width: '200px', height: "400px" }} />
+                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+
+                                <img src={BoxEmpty} alt="Sin resultados" style={{ width: 240 }} />
                                 <Typography mt={2} sx={{
                                     color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins',
-                                    fontSize: '14px', position: "absolute", marginLeft: "-100px", marginTop: "-100px"
+                                    fontSize: '14px'
                                 }}>
-                                    Seleccione un canal del menú superior para comenzar.
+                                    {
+                                        selectedSmsOption === 'Global'
+                                            ? 'Selecciona un rango para comenzar'
+                                            : 'Seleccione un canal del menú superior para comenzar.'
+                                    }
                                 </Typography>
-                            </CardContent>
-                        </Card>
+                            </Box>
+
+                        </Box>
                     </Box>
                 ) : (reportData === null && reportDatasms === undefined) ? (
 
@@ -1317,181 +1404,61 @@ const Reports: React.FC = () => {
                             No se encontraron resultados.
                         </Typography>
                     </Box>
-                ) : selectedSmsOption === "Global" ? (
-
-
+                ) : selectedSmsOption === "Global" ? (hasData ? (
                     <Box
                         ref={tableRef}
                         sx={{
-                            background: '#FFFFFF',
-                            border: '1px solid #E6E4E4',
+                            backgroundColor: '#fff',
                             borderRadius: '8px',
-                            width: '1180px',
-                            maxWidth: '100%',
-                            padding: '20px',
-                            marginTop: '5px',
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                             overflowX: 'auto',
                             overflowY: 'auto',
-                            height: '360px',
-                            maxHeight: '100%',
-
+                            height: "525px",
+                            mt: 3.6
                         }}
-
-
                     >
-                        <table style={{ maxWidth: "1180px", borderCollapse: 'collapse', marginTop: "-15px", tableLayout: 'auto' }}>
+                        <table style={{
+                            width: '100%', minWidth: '1080px',
+                            borderCollapse: 'collapse',
+                            fontFamily: 'Poppins',
+                        }}>
                             {/* Encabezados */}
                             <thead>
                                 <tr style={{ borderBottom: '1px solid #E6E4E4', }}>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF',
-                                        opacity: 1,
-                                    }}>
+                                    <th style={{ padding: '8px 0px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6 }}>
                                         Fecha
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0 16px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Teléfono
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Sala
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0 10px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Campaña
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0 20px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Id de Campaña
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Usuario
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0 10px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Id de Mensaje
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0 0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Mensaje
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Estado
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0 10px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Fecha de Recepción
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Costo
                                     </th>
-                                    <th style={{
-                                        fontWeight: "500",
-                                        textAlign: 'left',
-                                        padding: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        letterSpacing: '0px',
-                                        color: '#330F1B',
-                                        fontSize: '13px',
-                                        backgroundColor: '#FFFFFF'
-                                    }}>
+                                    <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Tipo
                                     </th>
                                 </tr>
@@ -1500,25 +1467,17 @@ const Reports: React.FC = () => {
                             {/* Datos */}
                             {Array.isArray(reportData) && reportData.length > 0 && (
                                 <tbody>
-
                                     {reportData.map((recarga, index) => (
-                                        <tr key={index} style={{ borderBottom: '1px solid #E6E4E4', height: '50px' }}>
+                                        <tr key={index} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0' }}>
                                             <td style={{
-                                                padding: '10px',
-                                                fontFamily: 'Poppins, sans-serif',
-                                                fontSize: '13px',
-                                                color: '#574B4F',
-                                                letterSpacing: "0.03",
-                                                textAlign: 'left',
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-
+                                                padding: '10px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                                textOverflow: 'ellipsis', textAlign: "left",
+                                                fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins',
                                             }}>
                                                 {new Date(recarga.Date).toLocaleString()}
                                             </td>
                                             <td style={{
-                                                padding: '10px',
+                                                padding: '0 20px',
                                                 fontFamily: 'Poppins, sans-serif',
                                                 fontSize: '13px',
                                                 color: '#574B4F',
@@ -1544,7 +1503,7 @@ const Reports: React.FC = () => {
                                                 {recarga.Room}
                                             </td>
                                             <td style={{
-                                                padding: '10px',
+                                                padding: '0 20px',
                                                 fontFamily: 'Poppins, sans-serif',
                                                 fontSize: '13px',
                                                 color: '#574B4F',
@@ -1557,15 +1516,10 @@ const Reports: React.FC = () => {
                                                 {recarga.Campaign}
                                             </td>
                                             <td style={{
-                                                padding: '10px',
-                                                fontFamily: 'Poppins, sans-serif',
-                                                fontSize: '13px',
-                                                color: '#574B4F',
-                                                letterSpacing: "0.03",
-                                                textAlign: 'left',
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
+                                                padding: '0 70px',
+                                                whiteSpace: 'nowrap', overflow: 'hidden',
+                                                textOverflow: 'ellipsis', textAlign: "left",
+                                                fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins',
                                             }}>
                                                 {recarga.CampaignId}
                                             </td>
@@ -1583,7 +1537,7 @@ const Reports: React.FC = () => {
                                                 {recarga.User}
                                             </td>
                                             <td style={{
-                                                padding: '10px',
+                                                padding: '0 45px',
                                                 fontFamily: 'Poppins, sans-serif',
                                                 fontSize: '13px',
                                                 color: '#574B4F',
@@ -1596,7 +1550,7 @@ const Reports: React.FC = () => {
                                                 {recarga.MessageId}
                                             </td>
                                             <td style={{
-                                                padding: '10px',
+                                                padding: '0 20px',
                                                 fontFamily: 'Poppins, sans-serif',
                                                 fontSize: '13px',
                                                 color: '#574B4F',
@@ -1622,7 +1576,7 @@ const Reports: React.FC = () => {
                                                 {getStatusText(recarga.Status)}
                                             </td>
                                             <td style={{
-                                                padding: '10px',
+                                                padding: '0 15px',
                                                 fontFamily: 'Poppins, sans-serif',
                                                 fontSize: '13px',
                                                 color: '#574B4F',
@@ -1635,7 +1589,7 @@ const Reports: React.FC = () => {
                                                 {new Date(recarga.Date).toLocaleString()}
                                             </td>
                                             <td style={{
-                                                padding: '10px',
+                                                padding: '0 15px',
                                                 fontFamily: 'Poppins, sans-serif',
                                                 fontSize: '13px',
                                                 color: '#574B4F',
@@ -1648,7 +1602,7 @@ const Reports: React.FC = () => {
                                                 {recarga.Cost ?? 0}
                                             </td>
                                             <td style={{
-                                                padding: '10px',
+                                                padding: '0 15px',
                                                 fontFamily: 'Poppins, sans-serif',
                                                 fontSize: '13px',
                                                 color: '#574B4F',
@@ -1667,6 +1621,39 @@ const Reports: React.FC = () => {
                             )}
                         </table>
                     </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            width: '100%',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '8px',
+                            height: '525px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            mt: 3,
+                        }}
+                    >
+                        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                            <img src={boxopen} alt="No results" style={{ width: 240 }} />
+                            <Typography
+                                sx={{
+                                    textAlign: 'center',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontSize: '14px',
+                                    fontWeight: '500',
+                                    lineHeight: '18px',
+                                    color: '#7B354D',
+                                    marginTop: '10px'
+                                }}
+                            >
+                                No se encontraron resultados.
+                            </Typography>
+                        </Box>
+                    </Box>
+                )
                 ) : selectedSmsOption === "Mensajes entrantes" ? (
                     <Box
                         ref={tableRef}
@@ -2400,17 +2387,30 @@ const Reports: React.FC = () => {
                             </tbody>
                         </table>
                     </Box>
-                ) : (null)}
+                ) : null}
 
             </Box>
 
             {/* Componente de selección de fechas */}
             <DatePicker
+                //No Fechas Futuras
+                maxDate={new Date()}
                 open={datePickerOpen}
                 anchorEl={anchorEl}
                 onApply={handleDateSelectionApply}
                 onClose={handleCancelDatePicker}
             />
+
+            {
+                showChipBar && (
+                    <ChipBar
+                        message={messageChipBar}
+                        buttonText="Cerrar"
+                        onClose={() => setShowChipBar(false)}
+                    />
+                )
+            }
+
         </Box>
     );
 };

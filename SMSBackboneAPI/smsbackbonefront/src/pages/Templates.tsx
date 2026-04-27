@@ -626,7 +626,6 @@ const Templates = () => {
                         </Box>
                     </Box>
                 )}
-
                 {templates.length === 0 ? (
                     <Box
                         sx={{
@@ -1236,8 +1235,8 @@ const Templates = () => {
                     elevation: 3,
                     sx: {
                         borderRadius: 2,
-                        mt: -1,
-                        ml: -13.5,
+                        mt: -0.5,
+                        ml: -9,
                         minWidth: 160,
                         boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
                         '& .MuiMenuItem-root': {
@@ -1265,9 +1264,67 @@ const Templates = () => {
 
                         Editar
                     </Typography>
+                    {hasAssignedCampaigns && (
+                        <Tooltip
+                            title={
+                                <Box
+                                    sx={{
+                                        backgroundColor: "#FFFFFF",
+                                        borderRadius: "8px",
+                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                        padding: "8px 12px",
+                                        fontSize: "14px",
+                                        fontFamily: "Poppins",
+                                        color: "#574B4F",
+                                        whiteSpace: "pre-line",
+                                        borderColor: "#00131F3D",
+                                        borderStyle: "solid",
+                                        borderWidth: "1px"
+                                    }}
+                                >
+                                    <>
+                                        La plantilla no puede<br />
+                                        ser editada debido a<br />
+                                        que se encuentra unida<br />
+                                        a una campaña
+                                    </>
+                                </Box>
+                            }
+                            placement="bottom-end"
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        backgroundColor: "transparent",
+                                        padding: 0,
+
+                                    },
+                                },
+                            }}
+                        >
+                            <IconButton
+                                disableRipple
+                                sx={{
+                                    marginLeft: 'auto',
+                                    padding: 0,
+                                    pointerEvents: "auto",
+                                    "&:hover": {
+                                        backgroundColor: "transparent !important",
+                                    },
+                                }}
+                            >
+                                <img
+                                    src={infoicon}
+                                    alt="info-icon"
+                                    style={{
+                                        width: 24,
+                                        height: 24,
+                                        marginLeft: "10px",
+                                    }}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                    )}
                 </MenuItem>
-
-
 
                 <MenuItem onClick={() => { handleMenuClose(); handleInspectTemplate(selectedTemplate!); }}
                     sx={{
@@ -1299,6 +1356,66 @@ const Templates = () => {
                         <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: "#574B4F", marginLeft: "4px" }}>
                             Eliminar
                         </Typography>
+                        {hasAssignedCampaigns && (
+                            <Tooltip
+                                title={
+                                    <Box
+                                        sx={{
+                                            backgroundColor: "#FFFFFF",
+                                            borderRadius: "8px",
+                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                            padding: "8px 12px",
+                                            fontSize: "14px",
+                                            fontFamily: "Poppins",
+                                            color: "#574B4F",
+                                            whiteSpace: "pre-line",
+                                            borderColor: "#00131F3D",
+                                            borderStyle: "solid",
+                                            borderWidth: "1px",
+                                        }}
+                                    >
+                                        <>
+                                            La plantilla no puede<br />
+                                            ser eliminada debido a<br />
+                                            que se encuentra unida<br />
+                                            a una campaña
+                                        </>
+                                    </Box>
+                                }
+                                placement="bottom-end"
+                                componentsProps={{
+                                    tooltip: {
+                                        sx: {
+                                            backgroundColor: "transparent",
+                                            padding: 0,
+
+                                        },
+                                    },
+                                }}
+                            >
+                                <IconButton
+                                    disableRipple
+                                    sx={{
+                                        marginLeft: '10px',
+                                        padding: 0,
+                                        pointerEvents: "auto",
+                                        "&:hover": {
+                                            backgroundColor: "transparent !important",
+                                        },
+                                    }}
+                                >
+                                    <img
+                                        src={infoicon}
+                                        alt="info-icon"
+                                        style={{
+                                            width: 24,
+                                            height: 24,
+
+                                        }}
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                        )}
                     </Box>
                 </MenuItem>
             </Menu>

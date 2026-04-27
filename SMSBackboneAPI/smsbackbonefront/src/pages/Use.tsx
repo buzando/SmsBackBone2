@@ -334,12 +334,30 @@ const Use: React.FC = () => {
         fetchData(newDates);
     };
 
-
+    const buildDateTime = (date: Date, hour: number, minute: number) => {
+        const newDate = new Date(date);
+        newDate.setHours(hour);
+        newDate.setMinutes(minute);
+        newDate.setSeconds(0);
+        return newDate;
+    };
 
     const formatDateRange = () => {
         if (!selectedDates) return 'FECHA';
 
-        return `${format(selectedDates.start, "dd MMM", { locale: es })} - ${format(selectedDates.end, "dd MMM", { locale: es })}`;
+        const start = buildDateTime(
+            selectedDates.start,
+            selectedDates.startHour,
+            selectedDates.startMinute
+        );
+
+        const end = buildDateTime(
+            selectedDates.end,
+            selectedDates.endHour,
+            selectedDates.endMinute
+        );
+
+        return `${format(start, "d MMM, HH:mm", { locale: es })} - ${format(end, "d MMM, HH:mm", { locale: es })}`;
     };
 
     const open = Boolean(anchorEl);

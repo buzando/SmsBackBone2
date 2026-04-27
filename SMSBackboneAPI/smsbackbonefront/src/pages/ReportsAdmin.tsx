@@ -256,12 +256,20 @@ const ReportsAdmin = () => {
     const showToolbar = hasFiltered && originalData.length > 0;
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", width: '100%', minHeight: 'calc(100vh - 80px)', overflow: 'hidden' }}>
-            <Box display="flex" alignItems="center" mb={2}>
-                <IconButton onClick={() => navigate('/')}>
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
                     <img src={ArrowBackIosNewIcon} alt="Regresar" style={{ width: 24, transform: 'rotate(270deg)' }} />
                 </IconButton>
-                <Typography sx={{ fontSize: "24px", fontFamily: "Poppins", fontWeight: 500, color: "#330F1B", ml: 1 }}>
+                <Typography
+                    variant="h4"
+                    sx={{
+                        fontWeight: '500',
+                        color: '#330F1B',
+                        fontFamily: 'Poppins',
+                        fontSize: '26px',
+                    }}
+                >
                     Reportes
                 </Typography>
             </Box>
@@ -933,6 +941,7 @@ const ReportsAdmin = () => {
                 </Box>
             </Menu>
             <CustomDateTimePicker
+                //maxDate={new Date()}
                 key={resetKey}
                 open={openFecha}
                 anchorEl={anchorElFecha}

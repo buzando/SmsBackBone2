@@ -858,7 +858,7 @@ const PaymentSettings: React.FC = () => {
                     </TableContainer>
 
                 </div>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: -4 }}>
                     <MainButton text='Guardar' onClick={addRechargeSetting} disabled={isAcceptButtonDisabled} isLoading={loading} />
                 </Box>
             </Box>

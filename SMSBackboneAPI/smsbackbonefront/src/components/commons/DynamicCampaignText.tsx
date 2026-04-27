@@ -227,8 +227,21 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
 
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2, width: "770px" }}>
-      <Typography sx={{ fontFamily: 'Poppins', fontSize: '18px', color: '#330F1B', fontWeight: 600 }}>
+    <Box sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 2,
+      mt: 2,
+      width: "750px",
+      //backgroundColor: "red"
+    }}>
+      <Typography
+        sx={{
+          fontFamily: 'Poppins',
+          fontSize: '18px',
+          color: '#330F1B',
+          fontWeight: 600
+        }}>
         Escribir mensaje y agregar variables según se requiera.
       </Typography>
 
@@ -264,50 +277,61 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
               }}
             />
             {isLimitExceeded && (
-              <Typography sx={{ color: 'red', fontSize: '12px', mt: 1 }}>
+              <Typography sx={{ color: 'red', fontSize: '12px', mt: 1, fontFamily: "Poppins" }}>
                 Has alcanzado el límite de caracteres permitido.
               </Typography>
             )}
           </Box>
-          <Typography sx={{ fontFamily: 'Poppins', fontSize: '12px', color: '#574B4F', mt: 1 }}>
-            {value.length}/{maxLength} caracteres para que el mensaje se realice en un sólo envío.
-          </Typography>
-          <Box
-            sx={{
-              width: "520px",
-              display: "flex",
-              justifyContent: "flex-end",
-              mt: 1,
-              ml: "5px",
-            }}
-          >
-            <SecondaryButton
-              text="Visualizar"
-              onClick={handlePreviewClick}
-              disabled={!value}
-            />
+          <Box sx={{
+            display: "flex",
+            flexDirection: "column"
+          }}>
+            <Typography sx={{ fontFamily: 'Poppins', fontSize: '12px', color: '#574B4F', mt: 1 }}>
+              {value.length}/{maxLength} caracteres para que el mensaje se realice en un sólo envío.
+            </Typography>
+            <Box
+              sx={{
+                height: "64px",
+                alignSelf: 'flex-end',
+
+              }}
+            >
+              <SecondaryButton
+                text="Visualizar"
+                onClick={handlePreviewClick}
+                disabled={!value}
+              />
+            </Box>
           </Box>
         </Box>
 
         <Box sx={{
-          width: "150px", mt: 1,
-          borderRadius: '12px',
-          height: '200px',
+          width: "175px",
+          height: '190px',
           overflowY: 'auto',
+          overflowX: 'hidden',
           display: 'flex',
           flexDirection: 'column',
+          alignItems: "center",
+          marginLeft: "-10px",
         }}>
           <Typography sx={{
             fontFamily: 'Poppins',
             fontWeight: 600,
             fontSize: '14px',
             color: '#330F1B',
-            mb: 1,
+            mb: 1.5,
+            alignSelf: "flex-start"
           }}>
             Variables
           </Typography>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignSelf: "flex-start", width: "170px", padding: "5px",
+            gap: 2, overflowX: "hidden", overflowY: "auto"
+          }}>
             {variables.map((variable, i) => (
               <Button
                 key={i}

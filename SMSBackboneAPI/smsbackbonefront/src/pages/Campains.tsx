@@ -1031,6 +1031,9 @@ const Campains: React.FC = () => {
     setCampaignName('');
   };
 
+  const resetDuplicateName = () => {
+    setDuplicateName('');
+  };
 
   const handleCloseModalCampaña = () => {
     setOpenCreateCampaignModal(false);
@@ -1236,11 +1239,17 @@ const Campains: React.FC = () => {
     } else if (editActiveStep === 1) {
       // Ir al paso de configuraciones (step 2)
       setEditActiveStep(2);
-    } else if (editActiveStep === 2) {
-      // Ir al último paso: guardar como plantilla
-      handleEditCampaign();
-    }
+    } //else if (editActiveStep === 2) {
+    // Ir al último paso: guardar como plantilla
+    //handleEditCampaign();
+    //}
   };
+
+  //Guardado
+  const handleGuardado = () => {
+    handleEditCampaign();
+  };
+
 
   const handleAtrasEditar = () => {
     if (editActiveStep === 1) {
@@ -1689,7 +1698,7 @@ const Campains: React.FC = () => {
     }
   };
 
-  const nameRegex = /^[a-zA-ZÀ-ÿÑñ\s]{2,40}$/;
+  const nameRegex = /^[a-zA-Z0-9À-ÿÑñ\s]{2,40}$/;
 
   const isFormatInvalid =
     duplicateName.trim().length > 0 &&
@@ -2685,7 +2694,7 @@ const Campains: React.FC = () => {
 
                 {/* Paper Horarios */}
                 {infoChecks["Horarios"] && (
-                  <Paper sx={{ padding: "10px", marginTop: "10px", borderRadius: "10px", width: "100%", maxWidth: "676px", height: "auto" }}>
+                  <Paper sx={{ padding: "10px", marginTop: "10px", borderRadius: "10px", width: "100%", height: "auto" }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <Typography variant="subtitle1" sx={{ fontFamily: "Poppins", marginLeft: "10px" }}>
                         Horarios
@@ -5861,7 +5870,12 @@ const Campains: React.FC = () => {
 
                 </Box>
               ) : tipoMensaje === "escrito" ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, overflowX: "hidden", }}>
+                <Box sx={{
+                  display: 'flex', flexDirection: 'column',
+                  overflowX: "hidden",
+                  marginTop: "20px",
+                  //backgroundColor: "purple"
+                }}>
                   {/* Componente editor de mensaje */}
                   <DynamicCampaignText
                     variables={selectedVariables}
@@ -5919,92 +5933,100 @@ const Campains: React.FC = () => {
                         }}
                       />
 */}
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checkedIcon={
-                              <Box
-                                sx={{
-                                  width: '24px',
-                                  height: '24px',
-                                  position: 'relative',
-                                  marginTop: '0px',
-                                  marginLeft: '0px',
-                                }}
-                              >
-                                <img
-                                  src={IconCheckBox1}
-                                  alt="Seleccionado"
-                                  style={{ width: '24px', height: '24px' }}
-                                />
-                              </Box>
-                            }
-                            sx={{
-                              color: "#786F72",
-                              '&.Mui-checked': {
-                                color: "#8F4D63",
-                              },
-                            }}
-                          />
-                        }
-                        label="Acortar URLs en el mensaje"
+                      <Box
                         sx={{
-                          fontFamily: "Poppins",
-                          '& .MuiFormControlLabel-label': {
-                            fontFamily: "Poppins",
-                            fontSize: "14px",
-                            color: "#786F72",
-                          },
-                          '& .Mui-checked + .MuiFormControlLabel-label': {
-                            color: "#8F4D63",
-                          },
+                          display: "flex",
+                          flexDirection: "column",
+                          width: "300px",
+                          marginTop: "-35px",
                         }}
-                      />
-
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checkedIcon={
-                              <Box
-                                sx={{
-                                  width: '24px',
-                                  height: '24px',
-                                  position: 'relative',
-                                  marginTop: '0px',
-                                  marginLeft: '0px',
-                                }}
-                              >
-                                <img
-                                  src={IconCheckBox1}
-                                  alt="Seleccionado"
-                                  style={{ width: '24px', height: '24px' }}
-                                />
-                              </Box>
-                            }
-                            sx={{
+                      >
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checkedIcon={
+                                <Box
+                                  sx={{
+                                    width: '24px',
+                                    height: '24px',
+                                    position: 'relative',
+                                    marginTop: '0px',
+                                    marginLeft: '0px',
+                                  }}
+                                >
+                                  <img
+                                    src={IconCheckBox1}
+                                    alt="Seleccionado"
+                                    style={{ width: '24px', height: '24px' }}
+                                  />
+                                </Box>
+                              }
+                              sx={{
+                                color: "#786F72",
+                                '&.Mui-checked': {
+                                  color: "#8F4D63",
+                                },
+                              }}
+                            />
+                          }
+                          label="Acortar URLs en el mensaje"
+                          sx={{
+                            fontFamily: "Poppins",
+                            '& .MuiFormControlLabel-label': {
+                              fontFamily: "Poppins",
+                              fontSize: "14px",
                               color: "#786F72",
-                              '&.Mui-checked': {
-                                color: "#8F4D63",
-                              },
-                            }}
-                            checked={saveAsTemplate}
-                            onChange={(e) => setSaveAsTemplate(e.target.checked)}
-                          />
-                        }
-                        label="Guardar como plantilla"
-                        sx={{
-                          fontFamily: "Poppins",
-                          '& .MuiFormControlLabel-label': {
-                            fontFamily: "Poppins",
-                            fontSize: "14px",
-                            color: "#786F72",
-                          },
-                          '& .Mui-checked + .MuiFormControlLabel-label': {
-                            color: "#8F4D63",
-                          },
-                        }}
-                      />
+                            },
+                            '& .Mui-checked + .MuiFormControlLabel-label': {
+                              color: "#8F4D63",
+                            },
+                          }}
+                        />
 
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checkedIcon={
+                                <Box
+                                  sx={{
+                                    width: '24px',
+                                    height: '24px',
+                                    position: 'relative',
+                                    marginTop: '0px',
+                                    marginLeft: '0px',
+                                  }}
+                                >
+                                  <img
+                                    src={IconCheckBox1}
+                                    alt="Seleccionado"
+                                    style={{ width: '24px', height: '24px' }}
+                                  />
+                                </Box>
+                              }
+                              sx={{
+                                color: "#786F72",
+                                '&.Mui-checked': {
+                                  color: "#8F4D63",
+                                },
+                              }}
+                              checked={saveAsTemplate}
+                              onChange={(e) => setSaveAsTemplate(e.target.checked)}
+                            />
+                          }
+                          label="Guardar como plantilla"
+                          sx={{
+                            fontFamily: "Poppins",
+                            '& .MuiFormControlLabel-label': {
+                              fontFamily: "Poppins",
+                              fontSize: "14px",
+                              color: "#786F72",
+                            },
+                            '& .Mui-checked + .MuiFormControlLabel-label': {
+                              color: "#8F4D63",
+                            },
+                          }}
+                        />
+                      </Box>
                     </Box>
                     {saveAsTemplate && (
                       <>
@@ -6964,6 +6986,7 @@ const Campains: React.FC = () => {
         open={calendarOpen}
         anchorEl={calendarAnchor}
         initialDate={calendarInitialDate ?? undefined}
+        label={calendarTarget === 'start' ? 'HORA INICIAL' : 'HORA FINAL'}
         onClose={() => {
           setCalendarOpen(false);
           setCalendarInitialDate(null);
@@ -9137,7 +9160,6 @@ const Campains: React.FC = () => {
 
         </Box>
 
-
         {/*Botones Cancelar / Atras / Siguiente */}
         <DialogActions
           sx={{
@@ -9199,10 +9221,30 @@ const Campains: React.FC = () => {
                 Atrás
               </Button>
             )}
-
+            {editActiveStep !== 2 && (
+              <Button
+                variant="contained"
+                onClick={handleContinuarEditar}
+                disabled={isEditNextDisabled}
+                sx={{
+                  minWidth: "118px",
+                  height: "36px",
+                  background: "#833A53",
+                  border: "1px solid #D4D1D1",
+                  borderRadius: "4px",
+                  color: "#FFFFFF",
+                  fontFamily: "Poppins",
+                  fontWeight: "500",
+                  fontSize: "14px",
+                  letterSpacing: "1.12px",
+                }}
+              >
+                Siguiente
+              </Button>
+            )}
             <Button
               variant="contained"
-              onClick={handleContinuarEditar}
+              onClick={handleGuardado}
               disabled={isEditNextDisabled}
               sx={{
                 minWidth: "118px",
@@ -9217,7 +9259,7 @@ const Campains: React.FC = () => {
                 letterSpacing: "1.12px",
               }}
             >
-              {editActiveStep === 2 || (editActiveStep === 0) ? "Guardar Cambios" : "Siguiente"}
+              Guardar Cambios
 
             </Button>
           </Box>
@@ -9226,15 +9268,38 @@ const Campains: React.FC = () => {
 
       </Dialog>
 
-      <Dialog open={openDuplicateModal} onClose={() => setOpenDuplicateModal(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={openDuplicateModal}
+        onClose={(event, reason) => {
+          if (reason === 'backdropClick' || reason === 'escapeKeyDown') {
+            return; // ❌ evita que se cierre
+          }
+          setOpenDuplicateModal(false);
+        }}
+        maxWidth="sm" fullWidth>
         <Box sx={{ fontFamily: 'Poppins' }}>
           <DialogTitle sx={{
             fontFamily: 'Poppins', fontWeight: 600, fontSize: '20px', display: 'flex', mt: "4px",
             justifyContent: 'space-between', alignItems: 'center', textTransform: 'none',
           }}>
             Duplicar campaña SMS
-            <IconButton onClick={() => setOpenDuplicateModal(false)}>
-              <CloseIcon sx={{ position: "absolute", color: '#A6A6A6', marginTop: "-19px", marginLeft: "15px" }} />
+            <IconButton
+              onClick={() => {
+                setOpenDuplicateModal(false);
+                resetDuplicateName();
+              }}
+              sx={{
+                color: "#574B4F",
+                marginLeft: "530px",
+                marginTop: "-20px",
+                position: "absolute"
+              }}>
+              <img
+                src={IconCloseModal}
+                alt="x"
+                width="24"
+                height="24"
+              />
             </IconButton>
           </DialogTitle>
 
@@ -9294,7 +9359,6 @@ const Campains: React.FC = () => {
                         }}
                       >
                         <>
-                          • Solo caracteres alfabéticos<br />
                           • Longitud máxima de 40<br />
                           caracteres
                         </>
@@ -9349,7 +9413,7 @@ const Campains: React.FC = () => {
                     {`Horario ${index + 1}`}
                   </Typography>
 
-                  {/* Modo de operación desde Horario 2 */}
+                  {/* Modo de operación desde Horario 2
                   {index > 0 && (
                     <Box sx={{ mt: -1, mb: 1 }}>
                       <Typography
@@ -9421,6 +9485,7 @@ const Campains: React.FC = () => {
                       </FormControl>
                     </Box>
                   )}
+*/}
 
                   {/* Fila con los pickers y botones */}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -9532,39 +9597,100 @@ const Campains: React.FC = () => {
 
                     {/* Eliminar horario */}
                     {duplicateHorarios.length > 1 && (
-                      <IconButton onClick={() => handleRemoveDuplicateHorario(index)}>
-                        <RemoveIcon
-                          sx={{
-                            color: '#6C3A52',
-                            width: 20,
-                            height: 20,
-                            ml: -2,
-                            mr: -1.5,
-                          }}
-                        />
-                      </IconButton>
+                      <Tooltip title="Eliminar" arrow placement="top"
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              backgroundColor: "rgba(0, 0, 0, 0.8)",
+                              color: "#DEDADA",
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: "12px",
+                              padding: "6px 8px",
+                              borderRadius: "8px",
+                              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                            }
+                          },
+                          arrow: {
+                            sx: {
+                              color: "rgba(0, 0, 0, 0.8)"
+                            }
+                          }
+                        }}
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: 'offset',
+                              options: {
+                                offset: [-0, -10] // [h,v]
+                              }
+                            }
+                          ]
+                        }}
+                      >
+                        <IconButton onClick={() => handleRemoveDuplicateHorario(index)}>
+                          <Box
+                            component="img"
+                            src={IconTrash}
+                            alt="Eliminar"
+                            sx={{ width: 24, height: 24, cursor: "pointer", opacity: 0.6, }}
+                          />
+                        </IconButton>
+                      </Tooltip>
                     )}
 
                     {/* Agregar horario */}
                     {index === duplicateHorarios.length - 1 &&
                       duplicateHorarios.length < 5 && (
-                        <IconButton onClick={handleAddDuplicateHorario}>
-                          <Box
-                            component="img"
-                            src={IconCirclePlus}
-                            alt="Agregar Horario"
-                            sx={{ width: 24, height: 24, cursor: 'pointer' }}
-                          />
-                        </IconButton>
+                        <Tooltip title="Añadir horario" arrow placement="top"
+                          componentsProps={{
+                            tooltip: {
+                              sx: {
+                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                color: "#DEDADA",
+                                fontFamily: "Poppins, sans-serif",
+                                fontSize: "12px",
+                                padding: "6px 8px",
+                                borderRadius: "8px",
+                              }
+                            },
+                            arrow: {
+                              sx: {
+                                color: "rgba(0, 0, 0, 0.8)"
+                              }
+                            }
+                          }}
+                          PopperProps={{
+                            modifiers: [
+                              {
+                                name: 'offset',
+                                options: {
+                                  offset: [0, -12]
+                                }
+                              }
+                            ]
+                          }}
+                        >
+                          <IconButton
+                            onClick={handleAddDuplicateHorario}
+                            disabled={!horario.start || !horario.end}
+                            sx={{
+                              opacity: !horario.start || !horario.end ? 0.5 : 1,
+                              pointerEvents: !horario.start || !horario.end ? 'none' : 'auto',
+                            }}
+                          >
+                            <Box
+                              component="img"
+                              src={IconCirclePlus}
+                              alt="Agregar Horario"
+                              sx={{ width: 24, height: 24, cursor: 'pointer' }}
+                            />
+                          </IconButton>
+                        </Tooltip>
                       )}
                   </Box>
                 </Box>
               ))}
             </Box>
-
-
-
-
 
             <FormControlLabel
               control={
