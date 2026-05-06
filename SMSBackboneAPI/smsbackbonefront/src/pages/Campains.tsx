@@ -584,6 +584,21 @@ const Campains: React.FC = () => {
   const [campaigns, setCampaigns] = useState<CampaignFullResponse[]>([]);
   const [campaignToDelete, setCampaignToDelete] = useState<CampaignFullResponse | null>(null);
   const [stateMessageCounts, setStateMessageCounts] = useState<{ stateName: string; messages: number }[]>([]);
+  const pinnedKey = (roomId: number) => `o2c_pinnedCampaignIds_${roomId}`;
+
+  const [pinnedCampaignIds, setPinnedCampaignIds] = useState<number[]>([]);
+
+  const orderedCampaigns = useMemo(() => {
+    if (!campaigns?.length) return [];
+    if (!pinnedCampaignIds.length) return campaigns;
+
+    const pinned = pinnedCampaignIds
+      .map(id => campaigns.find(c => c.id === id))
+      .filter(Boolean) as typeof campaigns;
+
+    const rest = campaigns.filter(c => !pinnedCampaignIds.includes(c.id));
+    return [...pinned, ...rest];
+  }, [campaigns, pinnedCampaignIds]);
 
 
 
@@ -758,7 +773,14 @@ const Campains: React.FC = () => {
       showRecordsManager: desired.records,
       showCharts: desired.charts,
     };
+
     setSelectedCampaign(nextCampaign);
+
+    setCampaigns(prev =>
+      prev.map(c =>
+        c.id === prevCampaign.id ? nextCampaign : c
+      )
+    );
 
     try {
       const url = `${import.meta.env.VITE_API_UPDATE_CAMPAIGNSHOW}`;
@@ -893,16 +915,33 @@ const Campains: React.FC = () => {
 
   const [selectedCampaigns, setSelectedCampaigns] = useState<number[]>([]);
 
-  const filteredCampaigns = campaigns
+  const isFinalizada = (c: any) => {
+    if (!c.schedules || c.schedules.length === 0) return true;
+
+    const now = new Date();
+
+    return !c.schedules.some((h: any) => {
+      const start = new Date(h.startDateTime);
+      const end = new Date(h.endDateTime);
+      return start <= now && now <= end;
+    });
+  };
+
+  const filteredCampaigns = orderedCampaigns
     .filter(c => {
-      if (campaignFilter === 'encendidas') return c.autoStart;
-      if (campaignFilter === 'detenidas') return !c.autoStart;
+      if (campaignFilter === 'encendidas') {
+        return c.autoStart && !isFinalizada(c);
+      }
+
+      if (campaignFilter === 'detenidas') {
+        return !c.autoStart || isFinalizada(c);
+      }
+
       return true;
     })
     .filter(c =>
       c.name.toLowerCase().includes(Serchterm.toLowerCase())
     );
-
 
   const [pinnedCampaigns, setPinnedCampaigns] = useState<number[]>([]);
 
@@ -1566,21 +1605,6 @@ const Campains: React.FC = () => {
     }
   };
 
-  const pinnedKey = (roomId: number) => `o2c_pinnedCampaignIds_${roomId}`;
-
-  const [pinnedCampaignIds, setPinnedCampaignIds] = useState<number[]>([]);
-
-  const orderedCampaigns = useMemo(() => {
-    if (!campaigns?.length) return [];
-    if (!pinnedCampaignIds.length) return campaigns;
-
-    const pinned = pinnedCampaignIds
-      .map(id => campaigns.find(c => c.id === id))
-      .filter(Boolean) as typeof campaigns;
-
-    const rest = campaigns.filter(c => !pinnedCampaignIds.includes(c.id));
-    return [...pinned, ...rest];
-  }, [campaigns, pinnedCampaignIds]);
 
   useEffect(() => {
     const roomId = getRoomIdFromStorage();
@@ -2346,7 +2370,7 @@ const Campains: React.FC = () => {
                         </Typography>
                       </Box>
                     ) : (
-                      orderedCampaigns
+                      filteredCampaigns
                         .map((campaign, index) => {
                           const isSelected = selectedCampaigns.includes(index);
                           const isPinned = pinnedCampaignIds.includes(campaign.id);

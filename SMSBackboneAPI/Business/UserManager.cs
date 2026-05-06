@@ -1311,31 +1311,54 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                 using (var ctx = new Entities())
                 {
                     var today = DateTime.Today;
+                    var tomorrow = today.AddDays(1);
+                    var now = DateTime.Now;
 
-                    string smsTypeString = request.SmsType == 1 ? "short" :
-                                           request.SmsType == 2 ? "long" : null;
+                    var campaignsQuery = ctx.Campaigns
+                        .Where(c => c.RoomId == request.RoomId);
 
-                    var campaigns = ctx.CampaignFullResponse
-                        .FromSqlRaw("EXEC sp_GetCampaignsByRoom @RoomId = {0}, @SmsType = {1}", request.RoomId, smsTypeString)
+                    if (request.SmsType == 1)
+                        campaignsQuery = campaignsQuery.Where(c => c.NumberType == 1);
+
+                    if (request.SmsType == 2)
+                        campaignsQuery = campaignsQuery.Where(c => c.NumberType == 2);
+
+                    var campaignIds = campaignsQuery
+                        .Select(c => c.Id)
                         .ToList();
 
-                    var campaignIds = campaigns.Select(c => c.Id).ToList();
-                    int activeCampaigns = campaignIds.Count;
+                    int activeCampaigns = ctx.CampaignSchedules
+                        .Where(s =>
+                            campaignIds.Contains(s.CampaignId) &&
+                            s.StartDateTime <= now &&
+                            s.EndDateTime >= now
+                        )
+                        .Select(s => s.CampaignId)
+                        .Distinct()
+                        .Count();
 
                     int sentToday = ctx.CampaignContactScheduleSend
-                        .Count(s => campaignIds.Contains(s.CampaignId) && s.SentAt.HasValue && s.SentAt.Value.Date == today);
+                        .Count(s =>
+                            campaignIds.Contains(s.CampaignId) &&
+                            s.SentAt.HasValue &&
+                            s.SentAt.Value >= today &&
+                            s.SentAt.Value < tomorrow
+                        );
 
                     int totalSent = ctx.CampaignContactScheduleSend
                         .Count(s => campaignIds.Contains(s.CampaignId));
 
                     DateTime? firstSentDate = ctx.CampaignContactScheduleSend
-                        .Where(s => campaignIds.Contains(s.CampaignId) && s.SentAt.HasValue)
-                        .Select(s => s.SentAt.Value.Date)
+                        .Where(s =>
+                            campaignIds.Contains(s.CampaignId) &&
+                            s.SentAt.HasValue
+                        )
+                        .Select(s => (DateTime?)s.SentAt.Value.Date)
                         .OrderBy(d => d)
                         .FirstOrDefault();
 
                     int daysSinceFirstSend = firstSentDate.HasValue
-                        ? (DateTime.Today - firstSentDate.Value).Days + 1
+                        ? (today - firstSentDate.Value).Days + 1
                         : 0;
 
                     int averagePerDay = daysSinceFirstSend > 0
@@ -1355,34 +1378,80 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                     if (smsChannel != null)
                     {
                         decimal totalRecharge = ctx.CreditRecharge
-                            .Where(cr => userIds.Contains(cr.idUser) && cr.Chanel == smsChannel)
+                            .Where(cr =>
+                                userIds.Contains(cr.idUser) &&
+                                cr.idRoom == request.RoomId &&
+                                cr.Chanel == smsChannel)
                             .Sum(cr => (decimal?)cr.quantityCredits) ?? 0;
 
-                        var roomIds = ctx.roomsbyuser
-                            .Where(r => userIds.Contains(r.idUser))
-                            .Select(r => r.idRoom)
-                            .Distinct()
-                            .ToList();
-
                         decimal remainingCredits = smsChannel == "short_sms"
-                            ? ctx.Rooms.Where(r => roomIds.Contains(r.id)).Sum(r => (decimal?)r.short_sms) ?? 0
-                            : ctx.Rooms.Where(r => roomIds.Contains(r.id)).Sum(r => (decimal?)r.long_sms) ?? 0;
+                            ? ctx.Rooms
+                                .Where(r => r.id == request.RoomId)
+                                .Sum(r => (decimal?)r.short_sms) ?? 0
+                            : ctx.Rooms
+                                .Where(r => r.id == request.RoomId)
+                                .Sum(r => (decimal?)r.long_sms) ?? 0;
 
                         creditConsumption = totalRecharge - remainingCredits;
+
+                        if (creditConsumption < 0)
+                            creditConsumption = 0;
                     }
 
-                    // 🎯 Sumar métricas para las gráficas
-                    int delivered = campaigns.Sum(c => c.DeliveredCount);
-                    int responded = campaigns.Sum(c => c.RespondedRecords);
-                    int notDelivered = campaigns.Sum(c => c.NotDeliveredCount);
-                    int waiting = campaigns.Sum(c => c.InProcessCount);
-                    int failed = campaigns.Sum(c => c.FailedCount);
-                    int rejected = campaigns.Sum(c => c.BlockedRecords);
-                    int notSent = campaigns.Sum(c => c.NotSentCount);
-                    int exception = campaigns.Sum(c => c.ExceptionCount);
+                    var todaySends = ctx.CampaignContactScheduleSend
+                        .Where(s =>
+                            campaignIds.Contains(s.CampaignId) &&
+                            s.SentAt.HasValue &&
+                            s.SentAt.Value >= today &&
+                            s.SentAt.Value < tomorrow
+                        );
+
+                    int delivered = todaySends.Count(s => s.Status == "1");
+                    int responded = todaySends.Count(s =>
+                        s.ResponseMessage != null &&
+                        s.ResponseMessage != ""
+                    );
+                    int notDelivered = todaySends.Count(s => s.Status == "2");
+                    int waiting = todaySends.Count(s => s.Status == "0");
+                    int failed = todaySends.Count(s => s.Status == "4");
+                    int rejected = 0;
+                    int notSent = todaySends.Count(s => s.Status == "3");
+                    int exception = todaySends.Count(s => s.Status == "5");
 
                     int total = delivered + responded + notDelivered + waiting + failed + rejected + notSent + exception;
-                    int receptionRate = total > 0 ? (int)Math.Round((double)responded * 100 / total) : 0;
+
+                    int receptionRate = total > 0
+                        ? (int)Math.Round((double)responded * 100 / total)
+                        : 0;
+
+                    var campaigns = campaignsQuery
+                        .Select(c => new CampaignFullResponse
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                            Message = c.Message,
+                            UseTemplate = c.UseTemplate,
+                            TemplateId = c.TemplateId,
+                            AutoStart = c.AutoStart,
+                            FlashMessage = c.FlashMessage,
+                            CustomANI = c.CustomANI,
+                            RecycleRecords = c.RecycleRecords,
+                            NumberType = c.NumberType,
+                            CreatedDate = c.CreatedDate,
+                            StartDate = c.StartDate,
+
+                            ShowSchedules = c.ShowSchedules,
+                            ShowTestSend = c.ShowTestSend,
+                            ShowRecordsManager = c.ShowRecordsManager,
+                            ShowCharts = c.ShowCharts,
+
+                            numeroInicial = ctx.CampaignContacts
+                                .Count(cc => cc.CampaignId == c.Id),
+
+                            numeroActual = ctx.CampaignContactScheduleSend
+                                .Count(s => s.CampaignId == c.Id)
+                        })
+                        .ToList();
 
                     return new CampaignKPIResponse
                     {
