@@ -635,10 +635,19 @@ const BlackList: React.FC = () => {
         reader.readAsDataURL(file);
     };
 
+    useEffect(() => {
+        setSelectedTelefonoCol('');
+    }, [columns]);
+
+    useEffect(() => {
+        setSelectedTelefonoCol('');
+        setSelectedDatoCol('');
+    }, [columns]);
 
     const handleSheetChange = (event: SelectChangeEvent<string>) => {
         const selected = event.target.value;
         setSelectedSheet(selected);
+
 
         const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[selected], { header: 1 });
         const jsonData = sheet as any[][];
@@ -5454,7 +5463,11 @@ const BlackList: React.FC = () => {
                             text='Guardar cambios'
                             disabled={
                                 !(
-                                    (fileSuccess && selectedSheet?.length > 0) ||
+                                    (
+                                        fileSuccess &&
+                                        selectedSheet?.length > 0 &&
+                                        selectedTelefonoCol?.length > 0
+                                    ) ||
                                     individualPhones.some(p => /^\d{10}$/.test(p.trim()))
                                 )
                             }

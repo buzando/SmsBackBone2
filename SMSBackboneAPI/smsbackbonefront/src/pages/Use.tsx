@@ -54,14 +54,15 @@ const Use: React.FC = () => {
 
         if (datePickerOpen) {
             setDatePickerOpen(false);
-            return;
         }
 
         setCampaignMenuOpen(false);
         setUserMenuOpen(false);
-        setAnchorEl(anchorEl ? null : event.currentTarget);
+
+        setSmsAnchorEl(smsAnchorEl ? null : event.currentTarget);
     };
 
+    const [smsAnchorEl, setSmsAnchorEl] = useState<null | HTMLElement>(null);
     const [noResults, setNoResults] = useState(false);
     const [buttonText, setButtonText] = useState("CORTOS");
     const [selectedDates, setSelectedDates] = useState<{ start: Date, end: Date, startHour: number, startMinute: number, endHour: number, endMinute: number } | null>(null);
@@ -128,6 +129,7 @@ const Use: React.FC = () => {
 
         setCampaignMenuOpen(false);
         setAnchorElC(null);
+        setSmsAnchorEl(null);
 
         setUserMenuOpen(false);
         setUserAnchorEl(null);
@@ -345,7 +347,7 @@ const Use: React.FC = () => {
         return `${format(start, "d MMM, HH:mm", { locale: es })} - ${format(end, "d MMM, HH:mm", { locale: es })}`;
     };
 
-    const open = Boolean(anchorEl);
+    const open = Boolean(smsAnchorEl);
     const id = open ? 'sms-popper' : undefined;
 
     const fetchData = async (
@@ -488,7 +490,7 @@ const Use: React.FC = () => {
 
                 {/* Botones de filtro */}
                 <Box sx={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                    {/* Botón con Popper */}
+                    {/* Botón con Popper (Abre en donde debe pero aun no se cierra cuando otros se abren)*/}
                     <Button
                         variant="outlined"
                         sx={buttonStyle}
@@ -499,7 +501,12 @@ const Use: React.FC = () => {
                     </Button>
 
                     {/* Popper para mostrar opciones */}
-                    <Popper id={id} open={open} anchorEl={anchorEl} placement="bottom-start">
+                    <Popper
+                        id={id}
+                        open={open}
+                        anchorEl={smsAnchorEl}
+                        placement="bottom-start"
+                    >
                         <Paper sx={{
                             width: '280px',
                             height: '157px',
@@ -586,7 +593,7 @@ const Use: React.FC = () => {
                             </Box>
                         </Paper>
                     </Popper>
-
+                    {/* Botón de fecha*/}
                     <Button
                         variant="outlined"
                         sx={buttonStyle}
@@ -1279,17 +1286,17 @@ const buttonStyle = {
     fontFamily: "Poppins",
     letterSpacing: "1.12px",
     opacity: 0.8,
+
     whiteSpace: "nowrap",
+    width: "fit-content",
+    maxWidth: "100%",
+    flexShrink: 0,
 
     '&:hover': {
         background: '#F2F2F2',
         border: '1px solid #8F4E63CC',
         color: "#8F4E63"
     },
-    '&:active': {
-        background: '#FFFFFF',
-        border: '1px solid #8F4E63CC',
-    }
 };
 
 const boxStyle = {

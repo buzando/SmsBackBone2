@@ -1087,7 +1087,7 @@ const Reports: React.FC = () => {
                 <Divider sx={{ mb: 3 }} />
 
 
-                {selectedDates?.start && selectedDates?.end && (
+                {selectedDates?.start && selectedDates?.end && hasData && (
                     <Box display="flex" gap={2} alignItems="center" mb={3} sx={{ marginTop: "-15px", marginBottom: "20px", }}>
                         <Typography sx={{
                             fontFamily: "Poppins",

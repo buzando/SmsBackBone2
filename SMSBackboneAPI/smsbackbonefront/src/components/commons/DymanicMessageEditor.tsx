@@ -135,7 +135,8 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.userSelect = 'none';
 
     chip.addEventListener('mouseenter', () => {
-      chip.style.boxShadow = 'none';
+      chip.style.boxShadow = '0 0 10px rgba(164, 111, 128, 0.8), 0 0 20px rgba(164, 111, 128, 0.5)';
+
     });
 
     chip.addEventListener('mouseleave', () => {
@@ -143,7 +144,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     });
 
     const left = document.createElement('span');
-    left.textContent = '';
+    left.textContent = '{{';
     left.contentEditable = 'false';
 
     const center = document.createElement('span');
@@ -171,7 +172,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     center.addEventListener('input', () => { updateRawMessage(); });
 
     const right = document.createElement('span');
-    right.textContent = '';
+    right.textContent = '}}';
     right.contentEditable = 'false';
 
     const closeIcon = document.createElement('img');
@@ -275,7 +276,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.userSelect = 'none';
 
     chip.addEventListener('mouseenter', () => {
-      chip.style.boxShadow = 'none';
+      chip.style.boxShadow = '0 0 10px rgba(164, 111, 128, 0.8), 0 0 20px rgba(164, 111, 128, 0.5)';
     });
 
     chip.addEventListener('mouseleave', () => {
@@ -284,7 +285,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
 
     // Partes del chip
     const left = document.createElement('span');
-    left.textContent = '';
+    left.textContent = '{{';
     left.contentEditable = 'false';
 
     const center = document.createElement('span');
@@ -348,7 +349,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.ondrop = (e) => e.preventDefault();
 
     const right = document.createElement('span');
-    right.textContent = '';
+    right.textContent = '}}';
     right.contentEditable = 'false';
 
     const closeIcon = document.createElement('img');

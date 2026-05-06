@@ -348,7 +348,7 @@ export default function TestSMS() {
 
               setMessage(value);
 
-              setMessageError(value.trim().length === 0);
+              setMessageError(value.trim().length > 0 && value.trim().length < 3);
 
               if (value.trim().length > 0) {
                 setSelectedTemplateId('');

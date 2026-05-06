@@ -41,6 +41,16 @@ const BillingInformation: React.FC = () => {
         postalCode: false,
     });
 
+    const hasErrors = () => {
+        return (
+            rfcError ||
+            postalCodeError ||
+            businessNameError ||
+            errors.taxRegime ||
+            errors.cfdi
+        );
+    };
+
     const [originalData, setOriginalData] = useState<any>(null);
 
 
@@ -169,6 +179,21 @@ const BillingInformation: React.FC = () => {
         );
     };
 
+    const isFormValid = () => {
+        return (
+            personType &&
+            businessName?.trim() &&
+            rfc?.trim() &&
+            taxRegime &&
+            cfdi &&
+            postalCode?.trim() &&
+            street?.trim() &&
+            extNumber?.trim() &&
+            colony?.trim() &&
+            city?.trim() &&
+            state
+        );
+    };
 
 
     const handleCancel = () => {
@@ -1568,7 +1593,7 @@ const BillingInformation: React.FC = () => {
                         <MainButton
                             onClick={handleSave}
                             text="GUARDAR"
-                            disabled={!hasChanges()}
+                            disabled={!isFormValid() || hasErrors() || !hasChanges()}
                         />
                     </Box>
                 </Box>
