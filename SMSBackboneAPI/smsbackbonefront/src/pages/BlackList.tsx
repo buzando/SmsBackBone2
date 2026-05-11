@@ -5468,7 +5468,9 @@ const BlackList: React.FC = () => {
                                         selectedSheet?.length > 0 &&
                                         selectedTelefonoCol?.length > 0
                                     ) ||
-                                    individualPhones.some(p => /^\d{10}$/.test(p.trim()))
+                                    individualPhones.some(p => /^\d{10}$/.test(p.trim())) ||
+
+                                    selectedBlackListName
                                 )
                             }
                         />

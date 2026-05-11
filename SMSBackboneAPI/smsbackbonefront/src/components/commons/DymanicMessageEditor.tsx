@@ -12,7 +12,7 @@ interface Props {
 }
 
 const CHIP_BG = '#7B354D';
-const CHIP_BG_ACTIVE = '#7B354D';
+const CHIP_BG_ACTIVE = '#A46F80';
 
 const MAX_CHARACTERS = 160;
 const MAX_CHIPS = 7;
@@ -86,7 +86,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
 
       if (chips < MAX_CHIPS && plain.length + 2 /*espacios NBSP*/ <= remaining) {
         editor.appendChild(document.createTextNode('\u00A0'));
-        editor.appendChild(createChipElement(name));
+        editor.appendChild(createChipElement(name, true));
         editor.appendChild(document.createTextNode('\u00A0'));
         total += plain.length + 2;
         chips++;
@@ -114,14 +114,19 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
   }, [initialMessage]);
 
 
-  const createChipElement = (initialValue = 'Variable') => {
+  const createChipElement = (
+    initialValue = 'Variable',
+    isNew = false
+  ) => {
     const chip = document.createElement('span');
     chip.setAttribute('data-chip', 'true');
     chip.contentEditable = 'false';
     chip.style.display = 'inline-flex';
     chip.style.alignItems = 'center';
     chip.style.gap = '6px';
-    chip.style.background = CHIP_BG;
+    chip.style.background = isNew
+      ? CHIP_BG
+      : CHIP_BG_ACTIVE;
     chip.style.transition = 'background-color 0.15s ease, box-shadow 0.2s ease';
     chip.style.boxShadow = 'none';
     chip.style.transition = 'box-shadow 0.2s ease';
@@ -261,7 +266,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.display = 'inline-flex';
     chip.style.alignItems = 'center';
     chip.style.gap = '6px';
-    chip.style.background = CHIP_BG;
+    chip.style.background = CHIP_BG_ACTIVE;
     chip.style.transition = 'background-color 0.15s ease, box-shadow 0.2s ease';
     chip.style.boxShadow = 'none';
     chip.style.transition = 'box-shadow 0.2s ease';
@@ -371,7 +376,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
         chip.style.background = '#7B354D';
         chip.style.border = '1px solid #A46F80';
       } else {
-        chip.style.background = '#7B354D';
+        chip.style.background = '#A46F80';
         chip.style.border = '1px solid #A46F80';
       }
     };

@@ -7,6 +7,7 @@ import infoiconerror from '../assets/Icon-infoerror.svg'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import MainButton from '../components/commons/MainButton'
 import SecondaryButton from '../components/commons/SecondaryButton'
+import Emptybox from '../assets/NoResultados.svg';
 import { fontFamily, height, letterSpacing, styled, textTransform, width } from '@mui/system';
 import { ReactNode } from 'react';
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -172,19 +173,19 @@ const HomePage: React.FC = () => {
     }, []);
 
     useEffect(() => {
-    const userDataString = localStorage.getItem('userData');
-    if (!userDataString) return;
+        const userDataString = localStorage.getItem('userData');
+        if (!userDataString) return;
 
-    try {
-        const user = JSON.parse(userDataString);
+        try {
+            const user = JSON.parse(userDataString);
 
-        if (user?.rol === 'Root') {
-            navigate('/Clients', { replace: true });
+            if (user?.rol === 'Root') {
+                navigate('/Clients', { replace: true });
+            }
+        } catch (error) {
+            console.error('Error al leer userData del localStorage', error);
         }
-    } catch (error) {
-        console.error('Error al leer userData del localStorage', error);
-    }
-}, [navigate]);
+    }, [navigate]);
 
     const handleSendNewPassword = async () => {
         setLoadingpssw(true);
@@ -899,113 +900,123 @@ const HomePage: React.FC = () => {
                                             },
                                         }}
                                     >
-                                        {campaigns.map((campaign, index) => {
-                                            const percentage =
-                                                campaign.numeroInicial && campaign.numeroInicial !== 0
-                                                    ? (campaign.numeroActual / campaign.numeroInicial) * 100
-                                                    : 0;
+                                        {campaigns.length > 0 ? (
+                                            campaigns.map((campaign, index) => {
+                                                const percentage =
+                                                    campaign.numeroInicial && campaign.numeroInicial !== 0
+                                                        ? (campaign.numeroActual / campaign.numeroInicial) * 100
+                                                        : 0;
 
-                                            return (
-                                                <Box
-                                                    key={index}
-                                                    sx={{
-                                                        flex: "0 0 auto",
-                                                        scrollSnapAlign: "start",
-                                                        width: { xs: "210px", sm: "230px", md: "240px" }, // 👈 compacto y responsive
-                                                        border: "1px solid #D6CED2",
-                                                        borderRadius: "8px",
-                                                        background: "#FFFFFF",
-
-                                                        // 👇 aquí estaba el problema: height muy bajita y se cortaba el nombre
-                                                        minHeight: "88px",
-                                                        padding: "10px 12px",
-
-                                                        display: "flex",
-                                                        flexDirection: "column",
-                                                        justifyContent: "space-between",
-                                                        boxSizing: "border-box",
-                                                    }}
-                                                >
-                                                    {/* Nombre */}
-                                                    <Typography
-                                                        sx={{
-                                                            fontFamily: "Poppins",
-                                                            fontSize: "13px",
-                                                            fontWeight: 500,
-                                                            color: "#574B4F",
-                                                            lineHeight: "16px",
-                                                            mb: "6px",
-                                                            whiteSpace: "nowrap",
-                                                            overflow: "hidden",
-                                                            textOverflow: "ellipsis",
-                                                        }}
-                                                    >
-                                                        {campaign.name}
-                                                    </Typography>
-
-                                                    {/* Barra */}
-                                                    <Box sx={{ width: "100%", position: "relative", mb: "6px" }}>
-                                                        <Box
-                                                            sx={{
-                                                                width: "100%",
-                                                                height: "6px",
-                                                                borderRadius: "6px",
-                                                                backgroundColor: "#E0E0E0",
-                                                            }}
-                                                        />
-                                                        <Box
-                                                            sx={{
-                                                                width: `${percentage}%`,
-                                                                height: "6px",
-                                                                borderRadius: "6px",
-                                                                backgroundColor: "#8F4D63",
-                                                                position: "absolute",
-                                                                left: 0,
-                                                                top: 0,
-                                                            }}
-                                                        />
-                                                    </Box>
-
-                                                    {/* Footer */}
+                                                return (
                                                     <Box
+                                                        key={index}
                                                         sx={{
+                                                            flex: "0 0 auto",
+                                                            scrollSnapAlign: "start",
+                                                            width: { xs: "210px", sm: "230px", md: "240px" }, // 👈 compacto y responsive
+                                                            border: "1px solid #D6CED2",
+                                                            borderRadius: "8px",
+                                                            background: "#FFFFFF",
+
+                                                            // 👇 aquí estaba el problema: height muy bajita y se cortaba el nombre
+                                                            minHeight: "88px",
+                                                            padding: "10px 12px",
+
                                                             display: "flex",
-                                                            alignItems: "center",
+                                                            flexDirection: "column",
                                                             justifyContent: "space-between",
-                                                            width: "100%",
+                                                            boxSizing: "border-box",
                                                         }}
                                                     >
+                                                        {/* Nombre */}
                                                         <Typography
                                                             sx={{
                                                                 fontFamily: "Poppins",
                                                                 fontSize: "13px",
-                                                                fontWeight: 600,
-                                                                color: "#574B4FCC",
-                                                                whiteSpace: "nowrap",
-                                                            }}
-                                                        >
-                                                            {isNaN(percentage) ? 0 : Math.round(percentage)}%
-                                                        </Typography>
-
-                                                        <Typography
-                                                            sx={{
-                                                                fontFamily: "Poppins",
-                                                                fontSize: "12px",
                                                                 fontWeight: 500,
-                                                                color: "#574B4FCC",
+                                                                color: "#574B4F",
+                                                                lineHeight: "16px",
+                                                                mb: "6px",
                                                                 whiteSpace: "nowrap",
+                                                                overflow: "hidden",
+                                                                textOverflow: "ellipsis",
                                                             }}
                                                         >
-                                                            {campaign.numeroActual}/{campaign.numeroInicial}
+                                                            {campaign.name}
                                                         </Typography>
 
-                                                        <IconButton sx={{ p: 0 }} onClick={() => navigate("/Campains")}>
-                                                            <img src={smsico} alt="SMS" style={{ width: 20, height: 20 }} />
-                                                        </IconButton>
+                                                        {/* Barra */}
+                                                        <Box sx={{ width: "100%", position: "relative", mb: "6px" }}>
+                                                            <Box
+                                                                sx={{
+                                                                    width: "100%",
+                                                                    height: "6px",
+                                                                    borderRadius: "6px",
+                                                                    backgroundColor: "#E0E0E0",
+                                                                }}
+                                                            />
+                                                            <Box
+                                                                sx={{
+                                                                    width: `${Math.min(percentage, 100)}%`,
+                                                                    height: "6px",
+                                                                    borderRadius: "6px",
+                                                                    backgroundColor: "#8F4D63",
+                                                                    position: "absolute",
+                                                                    left: 0,
+                                                                    top: 0,
+                                                                }}
+                                                            />
+                                                        </Box>
+
+                                                        {/* Footer */}
+                                                        <Box
+                                                            sx={{
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                justifyContent: "space-between",
+                                                                width: "100%",
+                                                            }}
+                                                        >
+                                                            <Typography
+                                                                sx={{
+                                                                    fontFamily: "Poppins",
+                                                                    fontSize: "13px",
+                                                                    fontWeight: 600,
+                                                                    color: "#574B4FCC",
+                                                                    whiteSpace: "nowrap",
+                                                                }}
+                                                            >
+                                                                {isNaN(percentage) ? 0 : Math.round(percentage)}%
+                                                            </Typography>
+
+                                                            <Typography
+                                                                sx={{
+                                                                    fontFamily: "Poppins",
+                                                                    fontSize: "12px",
+                                                                    fontWeight: 500,
+                                                                    color: "#574B4FCC",
+                                                                    whiteSpace: "nowrap",
+                                                                }}
+                                                            >
+                                                                {campaign.numeroActual}/{campaign.numeroInicial}
+                                                            </Typography>
+
+                                                            <IconButton sx={{ p: 0 }} onClick={() => navigate("/Campains")}>
+                                                                <img src={smsico} alt="SMS" style={{ width: 20, height: 20 }} />
+                                                            </IconButton>
+                                                        </Box>
                                                     </Box>
-                                                </Box>
-                                            );
-                                        })}
+                                                );
+                                            })
+
+                                        ) : (
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: "350px", textAlign: 'center' }}>
+                                                <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
+                                                    No hay información para mostrar.  <br />
+                                                    Encienda una o más campañas.
+                                                </Typography>
+                                            </Box>
+                                        )}
                                     </Box>
                                 </Box>
                             )}
@@ -1059,211 +1070,225 @@ const HomePage: React.FC = () => {
                                         </IconButton>
                                     </Box>
 
-                                    {/* Contenedor de estadísticas */}
-                                    <Box
-                                        sx={{
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                            padding: 2,
-                                            border: "1px solid #E0E0E0",
-                                            borderRadius: 2,
-                                            background: "#FFFFFF",
-                                            minHeight: "80px",
-                                            gap: 2,
-                                            flexWrap: "wrap",
-                                        }}
-                                    >
-                                        {data.map((item, index) => (
-                                            <Box key={index} sx={{ textAlign: "center", flex: "1 1 140px" }}>
-                                                <CustomTooltip title={item.tooltip}>
-                                                    <img
-                                                        src={infoicon}
-                                                        alt="Info"
-                                                        style={{ width: "24px", height: "24px", cursor: "pointer" }}
-                                                    />
-                                                </CustomTooltip>
-
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: "14px",
-                                                        color: "#574B4F",
-                                                        fontFamily: "Poppins",
-                                                        opacity: 0.8,
-                                                    }}
-                                                >
-                                                    {item.label}:
-                                                </Typography>
-
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: "22px",
-                                                        fontWeight: 500,
-                                                        color: item.color,
-                                                        fontFamily: "Poppins",
-                                                    }}
-                                                >
-                                                    {item.value}%
-                                                </Typography>
-                                            </Box>
-                                        ))}
-                                    </Box>
-
-                                    {/* GRÁFICA */}
-                                    <Box sx={{ width: "100%", overflowX: "auto" }}>
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "flex-end",
-                                                justifyContent: "center",
-                                                height: "180px",
-                                                marginTop: 4,
-                                                position: "relative",
-                                                paddingBottom: 2,
-                                                minWidth: "900px", // 👈 se mantiene como la traías para que no se rompa en pantallas chicas
-                                            }}
-                                        >
-                                            {/* Líneas del eje Y */}
+                                    {campaigns.length > 0 ? (
+                                        <>
                                             <Box
                                                 sx={{
-                                                    position: "absolute",
-                                                    left: 0,
-                                                    bottom: 10,
-                                                    height: "100%",
-                                                    width: "100%",
                                                     display: "flex",
-                                                    flexDirection: "column",
                                                     justifyContent: "space-between",
-                                                    alignItems: "flex-start",
-                                                    paddingLeft: "40px",
+                                                    alignItems: "center",
+                                                    padding: 2,
+                                                    border: "1px solid #E0E0E0",
+                                                    borderRadius: 2,
+                                                    background: "#FFFFFF",
+                                                    minHeight: "80px",
+                                                    gap: 2,
+                                                    flexWrap: "wrap",
                                                 }}
                                             >
-                                                {[100, 80, 60, 40, 20, 0].map((percent) => (
-                                                    <Box
-                                                        key={percent}
-                                                        sx={{
-                                                            width: "100%",
-                                                            display: "flex",
-                                                            alignItems: "center",
-                                                        }}
-                                                    >
+                                                {data.map((item, index) => (
+                                                    <Box key={index} sx={{ textAlign: "center", flex: "1 1 140px" }}>
+                                                        <CustomTooltip title={item.tooltip}>
+                                                            <img
+                                                                src={infoicon}
+                                                                alt="Info"
+                                                                style={{ width: "24px", height: "24px", cursor: "pointer" }}
+                                                            />
+                                                        </CustomTooltip>
+
                                                         <Typography
                                                             sx={{
+                                                                fontSize: "14px",
+                                                                color: "#574B4F",
                                                                 fontFamily: "Poppins",
-                                                                fontSize: "12px",
-                                                                fontWeight: "400",
-                                                                color: "#8F8F8F",
-                                                                lineHeight: "12px",
-                                                                marginRight: "10px",
+                                                                opacity: 0.8,
                                                             }}
                                                         >
-                                                            {percent}%
+                                                            {item.label}:
                                                         </Typography>
-                                                        <Box sx={{ flexGrow: 1, borderBottom: "1px dashed #E0E0E0" }} />
+
+                                                        <Typography
+                                                            sx={{
+                                                                fontSize: "22px",
+                                                                fontWeight: 500,
+                                                                color: item.color,
+                                                                fontFamily: "Poppins",
+                                                            }}
+                                                        >
+                                                            {item.value}%
+                                                        </Typography>
                                                     </Box>
                                                 ))}
                                             </Box>
 
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    alignItems: "flex-end",
-                                                    justifyContent: "space-around",
-                                                    width: "100%",
-                                                    paddingLeft: "40px",
-                                                }}
-                                            >
-                                                {/* Ejes X/Y */}
-                                                <Box
-                                                    sx={{
-                                                        width: "1px",
-                                                        height: "165px",
-                                                        backgroundColor: "#574B4F",
-                                                        opacity: 0.3,
-                                                        position: "absolute",
-                                                        left: "40px",
-                                                        bottom: "0px",
-                                                    }}
-                                                />
-                                                <Box
-                                                    sx={{
-                                                        width: "calc(100% - 40px)",
-                                                        height: "1px",
-                                                        backgroundColor: "#574B4F",
-                                                        opacity: 0.3,
-                                                        position: "absolute",
-                                                        left: "40px",
-                                                        bottom: "0px",
-                                                    }}
-                                                />
 
-                                                {/* Barras */}
-                                                {data.map((item, index) => (
+                                            <Box sx={{ width: "100%", overflowX: "auto" }}>
+                                                <Box
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems: "flex-end",
+                                                        justifyContent: "center",
+                                                        height: "180px",
+                                                        marginTop: 4,
+                                                        position: "relative",
+                                                        paddingBottom: 2,
+                                                        minWidth: "900px", // 👈 se mantiene como la traías para que no se rompa en pantallas chicas
+                                                    }}
+                                                >
+                                                    {/* Líneas del eje Y */}
                                                     <Box
-                                                        key={index}
                                                         sx={{
-                                                            textAlign: "center",
-                                                            width: "90px",
-                                                            position: "relative",
-                                                            zIndex: 2,
+                                                            position: "absolute",
+                                                            left: 0,
+                                                            bottom: 10,
+                                                            height: "100%",
+                                                            width: "100%",
+                                                            display: "flex",
+                                                            flexDirection: "column",
+                                                            justifyContent: "space-between",
+                                                            alignItems: "flex-start",
+                                                            paddingLeft: "40px",
                                                         }}
                                                     >
+                                                        {[100, 80, 60, 40, 20, 0].map((percent) => (
+                                                            <Box
+                                                                key={percent}
+                                                                sx={{
+                                                                    width: "100%",
+                                                                    display: "flex",
+                                                                    alignItems: "center",
+                                                                }}
+                                                            >
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontFamily: "Poppins",
+                                                                        fontSize: "12px",
+                                                                        fontWeight: "400",
+                                                                        color: "#8F8F8F",
+                                                                        lineHeight: "12px",
+                                                                        marginRight: "10px",
+                                                                    }}
+                                                                >
+                                                                    {percent}%
+                                                                </Typography>
+                                                                <Box sx={{ flexGrow: 1, borderBottom: "1px dashed #E0E0E0" }} />
+                                                            </Box>
+                                                        ))}
+                                                    </Box>
+
+                                                    <Box
+                                                        sx={{
+                                                            display: "flex",
+                                                            alignItems: "flex-end",
+                                                            justifyContent: "space-around",
+                                                            width: "100%",
+                                                            paddingLeft: "40px",
+                                                        }}
+                                                    >
+                                                        {/* Ejes X/Y */}
                                                         <Box
                                                             sx={{
-                                                                width: "90px",
-                                                                height: `${(item.value / 100) * 120}px`,
-                                                                maxHeight: "120px",
-                                                                backgroundColor: item.color,
-                                                                borderRadius: "0px",
-                                                                transition: "height 0.5s ease-in-out",
-                                                                margin: "auto",
+                                                                width: "1px",
+                                                                height: "165px",
+                                                                backgroundColor: "#574B4F",
+                                                                opacity: 0.3,
+                                                                position: "absolute",
+                                                                left: "40px",
+                                                                bottom: "0px",
+                                                            }}
+                                                        />
+                                                        <Box
+                                                            sx={{
+                                                                width: "calc(100% - 40px)",
+                                                                height: "1px",
+                                                                backgroundColor: "#574B4F",
+                                                                opacity: 0.3,
+                                                                position: "absolute",
+                                                                left: "40px",
+                                                                bottom: "0px",
                                                             }}
                                                         />
 
-                                                        <Typography
-                                                            sx={{
-                                                                fontFamily: "Poppins",
-                                                                textAlign: "center",
-                                                                fontSize: "12px",
-                                                                fontWeight: "500",
-                                                                marginTop: "18px",
-                                                                color: "#574B4F",
-                                                                position: "absolute",
-                                                                bottom: "-18px",
-                                                                width: "90px",
-                                                                whiteSpace: "nowrap",
-                                                            }}
-                                                        >
-                                                            {[
-                                                                "Recibidos",
-                                                                "Entregados",
-                                                                "No entregados",
-                                                                "No enviados",
-                                                                "Fallidos",
-                                                                "Excepción",
-                                                            ][index]}
-                                                        </Typography>
-                                                    </Box>
-                                                ))}
-                                            </Box>
-                                        </Box>
-                                    </Box>
+                                                        {/* Barras */}
+                                                        {data.map((item, index) => (
+                                                            <Box
+                                                                key={index}
+                                                                sx={{
+                                                                    textAlign: "center",
+                                                                    width: "90px",
+                                                                    position: "relative",
+                                                                    zIndex: 2,
+                                                                }}
+                                                            >
+                                                                <Box
+                                                                    sx={{
+                                                                        width: "90px",
+                                                                        height: `${(item.value / 100) * 120}px`,
+                                                                        maxHeight: "120px",
+                                                                        backgroundColor: item.color,
+                                                                        borderRadius: "0px",
+                                                                        transition: "height 0.5s ease-in-out",
+                                                                        margin: "auto",
+                                                                    }}
+                                                                />
 
-                                    <Typography
-                                        sx={{
-                                            textAlign: "left",
-                                            fontSize: "12px",
-                                            fontWeight: "500",
-                                            lineHeight: "18px",
-                                            fontFamily: "Poppins, sans-serif",
-                                            letterSpacing: "0px",
-                                            color: "#574B4FCC",
-                                            opacity: 1,
-                                            marginTop: 2,
-                                        }}
-                                    >
-                                        * El cálculo de las tasas se basa en el total de mensajes enviados en el día.
-                                    </Typography>
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontFamily: "Poppins",
+                                                                        textAlign: "center",
+                                                                        fontSize: "12px",
+                                                                        fontWeight: "500",
+                                                                        marginTop: "18px",
+                                                                        color: "#574B4F",
+                                                                        position: "absolute",
+                                                                        bottom: "-18px",
+                                                                        width: "90px",
+                                                                        whiteSpace: "nowrap",
+                                                                    }}
+                                                                >
+                                                                    {[
+                                                                        "Recibidos",
+                                                                        "Entregados",
+                                                                        "No entregados",
+                                                                        "No enviados",
+                                                                        "Fallidos",
+                                                                        "Excepción",
+                                                                    ][index]}
+                                                                </Typography>
+                                                            </Box>
+                                                        ))}
+                                                    </Box>
+                                                </Box>
+                                            </Box>
+
+                                            <Typography
+                                                sx={{
+                                                    textAlign: "left",
+                                                    fontSize: "12px",
+                                                    fontWeight: "500",
+                                                    lineHeight: "18px",
+                                                    fontFamily: "Poppins, sans-serif",
+                                                    letterSpacing: "0px",
+                                                    color: "#574B4FCC",
+                                                    opacity: 1,
+                                                    marginTop: 2,
+                                                }}
+                                            >
+                                                * El cálculo de las tasas se basa en el total de mensajes enviados en el día.
+                                            </Typography>
+                                        </>
+                                    ) : (
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                                            <img
+                                                src={Emptybox}
+                                                alt="Caja vacía"
+                                                style={{ width: '176px', height: "149px", marginBottom: '16px' }} />
+                                            <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
+                                                No hay información para mostrar.  <br />
+                                                Encienda una o más campañas.
+                                            </Typography>
+                                        </Box>
+                                    )}
                                 </Box>
                             )}
 
@@ -1632,7 +1657,7 @@ const HomePage: React.FC = () => {
                                                     src={IconCheckBox1}
                                                     alt="Seleccionado"
                                                     style={{ width: '24px', height: '24px' }}
-                                            />
+                                                />
                                             }
                                         />
                                     }
