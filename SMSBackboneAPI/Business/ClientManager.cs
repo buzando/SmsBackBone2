@@ -898,7 +898,7 @@ namespace Business
                                     creditosGlobales = r.credits,
                                     creditosSmsCortos = r.short_sms,
                                     creditosSmsLargos = r.long_sms,
-
+                                    description = r.description,
                                     CanBeDeleted = !ctx.Campaigns.Any(cam => cam.RoomId == r.id)
                                 };
 

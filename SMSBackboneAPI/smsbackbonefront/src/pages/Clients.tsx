@@ -4091,11 +4091,14 @@ const Clients: React.FC = () => {
             <CustomDateTimePicker
                 open={datePickerOpen}
                 anchorEl={anchorEl2}
+                maxDate={new Date()} 
                 onApply={(date, hour, minute) => {
                     const newDate = new Date(date);
                     newDate.setHours(hour);
                     newDate.setMinutes(minute);
+
                     handleDateChange(newDate);
+
                     setRechargeData(prev => ({
                         ...prev,
                         billingDate: newDate.toISOString()

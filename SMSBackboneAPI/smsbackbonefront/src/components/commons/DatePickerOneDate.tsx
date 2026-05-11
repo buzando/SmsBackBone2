@@ -10,7 +10,15 @@ import { es } from "date-fns/locale";
 import Iconarrow from "../../assets/icon-punta-flecha-bottom.svg";
 import MainButton from "../commons/MainButton";
 import SecondaryButton from "../commons/SecondaryButton";
-import { addMonths, isBefore, startOfDay, startOfMonth } from "date-fns";
+
+import {
+  addMonths,
+  subMonths,
+  isBefore,
+  isAfter,
+  startOfDay,
+  startOfMonth,
+} from "date-fns";
 
 interface DatePickerProps {
   open: boolean;
@@ -19,16 +27,17 @@ interface DatePickerProps {
   onClose: () => void;
   label?: string;
   placement?:
-  | "bottom-start"
-  | "bottom"
-  | "bottom-end"
-  | "top-start"
-  | "top"
-  | "top-end";
+    | "bottom-start"
+    | "bottom"
+    | "bottom-end"
+    | "top-start"
+    | "top"
+    | "top-end";
   modifiers?: PopperProps["modifiers"];
   offset?: [number, number];
-  // Fecha inicial que viene del horario (start/end)
   initialDate?: Date | null;
+  minDate?: Date;
+  maxDate?: Date;
 }
 
 const DatePickerOneDate: React.FC<DatePickerProps> = ({
@@ -41,27 +50,57 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
   offset = [0, 10],
   initialDate,
   label = "HORA FINAL",
+  minDate,
+  maxDate,
 }) => {
-  const base = useMemo(() => initialDate ?? new Date(), [initialDate]);
+  const minAllowedDate = useMemo(
+    () => (minDate ? startOfDay(minDate) : null),
+    [minDate]
+  );
+
+  const maxAllowedDate = useMemo(
+    () => (maxDate ? startOfDay(maxDate) : null),
+    [maxDate]
+  );
+
+  const base = useMemo(() => {
+    const initial = initialDate ?? new Date();
+    const normalized = startOfDay(initial);
+
+    if (minAllowedDate && isBefore(normalized, minAllowedDate)) {
+      return minAllowedDate;
+    }
+
+    if (maxAllowedDate && isAfter(normalized, maxAllowedDate)) {
+      return maxAllowedDate;
+    }
+
+    return initial;
+  }, [initialDate, minAllowedDate, maxAllowedDate]);
 
   const [selectedDate, setSelectedDate] = useState<Date>(base);
   const [hour, setHour] = useState<number>(0);
   const [minute, setMinute] = useState<number>(0);
   const [focusedDate, setFocusedDate] = useState<Date>(base);
 
-  const today = useMemo(() => startOfDay(new Date()), []);
-  const minFocusMonth = useMemo(() => startOfMonth(today), [today]);
+  const minFocusMonth = useMemo(
+    () => (minAllowedDate ? startOfMonth(minAllowedDate) : null),
+    [minAllowedDate]
+  );
 
-  // Cada vez que se abre el popper, sincronizamos con la fecha que venga del padre
+  const maxFocusMonth = useMemo(
+    () => (maxAllowedDate ? startOfMonth(maxAllowedDate) : null),
+    [maxAllowedDate]
+  );
+
   useEffect(() => {
     if (!open) return;
 
-    const b = initialDate ?? new Date();
-    setSelectedDate(b);
-    setFocusedDate(b);
+    setSelectedDate(base);
+    setFocusedDate(base);
     setHour(0);
     setMinute(0);
-  }, [open, initialDate]);
+  }, [open, base]);
 
   const handleApply = () => {
     onApply(selectedDate, hour, minute);
@@ -79,33 +118,50 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
   };
 
   const goPrevMonth = () => {
-    const nextFocus = addMonths(focusedDate, -1);
-    // 🔒 opcional: no permitir ir a meses anteriores al mes actual
-    setFocusedDate(isBefore(nextFocus, minFocusMonth) ? minFocusMonth : nextFocus);
+    const nextFocus = subMonths(focusedDate, 1);
+
+    if (
+      minAllowedDate &&
+      minFocusMonth &&
+      isBefore(nextFocus, minFocusMonth)
+    ) {
+      setFocusedDate(minFocusMonth);
+      return;
+    }
+
+    setFocusedDate(nextFocus);
   };
 
   const goNextMonth = () => {
-    setFocusedDate(addMonths(focusedDate, 1));
+    const nextFocus = addMonths(focusedDate, 1);
+
+    if (
+      maxAllowedDate &&
+      maxFocusMonth &&
+      isAfter(nextFocus, maxFocusMonth)
+    ) {
+      setFocusedDate(maxFocusMonth);
+      return;
+    }
+
+    setFocusedDate(nextFocus);
   };
 
   return (
     <>
       <GlobalStyles
         styles={{
-          /* =========================
-             MESES: minúsculas + sin negritas (FIX)
-             ========================= */
           ".rdrMonthAndYearWrapper": {
             fontFamily: "Poppins, sans-serif",
             fontWeight: "400 !important",
             textTransform: "lowercase !important",
           },
+
           ".rdrMonthAndYearWrapper span": {
             fontWeight: "400 !important",
             textTransform: "lowercase !important",
           },
 
-          /* OJO: .rdrMonthName es el título del mes (el que ves como MAR 2026) */
           ".rdrMonthName": {
             fontFamily: "Poppins, sans-serif",
             fontSize: "12px",
@@ -118,26 +174,27 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
             borderBottom: "1px solid #E6E4E4CC",
           },
 
-          /* =========================
-             HOY: quitar estilo especial SOLO cuando NO está seleccionado
-             ========================= */
-          ".rdrDayToday": { background: "transparent !important" },
-          ".rdrDayToday .rdrDayNumber": { background: "transparent !important" },
+          ".rdrDayToday": {
+            background: "transparent !important",
+          },
+
+          ".rdrDayToday .rdrDayNumber": {
+            background: "transparent !important",
+          },
+
           ".rdrDayToday .rdrDayNumber span": {
             background: "transparent !important",
             fontWeight: "500 !important",
             color: "#574B4F !important",
             boxShadow: "none !important",
           },
+
           ".rdrDayToday .rdrDayNumber span:after": {
             display: "none !important",
             content: '""',
             background: "transparent !important",
           },
 
-          /* =========================
-             CONTENEDOR
-             ========================= */
           ".date-picker-container": {
             borderRadius: "8px",
             border: "1px solid #C6BFC2",
@@ -146,20 +203,17 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
             fontFamily: "Poppins, sans-serif",
           },
 
-          /* =========================
-             HEADER (layout del mes)
-             ========================= */
-          ".rdrMonth": { padding: "0 10px 6px 10px" },
+          ".rdrMonth": {
+            padding: "0 10px 6px 10px",
+          },
 
-          /* =========================
-             TIPOGRAFÍA
-             ========================= */
           ".rdrWeekDay": {
             fontFamily: "Poppins, sans-serif",
             color: "#807D7E",
             fontSize: "11px",
             fontWeight: 500,
           },
+
           ".rdrDayNumber span": {
             fontFamily: "Poppins, sans-serif",
             color: "#574B4F",
@@ -167,34 +221,26 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
             fontWeight: 500,
           },
 
-          /* =========================
-             BASE DÍA
-             ========================= */
           ".rdrDay": {
             outline: "none !important",
             background: "transparent !important",
           },
 
-          /* Mata inline azul (style="color: rgb(61,145,255)") */
           ".date-picker-container .rdrDay": {
             color: "#574B4F !important",
           },
 
-          /* Hover */
           ".rdrDayHovered .rdrDayNumber span": {
             color: "#8F4D63 !important",
           },
 
-          /* Quitar preview azul */
-          ".date-picker-container .rdrDayStartPreview, .date-picker-container .rdrDayEndPreview, .date-picker-container .rdrDayInPreview": {
-            border: "none !important",
-            color: "transparent !important",
-            opacity: "0 !important",
-          },
+          ".date-picker-container .rdrDayStartPreview, .date-picker-container .rdrDayEndPreview, .date-picker-container .rdrDayInPreview":
+            {
+              border: "none !important",
+              color: "transparent !important",
+              opacity: "0 !important",
+            },
 
-          /* =========================
-             SELECCIÓN REAL
-             ========================= */
           ".date-picker-container .rdrDay .rdrSelected": {
             background: "#8F4D63 !important",
             opacity: "1 !important",
@@ -211,38 +257,38 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
             position: "relative",
             zIndex: "2 !important",
           },
-          ".date-picker-container .rdrDay .rdrSelected ~ .rdrDayNumber span": {
-            color: "#FFFFFF !important",
-            fontWeight: "700 !important",
-          },
 
-          /* Hoy seleccionado */
-          ".date-picker-container .rdrDay.rdrDayToday .rdrSelected ~ .rdrDayNumber span": {
-            color: "#FFFFFF !important",
-            fontWeight: "700 !important",
-          },
+          ".date-picker-container .rdrDay .rdrSelected ~ .rdrDayNumber span":
+            {
+              color: "#FFFFFF !important",
+              fontWeight: "700 !important",
+            },
 
-          /* =========================
-             PASSIVE (otro mes)
-             ========================= */
-          ".date-picker-container .rdrDay.rdrDayPassive .rdrDayNumber span": {
-            color: "#C6BFC2 !important",
-            fontWeight: "400 !important",
-          },
-          ".date-picker-container .rdrDay.rdrDayPassive .rdrSelected ~ .rdrDayNumber span": {
-            color: "#FFFFFF !important",
-            fontWeight: "700 !important",
-          },
+          ".date-picker-container .rdrDay.rdrDayToday .rdrSelected ~ .rdrDayNumber span":
+            {
+              color: "#FFFFFF !important",
+              fontWeight: "700 !important",
+            },
 
-          /* =========================
-             FIX FINAL: que no se bajen los números
-             ========================= */
+          ".date-picker-container .rdrDay.rdrDayPassive .rdrDayNumber span":
+            {
+              color: "#C6BFC2 !important",
+              fontWeight: "400 !important",
+            },
+
+          ".date-picker-container .rdrDay.rdrDayPassive .rdrSelected ~ .rdrDayNumber span":
+            {
+              color: "#FFFFFF !important",
+              fontWeight: "700 !important",
+            },
+
           ".date-picker-container .rdrDayNumber": {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             height: "100%",
           },
+
           ".date-picker-container .rdrDayNumber span": {
             lineHeight: "12px !important",
             display: "inline-block",
@@ -250,14 +296,12 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
             top: "-1px",
           },
 
-          /* =========================
-             OCULTAR PICKERS
-             ========================= */
           ".rdrCalendarWrapper": {
             fontFamily: "Poppins, sans-serif",
           },
         }}
       />
+
       <Popper
         open={open}
         anchorEl={anchorEl}
@@ -265,8 +309,19 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
         sx={{ zIndex: 1500 }}
         modifiers={
           modifiers ?? [
-            { name: "preventOverflow", options: { boundary: "window", padding: 10 } },
-            { name: "offset", options: { offset: offset ?? [0, 10] } },
+            {
+              name: "preventOverflow",
+              options: {
+                boundary: "window",
+                padding: 10,
+              },
+            },
+            {
+              name: "offset",
+              options: {
+                offset: offset ?? [0, 10],
+              },
+            },
           ]
         }
       >
@@ -309,15 +364,21 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
             />
 
             <Calendar
+              key={`${focusedDate.getFullYear()}-${focusedDate.getMonth()}`}
               locale={es}
               date={selectedDate}
               onChange={(date) => {
                 const d = startOfDay(date as Date);
 
-                // ✅ No dejar seleccionar fechas pasadas (pero sin romper navegación)
-                if (isBefore(d, today)) {
-                  setSelectedDate(today);
-                  setFocusedDate(today);
+                if (minAllowedDate && isBefore(d, minAllowedDate)) {
+                  setSelectedDate(minAllowedDate);
+                  setFocusedDate(minAllowedDate);
+                  return;
+                }
+
+                if (maxAllowedDate && isAfter(d, maxAllowedDate)) {
+                  setSelectedDate(maxAllowedDate);
+                  setFocusedDate(maxAllowedDate);
                   return;
                 }
 
@@ -328,9 +389,9 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
               showDateDisplay={false}
               showMonthAndYearPickers={false}
               shownDate={focusedDate}
-              onShownDateChange={(date) => setFocusedDate(date as Date)}
-            // ❌ Quitamos minDate porque te bloquea la navegación de mes
-            // minDate={startOfDay(new Date())}
+              onShownDateChange={(date) =>
+                setFocusedDate(date as Date)
+              }
             />
           </Box>
 
@@ -344,8 +405,15 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
             }}
           />
 
-          {/* Controles de HORA FINAL */}
-          <Box sx={{ display: "flex", justifyContent: "center", mt: "-2px", pb: "8px" }}>
+          {/* Hora */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              mt: "-2px",
+              pb: "8px",
+            }}
+          >
             <Box sx={{ textAlign: "center" }}>
               <Box
                 component="p"
@@ -369,17 +437,23 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "18px", // más aire entre hora, ":" y minuto
+                  gap: "18px",
                 }}
               >
-                {/* Hora */}
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                {/* Horas */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
                   <Box
                     sx={{
                       position: "relative",
                       display: "flex",
                       alignItems: "center",
-                      mr: "6px", // mueve horas un poquito a la izquierda
+                      mr: "6px",
                     }}
                   >
                     <input
@@ -390,17 +464,22 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                         textAlign: "center",
                         width: "42px",
                         height: "42px",
-                        border: hour !== 0 ? "1px solid #8C3F56" : "1px solid #C6BFC2",
+                        border:
+                          hour !== 0
+                            ? "1px solid #8C3F56"
+                            : "1px solid #C6BFC2",
                         borderRadius: "8px",
                         background: "#dfdfdf",
                         fontSize: "18px",
                         fontWeight: 700,
-                        color: hour !== 0 ? "#8C3F56" : "#574B4F",
+                        color:
+                          hour !== 0
+                            ? "#8C3F56"
+                            : "#574B4F",
                         outline: "none",
                       }}
                     />
 
-                    {/* Flechas hora */}
                     <Box
                       sx={{
                         position: "absolute",
@@ -412,7 +491,6 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                         gap: "2px",
                       }}
                     >
-                      {/* SUBIR */}
                       <button
                         type="button"
                         onClick={() => inc(true)}
@@ -434,14 +512,13 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                           style={{
                             width: "24px",
                             height: "24px",
-                            transform: "rotate(0deg)", // ↑ (Iconarrow apunta hacia abajo por default)
+                            transform: "rotate(0deg)",
                             opacity: 0.85,
                             display: "block",
                           }}
                         />
                       </button>
 
-                      {/* BAJAR */}
                       <button
                         type="button"
                         onClick={() => dec(true)}
@@ -463,7 +540,7 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                           style={{
                             width: "24px",
                             height: "24px",
-                            transform: "rotate(180deg)", // ↓
+                            transform: "rotate(180deg)",
                             opacity: 0.85,
                             display: "block",
                           }}
@@ -486,7 +563,7 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                   </Box>
                 </Box>
 
-                {/* Separador : */}
+                {/* : */}
                 <Box
                   component="span"
                   sx={{
@@ -500,9 +577,21 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                   :
                 </Box>
 
-                {/* Minuto */}
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <Box sx={{ position: "relative", display: "flex", alignItems: "center" }}>
+                {/* Minutos */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      position: "relative",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
                     <input
                       type="text"
                       value={minute.toString().padStart(2, "0")}
@@ -511,17 +600,22 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                         textAlign: "center",
                         width: "42px",
                         height: "42px",
-                        border: minute !== 0 ? "1px solid #8C3F56" : "1px solid #C6BFC2",
+                        border:
+                          minute !== 0
+                            ? "1px solid #8C3F56"
+                            : "1px solid #C6BFC2",
                         borderRadius: "8px",
                         background: "#dfdfdf",
                         fontSize: "18px",
                         fontWeight: 700,
-                        color: minute !== 0 ? "#8C3F56" : "#574B4F",
+                        color:
+                          minute !== 0
+                            ? "#8C3F56"
+                            : "#574B4F",
                         outline: "none",
                       }}
                     />
 
-                    {/* Flechas minuto */}
                     <Box
                       sx={{
                         position: "absolute",
@@ -533,7 +627,6 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                         gap: "2px",
                       }}
                     >
-                      {/* SUBIR */}
                       <button
                         type="button"
                         onClick={() => inc(false)}
@@ -555,14 +648,13 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                           style={{
                             width: "24px",
                             height: "24px",
-                            transform: "rotate(0deg)", // ↑
+                            transform: "rotate(0deg)",
                             opacity: 0.85,
                             display: "block",
                           }}
                         />
                       </button>
 
-                      {/* BAJAR */}
                       <button
                         type="button"
                         onClick={() => dec(false)}
@@ -584,7 +676,7 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
                           style={{
                             width: "24px",
                             height: "24px",
-                            transform: "rotate(180deg)", // ↓
+                            transform: "rotate(180deg)",
                             opacity: 0.85,
                             display: "block",
                           }}
@@ -620,10 +712,22 @@ const DatePickerOneDate: React.FC<DatePickerProps> = ({
             }}
           />
 
-          {/* Botones */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: "6px" }}>
-            <SecondaryButton text="Limpiar" onClick={onClose} />
-            <MainButton text="Aplicar" onClick={handleApply} />
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mt: "6px",
+            }}
+          >
+            <SecondaryButton
+              text="Limpiar"
+              onClick={onClose}
+            />
+
+            <MainButton
+              text="Aplicar"
+              onClick={handleApply}
+            />
           </Box>
         </Paper>
       </Popper>

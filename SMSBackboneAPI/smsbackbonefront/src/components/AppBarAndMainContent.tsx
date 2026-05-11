@@ -666,7 +666,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                             </Box>
                         )}
                     </Box>
-
+{userMenu !== 'Root' && (
 
                     <Box
                         display="flex"
@@ -901,7 +901,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
 
                     </Box>
-
+)}
 
                     {/* Usuario */}
                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, ml: 2 }}>
