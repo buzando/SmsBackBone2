@@ -60,6 +60,7 @@ import IconUserArrow from '../assets/CHEVRON_USER.svg';
 import CloseSession from '../assets/Icon-CerrarSesion.svg';
 import facturicone from '../assets/facturicone.svg';
 import Iconhelpu from '../assets/Iconhelpu.svg';
+import ApiIconDownload from '../assets/ApiIconDownload.svg';
 import logorq from '../assets/quantum-logov25.svg';
 import PrivacityIcon from '../assets/Icon_privacidad.svg'
 import api from '../assets/api.svg'
@@ -666,242 +667,242 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                             </Box>
                         )}
                     </Box>
-{userMenu !== 'Root' && (
+                    {userMenu !== 'Root' && (
 
-                    <Box
-                        display="flex"
-                        alignItems="center"
-                        sx={{
-                            ml: 2,
-                            padding: '4px 8px',
-                            backgroundColor: '#fff',
-                            borderRadius: '4px',
-                            border: '1px solid #ddd',
-                            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                            justifyContent: 'space-between',
-                            minWidth: '300px',
-                            maxWidth: '350px',
-                            height: '50px',
-                            position: 'relative', // Es importante mantener esto para el Popper
-                            marginLeft: '-5px'
-                        }}
-                    >
-                        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-
-                            <img
-                                src={HouseIcon}
-                                alt="Room Icon"
-                                style={{
-                                    width: '32px',
-                                    height: '32px',
-                                }}
-                            />
-                            <Box sx={{ marginLeft: '10px' }}>
-
-                                <Typography
-                                    variant="body1"
-                                    color="inherit"
-                                    sx={{
-                                        fontSize: '12px',
-                                        color: '#574B4F',
-                                        fontWeight: 'medium',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
-                                    {selectedRoom && selectedRoom.name ? selectedRoom.name : 'Sin nombre'}
-                                </Typography>
-                                <Typography
-                                    variant="body2"
-                                    color="textSecondary"
-                                    sx={{
-                                        fontSize: '9px',
-                                        color: '#574B4F',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                        fontFamily: 'Poppins, sans-serif',
-                                    }}
-                                >
-                                    {selectedRoom && selectedRoom.description ? selectedRoom.description : 'Sin descripción'}
-                                </Typography>
-                            </Box>
-                        </Box>
-
-
-                        <IconButton
-                            color="inherit"
-                            onClick={handleMenuOpen}
+                        <Box
+                            display="flex"
+                            alignItems="center"
                             sx={{
-                                color: 'black',
-                                transform: anchorEl ? 'rotate(180deg)' : 'rotate(0deg)',
-                                transition: 'transform 0.3s ease-in-out',
+                                ml: 2,
+                                padding: '4px 8px',
+                                backgroundColor: '#fff',
+                                borderRadius: '4px',
+                                border: '1px solid #ddd',
+                                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                                justifyContent: 'space-between',
+                                minWidth: '300px',
+                                maxWidth: '350px',
+                                height: '50px',
+                                position: 'relative', // Es importante mantener esto para el Popper
+                                marginLeft: '-5px'
                             }}
                         >
+                            <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
 
-                            <img src={DropDownIcon} alt="dropdown" width="24" height="24" />
-                        </IconButton>
-
-
-                        <Popper
-                            open={Boolean(anchorEl)}
-                            anchorEl={anchorEl}
-                            placement="bottom"
-                            modifiers={[
-                                {
-                                    name: 'offset',
-                                    options: {
-                                        offset: [-120, 8],
-                                    },
-                                },
-                                {
-                                    name: 'preventOverflow',
-                                    options: {
-                                        boundary: 'window',
-                                    },
-                                },
-                            ]}
-                            sx={{
-                                zIndex: 1300,
-                                backgroundColor: 'white',
-                                boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.2)',
-                                borderRadius: '8px',
-                                width: '100%',
-                                maxWidth: '300px',
-                                marginTop: '8px',
-                            }}
-                        >
-
-                            <Box sx={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
-                                <TextField
-
-                                    placeholder="Buscar"
-                                    variant="outlined"
-                                    size="small"
-                                    value={searchTerm2}
-                                    onChange={(e) => setSearchTerm2(e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            padding: '2px 8px',
-                                            '& .MuiInputAdornment-root': {
-                                                position: 'absolute',
-                                                right: 0,
-                                                marginRight: '8px',
-                                            },
-                                        },
-                                    }}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <SearchIcon sx={{ color: '#7B354D', marginRight: 1 }} />
-                                        ),
-                                        endAdornment: searchTerm2 && (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => setSearchTerm2('')}
-                                                    sx={{ color: '#7B354D' }}
-                                                >
-                                                    <img src={iconclose} alt="Limpiar" style={{ width: '16px', height: '16px' }} />
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                        style: {
-                                            height: '100%',
-                                            textAlign: 'left',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '16px',
-                                            lineHeight: '25px',
-                                            letterSpacing: '0px',
-                                            color: '#7B354D',
-                                            opacity: 1,
-                                        },
+                                <img
+                                    src={HouseIcon}
+                                    alt="Room Icon"
+                                    style={{
+                                        width: '32px',
+                                        height: '32px',
                                     }}
                                 />
+                                <Box sx={{ marginLeft: '10px' }}>
+
+                                    <Typography
+                                        variant="body1"
+                                        color="inherit"
+                                        sx={{
+                                            fontSize: '12px',
+                                            color: '#574B4F',
+                                            fontWeight: 'medium',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    >
+                                        {selectedRoom && selectedRoom.name ? selectedRoom.name : 'Sin nombre'}
+                                    </Typography>
+                                    <Typography
+                                        variant="body2"
+                                        color="textSecondary"
+                                        sx={{
+                                            fontSize: '9px',
+                                            color: '#574B4F',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                            fontFamily: 'Poppins, sans-serif',
+                                        }}
+                                    >
+                                        {selectedRoom && selectedRoom.description ? selectedRoom.description : 'Sin descripción'}
+                                    </Typography>
+                                </Box>
                             </Box>
 
 
-                            <MenuList sx={{ paddingLeft: 0 }}>
-                                {/* Lista de salas o mensaje vacío */}
-                                {rooms.filter((room) =>
-                                    room.name.toLowerCase().includes(searchTerm2.toLowerCase())
-                                ).length > 0 ? (
-                                    <MenuList sx={{ paddingLeft: 0 }}>
-                                        {rooms
-                                            .filter((room) =>
-                                                room.name.toLowerCase().includes(searchTerm2.toLowerCase())
-                                            )
-                                            .map((room, index) => (
-                                                <MenuItem
-                                                    key={index}
-                                                    onClick={() => handleRoomChange(room)}
-                                                    sx={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        padding: '8px 16px',
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={HouseIcon}
-                                                        alt="Room Icon"
-                                                        style={{
-                                                            width: '32px',
-                                                            height: '32px',
-                                                            marginRight: '10px',
-                                                            color: '#574B4F',
-                                                        }}
-                                                    />
-                                                    <Box sx={{ textAlign: 'left' }}>
-                                                        <Typography
-                                                            variant="body1"
-                                                            sx={{
-                                                                fontSize: '12px',
-                                                                color: '#000',
-                                                                fontFamily: 'Poppins, sans-serif',
-                                                            }}
-                                                        >
-                                                            {room.name}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="body2"
-                                                            sx={{
-                                                                fontSize: '9px',
-                                                                color: '#574B4F',
-                                                                fontFamily: 'Poppins, sans-serif',
-                                                            }}
-                                                        >
-                                                            {room.description}
-                                                        </Typography>
-                                                    </Box>
-                                                </MenuItem>
-                                            ))}
-                                    </MenuList>
-                                ) : (
-                                    <Typography
+                            <IconButton
+                                color="inherit"
+                                onClick={handleMenuOpen}
+                                sx={{
+                                    color: 'black',
+                                    transform: anchorEl ? 'rotate(180deg)' : 'rotate(0deg)',
+                                    transition: 'transform 0.3s ease-in-out',
+                                }}
+                            >
+
+                                <img src={DropDownIcon} alt="dropdown" width="24" height="24" />
+                            </IconButton>
+
+
+                            <Popper
+                                open={Boolean(anchorEl)}
+                                anchorEl={anchorEl}
+                                placement="bottom"
+                                modifiers={[
+                                    {
+                                        name: 'offset',
+                                        options: {
+                                            offset: [-120, 8],
+                                        },
+                                    },
+                                    {
+                                        name: 'preventOverflow',
+                                        options: {
+                                            boundary: 'window',
+                                        },
+                                    },
+                                ]}
+                                sx={{
+                                    zIndex: 1300,
+                                    backgroundColor: 'white',
+                                    boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.2)',
+                                    borderRadius: '8px',
+                                    width: '100%',
+                                    maxWidth: '300px',
+                                    marginTop: '8px',
+                                }}
+                            >
+
+                                <Box sx={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
+                                    <TextField
+
+                                        placeholder="Buscar"
+                                        variant="outlined"
+                                        size="small"
+                                        value={searchTerm2}
+                                        onChange={(e) => setSearchTerm2(e.target.value)}
                                         sx={{
-                                            textAlign: 'center',
-                                            fontFamily: 'Poppins',
-                                            fontWeight: 500, // "medium"
-                                            fontSize: '14px',
-                                            lineHeight: '18px',
-                                            letterSpacing: '0px',
-                                            color: '#7B354D',
-                                            opacity: 1,
-                                            px: 2,
-                                            py: 1.5,
+                                            '& .MuiOutlinedInput-root': {
+                                                padding: '2px 8px',
+                                                '& .MuiInputAdornment-root': {
+                                                    position: 'absolute',
+                                                    right: 0,
+                                                    marginRight: '8px',
+                                                },
+                                            },
                                         }}
-                                    >
-                                        No se encontraron resultados
-                                    </Typography>
-                                )}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <SearchIcon sx={{ color: '#7B354D', marginRight: 1 }} />
+                                            ),
+                                            endAdornment: searchTerm2 && (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => setSearchTerm2('')}
+                                                        sx={{ color: '#7B354D' }}
+                                                    >
+                                                        <img src={iconclose} alt="Limpiar" style={{ width: '16px', height: '16px' }} />
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                            style: {
+                                                height: '100%',
+                                                textAlign: 'left',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '16px',
+                                                lineHeight: '25px',
+                                                letterSpacing: '0px',
+                                                color: '#7B354D',
+                                                opacity: 1,
+                                            },
+                                        }}
+                                    />
+                                </Box>
 
-                            </MenuList>
-                        </Popper>
+
+                                <MenuList sx={{ paddingLeft: 0 }}>
+                                    {/* Lista de salas o mensaje vacío */}
+                                    {rooms.filter((room) =>
+                                        room.name.toLowerCase().includes(searchTerm2.toLowerCase())
+                                    ).length > 0 ? (
+                                        <MenuList sx={{ paddingLeft: 0 }}>
+                                            {rooms
+                                                .filter((room) =>
+                                                    room.name.toLowerCase().includes(searchTerm2.toLowerCase())
+                                                )
+                                                .map((room, index) => (
+                                                    <MenuItem
+                                                        key={index}
+                                                        onClick={() => handleRoomChange(room)}
+                                                        sx={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            padding: '8px 16px',
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={HouseIcon}
+                                                            alt="Room Icon"
+                                                            style={{
+                                                                width: '32px',
+                                                                height: '32px',
+                                                                marginRight: '10px',
+                                                                color: '#574B4F',
+                                                            }}
+                                                        />
+                                                        <Box sx={{ textAlign: 'left' }}>
+                                                            <Typography
+                                                                variant="body1"
+                                                                sx={{
+                                                                    fontSize: '12px',
+                                                                    color: '#000',
+                                                                    fontFamily: 'Poppins, sans-serif',
+                                                                }}
+                                                            >
+                                                                {room.name}
+                                                            </Typography>
+                                                            <Typography
+                                                                variant="body2"
+                                                                sx={{
+                                                                    fontSize: '9px',
+                                                                    color: '#574B4F',
+                                                                    fontFamily: 'Poppins, sans-serif',
+                                                                }}
+                                                            >
+                                                                {room.description}
+                                                            </Typography>
+                                                        </Box>
+                                                    </MenuItem>
+                                                ))}
+                                        </MenuList>
+                                    ) : (
+                                        <Typography
+                                            sx={{
+                                                textAlign: 'center',
+                                                fontFamily: 'Poppins',
+                                                fontWeight: 500, // "medium"
+                                                fontSize: '14px',
+                                                lineHeight: '18px',
+                                                letterSpacing: '0px',
+                                                color: '#7B354D',
+                                                opacity: 1,
+                                                px: 2,
+                                                py: 1.5,
+                                            }}
+                                        >
+                                            No se encontraron resultados
+                                        </Typography>
+                                    )}
+
+                                </MenuList>
+                            </Popper>
 
 
-                    </Box>
-)}
+                        </Box>
+                    )}
 
                     {/* Usuario */}
                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, ml: 2 }}>
@@ -1412,7 +1413,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                     }}>
 
                     {userMenu === 'Root' ? (
-
                         <List component="nav">
                             {/* Menú de Administración */}
                             <ListItem disablePadding>
@@ -1732,7 +1732,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                         </List>
                                     </Collapse>
 
-
                                     {/* Menú de SMS */}
                                     <ListItem disablePadding>
                                         <ListItemButton onClick={() => toggleSubMenu('sms')} sx={{ borderRadius: '8px' }}>
@@ -1926,8 +1925,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                             </ListItemButton>
                                         </Link>
 
-
-
                                     </Collapse>
 
                                     {/* Menú de Reportes */}
@@ -2096,8 +2093,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                             </ListItemButton>
                                         </Link>
 
-
-
                                         {/* Datos de facturación */}
                                         <Link to="/BillingInformation" style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <ListItemButton
@@ -2141,15 +2136,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                             </ListItemButton>
                                         </Link>
 
-
-
-
-
-
-
                                     </Collapse>
-
-
 
                                     {/* Menú de Ayuda */}
                                     <ListItem disablePadding>
@@ -2165,26 +2152,45 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                 primary="Ayuda"
                                                 primaryTypographyProps={{
                                                     fontFamily: "Poppins",
-                                                    marginLeft: "6px",
+                                                    marginLeft: "5px",
                                                     color: '#FFFFFF',
                                                 }}
                                             />
                                         </ListItemButton>
                                     </ListItem>
+
+                                    {/* Descargar API */}
+                                    <ListItem disablePadding>
+                                        <ListItemButton
+                                            onClick={handleDownload}
+                                            sx={{ borderRadius: '8px', marginLeft: "5px" }}>
+                                            <img alt="DownloadApi" src={ApiIconDownload} style={{ width: 24, height: 24, filter: "brightness(0) invert(1)" }} />
+                                            <ListItemText
+                                                primary="Descargar API"
+                                                primaryTypographyProps={{
+                                                    fontFamily: "Poppins",
+                                                    marginLeft: "9px",
+                                                    color: '#FFFFFF',
+                                                }}
+                                            />
+                                        </ListItemButton>
+                                    </ListItem>
+
                                 </List>
                             )
-                    )
 
+                    )
                     }
 
                     {/* Final del fondo para opciones */}
                 </Box>
+
                 {userMenu === 'Mesa' && location.pathname !== '/ClientRoomPicker' && (
                     <Box
                         sx={{
-                            position: 'fixed',
-                            left: 16,
-                            bottom: { xs: 112, sm: 96, md: 88 }, // ⬅️ Responsivo según tamaño de pantalla
+                            position: 'relative',
+                            left: 45, top: 15,
+                            bottom: { xs: 112, sm: 96, md: 88 },
                             zIndex: 1300,
                         }}
                     >
@@ -2214,22 +2220,21 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
             </Drawer >
             <Container
-
                 maxWidth={false}
                 disableGutters
                 sx={{
-                    width: '83.5%',
-                    height: '100%',
+                    width: 'calc(100% - 277px)',
+                    height: 'calc(100vh - 70px)',
                     overflowX: 'hidden',
-                    overflowY: 'hidden',
-                    overflow: 'hidden',
+                    overflowY: 'auto',
                     margin: 0,
-                    marginLeft: "277px",
-                    marginTop: "70px",
+                    marginLeft: '277px',
+                    marginTop: '70px',
                     padding: 0,
                     backgroundColor: '#F2F2F2',
                     display: 'flex',
                     flexDirection: 'column',
+                    boxSizing: 'border-box',
                 }}
             >
                 <Box sx={{ height: '4.5rem' }} />
@@ -2258,6 +2263,8 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                         {' Nuxiba. Todos los derechos reservados. Se prohíbe el uso no autorizado.'}
                     </Typography>
                     <img src={nuxiba_svg} alt="Nuxiba Logo" width="80" />
+
+                    {/*
                     {location.pathname === '/' && (
                         <Fab
                             aria-label="help"
@@ -2313,7 +2320,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                         zIndex: 1500,
                                     }}
                                 >
-                                    {/* Imagen base */}
+
                                     <img
                                         src={api}
                                         alt="Ícono de api"
@@ -2326,7 +2333,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                         }}
                                     />
 
-                                    {/* Overlay rosita */}
+
                                     {isHoveringApi && (
                                         <div
                                             style={{
@@ -2351,7 +2358,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                         </Fab>
                     )}
-
+ */}
 
 
 

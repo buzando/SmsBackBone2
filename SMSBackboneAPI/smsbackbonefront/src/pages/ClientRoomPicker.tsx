@@ -12,6 +12,9 @@ import Iconseachred from "../assets/Iconseachred.svg";
 import iconclose from "../assets/icon-close.svg";
 import NoResult from "../assets/NoResultados.svg";
 
+import SpinnerTop from "../assets/SpinnerTop.svg";
+import SpinnerBottom from "../assets/SpinnerBottom.svg";
+
 // Botón primario del proyecto
 import MainButton from "../components/commons/MainButton";
 
@@ -224,7 +227,28 @@ const ClientRoomPicker: React.FC = () => {
 
   // === UI ===
   return (
-    <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1260px" }}>
+    <Box p={3}
+      sx={{
+        width: "100%",
+
+        mx: "auto",
+
+        px: {
+          sm: 2,
+          md: 3,
+          lg: 3,
+        },
+
+        pt: {
+          sm: 2,
+          md: 3,
+        },
+
+        minHeight: "calc(100vh - 64px)",
+
+        overflowX: "hidden",
+      }}
+    >
       <Typography
         variant="h4"
         sx={{
@@ -239,18 +263,25 @@ const ClientRoomPicker: React.FC = () => {
 
       <Box
         sx={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          display: "flex",
+          flexDirection: {
+            xs: "column",
+            md: "row",
+          },
+          alignItems: "stretch",
           gap: 2,
-          bgcolor: "transparent",
+          width: "100%",
         }}
       >
         {/* Columna izquierda: clientes */}
         <Box
           sx={{
+            flex: 1,
+            minWidth: 0,
+            width: "100%",
             background: "#fff",
             borderRadius: 2,
-            border: "1px solid #E7E1E3",
+            border: "1px solid #E7E1E3", maxHeight: "524px"
           }}
         >
           <Typography
@@ -312,9 +343,10 @@ const ClientRoomPicker: React.FC = () => {
           </Box>
 
           {loadingClients ? (
-            <Box sx={{ p: 4, display: "flex", justifyContent: "center" }}>
+            <Box sx={{ p: 15, display: "flex", justifyContent: "center" }}>
               <CircularProgress />
             </Box>
+
           ) : filteredClients.length === 0 ? (
             <Box
               sx={{
@@ -322,10 +354,10 @@ const ClientRoomPicker: React.FC = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: 1,
+                gap: 1, maxHeight: "524px"
               }}
             >
-              <img src={NoResult} alt="Sin resultados" style={{ width: 220 }} />
+              <img src={NoResult} alt="Sin resultados" style={{ width: 240 }} />
               <Typography
                 sx={{ color: "#7B354D", fontFamily: "Poppins", fontSize: 14 }}
               >
@@ -333,7 +365,7 @@ const ClientRoomPicker: React.FC = () => {
               </Typography>
             </Box>
           ) : (
-            <Box sx={{ px: 2, pb: 2, maxHeight: 440, overflowY: "auto" }}>
+            <Box sx={{ px: 2, pb: 1, overflowY: "auto", maxHeight: "380px" }}>
               {filteredClients.map((c) => (
                 <Box
                   key={`${c.id}-${c.email}`}
@@ -391,10 +423,12 @@ const ClientRoomPicker: React.FC = () => {
         {/* Columna derecha: salas */}
         <Box
           sx={{
+            flex: 1,
+            minWidth: 0,
+            width: "100%",
             background: "#fff",
             borderRadius: 2,
-            border: "1px solid #E7E1E3",
-            position: "relative",
+            border: "1px solid #E7E1E3", maxHeight: "524px"
           }}
         >
           <Typography
@@ -452,7 +486,7 @@ const ClientRoomPicker: React.FC = () => {
               </Typography>
             </Box>
           ) : (
-            <Box sx={{ px: 2, pb: 10, maxHeight: 480, overflowY: "auto" }}>
+            <Box sx={{ px: 2, pb: 0, overflowY: "auto", maxHeight: "460px" }}>
               {clientRooms.map((r) => (
                 <Box
                   key={r.id ?? r.name}
@@ -495,23 +529,23 @@ const ClientRoomPicker: React.FC = () => {
                         {r.name}
                       </Typography>
 
-               
-                        <Typography
-                          sx={{
-                            fontFamily: "Poppins",
-                            color: "#796E71",
-                            fontSize: 13,
-                            lineHeight: "18px",
-                            mt: 0.3,
-                            maxWidth: "320px",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {r.description}
-                        </Typography>
-                      
+
+                      <Typography
+                        sx={{
+                          fontFamily: "Poppins",
+                          color: "#796E71",
+                          fontSize: 13,
+                          lineHeight: "18px",
+                          mt: 0.3,
+                          maxWidth: "320px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {r.description}
+                      </Typography>
+
 
                       {typeof r.credits === "number" && (
                         <Typography
@@ -533,14 +567,16 @@ const ClientRoomPicker: React.FC = () => {
             </Box>
           )}
 
-          {/* CTA inferior derecha */}
-          <Box sx={{ position: "absolute", bottom: 16, right: 16 }}>
-            <MainButton
-              disabled={!canContinue}
-              text={canContinue ? "Continuar" : "Selecciona cliente y sala"}
-              onClick={handleContinue}
-            />
-          </Box>
+
+        </Box>
+        {/* Boton creo */}
+        {/* CTA inferior derecha */}
+        <Box sx={{ position: "absolute", bottom: '20%', right: '12%' }}>
+          <MainButton
+            disabled={!canContinue}
+            text={canContinue ? "Continuar" : "Selecciona cliente y sala"}
+            onClick={handleContinue}
+          />
         </Box>
       </Box>
     </Box>

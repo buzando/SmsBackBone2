@@ -614,7 +614,28 @@ const Reports: React.FC = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+
+                mx: "auto",
+
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+
+                minHeight: "calc(100vh - 64px)",
+
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
@@ -1088,7 +1109,9 @@ const Reports: React.FC = () => {
 
 
                 {selectedDates?.start && selectedDates?.end && hasData && (
-                    <Box display="flex" gap={2} alignItems="center" mb={3} sx={{ marginTop: "-15px", marginBottom: "20px", }}>
+
+                    <Box display="flex" gap={2} alignItems="center" mb={3}
+                        sx={{ marginTop: "-15px", marginBottom: "20px", }}>
                         <Typography sx={{
                             fontFamily: "Poppins",
                             fontWeight: 500,
@@ -1144,142 +1167,151 @@ const Reports: React.FC = () => {
 
                                 </IconButton>
                             </Box>
-                            {/* Botones de CSV / Excel y PDF */}
-                            <Box sx={{ display: "flex", justifyContent: "flex-end", flex: 1, marginLeft: "940px", gap: 2 }}>
-                                <IconButton sx={{ p: 0, opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
-                                    onClick={() => handleExportClick('csv', setIsExportingCSV)}
-                                    disabled={anyExporting && !isExportingCSV}
+
+                        </Box>
+                        {/* Botones de CSV / Excel y PDF */}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                alignItems: "center",
+                                flex: 1,
+                                gap: 2,
+                                flexWrap: "nowrap",
+                            }}
+                        >
+                            <IconButton sx={{ p: 0, opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
+                                onClick={() => handleExportClick('csv', setIsExportingCSV)}
+                                disabled={anyExporting && !isExportingCSV}
+                            >
+                                <Tooltip title="Exportar a CSV" placement="top"
+                                    arrow
+                                    PopperProps={{
+                                        modifiers: [
+                                            {
+                                                name: 'arrow',
+                                                options: {
+                                                    padding: 8,
+                                                },
+                                            },
+                                        ],
+                                    }}
+                                    componentsProps={{
+                                        tooltip: {
+                                            sx: {
+                                                fontFamily: 'Poppins',
+                                                backgroundColor: '#322D2E',
+                                                color: '#FFFFFF',
+                                                fontSize: '12px',
+                                                borderRadius: '4px',
+                                                padding: '6px 10px',
+                                            },
+                                        },
+                                        arrow: {
+                                            sx: {
+                                                color: '#322D2E',
+                                            },
+                                        },
+                                    }}
+
                                 >
-                                    <Tooltip title="Exportar a CSV" placement="top"
-                                        arrow
-                                        PopperProps={{
-                                            modifiers: [
-                                                {
-                                                    name: 'arrow',
-                                                    options: {
-                                                        padding: 8,
-                                                    },
-                                                },
-                                            ],
-                                        }}
-                                        componentsProps={{
-                                            tooltip: {
-                                                sx: {
-                                                    fontFamily: 'Poppins',
-                                                    backgroundColor: '#322D2E',
-                                                    color: '#FFFFFF',
-                                                    fontSize: '12px',
-                                                    borderRadius: '4px',
-                                                    padding: '6px 10px',
+                                    {isExportingCSV ? (
+                                        <DualSpinner />
+                                    ) : (
+                                        <img src={IconCSV} alt="csv" style={{ transform: 'rotate(0deg)' }} />
+                                    )}
+                                </Tooltip>
+                            </IconButton>
+
+                            <IconButton sx={{ p: 0, opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
+                                onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
+                                disabled={anyExporting && !isExportingXLSX}
+                            >
+                                <Tooltip title="Exportar a Excel"
+                                    placement="top"
+                                    arrow
+
+                                    PopperProps={{
+                                        modifiers: [
+                                            {
+                                                name: 'arrow',
+                                                options: {
+                                                    padding: 8,
                                                 },
                                             },
-                                            arrow: {
-                                                sx: {
-                                                    color: '#322D2E',
-                                                },
+                                        ],
+                                    }}
+                                    componentsProps={{
+                                        tooltip: {
+                                            sx: {
+                                                fontFamily: 'Poppins',
+                                                backgroundColor: '#322D2E',
+                                                color: '#FFFFFF',
+                                                fontSize: '12px',
+                                                borderRadius: '4px',
+                                                padding: '6px 10px',
                                             },
-                                        }}
+                                        },
+                                        arrow: {
+                                            sx: {
+                                                color: '#322D2E',
+                                            },
+                                        },
+                                    }}
 
-                                    >
-                                        {isExportingCSV ? (
-                                            <DualSpinner />
-                                        ) : (
-                                            <img src={IconCSV} alt="csv" style={{ transform: 'rotate(0deg)' }} />
-                                        )}
-                                    </Tooltip>
-                                </IconButton>
-
-                                <IconButton sx={{ p: 0, opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
-                                    onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
-                                    disabled={anyExporting && !isExportingXLSX}
                                 >
-                                    <Tooltip title="Exportar a Excel"
-                                        placement="top"
-                                        arrow
+                                    {isExportingXLSX ? (
+                                        <DualSpinner />
+                                    ) : (
+                                        <img src={IconExcel} alt="xlsx" style={{ transform: 'rotate(0deg)' }} />
+                                    )}
+                                </Tooltip>
+                            </IconButton>
 
-                                        PopperProps={{
-                                            modifiers: [
-                                                {
-                                                    name: 'arrow',
-                                                    options: {
-                                                        padding: 8,
-                                                    },
-                                                },
-                                            ],
-                                        }}
-                                        componentsProps={{
-                                            tooltip: {
-                                                sx: {
-                                                    fontFamily: 'Poppins',
-                                                    backgroundColor: '#322D2E',
-                                                    color: '#FFFFFF',
-                                                    fontSize: '12px',
-                                                    borderRadius: '4px',
-                                                    padding: '6px 10px',
-                                                },
-                                            },
-                                            arrow: {
-                                                sx: {
-                                                    color: '#322D2E',
+                            <IconButton sx={{ p: 0, opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
+                                onClick={() => handleExportClick('pdf', setIsExportingPDF)}
+                                disabled={anyExporting && !isExportingPDF}
+                            >
+                                <Tooltip title="Exportar a PDF"
+                                    placement="top"
+                                    arrow
+
+                                    PopperProps={{
+                                        modifiers: [
+                                            {
+                                                name: 'arrow',
+                                                options: {
+                                                    padding: 8,
                                                 },
                                             },
-                                        }}
+                                        ],
+                                    }}
+                                    componentsProps={{
+                                        tooltip: {
+                                            sx: {
+                                                fontFamily: 'Poppins',
+                                                backgroundColor: '#322D2E',
+                                                color: '#FFFFFF',
+                                                fontSize: '12px',
+                                                borderRadius: '4px',
+                                                padding: '6px 10px',
+                                            },
+                                        },
+                                        arrow: {
+                                            sx: {
+                                                color: '#322D2E',
+                                            },
+                                        },
+                                    }}
 
-                                    >
-                                        {isExportingXLSX ? (
-                                            <DualSpinner />
-                                        ) : (
-                                            <img src={IconExcel} alt="xlsx" style={{ transform: 'rotate(0deg)' }} />
-                                        )}
-                                    </Tooltip>
-                                </IconButton>
-
-                                <IconButton sx={{ p: 0, opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
-                                    onClick={() => handleExportClick('pdf', setIsExportingPDF)}
-                                    disabled={anyExporting && !isExportingPDF}
                                 >
-                                    <Tooltip title="Exportar a PDF"
-                                        placement="top"
-                                        arrow
-
-                                        PopperProps={{
-                                            modifiers: [
-                                                {
-                                                    name: 'arrow',
-                                                    options: {
-                                                        padding: 8,
-                                                    },
-                                                },
-                                            ],
-                                        }}
-                                        componentsProps={{
-                                            tooltip: {
-                                                sx: {
-                                                    fontFamily: 'Poppins',
-                                                    backgroundColor: '#322D2E',
-                                                    color: '#FFFFFF',
-                                                    fontSize: '12px',
-                                                    borderRadius: '4px',
-                                                    padding: '6px 10px',
-                                                },
-                                            },
-                                            arrow: {
-                                                sx: {
-                                                    color: '#322D2E',
-                                                },
-                                            },
-                                        }}
-
-                                    >
-                                        {isExportingPDF ? (
-                                            <DualSpinner />
-                                        ) : (
-                                            <img src={IconPDF} alt="pdf" style={{ transform: 'rotate(0deg)' }} />
-                                        )}
-                                    </Tooltip>
-                                </IconButton>
-
-                            </Box>
+                                    {isExportingPDF ? (
+                                        <DualSpinner />
+                                    ) : (
+                                        <img src={IconPDF} alt="pdf" style={{ transform: 'rotate(0deg)' }} />
+                                    )}
+                                </Tooltip>
+                            </IconButton>
 
                         </Box>
                     </Box>
@@ -1358,7 +1390,7 @@ const Reports: React.FC = () => {
 
                             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
 
-                                <img src={BoxEmpty} alt="Sin resultados" style={{ width: 240 }} />
+                                <img src={BoxEmpty} alt="Sin resultados" style={{ width: '240px', height: '190px' }} />
                                 <Typography mt={2} sx={{
                                     color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins',
                                     fontSize: '14px'
@@ -1413,7 +1445,7 @@ const Reports: React.FC = () => {
                             boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
                             overflowX: 'auto',
                             overflowY: 'auto',
-                            height: "525px",
+                            height: "490px",
                             mt: 3.6
                         }}
                     >

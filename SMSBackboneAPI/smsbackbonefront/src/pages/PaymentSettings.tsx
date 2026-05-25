@@ -560,7 +560,28 @@ const PaymentSettings: React.FC = () => {
     };
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+
+                mx: "auto",
+
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+
+                minHeight: "calc(100vh - 64px)",
+
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
             <Box sx={{ display: 'flex', alignItems: 'center', pl: '0px', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
@@ -750,76 +771,66 @@ const PaymentSettings: React.FC = () => {
                             Seleccionar usuarios para recibir notificación
                         </h3>
 
-                        {/* Tabla de usuarios */}
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <TableContainer component={Paper} style={{
-                                background: '#FFFFFF 0% 0% no-repeat padding-box',
-                                border: '1px solid #E6E4E4',
-                                borderRadius: '8px',
-                                opacity: 1,
-                                width: '553px',
-                                maxHeight: "200px",
-                                overflowY: 'auto',
 
-                            }}>
-                                <Table
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "flex-start",
+                                alignItems: "stretch",
+                                width: "100%",
+                            }}
+                        >
+                            {/* Tabla de usuarios */}
+                            <Box
+                                sx={{
+                                    flex: 1,
+                                }}
+                            >
+                                <TableContainer
+                                    component={Paper}
                                     sx={{
-                                        '& .MuiTableCell-root': {
-                                            padding: '8px 6px'
-                                        },
-                                    }}>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>
-                                                <Checkbox
-                                                    checked={Users.length > 0 && selectedUsers.length === Users.length}
-                                                    indeterminate={selectedUsers.length > 0 && selectedUsers.length < Users.length}
-                                                    onChange={handleToggleAllUsers}
-                                                    disabled={!isNotificationEnabled}
-                                                    checkedIcon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                                position: 'relative',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={IconCheckBox1}
-                                                                alt="Seleccionado"
-                                                                style={{ width: '24px', height: '24px' }}
-                                                            />
-                                                        </Box>
-                                                    }
-                                                    indeterminateIcon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                                position: 'relative',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={IconCheckBox2}
-                                                                alt="Indeterminado"
-                                                                style={{ width: '24px', height: '24px' }}
-                                                            />
-                                                        </Box>
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Nombre</TableCell>
-                                            <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Rol</TableCell>
-                                            <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Ícono</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {Users.map((user) => (
-                                            <TableRow key={user.id}>
-                                                <TableCell>
+                                        background: '#FFFFFF 0% 0% no-repeat padding-box',
+
+                                        border: '1px solid #E6E4E4',
+
+                                        borderRadius: '8px',
+
+                                        opacity: 1,
+
+                                        width: '100%',
+
+                                        maxWidth: '684px',
+
+                                        maxHeight: "calc(100vh - 579px)",
+
+                                        overflowY: 'auto',
+
+                                        overflowX: 'hidden',
+                                    }}
+                                >
+                                    <Table
+                                        stickyHeader
+                                        sx={{
+                                            '& .MuiTableCell-root': {
+                                                padding: '5px 6px'
+                                            },
+                                        }}
+                                    >
+                                        <TableHead
+                                            sx={{
+                                                '& .MuiTableCell-root': {
+                                                    backgroundColor: '#FFFFFF',
+                                                    borderBottom: '1px solid #E6E4E4',
+                                                    zIndex: 7,
+                                                },
+                                            }}
+                                        >
+                                            <TableRow>
+                                                <TableCell sx={{}}>
                                                     <Checkbox
-                                                        checked={selectedUsers.includes(Number(user.id))}
-                                                        onChange={() => handleUserToggle(user.id)}
+                                                        checked={Users.length > 0 && selectedUsers.length === Users.length}
+                                                        indeterminate={selectedUsers.length > 0 && selectedUsers.length < Users.length}
+                                                        onChange={handleToggleAllUsers}
                                                         disabled={!isNotificationEnabled}
                                                         checkedIcon={
                                                             <Box
@@ -827,8 +838,6 @@ const PaymentSettings: React.FC = () => {
                                                                     width: '24px',
                                                                     height: '24px',
                                                                     position: 'relative',
-                                                                    marginTop: '0px',
-                                                                    marginLeft: '0px',
                                                                 }}
                                                             >
                                                                 <img
@@ -838,41 +847,91 @@ const PaymentSettings: React.FC = () => {
                                                                 />
                                                             </Box>
                                                         }
+                                                        indeterminateIcon={
+                                                            <Box
+                                                                sx={{
+                                                                    width: '24px',
+                                                                    height: '24px',
+                                                                    position: 'relative',
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={IconCheckBox2}
+                                                                    alt="Indeterminado"
+                                                                    style={{ width: '24px', height: '24px' }}
+                                                                />
+                                                            </Box>
+                                                        }
                                                     />
                                                 </TableCell>
-                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.name}</TableCell>
-                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.role}</TableCell>
-                                                <TableCell>{user.role === "Administrador" && (
-                                                    <img src={usrAdmin} alt="Administrador" width="32" height="32" />
-                                                )}
-                                                    {user.role === "Supervisor" && (
-                                                        <img src={usrSup} alt="Supervisor" width="32" height="32" />
-                                                    )}
-                                                    {user.role === "Monitor" && (
-                                                        <img src={usrMon} alt="Monitor" width="32" height="32" />
-                                                    )}</TableCell>
+                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Nombre</TableCell>
+                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Rol</TableCell>
+                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Ícono</TableCell>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Box>
+                                        </TableHead>
+                                        <TableBody>
+                                            {Users.map((user) => (
+                                                <TableRow key={user.id}>
+                                                    <TableCell>
+                                                        <Checkbox
+                                                            checked={selectedUsers.includes(Number(user.id))}
+                                                            onChange={() => handleUserToggle(user.id)}
+                                                            disabled={!isNotificationEnabled}
+                                                            checkedIcon={
+                                                                <Box
+                                                                    sx={{
+                                                                        width: '24px',
+                                                                        height: '24px',
+                                                                        position: 'relative',
+                                                                        marginTop: '0px',
+                                                                        marginLeft: '0px',
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={IconCheckBox1}
+                                                                        alt="Seleccionado"
+                                                                        style={{ width: '24px', height: '24px' }}
+                                                                    />
+                                                                </Box>
+                                                            }
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.name}</TableCell>
+                                                    <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.role}</TableCell>
+                                                    <TableCell>{user.role === "Administrador" && (
+                                                        <img src={usrAdmin} alt="Administrador" width="32" height="32" />
+                                                    )}
+                                                        {user.role === "Supervisor" && (
+                                                            <img src={usrSup} alt="Supervisor" width="32" height="32" />
+                                                        )}
+                                                        {user.role === "Monitor" && (
+                                                            <img src={usrMon} alt="Monitor" width="32" height="32" />
+                                                        )}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Box>
 
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "flex-end",
+                                    minWidth: "200px",
+                                }}
+                            >
+                                <MainButton text='Guardar'
+                                    onClick={addRechargeSetting}
+                                    disabled={isAcceptButtonDisabled}
+                                    isLoading={loading} />
+                            </Box>
+                        </Box>
                     </div>
 
                 </Box>
 
-                <Box display="flex" alignItems={"flex-end"}
-                    sx={{ marginTop: "-50px", gap: 6, marginLeft: "840px", marginBottom: "50px" }}>
 
-
-
-                    <MainButton text='Guardar'
-                        onClick={addRechargeSetting}
-                        disabled={isAcceptButtonDisabled}
-                        isLoading={loading} />
-
-                </Box>
 
             </Box>
             {/* Nueva sección: Activar Autorecarga Comentada*/}

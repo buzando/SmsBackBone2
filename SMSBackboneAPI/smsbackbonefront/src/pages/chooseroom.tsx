@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Modal from 'react-modal';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import HouseIcon from "../assets/IconRooms.svg";
 import Checkbox from '@mui/material/Checkbox';
 import '../chooseroom.css'
 import { useNavigate } from 'react-router-dom';
@@ -228,7 +229,13 @@ const Chooseroom: React.FC = () => {
             </Box>
 
             {/* Lista de salas */}
-            <Box sx={{ height: "445px", backgroundColor: "#F2F2F2", width: "500px", overflowY: "auto" }}>
+            <Box sx={{
+                height: "445px",
+                backgroundColor: "#F2F2F2",
+                width: "454px",
+                overflowY: "auto",
+                borderRadius: '8px'
+            }}>
                 {rooms.filter((room) => {
                     const term = searchTerm.toLowerCase();
                     const nameWords = room.name.toLowerCase().split(" ");
@@ -267,86 +274,104 @@ const Chooseroom: React.FC = () => {
                                     },
                                 }}
                             >
-                                <div className="room-info">
-                                    <Box className="icon-container">
-                                        <HomeIcon sx={{}} />
-                                    </Box>
+                                <Box className="room-info" sx={{ display: 'flex', flexDirection: 'row' }}>
+
+                                    <img
+                                        src={HouseIcon}
+                                        alt="Rooms Icon"
+                                        style={{
+                                            width: '46px',
+                                            height: '46px',
+                                        }}
+                                    />
+
                                     <Box className="room-details" style={{
                                         marginLeft: "10px"
-
                                     }}>
                                         <Typography sx={{
-                                            fontSize: "16px", color: "#574B4F", fontFamily: "Poppins"
+                                            fontSize: "16px",
+                                            fontWeight: "500",
+                                            color: "#574B4F",
+                                            fontFamily: "Poppins",
                                         }}>
-                                            {room.name}
+
+                                            {room.name?.length > 16
+                                                ? `${room.name.slice(0, 16)}...`
+                                                : room.name
+                                            }
                                         </Typography>
                                         <Typography sx={{ fontSize: "14px", color: "#9B9295", fontFamily: "Poppins" }}>
                                             {room.cliente}
                                         </Typography>
                                     </Box>
 
-                                </div>
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'flex-end',
-                                        gap: '4px',
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            textAlign: 'right',
-                                            fontFamily: 'Poppins',
-                                            fontWeight: '500',
-                                            fontSize: '12px',
-                                            lineHeight: '18px',
-                                            letterSpacing: '0px',
-                                            color: '#8D4B62',
-                                            opacity: 1,
-                                        }}
-                                    >
-                                        SMS cortos: {room.short_sms}
-                                    </span>
-                                    <span
-                                        style={{
-                                            textAlign: 'right',
-                                            fontFamily: 'Poppins',
-                                            fontWeight: '500',
-                                            fontSize: '12px',
-                                            lineHeight: '18px',
-                                            letterSpacing: '0px',
-                                            color: '#8D4B62',
-                                            opacity: 1,
-                                        }}
-                                    >
-                                        SMS largos: {room.long_sms}
-                                    </span>
-                                </div>
+                                </Box>
 
-                                {/* Botón para seleccionar la sala */}
-                                <Button
-                                    onClick={() => handleRoomSelection(room)}
-                                    sx={{
-                                        minWidth: 'auto',
-                                        padding: 0,
-                                        color: '#000',
-                                        backgroundColor: 'transparent',
-                                        border: 'none',
-                                        '&:hover': {
-                                            backgroundColor: 'transparent',
-                                        },
-                                    }}
-                                >
+
+                                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 5 }}>
                                     <Box
                                         sx={{
-                                            fontSize: '24px',
-                                            lineHeight: 1,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'flex-end',
+                                            gap: '4px'
                                         }}
                                     >
-                                        &gt;
+                                        <Typography
+                                            sx={{
+                                                textAlign: 'right',
+                                                fontFamily: 'Poppins',
+                                                fontWeight: '500',
+                                                fontSize: '12px',
+                                                lineHeight: '18px',
+                                                letterSpacing: '0px',
+                                                color: '#8D4B62',
+                                                opacity: 1,
+                                            }}
+                                        >
+                                            SMS cortos: {room.short_sms}
+                                        </Typography>
+                                        <Typography
+                                            sx={{
+                                                textAlign: 'right',
+                                                fontFamily: 'Poppins',
+                                                fontWeight: '500',
+                                                fontSize: '12px',
+                                                lineHeight: '18px',
+                                                letterSpacing: '0px',
+                                                color: '#8D4B62',
+                                                opacity: 1,
+                                            }}
+                                        >
+                                            SMS largos: {room.long_sms}
+                                        </Typography>
                                     </Box>
-                                </Button>
+
+                                    {/* Botón para seleccionar la sala */}
+                                    <Button
+                                        onClick={() => handleRoomSelection(room)}
+                                        sx={{
+                                            minWidth: 'auto',
+                                            padding: 0,
+                                            color: '#000',
+                                            backgroundColor: 'transparent',
+                                            border: 'none',
+                                            '&:hover': {
+                                                backgroundColor: 'transparent',
+                                            },
+                                        }}
+                                    >
+                                        <Box
+                                            sx={{
+                                                fontSize: '24px',
+                                                lineHeight: 1,
+                                            }}
+                                        >
+                                            &gt;
+                                        </Box>
+                                    </Button>
+                                </Box>
+
                             </Box>
 
                         ))

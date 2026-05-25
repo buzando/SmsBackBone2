@@ -32,8 +32,8 @@ import seachicon from '../assets/icon-lupa.svg'
 import Iconseachred from "../assets/Iconseachred.svg";
 import NoResult from '../assets/NoResultados.svg'
 import ChipBar from "../components/commons/ChipBar";
-import HouseIcon from "../assets/IconRooms.svg"
-import iconclose from "../assets/icon-close.svg"
+import HouseIcon from "../assets/IconRooms.svg";
+import iconclose from "../assets/icon-close.svg";
 import MainButton from "../components/commons/MainButton";
 import SecondaryButton from "../components/commons/SecondaryButton";
 import ErrorModal from '../components/commons/ModalError'
@@ -41,6 +41,8 @@ import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "../assets/icon-punta-flecha-bottom.svg";
 import { Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import SpinnerTop from "../assets/SpinnerTop.svg";
+import SpinnerBottom from "../assets/SpinnerBottom.svg";
 type Rooms = {
     id: string | number;
     name: string;
@@ -253,9 +255,32 @@ const CreditManagement: React.FC = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", width: '90%', minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', pl: '16px', mb: 3 }}>
-                <IconButton onClick={() => navigate('/')} sx={{ color: "#5A2836", mr: 1 }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+
+                mx: "auto",
+
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+
+                minHeight: "calc(100vh - 64px)",
+
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <IconButton onClick={() => navigate('/')}
+                    sx={{ p: 0, mr: 1 }}
+                >
                     <img
                         src={ArrowBackIcon}
                         alt="Regresar"
@@ -264,21 +289,31 @@ const CreditManagement: React.FC = () => {
                 </IconButton>
                 <Typography
                     variant="h4"
-                    sx={{
-                        fontWeight: "500",
-                        fontFamily: "Poppins, sans-serif",
-                        color: "#5A2836",
-                        fontSize: '26px',
-                    }}
+                    fontFamily="Poppins"
+                    sx={{ color: "#330F1B", fontSize: '26px', }}
                 >
                     Gestión
                 </Typography>
             </Box>
-            <Box sx={{ pl: 5 }}>
-                <Box>
+            <Box sx={{
+                width: "100%",
 
-                    <Divider sx={{ mb: 3 }} />
-                    <Box display="flex" alignItems="center" justifyContent="flex-start" mb={2}>
+                px: {
+                    sm: 1,
+                    md: 2,
+                    lg: 3,
+                },
+            }}>
+
+                <Box>
+                    <Divider sx={{ width: '100%', mb: 3 }} />
+                    <Box
+                        display="flex"
+                        flexWrap="wrap"
+                        alignItems="center"
+                        gap={2}
+                        mb={2}
+                    >
                         <Box
                             display="flex"
                             alignItems="center"
@@ -326,16 +361,74 @@ const CreditManagement: React.FC = () => {
                     </Box>
                 </Box>
                 {loading ? (
-                    <Box display="flex" justifyContent="center" mt={5}>
-                        <CircularProgress />
+                    <Box sx={{
+                        position: 'fixed',
+                        top: 0, left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999
+                    }}>
+                        <Box
+                            sx={{
+                                position: "relative",
+                                width: 80,
+                                height: 80
+                            }}
+                        >
+                            {/* Spinner base */}
+                            <img
+                                src={SpinnerBottom}
+                                alt="loading-base"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0
+                                }}
+                            />
+
+                            {/* Spinner que gira */}
+                            <img
+                                src={SpinnerTop}
+                                alt="loading-top"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    animation: "spin 1s linear infinite"
+                                }}
+                            />
+                        </Box>
+                        <style>{`
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `}</style>
                     </Box>
                 ) : (
                     <Box
                         sx={{
-                            display: 'grid',
-                            gap: '10px',
-                            gridTemplateColumns: '430px 430px',
-                            columnGap: '10px',
+                            display: "grid",
+
+                            gap: {
+                                sm: "16px",
+                                md: "24px",
+                            },
+
+                            gridTemplateColumns: {
+                                sm: "1fr",
+                                md: "repeat(2, 1fr)",
+                            },
+
+                            width: "100%",
                         }}
                     >
                         {rooms.filter((rooms) => {
@@ -343,230 +436,292 @@ const CreditManagement: React.FC = () => {
                             const nameWords = rooms.name.toLowerCase().split(" ");
                             return nameWords.some((word) => word.startsWith(term));
                         }).length === 0 ? (
-
                             <Box
                                 sx={{
                                     display: "flex",
+
                                     flexDirection: "column",
-                                    alignItems: "flex-end",
-                                    justifyContent: "center", marginRight: "-350px"
+
+                                    alignItems: "center",
+
+                                    justifyContent: "center",
+
+                                    width: "100%",
+                                    minHeight: "40vh",
+
+                                    mt: 12, ml: 32,
+
+                                    textAlign: "center",
                                 }}
                             >
-                                <Box sx={{ marginTop: "120px" }}>
-                                    <img
-                                        src={NoResult}
-                                        alt="Sin resultados"
-                                        style={{
-                                            width: "300px",
-                                            marginBottom: "16px",
-                                        }}
-                                    />
-                                    <Typography
-                                        variant="body1"
-                                        sx={{
-                                            textAlign: "center",
-                                            color: "#833A53",
-                                            fontSize: "16px",
-                                            fontFamily: "Poppins, sans-serif",
-                                            fontWeight: "medium",
-                                        }}
-                                    >
-                                        No se encontraron resultados.
-                                    </Typography>
-                                </Box>
+                                <Box
+                                    component="img"
+                                    src={NoResult}
+                                    alt="No hay resultados"
+                                    sx={{
+                                        width: {
+                                            sm: "200px",
+                                            md: "240px",
+                                            lg: "280px",
+                                        },
+
+                                        height: "auto",
+
+                                        mb: 2,
+                                    }}
+                                />
+
+                                <Typography
+                                    variant="body1"
+                                    sx={{
+                                        color: "#7B354D",
+
+                                        fontWeight: 500,
+
+                                        fontSize: {
+                                            sm: "12px",
+                                            md: "14px",
+                                        },
+
+                                        fontFamily: "Poppins",
+                                    }}
+                                >
+                                    No se encontraron resultados.
+                                </Typography>
                             </Box>
                         ) : (
-                            rooms
-                                .filter((rooms) => {
-                                    const term = searchTerm.toLowerCase();
-                                    const nameWords = rooms.name.toLowerCase().split(" ");
-                                    return nameWords.some((word) => word.startsWith(term));
-                                })
-                                .map((room) => (
-                                    <Grid
-                                        item
-                                        xs={12}
-                                        sm={6}
-                                        md={4}
-                                        key={room.id}
-                                    >
-                                        <Box
+                            <Box
+                                sx={{
+                                    backgroundColor: "F2F2F2",
+                                    width: "200%",
+                                    maxHeight: {
+                                        sm: "60vh",
+                                        md: "65vh",
+                                    },
+
+                                    overflowY: "auto",
+
+                                    display: "grid",
+
+                                    gridTemplateColumns: {
+                                        sm: "1fr",
+                                        md: "repeat(2, 1fr)",
+                                    },
+
+                                    gap: {
+                                        sm: "16px",
+                                        md: "24px",
+                                    },
+                                }}
+                            >
+                                {rooms
+                                    .filter((rooms) => {
+                                        const term = searchTerm.toLowerCase();
+                                        const nameWords = rooms.name.toLowerCase().split(" ");
+                                        return nameWords.some((word) => word.startsWith(term));
+                                    })
+                                    .map((room) => (
+                                        <Grid
+                                            item
+                                            xs={12}
+                                            sm={6}
+                                            md={4}
+                                            key={room.id}
                                             sx={{
-                                                width: '430px', // Ancho especificado
-                                                height: '101px', // Alto especificado
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                backgroundColor: '#FFFFFF',
-                                                borderRadius: '8px',
-                                                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-                                                padding: '16px',
+                                                width: "100%",
                                             }}
                                         >
-                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                <img
-                                                    src={HouseIcon}
-                                                    alt="Rooms Icon"
-                                                    style={{
-                                                        width: '46px',
-                                                        height: '46px',
-                                                        marginRight: '16px',
-                                                    }}
-                                                />
-                                                <Box>
-                                                    <Typography
-                                                        variant="h6"
-                                                        sx={{
-                                                            textAlign: 'left',
-                                                            fontFamily: "Poppins, sans-serif",
-                                                            letterSpacing: '0px',
-                                                            color: '#574B4F',
-                                                            opacity: 1,
-                                                            fontSize: '16px',
-                                                            whiteSpace: 'nowrap',
-                                                            overflow: 'hidden',
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+
+                                                    backgroundColor: '#FFFFFF',
+
+                                                    borderRadius: '8px',
+
+                                                    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+
+                                                    padding: {
+                                                        sm: '12px',
+                                                        md: '16px',
+                                                    },
+
+                                                    width: '100%',
+
+                                                    minHeight: '108px',
+                                                }}
+                                            >
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    <img
+                                                        src={HouseIcon}
+                                                        alt="Rooms Icon"
+                                                        style={{
+                                                            width: '46px',
+                                                            height: '46px',
+                                                            marginRight: '16px',
                                                         }}
-                                                    >
-                                                        {room.name}
-                                                    </Typography>
-                                                    <Tooltip
-                                                        title={room.description}
-                                                        arrow
-                                                        placement="top"
-                                                        componentsProps={{
-                                                            tooltip: {
-                                                                sx: {
-                                                                    backgroundColor: "rgba(0, 0, 0, 0.9)",
-                                                                    color: "#DEDADA",
-                                                                    fontFamily: "Poppins, sans-serif",
-                                                                    fontSize: "12px",
-                                                                    padding: "6px 8px",
-                                                                    borderRadius: "8px",
-                                                                }
-                                                            },
-                                                            arrow: {
-                                                                sx: {
-                                                                    color: "rgba(0, 0, 0, 0.9)",
-                                                                    marginLeft: "20px",
-                                                                }
-                                                            }
-                                                        }}
-                                                        PopperProps={{
-                                                            modifiers: [
-                                                                {
-                                                                    name: "offset",
-                                                                    options: { offset: [20, -10] }
-                                                                },
-                                                            ],
-                                                        }}
-                                                    >
+                                                    />
+                                                    <Box>
                                                         <Typography
-                                                            variant="body2"
+                                                            variant="h6"
                                                             sx={{
                                                                 textAlign: 'left',
                                                                 fontFamily: "Poppins, sans-serif",
                                                                 letterSpacing: '0px',
                                                                 color: '#574B4F',
                                                                 opacity: 1,
-                                                                fontSize: '14px',
+                                                                fontSize: '16px',
+                                                                whiteSpace: 'nowrap',
+                                                                overflow: 'hidden',
                                                             }}
                                                         >
-                                                            {room.description.length > 25
-                                                                ? `${room.description.slice(0, 17)}...`
-                                                                : room.description}
-                                                        </Typography>
-                                                    </Tooltip>
 
-                                                </Box>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                <Box sx={{ textAlign: 'right', marginRight: '16px' }}>
-                                                    <Typography
-                                                        variant="body2"
-                                                        sx={{
-                                                            textAlign: 'right',
-                                                            fontFamily: "Poppins, sans-serif",
-                                                            letterSpacing: '0px',
-                                                            color: '#8D4B62',
-                                                            opacity: 1,
-                                                            fontSize: '12px',
-                                                        }}
-                                                    >
-                                                        SMS # Cortos: {room.short_sms.toLocaleString()}
-                                                    </Typography>
-                                                    <Typography
-                                                        variant="body2"
-                                                        sx={{
-                                                            textAlign: 'right',
-                                                            fontFamily: "Poppins, sans-serif",
-                                                            letterSpacing: '0px',
-                                                            color: '#8D4B62',
-                                                            opacity: 1,
-                                                            fontSize: '12px',
-                                                        }}
-                                                    >
-                                                        SMS # Largos: {room.long_sms.toLocaleString()}
-                                                    </Typography>
-                                                </Box>
-                                                <IconButton onClick={(event) => handleMenuOpen(event, room)}>
-                                                    <MoreVertIcon />
-                                                </IconButton>
-                                                <Menu
-                                                    anchorEl={menuAnchorEl}
-                                                    open={Boolean(menuAnchorEl)}
-                                                    onClose={handleMenuClose}
-                                                    anchorOrigin={{
-                                                        vertical: 'bottom',
-                                                        horizontal: 'left',
-                                                    }}
-                                                    transformOrigin={{
-                                                        vertical: 'bottom',
-                                                        horizontal: 'right',
-                                                    }}
-                                                    PaperProps={{
-                                                        sx: {
-                                                            borderRadius: '8px',
-                                                            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
-                                                        },
-                                                    }}
-                                                >
-                                                    <MenuItem onClick={handleOpenModal} sx={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '8px',
-                                                        padding: '6px 14px',
-                                                        borderRadius: '8px',
-                                                        '&:hover': {
-                                                            background: '#F2EBED 0% 0% no-repeat padding-box',
-                                                            opacity: 1,
-                                                        },
-                                                    }}>
-                                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                            <img
-                                                                src={TrashIcon}
-                                                                alt="Distribución de créditos"
-                                                                width="29"
-                                                                height="29"
-                                                                style={{ marginRight: "8px" }}
-                                                            />
+                                                            {room.name?.length > 28
+                                                                ? `${room.name.slice(0, 28)}...`
+                                                                : room.name
+                                                            }
+                                                        </Typography>
+                                                        <Tooltip
+                                                            title={room.description}
+                                                            arrow
+                                                            placement="top"
+                                                            componentsProps={{
+                                                                tooltip: {
+                                                                    sx: {
+                                                                        backgroundColor: "rgba(0, 0, 0, 0.9)",
+                                                                        color: "#DEDADA",
+                                                                        fontFamily: "Poppins, sans-serif",
+                                                                        fontSize: "12px",
+                                                                        padding: "6px 8px",
+                                                                        borderRadius: "8px",
+                                                                    }
+                                                                },
+                                                                arrow: {
+                                                                    sx: {
+                                                                        color: "rgba(0, 0, 0, 0.9)",
+                                                                        marginLeft: "20px",
+                                                                    }
+                                                                }
+                                                            }}
+                                                            PopperProps={{
+                                                                modifiers: [
+                                                                    {
+                                                                        name: "offset",
+                                                                        options: { offset: [20, -10] }
+                                                                    },
+                                                                ],
+                                                            }}
+                                                        >
                                                             <Typography
+                                                                variant="body2"
                                                                 sx={{
-                                                                    fontSize: '14px',
-                                                                    fontWeight: '500',
                                                                     textAlign: 'left',
-                                                                    fontFamily: 'Poppins', color: '#574B4F'
+                                                                    fontFamily: "Poppins, sans-serif",
+                                                                    letterSpacing: '0px',
+                                                                    color: '#574B4F',
+                                                                    opacity: 1,
+                                                                    fontSize: '14px',
                                                                 }}
                                                             >
-                                                                Distribución de créditos
+                                                                {room.description?.length > 16
+                                                                    ? `${room.description.slice(0, 16)}...`
+                                                                    : room.description
+                                                                }
                                                             </Typography>
-                                                        </Box>
-                                                    </MenuItem>
-                                                </Menu>
-                                            </Box>
-                                        </Box>
-                                    </Grid>
-                                ))
+                                                        </Tooltip>
 
+                                                    </Box>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    <Box sx={{ textAlign: 'right', marginRight: '16px' }}>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                textAlign: 'right',
+                                                                fontFamily: "Poppins, sans-serif",
+                                                                letterSpacing: '0px',
+                                                                color: '#8D4B62',
+                                                                opacity: 1,
+                                                                fontSize: '12px',
+                                                            }}
+                                                        >
+                                                            SMS # Cortos: {room.short_sms.toLocaleString()}
+                                                        </Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                textAlign: 'right',
+                                                                fontFamily: "Poppins, sans-serif",
+                                                                letterSpacing: '0px',
+                                                                color: '#8D4B62',
+                                                                opacity: 1,
+                                                                fontSize: '12px',
+                                                            }}
+                                                        >
+                                                            SMS # Largos: {room.long_sms.toLocaleString()}
+                                                        </Typography>
+                                                    </Box>
+                                                    <IconButton onClick={(event) => handleMenuOpen(event, room)}>
+                                                        <MoreVertIcon />
+                                                    </IconButton>
+                                                    <Menu
+                                                        anchorEl={menuAnchorEl}
+                                                        open={Boolean(menuAnchorEl)}
+                                                        onClose={handleMenuClose}
+                                                        anchorOrigin={{
+                                                            vertical: 'bottom',
+                                                            horizontal: 'left',
+                                                        }}
+                                                        transformOrigin={{
+                                                            vertical: 'bottom',
+                                                            horizontal: 'right',
+                                                        }}
+                                                        PaperProps={{
+                                                            sx: {
+                                                                borderRadius: '8px',
+                                                                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+                                                            },
+                                                        }}
+                                                    >
+                                                        <MenuItem onClick={handleOpenModal} sx={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '8px',
+                                                            padding: '6px 14px',
+                                                            borderRadius: '8px',
+                                                            '&:hover': {
+                                                                background: '#F2EBED 0% 0% no-repeat padding-box',
+                                                                opacity: 1,
+                                                            },
+                                                        }}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                                <img
+                                                                    src={TrashIcon}
+                                                                    alt="Distribución de créditos"
+                                                                    width="29"
+                                                                    height="29"
+                                                                    style={{ marginRight: "8px" }}
+                                                                />
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontSize: '14px',
+                                                                        fontWeight: '500',
+                                                                        textAlign: 'left',
+                                                                        fontFamily: 'Poppins', color: '#574B4F'
+                                                                    }}
+                                                                >
+                                                                    Distribución de créditos
+                                                                </Typography>
+                                                            </Box>
+                                                        </MenuItem>
+                                                    </Menu>
+                                                </Box>
+                                            </Box>
+                                        </Grid>
+                                    ))}
+                            </Box>
                         )}
                     </Box>
                 )}

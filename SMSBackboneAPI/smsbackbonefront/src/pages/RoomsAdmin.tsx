@@ -317,7 +317,23 @@ const RoomsAdmin: React.FC = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+                mx: "auto",
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+                minHeight: "calc(100vh - 64px)",
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
             {/* Header con título y flecha */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -441,18 +457,24 @@ const RoomsAdmin: React.FC = () => {
                     justifyContent="space-between"
                     alignItems="center"
                     mt={0}
-                    p={2}
+                    p={1}
                     sx={{ backgroundColor: "#F2F2F2", borderRadius: "8px" }}
                 >
-                    {/* Rango de resultados */}
-                    <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E" }}>
-                        {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, roomsData.length)} de {roomsData.length}
-                    </Typography>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                        }}
+                    >
+                        {/* Rango de resultados */}
+                        <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#6F565E" }}>
+                            {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, roomsData.length)} de {roomsData.length}
+                        </Typography>
 
+                        {/* Flechas + Exportaciones */}
 
-                    {/* Flechas + Exportaciones */}
-                    <Box display="flex" alignItems="center" gap={1} height={"25px"} marginBottom={"-5px"} marginTop={"-5px"}>
-                        <Box sx={{ marginRight: "750px" }}>
+                        <Box sx={{ display: 'flex', justifyContent: "flex-start", alignItems: 'flex-start' }}>
                             <Tooltip title="Primera página">
                                 <IconButton onClick={goToFirstPage} disabled={currentPage === 1}>
                                     <Box
@@ -497,128 +519,128 @@ const RoomsAdmin: React.FC = () => {
                                 </IconButton>
                             </Tooltip>
                         </Box>
-
-                        {/* Exportaciones */}
-                        <Box display="flex" alignItems="center" gap={0} mr={-2.5}>
-                            <Tooltip title="Exportar a CSV" placement="top"
-                                arrow
-                                PopperProps={{
-                                    modifiers: [
-                                        {
-                                            name: 'arrow',
-                                            options: {
-                                                padding: 0,
-                                            },
-                                        },
-                                    ],
-                                }}
-                                componentsProps={{
-                                    tooltip: {
-                                        sx: {
-                                            fontFamily: 'Poppins',
-                                            backgroundColor: '#312D2E',
-                                            color: '#DEDADA',
-                                            fontSize: '12px',
-                                            borderRadius: '6px',
-                                            padding: '6px 10px',
-                                        },
-                                    },
-                                    arrow: {
-                                        sx: {
-                                            color: '#322D2E',
-                                        },
-                                    },
-                                }}
-                            >
-                                <IconButton
-                                    onClick={() => handleExportClick('csv', setIsExportingCSV)}
-                                    disabled={anyExporting && !isExportingCSV}
-                                    sx={{ opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
-                                >
-                                    {isExportingCSV ? <DualSpinner /> : <img src={IconDownloadCSV} alt="CSV" />}
-                                </IconButton>
-                            </Tooltip>
-
-                            <Tooltip title="Exportar a Excel" placement="top"
-                                arrow
-                                PopperProps={{
-                                    modifiers: [
-                                        {
-                                            name: 'arrow',
-                                            options: {
-                                                padding: 0,
-                                            },
-                                        },
-                                    ],
-                                }}
-                                componentsProps={{
-                                    tooltip: {
-                                        sx: {
-                                            fontFamily: 'Poppins',
-                                            backgroundColor: '#312D2E',
-                                            color: '#DEDADA',
-                                            fontSize: '12px',
-                                            borderRadius: '6px',
-                                            padding: '6px 10px',
-                                        },
-                                    },
-                                    arrow: {
-                                        sx: {
-                                            color: '#322D2E',
-                                        },
-                                    },
-                                }}
-                            >
-                                <IconButton
-                                    onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
-                                    disabled={anyExporting && !isExportingXLSX}
-                                    sx={{ opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
-                                >
-                                    {isExportingXLSX ? <DualSpinner /> : <img src={IconDownloadExcel} alt="Excel" />}
-                                </IconButton>
-                            </Tooltip>
-
-                            <Tooltip title="Exportar a PDF" placement="top"
-                                arrow
-                                PopperProps={{
-                                    modifiers: [
-                                        {
-                                            name: 'arrow',
-                                            options: {
-                                                padding: 0,
-                                            },
-                                        },
-                                    ],
-                                }}
-                                componentsProps={{
-                                    tooltip: {
-                                        sx: {
-                                            fontFamily: 'Poppins',
-                                            backgroundColor: '#312D2E',
-                                            color: '#DEDADA',
-                                            fontSize: '12px',
-                                            borderRadius: '6px',
-                                            padding: '6px 10px',
-                                        },
-                                    },
-                                    arrow: {
-                                        sx: {
-                                            color: '#322D2E',
-                                        },
-                                    },
-                                }}
-                            >
-                                <IconButton
-                                    onClick={() => handleExportClick('pdf', setIsExportingPDF)}
-                                    disabled={anyExporting && !isExportingPDF}
-                                    sx={{ opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
-                                >
-                                    {isExportingPDF ? <DualSpinner /> : <img src={IconDownloadPDF} alt="PDF" />}
-                                </IconButton>
-                            </Tooltip>
-                        </Box>
-
                     </Box>
+                    {/* Botones de CSV / Excel y PDF */}
+                    <Box display="flex" alignItems="center" gap={0} mr={-2.5}>
+                        <Tooltip title="Exportar a CSV" placement="top"
+                            arrow
+                            PopperProps={{
+                                modifiers: [
+                                    {
+                                        name: 'arrow',
+                                        options: {
+                                            padding: 0,
+                                        },
+                                    },
+                                ],
+                            }}
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        fontFamily: 'Poppins',
+                                        backgroundColor: '#312D2E',
+                                        color: '#DEDADA',
+                                        fontSize: '12px',
+                                        borderRadius: '6px',
+                                        padding: '6px 10px',
+                                    },
+                                },
+                                arrow: {
+                                    sx: {
+                                        color: '#322D2E',
+                                    },
+                                },
+                            }}
+                        >
+                            <IconButton
+                                onClick={() => handleExportClick('csv', setIsExportingCSV)}
+                                disabled={anyExporting && !isExportingCSV}
+                                sx={{ opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
+                            >
+                                {isExportingCSV ? <DualSpinner /> : <img src={IconDownloadCSV} alt="CSV" />}
+                            </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Exportar a Excel" placement="top"
+                            arrow
+                            PopperProps={{
+                                modifiers: [
+                                    {
+                                        name: 'arrow',
+                                        options: {
+                                            padding: 0,
+                                        },
+                                    },
+                                ],
+                            }}
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        fontFamily: 'Poppins',
+                                        backgroundColor: '#312D2E',
+                                        color: '#DEDADA',
+                                        fontSize: '12px',
+                                        borderRadius: '6px',
+                                        padding: '6px 10px',
+                                    },
+                                },
+                                arrow: {
+                                    sx: {
+                                        color: '#322D2E',
+                                    },
+                                },
+                            }}
+                        >
+                            <IconButton
+                                onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
+                                disabled={anyExporting && !isExportingXLSX}
+                                sx={{ opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
+                            >
+                                {isExportingXLSX ? <DualSpinner /> : <img src={IconDownloadExcel} alt="Excel" />}
+                            </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Exportar a PDF" placement="top"
+                            arrow
+                            PopperProps={{
+                                modifiers: [
+                                    {
+                                        name: 'arrow',
+                                        options: {
+                                            padding: 0,
+                                        },
+                                    },
+                                ],
+                            }}
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        fontFamily: 'Poppins',
+                                        backgroundColor: '#312D2E',
+                                        color: '#DEDADA',
+                                        fontSize: '12px',
+                                        borderRadius: '6px',
+                                        padding: '6px 10px',
+                                    },
+                                },
+                                arrow: {
+                                    sx: {
+                                        color: '#322D2E',
+                                    },
+                                },
+                            }}
+                        >
+                            <IconButton
+                                onClick={() => handleExportClick('pdf', setIsExportingPDF)}
+                                disabled={anyExporting && !isExportingPDF}
+                                sx={{ opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
+                            >
+                                {isExportingPDF ? <DualSpinner /> : <img src={IconDownloadPDF} alt="PDF" />}
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+
+
                 </Box>
                 {roomsData.length === 0 && searchTerm === '' ? (
                     // Caso 1: No hay rooms en general

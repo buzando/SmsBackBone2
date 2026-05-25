@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, IconButton, Divider, Modal, FormControl, TextField, InputLabel, Select, MenuItem, Menu, Tooltip, ListItemText, ListItemIcon, Checkbox } from '@mui/material';
+import { Box, Typography, IconButton, Divider, Modal, FormControl, TextField, InputLabel, Select, MenuItem, Menu, Tooltip, ListItemText, ListItemIcon, Checkbox, Table, TableHead } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import MainIcon from '../components/commons/MainButtonIcon';
 import seachicon from '../assets/icon-lupa.svg';
@@ -462,8 +462,29 @@ const Templates = () => {
 
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+
+                mx: "auto",
+
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+
+                minHeight: "calc(100vh - 64px)",
+
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
                 <IconButton
                     onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
                     <img
@@ -702,12 +723,19 @@ const Templates = () => {
                             mt: 3.6
                         }}
                     >
-                        <table style={{
-                            width: '100%', minWidth: '1080px',
-                            borderCollapse: 'collapse',
-                            fontFamily: 'Poppins',
-                        }}>
-                            <thead>
+                        <Table stickyHeader
+                            sx={{
+                                width: '100%', minWidth: '1080px',
+                                borderCollapse: 'collapse',
+                                fontFamily: 'Poppins',
+                            }}>
+                            <TableHead sx={{
+                                '& .MuiTableCell-root': {
+                                    backgroundColor: '#FFFFFF',
+                                    borderBottom: '1px solid #F2F2F2',
+                                    zIndex: 7,
+                                },
+                            }}>
                                 {selectedTemplates.length === 0 ? (
                                     <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', width: '100%' }}>
                                         <th style={{ padding: '5px', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
@@ -843,7 +871,7 @@ const Templates = () => {
                                         </th>
                                     </tr>
                                 )}
-                            </thead>
+                            </TableHead>
 
                             <tbody>
                                 {currentItems.map((template) => (
@@ -924,7 +952,7 @@ const Templates = () => {
                                 ))}
                             </tbody>
 
-                        </table>
+                        </Table>
                     </Box>
                 )}
             </Box>
