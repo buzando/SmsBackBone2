@@ -644,8 +644,29 @@ const ManageAccounts: React.FC = () => {
 
 
 
-    return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1360px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+    return 
+    <Box p={3}
+        sx={{
+            width: "100%",
+
+            mx: "auto",
+
+            px: {
+                sm: 2,
+                md: 3,
+                lg: 3,
+            },
+
+            pt: {
+                sm: 2,
+                md: 3,
+            },
+
+            minHeight: "calc(100vh - 64px)",
+
+            overflowX: "hidden", marginTop: "-80px"
+        }}
+    >
             <Joyride
                 steps={searchCreateSteps}
                 run={runSearchCreateTour}
@@ -687,6 +708,7 @@ const ManageAccounts: React.FC = () => {
                     buttonPrimary: joyrideActionButtonStyle,
                 }}
             />
+        
             <Backdrop
                 open={loading}
                 sx={{
@@ -813,25 +835,36 @@ const ManageAccounts: React.FC = () => {
                         sx={{
                             width: "100%", height: "450px",
                             marginLeft: "-200 auto",
-                            overflowX: "auto", overflowY: "hidden", marginTop: "8px", borderRadius: "8px"
+                            overflowX: "hidden", overflowY: "auto", marginTop: "8px", borderRadius: "8px"
                         }}
                     >
                         <Table
                             sx={{
                                 maxWidth: 1750,
-                                tableLayout: "auto"
+                                tableLayout: "fixed",
                             }}
                             aria-label="tabla de usuarios"
                         >
                             {accounts.length > 0 && (
                                 <TableHead>
-                                    <TableRow sx={{}}>
-                                        <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins", }}>Nombre</TableCell>
+                                    <TableRow sx={{ position: 'sticky', top: 0, zIndex: 6, backgroundColor: '#FFFFFF' }}>
+                                        <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Nombre</TableCell>
                                         <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Correo Electrónico</TableCell>
                                         <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Rol</TableCell>
                                         <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Ícono</TableCell>
                                         <TableCell sx={{ fontSize: "13px", color: '#5A2836', fontFamily: "Poppins" }}>Salas</TableCell>
-                                        <TableCell align="right" sx={{ borderLeft: "2px solid #F2F2F2" }}></TableCell>
+                                        <TableCell
+                                            align="center"
+                                            sx={{
+                                                width: "70px",
+                                                minWidth: "70px",
+                                                maxWidth: "70px",
+                                                padding: "0px",
+                                                borderLeft: "2px solid #F2F2F2",
+                                            }}
+                                        >
+                                        </TableCell>
+
                                     </TableRow>
                                 </TableHead>
                             )}
@@ -993,20 +1026,30 @@ const ManageAccounts: React.FC = () => {
                                             <TableCell
                                                 align="center"
                                                 sx={{
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                    position: "relative",
-                                                    borderLeft: "2px solid #F2F2F2"
+                                                    width: "70px",
+                                                    minWidth: "70px",
+                                                    maxWidth: "70px",
+                                                    padding: "0px",
+                                                    borderLeft: "2px solid #F2F2F2",
                                                 }}
                                             >
-
-                                                <IconButton
-                                                    onClick={(e) => handleMenuOpen(e, account)}
-                                                    aria-label="more"
+                                                <Box
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                    }}
                                                 >
-                                                    <MoreVertIcon />
-                                                </IconButton>
+                                                    <IconButton
+                                                        onClick={(e) => handleMenuOpen(e, account)}
+                                                        aria-label="more"
+                                                        sx={{
+                                                            padding: "4px",
+                                                        }}
+                                                    >
+                                                        <MoreVertIcon />
+                                                    </IconButton>
+                                                </Box>
                                                 <Menu
                                                     anchorEl={menuAnchorEl}
                                                     open={Boolean(menuAnchorEl)}

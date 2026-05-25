@@ -685,7 +685,28 @@ const PaymentSettings: React.FC = () => {
     };
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+
+                mx: "auto",
+
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+
+                minHeight: "calc(100vh - 64px)",
+
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
             <Joyride
                 steps={paymentTourSteps}
                 run={runPaymentTour}
@@ -729,6 +750,7 @@ const PaymentSettings: React.FC = () => {
                     buttonBack: joyrideActionButtonStyle,
                 }}
             />
+       
             <Box sx={{ display: 'flex', alignItems: 'center', pl: '0px', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
@@ -919,27 +941,62 @@ const PaymentSettings: React.FC = () => {
                                 Seleccionar usuarios para recibir notificación
                             </h3>
 
-                            {/* Tabla de usuarios */}
-                            <Box className="tour-payment-users" display="flex" justifyContent="space-between" alignItems="center">
-                                <TableContainer component={Paper} style={{
-                                    background: '#FFFFFF 0% 0% no-repeat padding-box',
-                                    border: '1px solid #E6E4E4',
-                                    borderRadius: '8px',
-                                    opacity: 1,
-                                    width: '553px',
-                                    maxHeight: "200px",
-                                    overflowY: 'auto',
 
-                                }}>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "flex-start",
+                                alignItems: "stretch",
+                                width: "100%",
+                            }}
+                        >
+                            {/* Tabla de usuarios */}
+                            <Box
+                                sx={{
+                                    flex: 1,
+                                }}
+                            >
+                                <TableContainer
+                                    component={Paper}
+                                    sx={{
+                                        background: '#FFFFFF 0% 0% no-repeat padding-box',
+
+                                        border: '1px solid #E6E4E4',
+
+                                        borderRadius: '8px',
+
+                                        opacity: 1,
+
+                                        width: '100%',
+
+                                        maxWidth: '684px',
+
+                                        maxHeight: "calc(100vh - 579px)",
+
+                                        overflowY: 'auto',
+
+                                        overflowX: 'hidden',
+                                    }}
+                                >
                                     <Table
+                                        stickyHeader
                                         sx={{
                                             '& .MuiTableCell-root': {
-                                                padding: '8px 6px'
+                                                padding: '5px 6px'
                                             },
-                                        }}>
-                                        <TableHead>
+                                        }}
+                                    >
+                                        <TableHead
+                                            sx={{
+                                                '& .MuiTableCell-root': {
+                                                    backgroundColor: '#FFFFFF',
+                                                    borderBottom: '1px solid #E6E4E4',
+                                                    zIndex: 7,
+                                                },
+                                            }}
+                                        >
                                             <TableRow>
-                                                <TableCell>
+                                                <TableCell sx={{}}>
                                                     <Checkbox
                                                         checked={Users.length > 0 && selectedUsers.length === Users.length}
                                                         indeterminate={selectedUsers.length > 0 && selectedUsers.length < Users.length}
@@ -1027,21 +1084,24 @@ const PaymentSettings: React.FC = () => {
                                 </TableContainer>
                             </Box>
 
-                        </div>
-                    </Box>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "flex-end",
+                                    minWidth: "200px",
+                                }}
+                            >
+                                <MainButton text='Guardar'
+                                    onClick={addRechargeSetting}
+                                    disabled={isAcceptButtonDisabled}
+                                    isLoading={loading} />
+                            </Box>
+                        </Box>
+                    </div>
+
                 </Box>
 
-                <Box display="flex" alignItems={"flex-end"}
-                    sx={{ marginTop: "-50px", gap: 6, marginLeft: "840px", marginBottom: "50px" }}>
 
-
-
-                    <MainButton text='Guardar'
-                        onClick={addRechargeSetting}
-                        disabled={isAcceptButtonDisabled}
-                        isLoading={loading} />
-
-                </Box>
 
             </Box>
             {/* Nueva sección: Activar Autorecarga Comentada*/}

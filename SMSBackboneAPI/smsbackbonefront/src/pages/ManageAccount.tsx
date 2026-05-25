@@ -182,22 +182,33 @@ const ManageAccount: React.FC = () => {
 
 
     return (
-        <Box p={6} maxWidth={800} sx={{ marginTop: "-100px", textAlign: 'center' }} >
+        <Box p={3}
+            sx={{
+                width: "100%",
+                mx: "auto",
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+                minHeight: "calc(100vh - 64px)",
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
             <Typography
-                sx={{
-                    textAlign: "left",
-                    font: "normal normal medium 26px/55px Poppins",
-                    letterSpacing: "0px",
-                    color: "#330F1B",
-                    opacity: 1,
-                    fontSize: "26px",
-                }}
+                variant="h4"
+                fontFamily="Poppins"
+                sx={{ color: "#330F1B", fontSize: '26px', }}
             >
                 Editar cuenta
             </Typography>
 
-            <Divider sx={{ mb: 3, backgroundColor: "#CCC" }} />
-            <Paper sx={{ p: 3 }}>
+            <Divider sx={{ width: '100%', mb: 3 }} />
+            <Paper sx={{ p: 3, width: "80%" }}>
                 <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2}>
                     <Box>
                         <Typography
@@ -461,13 +472,11 @@ const ManageAccount: React.FC = () => {
                 mt={3}
             >
 
-
                 <SecondaryButton
                     text="Cancelar"
                     onClick={handleCancel}
                     disabled={loading || !isDirty}
                 />
-
 
                 <Button
                     variant="contained"

@@ -640,13 +640,12 @@ const HomePage: React.FC = () => {
         <Box sx={{
             padding: '30px',
             width: "100%",
-            padding: '20px',
-            width: "1180px",
             minHeight: '800px',
             backgroundColor: '#F2F2F2',
             display: 'flex',
             flexDirection: 'column',
-            marginTop: "-70px"
+            marginTop: "10px",
+            mb: 5
 
         }}>
             <Joyride
@@ -693,12 +692,9 @@ const HomePage: React.FC = () => {
 
             <Box
                 sx={{
-                    width: "100%",
-                    maxWidth: "1280px",
-                    mx: "auto",
-                    px: "24px",
-                    pb: "24px",
+
                     boxSizing: "border-box",
+
                 }}
             >
 
@@ -826,7 +822,7 @@ const HomePage: React.FC = () => {
                         </Paper>
                     </Popper>
                     {/* ESPACIADOR FLEXIBLE */}
-                    <Box sx={{ flexGrow: { xs: 0, sm: 1 } }} />
+                    <Box sx={{ flexGrow: { xs: 0, sm: 0.98 } }} />
 
 
                     {/* BOTONES DERECHA */}
@@ -836,7 +832,7 @@ const HomePage: React.FC = () => {
                             sx={{
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "12px",
+                                gap: "10px",
                                 width: { xs: "100%", sm: "auto" },
                                 justifyContent: { xs: "flex-start", sm: "flex-end" },
                             }}
@@ -917,7 +913,7 @@ const HomePage: React.FC = () => {
 
 
                 {!showData && (
-                    <Box sx={{ textAlign: 'center', marginTop: '150px', marginLeft: '250px' }}>
+                    <Box sx={{ textAlign: 'center', marginTop: '150px', marginLeft: '200px' }}>
                         <Box component="img" src={BoxEmpty} alt="Caja Vacía" sx={{ width: '250px', height: 'auto' }} />
                         <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
                             Seleccione un canal para continuar.
@@ -1094,12 +1090,11 @@ const HomePage: React.FC = () => {
                                                         sx={{
                                                             flex: "0 0 auto",
                                                             scrollSnapAlign: "start",
-                                                            width: { xs: "210px", sm: "230px", md: "240px" }, // 👈 compacto y responsive
+                                                            width: { xs: "210px", sm: "230px", md: "240px" },
                                                             border: "1px solid #D6CED2",
                                                             borderRadius: "8px",
                                                             background: "#FFFFFF",
 
-                                                            // 👇 aquí estaba el problema: height muy bajita y se cortaba el nombre
                                                             minHeight: "88px",
                                                             padding: "10px 12px",
 
@@ -1191,7 +1186,7 @@ const HomePage: React.FC = () => {
                                             })
 
                                         ) : (
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: "350px", textAlign: 'center' }}>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginLeft: "40%" }}>
                                                 <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
                                                     No hay información para mostrar.  <br />
                                                     Encienda una o más campañas.

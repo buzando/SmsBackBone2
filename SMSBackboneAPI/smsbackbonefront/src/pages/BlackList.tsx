@@ -29,7 +29,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import IconCloudError from '../assets/IconCloudError.svg'
 import CloudCheckedIcon from '../assets/CloudCheckedIcon.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
-import { Divider, InputAdornment, Tooltip, TooltipProps, Typography, Paper, ToggleButton, ToggleButtonGroup, Switch, FormControl, FormControlLabel, List, ListItemText, ListItemButton, ListItem, Button } from "@mui/material";
+import { Divider, InputAdornment, Tooltip, TooltipProps, Typography, Paper, ToggleButton, ToggleButtonGroup, Switch, FormControl, FormControlLabel, List, ListItemText, ListItemButton, ListItem, Button, Table, TableHead } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import Checkbox from '@mui/material/Checkbox';
 import trash from '../assets/Icon-trash-Card.svg'
@@ -1064,7 +1064,29 @@ const BlackList: React.FC = () => {
     };
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+
+                mx: "auto",
+
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+
+                minHeight: "calc(100vh - 64px)",
+
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
+        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}> borrar
             <Joyride
                 steps={blackListTourSteps}
                 run={runBlackListTour}
@@ -1354,102 +1376,126 @@ const BlackList: React.FC = () => {
                     {filteredBlackList.length > 0 && (
                         <Box
                             sx={{
-                                width: '100%',
-                                backgroundColor: '#FFFFFF',
+                                backgroundColor: '#fff',
                                 borderRadius: '8px',
-                                height: '525px',
                                 boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-                                overflowX: 'auto',
-                                mt: 1.2
+                                overflowX: 'hidden',
+                                overflowY: 'auto',
+                                height: "525px",
+                                mt: 1.2,
+                                width: '100%'
                             }}
                         >
-                            <table style={{
-                                width: '100%', minWidth: '1100px',
-                                borderCollapse: 'collapse',
-                                fontFamily: 'Poppins'
-                            }}>
-                                <thead>
+                            <Table stickyHeader
+                                sx={{
+                                    width: '100%', minWidth: '1080px',
+                                    borderCollapse: 'collapse',
+                                    fontFamily: 'Poppins',
+                                }}>
+                                <TableHead sx={{
+                                    '& .MuiTableCell-root': {
+                                        backgroundColor: '#FFFFFF',
+                                        borderBottom: '1px solid #F2F2F2',
+                                        zIndex: 7,
+                                    },
+                                }}>
                                     {selectedRows.length === 0 ? (
                                         <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', width: '100%' }}>
-                                            <th style={{ padding: '5px', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6 }}>
-                                                <Box sx={{ marginLeft: "7px" }}>
+                                            <th style={{ padding: '5px', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                                <Box sx={{ marginLeft: "6px" }}>
                                                     <Checkbox
-                                                        sx={{
-                                                            color: '#574861',
-                                                            '&.Mui-checked': { color: '#8F4E63' },
-                                                            '&.MuiCheckbox-indeterminate': { color: '#8F4E63' }
-                                                        }}
                                                         checked={isAllSelected}
                                                         indeterminate={isIndeterminate}
                                                         onChange={handleSelectAll}
+                                                        sx={{
+                                                            color: '#574861',
+                                                            '&.Mui-checked': {
+                                                                color: '#7B354D'
+                                                            },
+                                                            '&.MuiCheckbox-indeterminate': {
+                                                                color: '#7B354D'
+                                                            }
+                                                        }}
                                                     />
                                                 </Box>
                                             </th>
-                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Fecha de creación</th>
-                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Nombre de lista</th>
-                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Fecha de expiración</th>
-                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', borderRight: '1px solid #E0E0E0', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>Cantidad de registros</th>
-                                            <th style={{ padding: '0px', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}></th>
+                                            <th style={{ padding: '0px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                                Fecha de creación</th>
+                                            <th style={{ padding: '0px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                                Nombre de lista</th>
+                                            <th style={{ padding: '0px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                                Fecha de expiración</th>
+                                            <th style={{ padding: '0px', fontFamily: 'Poppins', fontWeight: '500', borderRight: '1px solid #E0E0E0', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                                Cantidad de registros</th>
+                                            <th style={{ padding: '0px', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+
+                                            </th>
                                         </tr>
                                     ) : (
-                                        <tr style={{
-                                            backgroundColor: '#FFFFFF',
-                                            textAlign: 'left', width: '100%'
-                                        }}>
-                                            <th colSpan={6} style={{ minWidth: "967px" }}>
+                                        <tr style={{}}>
+                                            <th
+                                                colSpan={6}
+                                                style={{
+                                                    //minWidth: "967px",
+                                                    position: 'sticky',
+                                                    top: 0,
+                                                    backgroundColor: '#FFFFFF',
+                                                    zIndex: 6,
+                                                }}
+                                            >
 
-                                                <Box display="flex" alignItems="center" gap={1} pl={2} marginTop={"4px"} marginLeft={"-5px"} marginBottom={"4px"}>
+                                                <Box display="flex" alignItems="center" gap={1} pl={2} marginTop={"6px"} marginLeft={"-7px"} marginBottom={"8px"}>
                                                     {/*Checkbox para tablas*/}
-                                                    <Checkbox
-                                                        checked={isAllSelected}
-                                                        indeterminate={isIndeterminate}
-                                                        onChange={handleSelectAll}
-                                                        icon={
-                                                            <Box
-                                                                sx={{
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    border: '2px solid #8F4E63',
-                                                                    borderRadius: '2px',
-                                                                }}
-                                                            />
-                                                        }
-                                                        checkedIcon={
-                                                            <Box
-                                                                sx={{
-                                                                    width: '24px',
-                                                                    height: '24px',
-                                                                    position: 'relative',
-                                                                    marginTop: '0px',
-                                                                    marginLeft: '0px',
-                                                                }}
-                                                            >
-                                                                <img
-                                                                    src={IconCheckBox1}
-                                                                    alt="Seleccionado"
-                                                                    style={{ width: '24px', height: '24px' }}
+                                                    <Box sx={{ marginBottom: "0px", marginTop: "2px" }}>
+                                                        <Checkbox
+                                                            checked={isAllSelected}
+                                                            indeterminate={isIndeterminate}
+                                                            onChange={handleSelectAll}
+                                                            icon={
+                                                                <Box
+                                                                    sx={{
+                                                                        width: '24px',
+                                                                        height: '24px',
+                                                                    }}
                                                                 />
-                                                            </Box>
-                                                        }
-                                                        indeterminateIcon={
-                                                            <Box
-                                                                sx={{
-                                                                    width: '24px',
-                                                                    height: '24px',
-                                                                    position: 'relative',
-                                                                    marginTop: '0px',
-                                                                    marginLeft: '0px',
-                                                                }}
-                                                            >
-                                                                <img
-                                                                    src={IconCheckBox2}
-                                                                    alt="Indeterminado"
-                                                                    style={{ width: '24px', height: '24px' }}
-                                                                />
-                                                            </Box>
-                                                        }
-
-                                                    />
+                                                            }
+                                                            checkedIcon={
+                                                                <Box
+                                                                    sx={{
+                                                                        width: '24px',
+                                                                        height: '24px',
+                                                                        position: 'relative',
+                                                                        marginTop: '1px',
+                                                                        marginLeft: '10px',
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={IconCheckBox1}
+                                                                        alt="Seleccionado"
+                                                                        style={{ width: '24px', height: '24px' }}
+                                                                    />
+                                                                </Box>
+                                                            }
+                                                            indeterminateIcon={
+                                                                <Box
+                                                                    sx={{
+                                                                        width: '24px',
+                                                                        height: '24px',
+                                                                        position: 'relative',
+                                                                        marginTop: '1px',
+                                                                        marginLeft: '10px',
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={IconCheckBox2}
+                                                                        alt="Indeterminado"
+                                                                        style={{ width: '24px', height: '24px' }}
+                                                                    />
+                                                                </Box>
+                                                            }
+                                                            sx={{ padding: 0 }}
+                                                        />
+                                                    </Box>
                                                     <Tooltip title="Eliminar" arrow placement="top"
                                                         componentsProps={{
                                                             tooltip: {
@@ -1486,26 +1532,29 @@ const BlackList: React.FC = () => {
                                                     </Tooltip>
                                                 </Box>
                                             </th>
-
                                         </tr>
                                     )}
-                                </thead>
-
+                                </TableHead>
 
                                 <tbody>
                                     {currentItems.map((black) => (
-                                        <tr key={black.id} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0', }}>
-                                            <td style={{ padding: '0px', width: "50px" }}>
+                                        <tr key={black.id} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0' }}>
+                                            <td style={{ padding: '0px', width: "4.5%" }}>
                                                 <Box sx={{ marginLeft: "10px" }}>
                                                     <Checkbox
+                                                        checked={selectedRows.some(r => r.id === black.id)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setSelectedRows(prev => [...prev, black]);
+                                                            } else {
+                                                                setSelectedRows(prev => prev.filter(r => r.id !== black.id));
+                                                            }
+                                                        }}
                                                         checkedIcon={
                                                             <Box
                                                                 sx={{
                                                                     width: '24px',
                                                                     height: '24px',
-                                                                    position: 'relative',
-                                                                    marginTop: '0px',
-                                                                    marginLeft: '0px',
                                                                 }}
                                                             >
                                                                 <img
@@ -1517,45 +1566,64 @@ const BlackList: React.FC = () => {
                                                         }
                                                         sx={{
                                                             color: '#574861',
-                                                        }}
-                                                        checked={selectedRows.some(r => r.id === black.id)}
-                                                        onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                setSelectedRows(prev => [...prev, black]);
-                                                            } else {
-                                                                setSelectedRows(prev => prev.filter(r => r.id !== black.id));
+                                                            '&.MuiCheckbox-indeterminate': {
+                                                                color: '#7B354D'
                                                             }
                                                         }}
                                                     />
                                                 </Box>
                                             </td>
+
+                                            {/* Fecha */}
                                             <td style={{
-                                                padding: '0px', fontFamily: 'Poppins',
-                                                color: "#574B4F", fontSize: "13px", width: '210px',
+                                                padding: '0px', width: '23%', whiteSpace: 'nowrap', overflow: 'hidden',
+                                                textOverflow: 'ellipsis', textAlign: "left",
+                                                fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins',
                                             }}>
                                                 {formatDate(black.creationDate)}</td>
 
+                                            {/* Nombre de lista*/}
                                             <td style={{
-                                                padding: '0px', width: '160px', whiteSpace: 'nowrap', overflow: 'hidden',
+                                                padding: '0px', width: '23%', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
                                                 textOverflow: 'ellipsis', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px"
                                             }}>
-                                                {black.name}
+                                                {black.name.length > 15 ? (
+                                                    <Tooltip title={black.name} arrow>
+                                                        <span>{black.name.slice(0, 15) + '...'}</span>
+                                                    </Tooltip>
+                                                ) : (
+                                                    black.name
+                                                )}
                                             </td>
 
-                                            <td style={{ padding: '0px', width: '200px', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px" }}>
-                                                {formatDate(black.expirationDate)}</td>
-                                            <td style={{ padding: '0px', width: '200px', textAlign: 'left', fontFamily: 'Poppins', color: "#574B4F", fontSize: "13px", }}>
-                                                {black.quantity}</td>
+                                            {/* Fecha de Expiración */}
                                             <td style={{
-                                                padding: '0px', width: '50px',
-                                                borderLeft: '1px solid #E0E0E0',
-                                                textAlign: 'center'
+                                                padding: '0px 0px', width: '23%', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                                textOverflow: 'ellipsis', fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins'
+
                                             }}>
+                                                {formatDate(black.expirationDate)}</td>
+
+                                            {/* Cantidad de Registros*/}
+                                            <td style={{
+                                                padding: '0px 89px', width: '23%', whiteSpace: 'nowrap', overflow: 'hidden', textAlign: "left",
+                                                textOverflow: 'ellipsis', fontSize: '13px', color: "#574B4F", fontFamily: 'Poppins'
+
+                                            }}>
+                                                {black.quantity}</td>
+
+                                            {/* Menú de acciones */}
+                                            <td
+                                                style={{
+                                                    padding: '0px', width: '3.5%',
+                                                    borderLeft: '1px solid #E0E0E0',
+                                                    textAlign: 'center',
+                                                }}
+                                            >
                                                 <IconButton onClick={(e) => {
                                                     setMenuAnchorEl(e.currentTarget);
                                                     setSelectedBlackList(black);
                                                 }}>
-
                                                     <MoreVertIcon sx={{ color: '#7B354D' }} />
                                                 </IconButton>
 
@@ -1563,7 +1631,7 @@ const BlackList: React.FC = () => {
                                         </tr>
                                     ))}
                                 </tbody>
-                            </table>
+                            </Table>
                         </Box>
                     )}
 

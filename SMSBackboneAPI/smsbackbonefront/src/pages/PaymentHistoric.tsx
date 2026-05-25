@@ -19,6 +19,8 @@ import ModalError from '../components/commons/ModalError'
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import { useNavigate } from "react-router-dom";
 import Snackbar from '../components/commons/ChipBar'
+import SpinnerTop from "../assets/SpinnerTop.svg";
+import SpinnerBottom from "../assets/SpinnerBottom.svg";
 import billingicon from '../assets/billing.svg'
 import { letterSpacing } from 'html2canvas/dist/types/css/property-descriptors/letter-spacing';
 interface Historic {
@@ -219,13 +221,13 @@ const PaymentHistoric: React.FC = () => {
             } else {
                 setTitleErrorModal("Error en facturación");
                 setBodyErrorModal("Intente más tarde");
-                 setIsInvoiceModalOpen(false);
+                setIsInvoiceModalOpen(false);
                 setIsErrorModalOpen(true);
             }
         } catch {
-               setTitleErrorModal("Error en facturación");
-                setBodyErrorModal("Intente más tarde");
-             setIsInvoiceModalOpen(false);
+            setTitleErrorModal("Error en facturación");
+            setBodyErrorModal("Intente más tarde");
+            setIsInvoiceModalOpen(false);
             setIsErrorModalOpen(true);
         } finally {
             setCreatingInvoice(false);
@@ -244,7 +246,28 @@ const PaymentHistoric: React.FC = () => {
     const canDownload = hasPrevInvoice;                // ✅ ya facturada
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+
+                mx: "auto",
+
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+
+                minHeight: "calc(100vh - 64px)",
+
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
                 <IconButton
                     onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -304,30 +327,72 @@ const PaymentHistoric: React.FC = () => {
 
                 {/* Lógica para mostrar el contenido correcto */}
                 {loading ? (
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            height: '512px'
-                        }}
-                    >
-                        <CircularProgress sx={{ color: '#7B354D' }} size={60} />
+                    <Box sx={{
+                        position: 'fixed',
+                        top: 0, left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999
+                    }}>
+                        <Box
+                            sx={{
+                                position: "relative",
+                                width: 80,
+                                height: 80
+                            }}
+                        >
+                            {/* Spinner base */}
+                            <img
+                                src={SpinnerBottom}
+                                alt="loading-base"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0
+                                }}
+                            />
+
+                            {/* Spinner que gira */}
+                            <img
+                                src={SpinnerTop}
+                                alt="loading-top"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    animation: "spin 1s linear infinite"
+                                }}
+                            />
+                        </Box>
+                        <style>{`
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `}</style>
                     </Box>
                 ) : Historic === undefined ? (
 
                     <Box
                         sx={{
-                            background: '#FFFFFF',
-                            border: '1px solid #E6E4E4',
+                            width: '100%',
+                            backgroundColor: '#FFFFFF',
                             borderRadius: '8px',
-                            maxWidth: "1140px",
-                            height: '468px',
+                            height: '525px',
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            marginTop: '20px'
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            mt: 3,
                         }}
                     >
                         <img src={boxclose} alt="No data" style={{ width: '240px', height: '190px' }} />
@@ -349,16 +414,16 @@ const PaymentHistoric: React.FC = () => {
                     // Imagen de caja abierta cuando NO se encuentran resultados
                     <Box
                         sx={{
-                            background: '#FFFFFF',
-                            border: '1px solid #E6E4E4',
+                            width: '100%',
+                            backgroundColor: '#FFFFFF',
                             borderRadius: '8px',
-                            maxWidth: "1140px",
-                            height: '468px',
+                            height: '525px',
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            marginTop: '20px'
+                            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
+                            mt: 3,
                         }}
                     >
                         <img src={boxopen} alt="No results" style={{ width: '240px', height: '190px' }} />

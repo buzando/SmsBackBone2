@@ -507,7 +507,28 @@ const Use: React.FC = () => {
     const yAxisMax = getNiceYAxisMax(dataChart);
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+
+                mx: "auto",
+
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+
+                minHeight: "calc(100vh - 64px)",
+
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
             {/* Encabezado */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
                 <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -1172,21 +1193,22 @@ const Use: React.FC = () => {
                                     Detalle de consumo
                                 </Typography>
 
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        gap: 14, // controla separación entre elementos
-                                    }}
-                                >
-                                    {detalleResumen.map((item, index) => (
-                                        <Box key={index} sx={boxStyle}>
-                                            <Typography sx={titleBoxStyle}>{item.title}</Typography>
-                                            <Typography sx={valueBoxStyle}>{item.value}</Typography>
-                                        </Box>
-                                    ))}
-                                </Box>
-                            </Paper>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    gap: 14,
+                                }}
+                            >
+                                {detalleResumen.map((item, index) => (
+                                    <Box key={index} sx={boxStyle}>
+                                        <Typography sx={titleBoxStyle}>{item.title}</Typography>
+                                        <Typography sx={valueBoxStyle}>{item.value}</Typography>
+                                    </Box>
+                                ))}
+                            </Box>
+                        </Paper>
+                        <div ref={chartRef}>
 
 
                             <Paper sx={graphPaperStyle}>
@@ -1378,7 +1400,7 @@ const paperStyle = {
     border: '1px solid #E6E4E44D',
     padding: '20px',
     borderRadius: '10px',
-    width: '1250px',
+    width: '100%',
     height: '212px'
 };
 
@@ -1391,7 +1413,7 @@ const graphPaperStyle = {
     border: '1px solid #E6E4E44D',
     padding: '20px',
     borderRadius: '10px',
-    width: '1250px',
+    width: '100%',
     height: '330px',
     marginTop: '20px'
 };

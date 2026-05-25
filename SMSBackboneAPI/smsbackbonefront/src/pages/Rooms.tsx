@@ -25,9 +25,12 @@ import HomeIcon from "@mui/icons-material/Home";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconCloseModal from "../assets/IconCloseModal.svg";
+import HouseIcon from "../assets/IconRooms.svg";
 import axios from "../components/commons/AxiosInstance";
 import iconlupa from "../assets/icon-lupa.svg";
 import ClearIcon from "@mui/icons-material/Clear";
+import SpinnerTop from "../assets/SpinnerTop.svg";
+import SpinnerBottom from "../assets/SpinnerBottom.svg";
 import infoicon from '../assets/Icon-info.svg'
 import infoiconerror from '../assets/Icon-infoerror.svg'
 import NoResult from '../assets/NoResultados.svg'
@@ -308,7 +311,23 @@ const Rooms: React.FC = () => {
     };
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1260px", height: 'calc(100vh - 64px)', }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+                mx: "auto",
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+                minHeight: "calc(100vh - 64px)",
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
@@ -329,9 +348,23 @@ const Rooms: React.FC = () => {
                     Salas
                 </Typography>
             </Box>
-            <Box sx={{ marginLeft: "32px", }}>
-                <Divider sx={{ width: 'calc(100% + 80px)', mb: 3 }} />
-                <Box display="flex" alignItems="center" justifyContent="flex-start" mb={2}>
+            <Box sx={{
+                width: "100%",
+
+                px: {
+                    sm: 1,
+                    md: 2,
+                    lg: 3,
+                },
+            }}>
+                <Divider sx={{ width: '100%', mb: 3 }} />
+                <Box
+                    display="flex"
+                    flexWrap="wrap"
+                    alignItems="center"
+                    gap={2}
+                    mb={2}
+                >
                     {/* Botón de Añadir Sala */}
                     <Button
                         variant="contained"
@@ -395,16 +428,74 @@ const Rooms: React.FC = () => {
 
 
                 {loading ? (
-                    <Box display="flex" justifyContent="center" mt={5}>
-                        <CircularProgress />
+                    <Box sx={{
+                        position: 'fixed',
+                        top: 0, left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999
+                    }}>
+                        <Box
+                            sx={{
+                                position: "relative",
+                                width: 80,
+                                height: 80
+                            }}
+                        >
+                            {/* Spinner base */}
+                            <img
+                                src={SpinnerBottom}
+                                alt="loading-base"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0
+                                }}
+                            />
+
+                            {/* Spinner que gira */}
+                            <img
+                                src={SpinnerTop}
+                                alt="loading-top"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    animation: "spin 1s linear infinite"
+                                }}
+                            />
+                        </Box>
+                        <style>{`
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `}</style>
                     </Box>
                 ) : (
                     <Box
                         sx={{
-                            display: 'grid',
-                            gap: '16px',
-                            columnGap: '24px',
-                            gridTemplateColumns: '500px 500px',
+                            display: "grid",
+
+                            gap: {
+                                sm: "16px",
+                                md: "24px",
+                            },
+
+                            gridTemplateColumns: {
+                                sm: "1fr",
+                                md: "repeat(2, 1fr)",
+                            },
+
+                            width: "100%",
                         }}
                     >
                         {rooms.filter((room) => {
@@ -412,55 +503,84 @@ const Rooms: React.FC = () => {
                             const nameWords = room.name.toLowerCase().split(" ");
                             return nameWords.some((word) => word.startsWith(term));
                         }).length === 0 ? (
-                            <Grid item xs={12}>
-                                <Box
-                                    display="flex"
-                                    flexDirection="column"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                    mt={3}
 
+                            <Box
+                                sx={{
+                                    display: "flex",
+
+                                    flexDirection: "column",
+
+                                    alignItems: "center",
+
+                                    justifyContent: "center",
+
+                                    width: "100%",
+                                    minHeight: "40vh",
+
+                                    mt: 12, ml: 32,
+
+                                    textAlign: "center",
+                                }}
+                            >
+                                <Box
+                                    component="img"
+                                    src={NoResult}
+                                    alt="No hay resultados"
+                                    sx={{
+                                        width: {
+                                            sm: "200px",
+                                            md: "240px",
+                                            lg: "280px",
+                                        },
+
+                                        height: "auto",
+
+                                        mb: 2,
+                                    }}
+                                />
+
+                                <Typography
+                                    variant="body1"
+                                    sx={{
+                                        color: "#7B354D",
+
+                                        fontWeight: 500,
+
+                                        fontSize: {
+                                            sm: "12px",
+                                            md: "14px",
+                                        },
+
+                                        fontFamily: "Poppins",
+                                    }}
                                 >
-                                    <img
-                                        src={NoResult}
-                                        alt="No hay resultados"
-                                        style={{
-                                            marginTop: 80,
-                                            marginLeft: 650,
-                                            width: "280px",
-                                            height: "200px",
-                                            marginBottom: "16px",
-                                        }}
-                                    />
-                                    <Typography
-                                        variant="body1"
-                                        sx={{
-                                            position: "absolute",
-                                            marginTop: 40,
-                                            marginLeft: 82,
-                                            textAlign: "center",
-                                            color: "#7B354D",
-                                            fontWeight: 500,
-                                            fontSize: "14px",
-                                            fontFamily: "Poppins"
-                                        }}
-                                    >
-                                        No se encontraron resultados.
-                                    </Typography>
-                                </Box>
-                            </Grid>
+                                    No se encontraron resultados.
+                                </Typography>
+                            </Box>
 
                         ) : (
                             <Box
                                 sx={{
-                                    width: "1260px",
-                                    maxHeight: '465px',
-                                    overflowY: 'auto',
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    flexDirection: 'row',
-                                    alignContent: 'flex-start',
-                                    gap: '24px 50px',
+                                    backgroundColor: "F2F2F2",
+                                    width: "200%",
+                                    maxHeight: {
+                                        sm: "60vh",
+                                        md: "65vh",
+                                    },
+
+                                    overflowY: "auto",
+
+                                    display: "grid",
+
+                                    gridTemplateColumns: {
+                                        sm: "1fr",
+                                        md: "repeat(2, 1fr)",
+                                    },
+
+                                    gap: {
+                                        sm: "16px",
+                                        md: "24px",
+                                    },
                                 }}
                             >
                                 {rooms
@@ -470,34 +590,43 @@ const Rooms: React.FC = () => {
                                         return nameWords.some((word) => word.startsWith(term));
                                     })
                                     .map((room) => (
-                                        <Grid item xs={12} sm={6} md={6} display="flex" justifyContent="flex-start"
-                                            width={"530px"} height={"101px"}
+                                        <Grid item
+                                            xs={12}
+                                            sm={12}
+                                            md={6}
+                                            sx={{
+                                                width: "100%",
+                                            }}
                                         >
                                             <Box
                                                 sx={{
                                                     display: 'flex',
                                                     justifyContent: 'space-between',
                                                     alignItems: 'center',
+
                                                     backgroundColor: '#FFFFFF',
+
                                                     borderRadius: '8px',
+
                                                     boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-                                                    padding: '16px',
+
+                                                    padding: {
+                                                        sm: '12px',
+                                                        md: '16px',
+                                                    },
+
                                                     width: '100%',
-                                                    height: '108|px',
-                                                    maxWidth: 600,
+
+                                                    minHeight: '108px',
                                                 }}
                                             >
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <HomeIcon
-                                                        sx={{
-                                                            backgroundColor: '#796E71',
-                                                            borderRadius: '50%',
-                                                            padding: '8px',
-                                                            fontSize: 40,
-                                                            color: 'white',
-                                                            width: "46px",
-                                                            height: "46px",
-                                                            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                                                    <img
+                                                        src={HouseIcon}
+                                                        alt="Rooms Icon"
+                                                        style={{
+                                                            width: '46px',
+                                                            height: '46px',
                                                             marginRight: '16px',
                                                         }}
                                                     />
@@ -506,15 +635,56 @@ const Rooms: React.FC = () => {
                                                             variant="h6"
                                                             sx={{ fontWeight: '500', fontSize: '16px', color: '#574B4F', fontFamily: "Poppins", }}
                                                         >
-                                                            {room.name}
+                                                            {room.name?.length > 28
+                                                                ? `${room.name.slice(0, 28)}...`
+                                                                : room.name
+                                                            }
                                                         </Typography>
 
-                                                        <Typography
-                                                            variant="body2"
-                                                            sx={{ fontSize: '14px', color: '#574B4F', fontFamily: "Poppins", }}
+                                                        <Tooltip
+                                                            title={room.description}
+                                                            placement="top"
+                                                            arrow
+                                                            componentsProps={{
+                                                                tooltip: {
+                                                                    sx: {
+                                                                        backgroundColor: "rgba(0, 0, 0, 0.9)",
+                                                                        color: "#DEDADA",
+                                                                        fontFamily: "Poppins, sans-serif",
+                                                                        fontSize: "12px",
+                                                                        padding: "6px 8px",
+                                                                        borderRadius: "8px",
+                                                                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                                    }
+                                                                },
+                                                                arrow: {
+                                                                    sx: {
+                                                                        color: "rgba(0, 0, 0, 0.8)"
+                                                                    }
+                                                                }
+                                                            }}
+                                                            PopperProps={{
+                                                                modifiers: [
+                                                                    {
+                                                                        name: 'offset',
+                                                                        options: {
+                                                                            offset: [0, -10]
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }}
                                                         >
-                                                            Descripción: {room.cliente}
-                                                        </Typography>
+                                                            <Typography
+                                                                variant="body2"
+                                                                sx={{ fontSize: '14px', color: '#574B4F', fontFamily: "Poppins", }}
+                                                            >
+                                                                Descripción:
+                                                                {room.description?.length > 16
+                                                                    ? `${room.description.slice(0, 16)}...`
+                                                                    : room.description
+                                                                }
+                                                            </Typography>
+                                                        </Tooltip>
                                                     </Box>
                                                 </Box>
 
@@ -691,6 +861,7 @@ const Rooms: React.FC = () => {
                                 }}
                             >
                                 Nombre de la sala
+                                <span style={{ color: "red" }}>*</span>
                             </Typography>
                             <TextField
                                 fullWidth
@@ -878,9 +1049,8 @@ const Rooms: React.FC = () => {
                                 onClick={handleCreateRoom}
                                 disabled={
                                     !newRoom.name ||
-                                    !newRoom.description ||
-                                    errors.name ||
-                                    errors.description
+
+                                    errors.name
                                 }
                                 sx={{
                                     width: "106px",

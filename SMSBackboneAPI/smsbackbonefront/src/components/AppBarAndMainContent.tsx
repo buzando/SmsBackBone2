@@ -60,6 +60,7 @@ import IconUserArrow from '../assets/CHEVRON_USER.svg';
 import CloseSession from '../assets/Icon-CerrarSesion.svg';
 import facturicone from '../assets/facturicone.svg';
 import Iconhelpu from '../assets/Iconhelpu.svg';
+import ApiIconDownload from '../assets/ApiIconDownload.svg';
 import logorq from '../assets/quantum-logov25.svg';
 import PrivacityIcon from '../assets/Icon_privacidad.svg'
 import api from '../assets/api.svg'
@@ -1638,7 +1639,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                     }}>
 
                     {userMenu === 'Root' ? (
-
                         <List component="nav">
                             {/* Menú de Administración */}
                             <ListItem disablePadding>
@@ -1958,7 +1958,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                         </List>
                                     </Collapse>
 
-
                                     {/* Menú de SMS */}
                                     <ListItem disablePadding>
                                         <ListItemButton onClick={() => toggleSubMenu('sms')} sx={{ borderRadius: '8px' }}>
@@ -2152,8 +2151,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                             </ListItemButton>
                                         </Link>
 
-
-
                                     </Collapse>
 
                                     {/* Menú de Reportes */}
@@ -2322,8 +2319,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                             </ListItemButton>
                                         </Link>
 
-
-
                                         {/* Datos de facturación */}
                                         <Link to="/BillingInformation" style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <ListItemButton
@@ -2367,15 +2362,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                             </ListItemButton>
                                         </Link>
 
-
-
-
-
-
-
                                     </Collapse>
-
-
 
                                     {/* Menú de Ayuda */}
                                     <ListItem disablePadding>
@@ -2391,26 +2378,45 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                 primary="Ayuda"
                                                 primaryTypographyProps={{
                                                     fontFamily: "Poppins",
-                                                    marginLeft: "6px",
+                                                    marginLeft: "5px",
                                                     color: '#FFFFFF',
                                                 }}
                                             />
                                         </ListItemButton>
                                     </ListItem>
+
+                                    {/* Descargar API */}
+                                    <ListItem disablePadding>
+                                        <ListItemButton
+                                            onClick={handleDownload}
+                                            sx={{ borderRadius: '8px', marginLeft: "5px" }}>
+                                            <img alt="DownloadApi" src={ApiIconDownload} style={{ width: 24, height: 24, filter: "brightness(0) invert(1)" }} />
+                                            <ListItemText
+                                                primary="Descargar API"
+                                                primaryTypographyProps={{
+                                                    fontFamily: "Poppins",
+                                                    marginLeft: "9px",
+                                                    color: '#FFFFFF',
+                                                }}
+                                            />
+                                        </ListItemButton>
+                                    </ListItem>
+
                                 </List>
                             )
-                    )
 
+                    )
                     }
 
                     {/* Final del fondo para opciones */}
                 </Box>
+
                 {userMenu === 'Mesa' && location.pathname !== '/ClientRoomPicker' && (
                     <Box
                         sx={{
-                            position: 'fixed',
-                            left: 16,
-                            bottom: { xs: 112, sm: 96, md: 88 }, // ⬅️ Responsivo según tamaño de pantalla
+                            position: 'relative',
+                            left: 45, top: 15,
+                            bottom: { xs: 112, sm: 96, md: 88 },
                             zIndex: 1300,
                         }}
                     >
@@ -2440,22 +2446,21 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
             </Drawer >
             <Container
-
                 maxWidth={false}
                 disableGutters
                 sx={{
-                    width: '83.5%',
-                    height: '100%',
+                    width: 'calc(100% - 277px)',
+                    height: 'calc(100vh - 70px)',
                     overflowX: 'hidden',
-                    overflowY: 'hidden',
-                    overflow: 'hidden',
+                    overflowY: 'auto',
                     margin: 0,
-                    marginLeft: "277px",
-                    marginTop: "70px",
+                    marginLeft: '277px',
+                    marginTop: '70px',
                     padding: 0,
                     backgroundColor: '#F2F2F2',
                     display: 'flex',
                     flexDirection: 'column',
+                    boxSizing: 'border-box',
                 }}
             >
                 <Box sx={{ height: '4.5rem' }} />
@@ -2484,6 +2489,8 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                         {' Nuxiba. Todos los derechos reservados. Se prohíbe el uso no autorizado.'}
                     </Typography>
                     <img src={nuxiba_svg} alt="Nuxiba Logo" width="80" />
+
+                    {/*
                     {location.pathname === '/' && (
                         <Fab
                             aria-label="help"
@@ -2539,7 +2546,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                         zIndex: 1500,
                                     }}
                                 >
-                                    {/* Imagen base */}
+
                                     <img
                                         src={api}
                                         alt="Ícono de api"
@@ -2552,7 +2559,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                         }}
                                     />
 
-                                    {/* Overlay rosita */}
+
                                     {isHoveringApi && (
                                         <div
                                             style={{
@@ -2577,7 +2584,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                         </Fab>
                     )}
-
+ */}
 
 
 

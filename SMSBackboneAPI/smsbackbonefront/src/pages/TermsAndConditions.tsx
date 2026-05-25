@@ -5,7 +5,23 @@ import { useNavigate } from 'react-router-dom';
 const TermsAndConditions: React.FC = () => {
     const navigate = useNavigate();
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+                mx: "auto",
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+                minHeight: "calc(100vh - 64px)",
+                overflowX: "hidden", marginTop: "-8px"
+            }}
+        >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>

@@ -1018,7 +1018,7 @@ const Campains: React.FC = () => {
     setVariables(varCols);
   };
 
-
+  {/* 
   useEffect(() => {
     if (!selectedCampaign?.startDate) return;
 
@@ -1037,7 +1037,47 @@ const Campains: React.FC = () => {
 
     return () => clearInterval(interval);
   }, [selectedCampaign?.startDate]);
+*/}
+  useEffect(() => {
+    if (!selectedCampaign?.startDate || !showCounter(selectedCampaign)) {
+      setElapsedTime("00:00:00");
+      return;
+    }
 
+    const updateElapsedTime = () => {
+      const start = new Date(selectedCampaign.startDate).getTime();
+
+      // Fecha inválida
+      if (isNaN(start)) {
+        setElapsedTime("00:00:00");
+        return;
+      }
+
+      const now = Date.now();
+
+      // Evita negativos
+      const diff = Math.max(now - start, 0);
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      const formattedTime =
+        `${String(hours).padStart(2, "0")}:` +
+        `${String(minutes).padStart(2, "0")}:` +
+        `${String(seconds).padStart(2, "0")}`;
+
+      setElapsedTime(formattedTime);
+    };
+
+    // Ejecuta inmediatamente
+    updateElapsedTime();
+
+    const interval = setInterval(updateElapsedTime, 1000);
+
+    return () => clearInterval(interval);
+
+  }, [selectedCampaign]);
 
   const fetchCampaigns = async (roomId?: number | null) => {
     setLoadingPage(true);
@@ -2121,7 +2161,29 @@ const Campains: React.FC = () => {
   const editDisabledReason = getEditDisabledReason(campaignMenu);
   return (
 
-    <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1360px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+    <Box p={3}
+      sx={{
+        width: "100%",
+
+        mx: "auto",
+
+        px: {
+          sm: 2,
+          md: 3,
+          lg: 3,
+        },
+
+        pt: {
+          sm: 2,
+          md: 3,
+        },
+
+        minHeight: "calc(100vh - 64px)",
+
+        overflowX: "hidden", marginTop: "-80px"
+      }}
+    >
+    <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1360px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}> borrar
       <Joyride
         steps={campaignTourSteps}
         run={runCampaignTour}
@@ -2724,7 +2786,9 @@ const Campains: React.FC = () => {
                               </Box>
                               <Box sx={{ width: "65%", backgroundColor: "#E0E0E0", borderRadius: "6px", height: "10px", position: "relative", marginBottom: "10px", marginX: "auto" }}>
                                 <Box sx={{
-                                  width: `${progreso}%`, backgroundColor: "#AE7888", borderRadius: "3px",
+                                  width: `${Math.min(progreso, 100)}%`,
+                                  backgroundColor: "#AE7888",
+                                  borderRadius: "3px",
                                   height: "8px",
                                   position: "absolute",
                                   marginTop: "-9px",
@@ -2746,8 +2810,8 @@ const Campains: React.FC = () => {
                 sx={{
                   height: "581px",
                   width: "30px",
-                  borderRadius: "0 8px 8px 0", // redondeado derecho
-                  borderLeft: "1px solid #D6D6D6", // 👉 esta es la línea gris
+                  borderRadius: "0 8px 8px 0",
+                  borderLeft: "1px solid #D6D6D6",
                   backgroundColor: "#FFFFFF",
                   '&:hover': { backgroundColor: "#FFFFFF" },
                   paddingX: "10px"

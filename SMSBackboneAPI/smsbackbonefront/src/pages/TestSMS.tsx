@@ -129,8 +129,30 @@ export default function TestSMS() {
 
 
   return (
-    <div style={{ padding: '14px', marginTop: '-70px', marginLeft: "40px", maxWidth: "1280px", height: "715px" }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+
+    <Box p={3}
+      sx={{
+        width: "100%",
+
+        mx: "auto",
+
+        px: {
+          sm: 2,
+          md: 3,
+          lg: 3,
+        },
+
+        pt: {
+          sm: 2,
+          md: 3,
+        },
+
+        minHeight: "calc(100vh - 64px)",
+
+        overflowX: "hidden", marginTop: "-80px"
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, marginLeft: "32px" }}>
         <IconButton
           onClick={() => navigate('/')}
           sx={{
@@ -167,6 +189,7 @@ export default function TestSMS() {
         </Typography>
       </Box>
 
+      {/* 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', position: "absolute", ml: "980px", mt: "-50px" }}>
         <FormControl size="small" sx={{ width: '150px', backgroundColor: "#ffffff" }}>
           <Select value={language} onChange={handleLanguageChange}>
@@ -176,447 +199,451 @@ export default function TestSMS() {
           </Select>
         </FormControl>
       </Box>
+      */}
+      <Box sx={{ marginLeft: "32px" }}>
+        <Divider sx={{ mb: 2.5, mt: 2 }} />
 
-      <Divider sx={{ mb: 2.5, mt: 2 }} />
+        <Typography sx={{ fontFamily: "Poppins", fontWeight: 500, fontSize: "18px", color: "#330F1B", mb: 1 }}>
+          {t('pages.testSMS.smsTestDescription')}
+        </Typography>
 
-      <Typography sx={{ fontFamily: "Poppins", fontWeight: 500, fontSize: "18px", color: "#330F1B", mb: 1 }}>
-        {t('pages.testSMS.smsTestDescription')}
-      </Typography>
+        <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 2, color: "#574B4F", mt: 2 }}>
+          {t('pages.testSMS.smsSelectDescription')}
+        </Typography>
 
-      <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 2, color: "#574B4F", mt: 2 }}>
-        {t('pages.testSMS.smsSelectDescription')}
-      </Typography>
+        <Box display="flex" gap={4} mb={3} sx={{ alignItems: "left" }}>
+          <Box>
+            <Typography sx={{ fontFamily: "Poppins", fontSize: "16px", fontWeight: 500, mb: 1, color: "#330F1B" }}>
+              {t('pages.testSMS.from')}
+            </Typography>
 
-      <Box display="flex" gap={4} mb={3} sx={{ alignItems: "left" }}>
-        <Box>
-          <Typography sx={{ fontFamily: "Poppins", fontSize: "16px", fontWeight: 500, mb: 1, color: "#330F1B" }}>
-            {t('pages.testSMS.from')}
-          </Typography>
-
-          <FormControl sx={{
-            backgroundColor: "#ffffff",
-            fontFamily: "Poppins",
-            borderRadius: "8px",
-            border: "1px solid #9B9295",
-            width: "220px", height: "40px"
-          }}>
-            <Select defaultValue="" value={fromNumber}
-              onChange={(e) => setFromNumber(e.target.value)}
-              displayEmpty sx={{
-                color: "#786E71",
-                borderRadius: '8px',
-                fontFamily: 'Poppins',
-                fontSize: '14px', mt: "-8px",
-                '& .MuiSelect-select': {
-                  display: 'flex',
-                  alignItems: 'center',
-                },
-                '& fieldset': {
-                  border: 'none',
-                },
-              }}
-            >
-              <MenuItem value="" sx={{ fontFamily: "Poppins", color: "#786E71" }}>
-                <em>{t('pages.testSMS.numberPlaceholder')}</em>
-              </MenuItem>
-              <MenuItem value="short" sx={{ fontFamily: "Poppins", color: "#786E71" }}>
-                Número corto
-              </MenuItem>
-              <MenuItem value="long" sx={{ fontFamily: "Poppins", color: "#786E71" }}>
-                Número largo
-              </MenuItem>
-            </Select>
-          </FormControl>
-
-        </Box>
-
-        <Box sx={{}}>
-          <Typography
-            sx={{
+            <FormControl sx={{
+              backgroundColor: "#ffffff",
               fontFamily: "Poppins",
-              fontSize: "16px",
-              fontWeight: 500,
-              mb: 1,
-              color: toNumberError ? "#D32F2F" : "#330F1B",
-            }}
-          >
-            {t('pages.testSMS.to')}
-          </Typography>
-
-          <TextField fullWidth
-            value={toNumber}
-            placeholder="5255"
-            onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, '');
-              setToNumber(value);
-              setToNumberError(value.length !== 10);
-            }}
-            sx={{ width: "221px", height: "54px" }}
-            error={toNumberError}
-            helperText={toNumberError ? t('pages.testSMS.invalidNumber') : " "}
-
-            InputProps={{
-              sx: {
-                backgroundColor: "#FFFFFF", fontFamily: "Poppins",
-                '&::placeholder': {
-                  color: '#786E71',
-                  opacity: 0.8,
-                  fontFamily: "Poppins"
-                }
-              },
-              endAdornment: (
-                <Tooltip
-                  placement="bottom-end"
-                  componentsProps={{
-                    tooltip: {
-                      sx: {
-                        backgroundColor: "transparent",
-                        padding: 0,
-                      },
-                    },
-                  }}
-                  title={
-                    <Box
-                      sx={{
-                        backgroundColor: "#FFFFFF",
-                        borderRadius: "8px",
-                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                        padding: "8px 12px",
-                        fontSize: "14px",
-                        fontFamily: "Poppins",
-                        color: "#574B4F",
-                        whiteSpace: "pre-line",
-                        transform: "translate(-10px, -22px)",
-                        borderColor: "#00131F3D",
-                        borderStyle: "solid",
-                        borderWidth: "1px"
-                      }}
-                    >
-                      <>
-                        • Solo caracteres numéricos<br />
-                        • El teléfono debe incluir el<br />
-                        código del país
-                      </>
-                    </Box>
-                  }
-                >
-                  <img
-                    src={toNumberError ? infoiconerror : infoicon}
-                    alt="info"
-                    style={{ width: 24, height: 24, marginRight: 8 }}
-                  />
-                </Tooltip>
-              )
-            }}
-          />
-
-        </Box>
-      </Box>
-
-      <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 3, color: "#786E71" }}>
-        {t('pages.testSMS.writeMessageOrSelect')}
-      </Typography>
-
-      <Box display="flex" gap={2}>
-        <Box flex={1}>
-          <Typography
-            sx={{
-              fontFamily: "Poppins",
-              fontSize: "16px",
-              fontWeight: 500,
-              mb: 1,
-              color: messageError ? "#D32F2F" : "#330F1B",
-            }}
-          >
-            {t('pages.testSMS.message')}
-          </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            value={message}
-            placeholder={t('pages.testSMS.writeMessageOrSelect')}
-            disabled={!!selectedTemplateId}
-            onChange={(e) => {
-              let value = e.target.value;
-
-              value = value.replace(/[^a-zA-Z0-9\s]/g, '');
-
-              if (value.length > 160) {
-                value = value.slice(0, 160);
-              }
-
-              setMessage(value);
-
-              setMessageError(value.trim().length > 0 && value.trim().length < 3);
-
-              if (value.trim().length > 0) {
-                setSelectedTemplateId('');
-                setSelectedTemplate(null);
-              }
-            }}
-            error={messageError}
-            helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
-            inputProps={{ maxLength: 160 }}
-            InputProps={{
-              sx: {
-                backgroundColor: "#FFFFFF",
-                fontFamily: "Poppins",
-                borderRadius: "2px",
-                border: "1px solid #C6BFC299",
-                width: "545px",
-                height: "123px",
-              },
-              endAdornment: (
-                <Tooltip
-                  placement="bottom-end"
-                  componentsProps={{
-                    tooltip: {
-                      sx: {
-                        backgroundColor: "transparent",
-                        padding: 0,
-                      },
-                    },
-                  }}
-                  title={
-                    <Box
-                      sx={{
-                        backgroundColor: "#FFFFFF",
-                        borderRadius: "8px",
-                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                        padding: "8px 12px",
-                        fontSize: "14px",
-                        fontFamily: "Poppins",
-                        color: "#574B4F",
-                        whiteSpace: "pre-line",
-                        transform: "translate(-10px, -22px)",
-                        borderColor: "#00131F3D",
-                        borderStyle: "solid",
-                        borderWidth: "1px"
-                      }}
-                    >
-                      <>
-                        • Solo caracteres alfanuméricos<br />
-                        • Longitud máxima de 160<br />
-                        caracteres
-                      </>
-                    </Box>
-                  }
-                >
-                  <img
-                    src={messageError ? infoiconerror : infoicon}
-                    alt="info"
-                    style={{ width: 24, height: 24, marginLeft: "5px", marginTop: "-65px" }}
-                  />
-                </Tooltip>
-              )
-            }}
-          />
-          <Typography
-            sx={{
-              fontFamily: "Poppins",
-              fontSize: "12px",
-              color: "#A1A1A1",
-              mt: -2, ml: 1.5
-            }}
-          >
-            {t('pages.testSMS.charactersCounter', { count: message.length })}
-          </Typography>
-        </Box>
-
-        <Box flex={1}>
-          <Typography sx={{ fontFamily: "Poppins", fontSize: "16px", fontWeight: 500, mb: 1 }}>
-            {t('pages.testSMS.template')}
-          </Typography>
-
-          <Box display="flex" alignItems="center" gap={1}>
-
-            <FormControl
-              sx={{
-                backgroundColor: "#ffffff",
-                fontFamily: "Poppins",
-                borderRadius: "8px",
-                border: "1px solid #9B9295",
-                width: "220px",
-                height: "40px",
-              }}
-              size="small"
-            >
-              <Select
-                value={selectedTemplateId}
-                onChange={(e) => {
-                  const id = e.target.value as string;
-                  setSelectedTemplateId(id);
-
-                  setMessage("");
-                  setMessageError(false);
-
-                  const t = templates.find((x) => x.id === Number(id)) || null;
-                  setSelectedTemplate(t);
-                }}
-                disabled={message.trim().length > 0}
-                displayEmpty
-                renderValue={(value) =>
-                  value ? (
-                    <span
-                      style={{
-                        display: "block",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {templates.find((t) => t.id === Number(value))?.name || ""}
-                    </span>
-                  ) : (
-                    <em style={{ color: "#786E71" }}>
-                      {t("pages.testSMS.selectMessagePlaceholder")}
-                    </em>
-                  )
-                }
-                sx={{
+              borderRadius: "8px",
+              border: "1px solid #9B9295",
+              width: "220px", height: "40px"
+            }}>
+              <Select defaultValue="" value={fromNumber}
+                onChange={(e) => setFromNumber(e.target.value)}
+                displayEmpty sx={{
                   color: "#786E71",
-                  borderRadius: "8px",
-                  fontFamily: "Poppins",
-                  fontSize: "14px",
-                  mt: "1px",
-
-                  paddingRight: "32px !important",
-
-                  "& .MuiSelect-select": {
-                    display: "block",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    paddingRight: "32px !important",
+                  borderRadius: '8px',
+                  fontFamily: 'Poppins',
+                  fontSize: '14px', mt: "-8px",
+                  '& .MuiSelect-select': {
+                    display: 'flex',
+                    alignItems: 'center',
                   },
-
-                  "& fieldset": {
-                    border: "none",
+                  '& fieldset': {
+                    border: 'none',
                   },
                 }}
               >
-                <MenuItem
-                  value=""
-                  sx={{
-                    fontFamily: "Poppins",
-                    color: "#786E71",
-                    mt: "-8px",
-                    fontSize: "12px",
-                  }}
-                >
-                  <em>{t("pages.testSMS.selectMessagePlaceholder")}</em>
+                <MenuItem value="" sx={{ fontFamily: "Poppins", color: "#786E71" }}>
+                  <em>{t('pages.testSMS.numberPlaceholder')}</em>
                 </MenuItem>
-
-                {templates.map((template) => (
-                  <MenuItem
-                    key={template.id}
-                    value={template.id}
-                    sx={{
-                      maxWidth: 280,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      fontFamily: "Poppins",
-                    }}
-                  >
-                    {template.name}
-                  </MenuItem>
-                ))}
+                <MenuItem value="short" sx={{ fontFamily: "Poppins", color: "#786E71" }}>
+                  Número corto
+                </MenuItem>
+                <MenuItem value="long" sx={{ fontFamily: "Poppins", color: "#786E71" }}>
+                  Número largo
+                </MenuItem>
               </Select>
             </FormControl>
 
-            <IconButton
-              sx={{ p: 1 }}
-              onClick={() => {
-                if (!isViewButtonEnabled) return;
-
-                const template = templates.find(
-                  (t) => t.id === Number(selectedTemplateId)
-                );
-
-                console.log("Plantilla seleccionada:", template);
-
-                if (template) {
-                  setSelectedTemplate(template);
-                  setTimeout(() => setIsPreviewOpen(true), 0);
-                }
-              }}
-              disabled={!isViewButtonEnabled}
-            >
-              <Tooltip
-                title="Visualizar"
-                arrow
-                placement="top"
-                componentsProps={{
-                  tooltip: {
-                    sx: {
-                      backgroundColor: "rgba(0, 0, 0, 0.8)",
-                      color: "#CCC3C3",
-                      fontFamily: "Poppins, sans-serif",
-                      fontSize: "12px",
-                      padding: "6px 8px",
-                      borderRadius: "8px",
-                      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)",
-                    },
-                  },
-                  arrow: {
-                    sx: {
-                      color: "rgba(0, 0, 0, 0.8)",
-                    },
-                  },
-                }}
-                PopperProps={{
-                  modifiers: [
-                    {
-                      name: "offset",
-                      options: {
-                        offset: [0, -12],
-                      },
-                    },
-                  ],
-                }}
-              >
-                <img
-                  src={Iconeyesopen}
-                  style={{ color: isViewButtonEnabled ? "#7B354D" : "#C4C4C4" }}
-                />
-              </Tooltip>
-            </IconButton>
           </Box>
 
+          <Box sx={{}}>
+            <Typography
+              sx={{
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                fontWeight: 500,
+                mb: 1,
+                color: toNumberError ? "#D32F2F" : "#330F1B",
+              }}
+            >
+              {t('pages.testSMS.to')}
+            </Typography>
+
+            <TextField fullWidth
+              value={toNumber}
+              placeholder="5255"
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, '');
+                setToNumber(value);
+                setToNumberError(value.length !== 10);
+              }}
+              sx={{ width: "221px", height: "54px" }}
+              error={toNumberError}
+              helperText={toNumberError ? t('pages.testSMS.invalidNumber') : " "}
+
+              InputProps={{
+                sx: {
+                  backgroundColor: "#FFFFFF", fontFamily: "Poppins",
+                  '&::placeholder': {
+                    color: '#786E71',
+                    opacity: 0.8,
+                    fontFamily: "Poppins"
+                  }
+                },
+                endAdornment: (
+                  <Tooltip
+                    placement="bottom-end"
+                    componentsProps={{
+                      tooltip: {
+                        sx: {
+                          backgroundColor: "transparent",
+                          padding: 0,
+                        },
+                      },
+                    }}
+                    title={
+                      <Box
+                        sx={{
+                          backgroundColor: "#FFFFFF",
+                          borderRadius: "8px",
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                          padding: "8px 12px",
+                          fontSize: "14px",
+                          fontFamily: "Poppins",
+                          color: "#574B4F",
+                          whiteSpace: "pre-line",
+                          transform: "translate(-10px, -22px)",
+                          borderColor: "#00131F3D",
+                          borderStyle: "solid",
+                          borderWidth: "1px"
+                        }}
+                      >
+                        <>
+                          • Solo caracteres numéricos<br />
+                          • El teléfono debe incluir el<br />
+                          código del país
+                        </>
+                      </Box>
+                    }
+                  >
+                    <img
+                      src={toNumberError ? infoiconerror : infoicon}
+                      alt="info"
+                      style={{ width: 24, height: 24, marginRight: 8 }}
+                    />
+                  </Tooltip>
+                )
+              }}
+            />
+
+          </Box>
         </Box>
 
+        <Typography sx={{ fontFamily: "Poppins", fontSize: "14px", mb: 3, color: "#786E71" }}>
+          {t('pages.testSMS.writeMessageOrSelect')}
+        </Typography>
 
-      </Box>
-      <Box display="flex" justifyContent="flex-end" mt={-8} gap={3} marginRight={"310px"} >
-        <SecondaryButton
-          text={t('pages.testSMS.clear')}
-          onClick={() => {
-            setSelectedTemplate(null);
-            setFromNumber('');
-            setToNumber('');
-            setSelectedTemplateId('');
-            setMessage('');
-            setMessageError(false);
-            setToNumberError(false);
-          }}
-        />
-        <MainButton
-          text={t('pages.testSMS.send')}
-          onClick={() => {
-            handleSend();
-          }}
-          isLoading={Loading}
-          disabled={
-            toNumberError ||
-            messageError ||
-            (
-              !selectedTemplateId &&
-              message.trim().length === 0
-            )
-          }
-        />
+        <Box display="flex" gap={2}>
+          <Box flex={1}>
+            <Typography
+              sx={{
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                fontWeight: 500,
+                mb: 1,
+                color: messageError ? "#D32F2F" : "#330F1B",
+              }}
+            >
+              {t('pages.testSMS.message')}
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              value={message}
+              placeholder={t('pages.testSMS.writeMessageOrSelect')}
+              disabled={!!selectedTemplateId}
+              onChange={(e) => {
+                let value = e.target.value;
+
+                value = value.replace(/[^a-zA-Z0-9\s]/g, '');
+
+                if (value.length > 160) {
+                  value = value.slice(0, 160);
+                }
+
+                setMessage(value);
+
+                setMessageError(value.trim().length > 0 && value.trim().length < 3);
+
+                if (value.trim().length > 0) {
+                  setSelectedTemplateId('');
+                  setSelectedTemplate(null);
+                }
+              }}
+              error={messageError}
+              helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
+              inputProps={{ maxLength: 160 }}
+              InputProps={{
+                sx: {
+                  backgroundColor: "#FFFFFF",
+                  fontFamily: "Poppins",
+                  borderRadius: "2px",
+                  border: "1px solid #C6BFC299",
+                  width: "545px",
+                  height: "123px",
+                },
+                endAdornment: (
+                  <Tooltip
+                    placement="bottom-end"
+                    componentsProps={{
+                      tooltip: {
+                        sx: {
+                          backgroundColor: "transparent",
+                          padding: 0,
+                        },
+                      },
+                    }}
+                    title={
+                      <Box
+                        sx={{
+                          backgroundColor: "#FFFFFF",
+                          borderRadius: "8px",
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                          padding: "8px 12px",
+                          fontSize: "14px",
+                          fontFamily: "Poppins",
+                          color: "#574B4F",
+                          whiteSpace: "pre-line",
+                          transform: "translate(-10px, -22px)",
+                          borderColor: "#00131F3D",
+                          borderStyle: "solid",
+                          borderWidth: "1px"
+                        }}
+                      >
+                        <>
+                          • Solo caracteres alfanuméricos<br />
+                          • Longitud máxima de 160<br />
+                          caracteres
+                        </>
+                      </Box>
+                    }
+                  >
+                    <img
+                      src={messageError ? infoiconerror : infoicon}
+                      alt="info"
+                      style={{ width: 24, height: 24, marginLeft: "5px", marginTop: "-65px" }}
+                    />
+                  </Tooltip>
+                )
+              }}
+            />
+            <Typography
+              sx={{
+                fontFamily: "Poppins",
+                fontSize: "12px",
+                color: "#A1A1A1",
+                mt: -2, ml: 1.5
+              }}
+            >
+              {t('pages.testSMS.charactersCounter', { count: message.length })}
+            </Typography>
+          </Box>
+
+          <Box flex={1}>
+            <Typography sx={{ fontFamily: "Poppins", fontSize: "16px", fontWeight: 500, mb: 1 }}>
+              {t('pages.testSMS.template')}
+            </Typography>
+
+            <Box display="flex" alignItems="center" gap={1}>
+
+              <FormControl
+                sx={{
+                  backgroundColor: "#ffffff",
+                  fontFamily: "Poppins",
+                  borderRadius: "8px",
+                  border: "1px solid #9B9295",
+                  width: "220px",
+                  height: "40px",
+                }}
+                size="small"
+              >
+                <Select
+                  value={selectedTemplateId}
+                  onChange={(e) => {
+                    const id = e.target.value as string;
+                    setSelectedTemplateId(id);
+
+                    setMessage("");
+                    setMessageError(false);
+
+                    const t = templates.find((x) => x.id === Number(id)) || null;
+                    setSelectedTemplate(t);
+                  }}
+                  disabled={message.trim().length > 0}
+                  displayEmpty
+                  renderValue={(value) =>
+                    value ? (
+                      <span
+                        style={{
+                          display: "block",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {templates.find((t) => t.id === Number(value))?.name || ""}
+                      </span>
+                    ) : (
+                      <em style={{ color: "#786E71" }}>
+                        {t("pages.testSMS.selectMessagePlaceholder")}
+                      </em>
+                    )
+                  }
+                  sx={{
+                    color: "#786E71",
+                    borderRadius: "8px",
+                    fontFamily: "Poppins",
+                    fontSize: "14px",
+                    mt: "1px",
+
+                    paddingRight: "32px !important",
+
+                    "& .MuiSelect-select": {
+                      display: "block",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      paddingRight: "32px !important",
+                    },
+
+                    "& fieldset": {
+                      border: "none",
+                    },
+                  }}
+                >
+                  <MenuItem
+                    value=""
+                    sx={{
+                      fontFamily: "Poppins",
+                      color: "#786E71",
+                      mt: "-8px",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <em>{t("pages.testSMS.selectMessagePlaceholder")}</em>
+                  </MenuItem>
+
+                  {templates.map((template) => (
+                    <MenuItem
+                      key={template.id}
+                      value={template.id}
+                      sx={{
+                        maxWidth: 280,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        fontFamily: "Poppins",
+                      }}
+                    >
+                      {template.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <IconButton
+                sx={{ p: 1 }}
+                onClick={() => {
+                  if (!isViewButtonEnabled) return;
+
+                  const template = templates.find(
+                    (t) => t.id === Number(selectedTemplateId)
+                  );
+
+                  console.log("Plantilla seleccionada:", template);
+
+                  if (template) {
+                    setSelectedTemplate(template);
+                    setTimeout(() => setIsPreviewOpen(true), 0);
+                  }
+                }}
+                disabled={!isViewButtonEnabled}
+              >
+                <Tooltip
+                  title="Visualizar"
+                  arrow
+                  placement="top"
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        backgroundColor: "rgba(0, 0, 0, 0.8)",
+                        color: "#CCC3C3",
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "12px",
+                        padding: "6px 8px",
+                        borderRadius: "8px",
+                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)",
+                      },
+                    },
+                    arrow: {
+                      sx: {
+                        color: "rgba(0, 0, 0, 0.8)",
+                      },
+                    },
+                  }}
+                  PopperProps={{
+                    modifiers: [
+                      {
+                        name: "offset",
+                        options: {
+                          offset: [0, -12],
+                        },
+                      },
+                    ],
+                  }}
+                >
+                  <img
+                    src={Iconeyesopen}
+                    style={{ color: isViewButtonEnabled ? "#7B354D" : "#C4C4C4" }}
+                  />
+                </Tooltip>
+              </IconButton>
+            </Box>
+
+          </Box>
+
+
+        </Box>
+        <Box display="flex" justifyContent="center" mt={-8} gap={3} marginLeft={"280px"}>
+          <SecondaryButton
+            text={t('pages.testSMS.clear')}
+            onClick={() => {
+              setSelectedTemplate(null);
+              setFromNumber('');
+              setToNumber('');
+              setSelectedTemplateId('');
+              setMessage('');
+              setMessageError(false);
+              setToNumberError(false);
+            }}
+          />
+          <MainButton
+            text={t('pages.testSMS.send')}
+            onClick={() => {
+              handleSend();
+            }}
+            isLoading={Loading}
+            disabled={
+              !fromNumber ||
+              toNumber.trim().length === 0 ||
+              toNumberError ||
+              messageError ||
+              (
+                !selectedTemplateId &&
+                message.trim().length === 0
+              )
+            }
+          />
+        </Box>
       </Box>
       <Modal open={isPreviewOpen} onClose={() => setIsPreviewOpen(false)}>
         <Box
@@ -664,6 +691,6 @@ export default function TestSMS() {
         buttonText="Cerrar"
         onClose={() => setIsErrorModalOpen(false)}
       />
-    </div>
+    </Box>
   );
 }

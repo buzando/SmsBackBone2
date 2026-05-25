@@ -618,14 +618,7 @@ const AccountRecharge: React.FC = () => {
     return (
         <Box
             sx={{
-                marginTop: "-50px",
-                width: "100%",
-                minHeight: "100vh",
-                overflowY: "auto",
-                backgroundColor: "#F2F2F2", // opcional para que se vea más claro
-                px: 4,
-                pb: 8, // aire abajo para que los botones no queden pegados o escondidos
-                boxSizing: "border-box",
+
             }}
         >
             {/* Modal de confirmación para eliminar */}
@@ -797,7 +790,25 @@ const AccountRecharge: React.FC = () => {
                 </Box>
             </Modal>
 
-            <Box p={3} sx={{ marginTop: "-30px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden', marginLeft: "-32px" }}>
+            <Box p={3}
+                sx={{
+                    width: "100%",
+                    mx: "auto",
+                    px: {
+                        sm: 2,
+                        md: 3,
+                        lg: 3,
+                    },
+                    pt: {
+                        sm: 2,
+                        md: 3,
+                    },
+
+                    minHeight: "calc(100vh - 64px)",
+
+                    overflowX: "hidden", marginTop: "-10px"
+                }}
+            >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     <IconButton
                         onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -827,7 +838,6 @@ const AccountRecharge: React.FC = () => {
                 </Box>
                 <Divider sx={{ marginBottom: '17px', marginTop: '16px', marginLeft: "32px" }} />
                 <Box sx={{ marginLeft: "50px", }}>
-
 
                     <form onSubmit={(e) => e.preventDefault()}>
                         <div style={{ marginBottom: '20px', width: '60%' }}> {/* Hacemos más estrecho el recuadro */}
@@ -1068,14 +1078,15 @@ const AccountRecharge: React.FC = () => {
 
                         <MainButtonIcon onClick={handleOpenModal} text='Agregar Tarjeta' width='210px' />
 
-                        <div style={{
-                            display: 'flex',
-                            gap: '20px',
-                            overflowX: 'auto',
-                            whiteSpace: 'nowrap',
-                            marginTop: '20px',
-                            paddingBottom: '10px',
-                        }}>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: "20px",
+                                margin: "20px 0px",
+                                marginBottom: "20px"
+                            }}
+                        >
                             {creditCards.map((card) => (
                                 <div
                                     key={card.id}
@@ -1191,11 +1202,11 @@ const AccountRecharge: React.FC = () => {
                                     </Tooltip>
                                 </div>
                             ))}
-                        </div>
+                        </Box>
 
-                        <Box sx={{ width: '100%', marginTop: '24px' }}>
+                        <Box sx={{ width: '100%', marginTop: '-14px' }}>
                             {/* Checkbox */}
-                            <Box sx={{ marginBottom: '4px' }}>
+                            <Box sx={{ marginBottom: '-14px' }}>
                                 <FormControlLabel
                                     control={
                                         <Checkbox
@@ -1241,7 +1252,7 @@ const AccountRecharge: React.FC = () => {
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
                                     width: '100%',
-                                    padding: '8px 0',
+                                    padding: '8px 0', marginBottom: 3.5
                                 }}
                             >
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

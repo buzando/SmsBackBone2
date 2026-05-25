@@ -305,6 +305,8 @@ const PaymentMethods: React.FC = () => {
             setTitleErrorModal('Error al añadir tarjeta');
             setMessageErrorModal('Algo salió mal. Inténtelo de nuevo o regreso más tarde.');
             setIsErrorModalOpen(true);
+            clearForm();
+
         } finally {
             handleCloseModal();
             setLoading(false);
@@ -433,7 +435,28 @@ const PaymentMethods: React.FC = () => {
     };
 
     return (
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1180px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+
+                mx: "auto",
+
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+
+                minHeight: "calc(100vh - 64px)",
+
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -518,7 +541,15 @@ const PaymentMethods: React.FC = () => {
                         <span className="mr-2">+</span> Add Card
                     </span>
                 </MainIcon>
-                <div style={{ display: 'flex', gap: '20px', margin: '20px 0', flexWrap: 'wrap' }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: "20px",
+                        margin: "20px 0px",
+                        marginBottom: "40px"
+                    }}
+                >
                     {creditCards.map((card) => (
                         <div
                             key={card.id}
@@ -651,7 +682,7 @@ const PaymentMethods: React.FC = () => {
                             </button>
                         </div>
                     ))}
-                </div>
+                </Box>
             </Box>
             <ModalError
                 isOpen={isErrorModalOpen}
