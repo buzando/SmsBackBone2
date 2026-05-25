@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect, type CSSProperties } from "react";
 import axios from "../components/commons/AxiosInstance";
 import {
     Box,
@@ -52,7 +52,8 @@ import IconHouse from "../assets/IconHouse.svg";
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import SecondaryButton from "../components/commons/SecondaryButton";
 import MainButton from "../components/commons/MainButton";
-
+import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
+import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 const INITIAL_FORM_DATA: FormData = {
     name: "", email: "", confirmEmail: "", phone: "",
     useRecoveryEmail: false, password: "", confirmPassword: "",
@@ -124,6 +125,142 @@ const ManageAccounts: React.FC = () => {
         profile: "",
         rooms: "",
     });
+    const [runSearchCreateTour, setRunSearchCreateTour] = useState(false);
+
+    const joyrideTextStyle: CSSProperties = {
+        textAlign: 'left',
+        font: 'normal normal normal 14px/20px Poppins',
+        letterSpacing: '0px',
+        color: '#574B4F',
+        opacity: 1,
+    };
+
+    const joyrideActionButtonStyle: CSSProperties = {
+        textAlign: 'center',
+        font: 'normal normal 600 14px/54px Poppins',
+        letterSpacing: '1.12px',
+        color: '#833A53',
+        textTransform: 'uppercase',
+        opacity: 1,
+        backgroundColor: 'transparent',
+        border: 'none',
+        boxShadow: 'none',
+        padding: '0 16px',
+    };
+
+    const joyrideTitle = (title: string, count: string) => (
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+            }}
+        >
+            <Typography
+                sx={{
+                    textAlign: 'left',
+                    font: 'normal normal 500 14px/20px Poppins',
+                    letterSpacing: '0px',
+                    color: '#574B4F',
+                    opacity: 1,
+                }}
+            >
+                {title}
+            </Typography>
+
+            <Typography
+                sx={{
+                    textAlign: 'right',
+                    font: 'normal normal normal 14px/20px Poppins',
+                    letterSpacing: '0px',
+                    color: '#9B9295',
+                    opacity: 1,
+                }}
+            >
+                {count}
+            </Typography>
+        </Box>
+    );
+
+    const searchCreateSteps: Step[] = [
+        {
+            target: '.tour-search-create',
+            title: joyrideTitle('Búsqueda y creación', '1/1'),
+            skipBeacon: true,
+            placement: 'bottom',
+            content: (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '22px',
+                    }}
+                >
+                    <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                        <AddIcon
+                            sx={{
+                                width: '24px',
+                                height: '24px',
+                                color: '#9B9295',
+                                mt: '2px',
+                            }}
+                        />
+
+                        <Typography sx={joyrideTextStyle}>
+                            Añade nuevos elementos para poder configurarlos.
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                        <Box
+                            component="img"
+                            src={seachicon}
+                            alt="Buscar"
+                            sx={{
+                                width: '24px',
+                                height: '24px',
+                                mt: '2px',
+                            }}
+                        />
+
+                        <Typography sx={joyrideTextStyle}>
+                            Cuando cuentes con recursos, podrás buscar un elemento en específico.
+                        </Typography>
+                    </Box>
+                </Box>
+            ),
+        },
+    ];
+
+    const handleSearchCreateJoyrideEvent = (data: EventData) => {
+        const { status, type } = data;
+
+        if (
+            type === EVENTS.TOUR_END ||
+            status === STATUS.FINISHED ||
+            status === STATUS.SKIPPED
+        ) {
+            localStorage.setItem('hasSeenSearchCreateOnboarding', 'true');
+            setRunSearchCreateTour(false);
+        }
+    };
+
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('hasSeenSearchCreateOnboarding');
+
+        if (hasSeenTour) return;
+
+        const timer = setTimeout(() => {
+            const targetReady = document.querySelector('.tour-search-create');
+
+            if (targetReady) {
+                setRunSearchCreateTour(true);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     const filteredAccounts = accounts.filter((account) =>
         account.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -509,6 +646,47 @@ const ManageAccounts: React.FC = () => {
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1360px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+            <Joyride
+                steps={searchCreateSteps}
+                run={runSearchCreateTour}
+                continuous
+                onEvent={handleSearchCreateJoyrideEvent}
+                locale={{
+                    skip: 'SALTAR',
+                    next: '›',
+                    back: '‹',
+                    last: 'ENTENDIDO',
+                    close: 'CERRAR',
+                }}
+                options={{
+                    primaryColor: '#833A53',
+                    zIndex: 10000,
+                    buttons: ['primary'] as const,
+                }}
+                styles={{
+                    ...joyrideBaseStyles,
+                    tooltip: {
+                        background: '#FFFFFF 0% 0% no-repeat padding-box',
+                        boxShadow: '0px 8px 16px #00131F3D',
+                        border: '1px solid #9B9295',
+                        opacity: 1,
+                        borderRadius: '8px',
+                        padding: '20px',
+                        width: '400px',
+                    },
+                    tooltipContainer: {
+                        textAlign: 'left',
+                    },
+                    tooltipTitle: {
+                        width: '100%',
+                        marginBottom: '14px',
+                    },
+                    tooltipContent: {
+                        padding: 0,
+                    },
+                    buttonPrimary: joyrideActionButtonStyle,
+                }}
+            />
             <Backdrop
                 open={loading}
                 sx={{
@@ -542,7 +720,7 @@ const ManageAccounts: React.FC = () => {
 
             <Box sx={{ marginLeft: "32px", }}>
                 <Divider sx={{ marginBottom: "24px", marginTop: "18px" }} />
-                <Box sx={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
+                <Box className="tour-search-create" sx={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
                     <Button
                         variant="contained"
                         startIcon={<AddIcon />}

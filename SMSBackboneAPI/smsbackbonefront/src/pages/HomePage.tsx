@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, type CSSProperties } from 'react';
 import { CircularProgress, Button, Grid, Paper, Typography, IconButton, Modal, Box, TextField, Checkbox, FormControlLabel, Divider, InputAdornment, Tooltip, tooltipClasses, TooltipProps, Popper, Radio, RadioGroup } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
@@ -26,7 +26,8 @@ import SnackBar from "../components/commons/ChipBar";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useSelectedRoom } from "../hooks/useSelectedRoom";
-
+import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
+import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 // Preferimos declarar primero el objeto y luego el type (evita "used before declaration")
 const defaultSettings = {
     campanasActivas: true,
@@ -132,6 +133,143 @@ const HomePage: React.FC = () => {
     const [MessageSnackBar, setMessageSnackBar] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [runHomeActionsTour, setRunHomeActionsTour] = useState(false);
+    const joyrideTextStyle: CSSProperties = {
+        textAlign: 'left',
+        font: 'normal normal normal 14px/20px Poppins',
+        letterSpacing: '0px',
+        color: '#574B4F',
+        opacity: 1,
+    };
+
+    const joyrideActionButtonStyle: CSSProperties = {
+        textAlign: 'center',
+        font: 'normal normal 600 14px/54px Poppins',
+        letterSpacing: '1.12px',
+        color: '#833A53',
+        textTransform: 'uppercase',
+        opacity: 1,
+        backgroundColor: 'transparent',
+        border: 'none',
+        boxShadow: 'none',
+        padding: '0 16px',
+    };
+
+    const joyrideTitle = (title: string, count: string) => (
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+            }}
+        >
+            <Typography
+                sx={{
+                    textAlign: 'left',
+                    font: 'normal normal 500 14px/20px Poppins',
+                    letterSpacing: '0px',
+                    color: '#574B4F',
+                    opacity: 1,
+                }}
+            >
+                {title}
+            </Typography>
+
+            <Typography
+                sx={{
+                    textAlign: 'right',
+                    font: 'normal normal normal 14px/20px Poppins',
+                    letterSpacing: '0px',
+                    color: '#9B9295',
+                    opacity: 1,
+                }}
+            >
+                {count}
+            </Typography>
+        </Box>
+    );
+
+    const homeActionsSteps: Step[] = [
+        {
+            target: '.tour-home-actions',
+            title: joyrideTitle('Acciones', '1/1'),
+            skipBeacon: true,
+            placement: 'bottom',
+            content: (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '18px',
+                    }}
+                >
+                    <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                        <Typography sx={{ ...joyrideTextStyle, fontWeight: 500, minWidth: '34px' }}>
+                            USO
+                        </Typography>
+                        <Typography sx={joyrideTextStyle}>
+                            Puedes consultar la distribución de los créditos en cada campaña y por cada usuario.
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                        <Box
+                            component="img"
+                            src={fast}
+                            alt="Envío rápido"
+                            sx={{ width: '24px', height: '24px', mt: '2px' }}
+                        />
+                        <Typography sx={joyrideTextStyle}>
+                            Puedes hacer pruebas rápidas de SMS.
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                        <Box
+                            component="img"
+                            src={welcome}
+                            alt="Editar información"
+                            sx={{ width: '24px', height: '24px', mt: '2px' }}
+                        />
+                        <Typography sx={joyrideTextStyle}>
+                            Decide qué información deseas visualizar en tu tablero de control.
+                        </Typography>
+                    </Box>
+                </Box>
+            ),
+        },
+    ];
+
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('hasSeenHomeActionsOnboarding');
+
+        if (hasSeenTour) return;
+        if (!showData || !enableButtons || !selectedOption) return;
+
+        const timer = setTimeout(() => {
+            const actionsReady = document.querySelector('.tour-home-actions');
+
+            if (actionsReady) {
+                setRunHomeActionsTour(true);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [showData, enableButtons, selectedOption]);
+
+    const handleHomeActionsJoyrideEvent = (data: EventData) => {
+        const { status, type } = data;
+
+        if (
+            type === EVENTS.TOUR_END ||
+            status === STATUS.FINISHED ||
+            status === STATUS.SKIPPED
+        ) {
+            localStorage.setItem('hasSeenHomeActionsOnboarding', 'true');
+            setRunHomeActionsTour(false);
+        }
+    };
 
     const selectedRoom = useSelectedRoom();
     const roomId = selectedRoom?.id;
@@ -511,6 +649,47 @@ const HomePage: React.FC = () => {
             marginTop: "-70px"
 
         }}>
+            <Joyride
+                steps={homeActionsSteps}
+                run={runHomeActionsTour}
+                continuous
+                onEvent={handleHomeActionsJoyrideEvent}
+                locale={{
+                    skip: 'SALTAR',
+                    next: '›',
+                    back: '‹',
+                    last: 'ENTENDIDO',
+                    close: 'CERRAR',
+                }}
+                options={{
+                    primaryColor: '#833A53',
+                    zIndex: 10000,
+                    buttons: ['primary'] as const,
+                }}
+                styles={{
+                    ...joyrideBaseStyles,
+                    tooltip: {
+                        background: '#FFFFFF 0% 0% no-repeat padding-box',
+                        boxShadow: '0px 8px 16px #00131F3D',
+                        border: '1px solid #9B9295',
+                        opacity: 1,
+                        borderRadius: '8px',
+                        padding: '20px',
+                        width: '320px',
+                    },
+                    tooltipContainer: {
+                        textAlign: 'left',
+                    },
+                    tooltipTitle: {
+                        width: '100%',
+                        marginBottom: '14px',
+                    },
+                    tooltipContent: {
+                        padding: 0,
+                    },
+                    buttonPrimary: joyrideActionButtonStyle,
+                }}
+            />
 
             <Box
                 sx={{
@@ -551,6 +730,7 @@ const HomePage: React.FC = () => {
 
                     {/* CANAL (izquierda) */}
                     <Button
+                        className="tour-channel-button"
                         variant="outlined"
                         sx={buttonStyle}
                         onClick={handleClick}
@@ -652,6 +832,7 @@ const HomePage: React.FC = () => {
                     {/* BOTONES DERECHA */}
                     {enableButtons && (
                         <Box
+                            className="tour-home-actions"
                             sx={{
                                 display: "flex",
                                 alignItems: "center",

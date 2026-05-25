@@ -29,7 +29,7 @@ namespace Business
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(UserManager));
 
-        public bool AgregarCliente(clientDTO cliente)
+        public bool AgregarCliente(clientDTO cliente, bool tmpssw = true)
         {
 
             try
@@ -41,7 +41,7 @@ namespace Business
                 cliente.LongRateQty = "1";
                 cliente.ShortRateType = 0;
                 cliente.LongRateType = 0;
-                cliente.TmpPassword = true;
+                cliente.TmpPassword = tmpssw;
                 var config = new MapperConfiguration(cfg =>
 
   cfg.CreateMap<clientDTO, clients>()
@@ -250,7 +250,7 @@ namespace Business
                 var cliente = clientMgr.ObtenerClienteporNombre(register.client);
                 if (cliente == null)
                 {
-                    var ok = clientMgr.AgregarCliente(new clientDTO { nombrecliente = register.client });
+                    var ok = clientMgr.AgregarCliente(new clientDTO { nombrecliente = register.client }, false);
                     if (!ok) throw new Exception("Error al guardar cliente, intente más tarde");
                     cliente = clientMgr.ObtenerClienteporNombre(register.client);
                     if (cliente == null) throw new Exception("Cliente no disponible tras crear");
@@ -280,7 +280,8 @@ namespace Business
                         status = true,
                         SecondaryEmail = register.emailConfirmation,
                         futurerooms = false,
-                        IdCliente = cliente.id
+                        IdCliente = cliente.id,
+                       
                     };
 
                     using (var ctx = new Entities())

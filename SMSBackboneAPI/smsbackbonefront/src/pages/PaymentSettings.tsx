@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, type CSSProperties } from 'react';
 import { Checkbox, TextField, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, Backdrop, CircularProgress, Typography, FormControlLabel, Divider } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import axios from "../components/commons/AxiosInstance";
@@ -32,7 +32,8 @@ import spei from '../assets/spei.png'
 import openpay from '../assets/OpenPayLogoColor.jpg';
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import IconCheckBox2 from "../assets/IconCheckBox2.svg";
-
+import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
+import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 type Account = {
     id: number;
     name: string;
@@ -118,6 +119,130 @@ const PaymentSettings: React.FC = () => {
     const [isShortSmsEnabled, setIsShortSmsEnabled] = useState(false);
     const [isLongSmsEnabled, setIsLongSmsEnabled] = useState(false);
     const [isCallEnabled, setIsCallEnabled] = useState(false);
+    const [runPaymentTour, setRunPaymentTour] = useState(false);
+
+    const joyrideTextStyle: CSSProperties = {
+        textAlign: 'left',
+        font: 'normal normal normal 14px/20px Poppins',
+        letterSpacing: '0px',
+        color: '#574B4F',
+        opacity: 1,
+    };
+
+    const joyrideActionButtonStyle: CSSProperties = {
+        textAlign: 'center',
+        font: 'normal normal 600 14px/54px Poppins',
+        letterSpacing: '1.12px',
+        color: '#833A53',
+        textTransform: 'uppercase',
+        opacity: 1,
+        backgroundColor: 'transparent',
+        border: 'none',
+        boxShadow: 'none',
+        padding: '0 16px',
+    };
+
+    const joyrideTitle = (title: string, count: string) => (
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+            }}
+        >
+            <Typography
+                sx={{
+                    textAlign: 'left',
+                    font: 'normal normal 500 14px/20px Poppins',
+                    letterSpacing: '0px',
+                    color: '#574B4F',
+                    opacity: 1,
+                }}
+            >
+                {title}
+            </Typography>
+
+            <Typography
+                sx={{
+                    textAlign: 'right',
+                    font: 'normal normal normal 14px/20px Poppins',
+                    letterSpacing: '0px',
+                    color: '#9B9295',
+                    opacity: 1,
+                }}
+            >
+                {count}
+            </Typography>
+        </Box>
+    );
+
+    const paymentTourSteps: Step[] = [
+        {
+            target: '.tour-payment-alert',
+            title: joyrideTitle('Activa una alerta', '1/3'),
+            skipBeacon: true,
+            placement: 'bottom',
+            content: (
+                <Typography sx={joyrideTextStyle}>
+                    Marca esta casilla para recibir notificaciones por correo cuando tus créditos bajen al límite que definas.
+                </Typography>
+            ),
+        },
+        {
+            target: '.tour-payment-channel-threshold',
+            title: joyrideTitle('Define canal y umbral', '2/3'),
+            placement: 'right',
+            content: (
+                <Typography sx={joyrideTextStyle}>
+                    Elige los canales (SMS Corto y/o Largo) que deseas monitorear e indica la cantidad mínima de créditos.
+                </Typography>
+            ),
+        },
+        {
+            target: '.tour-payment-users',
+            title: joyrideTitle('Selecciona destinatarios', '3/3'),
+            placement: 'right',
+            content: (
+                <Typography sx={joyrideTextStyle}>
+                    Elige a los administradores, supervisores y/o monitores que recibirán la notificación cuando se alcance el límite establecido.
+                </Typography>
+            ),
+        },
+    ];
+
+    const handlePaymentJoyrideEvent = (data: EventData) => {
+        const { status, type } = data;
+
+        if (
+            type === EVENTS.TOUR_END ||
+            status === STATUS.FINISHED ||
+            status === STATUS.SKIPPED
+        ) {
+            localStorage.setItem('hasSeenPaymentSettingsOnboarding', 'true');
+            setRunPaymentTour(false);
+        }
+    };
+
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('hasSeenPaymentSettingsOnboarding');
+
+        if (hasSeenTour || loading) return;
+
+        const timer = setTimeout(() => {
+            const alertReady = document.querySelector('.tour-payment-alert');
+            const channelReady = document.querySelector('.tour-payment-channel-threshold');
+            const usersReady = document.querySelector('.tour-payment-users');
+
+            if (alertReady && channelReady && usersReady) {
+                setRunPaymentTour(true);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [loading]);
+
+
     const WhiteTooltip = styled(({ className, ...props }: TooltipProps) => (
         <Tooltip {...props} classes={{ popper: className }} />
     ))(() => ({
@@ -561,6 +686,49 @@ const PaymentSettings: React.FC = () => {
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+            <Joyride
+                steps={paymentTourSteps}
+                run={runPaymentTour}
+                continuous
+                onEvent={handlePaymentJoyrideEvent}
+                locale={{
+                    skip: 'SALTAR',
+                    next: '›',
+                    back: '‹',
+                    last: 'ENTENDIDO',
+                    close: 'CERRAR',
+                }}
+                options={{
+                    primaryColor: '#833A53',
+                    zIndex: 10000,
+                    buttons: ['skip', 'back', 'primary'] as const,
+                }}
+                styles={{
+                    ...joyrideBaseStyles,
+                    tooltip: {
+                        background: '#FFFFFF 0% 0% no-repeat padding-box',
+                        boxShadow: '0px 8px 16px #00131F3D',
+                        border: '1px solid #9B9295',
+                        opacity: 1,
+                        borderRadius: '8px',
+                        padding: '20px',
+                        width: '325px',
+                    },
+                    tooltipContainer: {
+                        textAlign: 'left',
+                    },
+                    tooltipTitle: {
+                        width: '100%',
+                        marginBottom: '14px',
+                    },
+                    tooltipContent: {
+                        padding: 0,
+                    },
+                    buttonSkip: joyrideActionButtonStyle,
+                    buttonPrimary: joyrideActionButtonStyle,
+                    buttonBack: joyrideActionButtonStyle,
+                }}
+            />
             <Box sx={{ display: 'flex', alignItems: 'center', pl: '0px', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
@@ -589,7 +757,7 @@ const PaymentSettings: React.FC = () => {
                 <Divider sx={{ width: 'calc(100% + 0px)', marginLeft: '0px', mb: 1.5, mt: 1 }} />
                 <Box sx={{ overflowY: "auto", marginRight: "0px" }}>
                     {/* Checkbox para activar alertas */}
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <label className="tour-payment-alert" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                         <Checkbox
                             checked={isNotificationEnabled}
                             onChange={handleNotificationToggle}
@@ -633,193 +801,149 @@ const PaymentSettings: React.FC = () => {
                     </label>
 
                     {/* Sección de canales */}
-                    <h3
-                        style={{
-                            textAlign: 'left',
-                            fontFamily: "Poppins",
-                            letterSpacing: '0px',
-                            fontWeight: "500",
-                            color: isNotificationEnabled ? '#330F1B' : '#B0B0B0',
-                            opacity: 1,
-                            fontSize: '16px',
-                        }}
-                    >
-                        Seleccionar canal
-                    </h3>
-                    <div style={{ opacity: isNotificationEnabled ? 1 : 0.5, pointerEvents: isNotificationEnabled ? 'auto' : 'none' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            {['SMS # cortos', 'SMS # largos'].map((channel) => {
-                                const isChecked = selectedChannels.includes(channel);
-                                return (
-                                    <label key={channel} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                        <Checkbox
-                                            checked={isChecked}
-                                            onChange={() => handleChannelToggle(channel)}
-                                            checkedIcon={
-                                                <Box
-                                                    sx={{
-                                                        width: '24px',
-                                                        height: '24px',
-                                                        position: 'relative',
-                                                        marginTop: '0px',
-                                                        marginLeft: '0px',
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={IconCheckBox1}
-                                                        alt="Seleccionado"
-                                                        style={{ width: '24px', height: '24px' }}
-                                                    />
-                                                </Box>
-                                            }
-                                        />
-                                        <span
-                                            style={{
-                                                textAlign: 'left',
-                                                fontFamily: 'Poppins',
-                                                letterSpacing: '0px',
-                                                color: isChecked ? '#8F4D63' : '#574B4FCC',
-                                                fontSize: '16px',
-                                            }}
-                                        >
-                                            {channel}
-                                        </span>
-                                    </label>
-                                );
-                            })}
-                        </div>
-
-                        {/*Ingresar Cantidad */}
+                    <Box className="tour-payment-channel-threshold">
                         <h3
                             style={{
                                 textAlign: 'left',
                                 fontFamily: "Poppins",
-                                fontWeight: "500",
                                 letterSpacing: '0px',
-                                color: '#330F1B',
+                                fontWeight: "500",
+                                color: isNotificationEnabled ? '#330F1B' : '#B0B0B0',
                                 opacity: 1,
                                 fontSize: '16px',
-                                marginTop: '20px',
                             }}
                         >
-                            Ingresar Cantidad
+                            Seleccionar canal
                         </h3>
-                        <TextField
-                            value={threshold}
-                            onChange={(e) => setThreshold(e.target.value)}
-                            type="number"
-                            disabled={!isNotificationEnabled}
-                            sx={{
-                                background: '#FFFFFF',
-                                borderRadius: '4px',
-                                opacity: 1,
-                                width: '100%',
-                                maxWidth: '220px',
-                                height: '54px',
-                                '& .MuiInputBase-input': {
-                                    fontFamily: 'Poppins, sans-serif',
-                                    fontWeight: 500,
+                        <div style={{ opacity: isNotificationEnabled ? 1 : 0.5, pointerEvents: isNotificationEnabled ? 'auto' : 'none' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                {['SMS # cortos', 'SMS # largos'].map((channel) => {
+                                    const isChecked = selectedChannels.includes(channel);
+                                    return (
+                                        <label key={channel} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <Checkbox
+                                                checked={isChecked}
+                                                onChange={() => handleChannelToggle(channel)}
+                                                checkedIcon={
+                                                    <Box
+                                                        sx={{
+                                                            width: '24px',
+                                                            height: '24px',
+                                                            position: 'relative',
+                                                            marginTop: '0px',
+                                                            marginLeft: '0px',
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={IconCheckBox1}
+                                                            alt="Seleccionado"
+                                                            style={{ width: '24px', height: '24px' }}
+                                                        />
+                                                    </Box>
+                                                }
+                                            />
+                                            <span
+                                                style={{
+                                                    textAlign: 'left',
+                                                    fontFamily: 'Poppins',
+                                                    letterSpacing: '0px',
+                                                    color: isChecked ? '#8F4D63' : '#574B4FCC',
+                                                    fontSize: '16px',
+                                                }}
+                                            >
+                                                {channel}
+                                            </span>
+                                        </label>
+                                    );
+                                })}
+                            </div>
 
-                                    // 🔽 Remueve las flechas en navegadores
-                                    MozAppearance: 'textfield', // Firefox
-                                    '&::-webkit-outer-spin-button': {
-                                        WebkitAppearance: 'none',
-                                        margin: 0,
-                                    },
-                                    '&::-webkit-inner-spin-button': {
-                                        WebkitAppearance: 'none',
-                                        margin: 0,
-                                    },
-                                }
-                            }}
-                        />
+                            {/*Ingresar Cantidad */}
+                            <h3
+                                style={{
+                                    textAlign: 'left',
+                                    fontFamily: "Poppins",
+                                    fontWeight: "500",
+                                    letterSpacing: '0px',
+                                    color: '#330F1B',
+                                    opacity: 1,
+                                    fontSize: '16px',
+                                    marginTop: '20px',
+                                }}
+                            >
+                                Ingresar Cantidad
+                            </h3>
+                            <TextField
+                                value={threshold}
+                                onChange={(e) => setThreshold(e.target.value)}
+                                type="number"
+                                disabled={!isNotificationEnabled}
+                                sx={{
+                                    background: '#FFFFFF',
+                                    borderRadius: '4px',
+                                    opacity: 1,
+                                    width: '100%',
+                                    maxWidth: '220px',
+                                    height: '54px',
+                                    '& .MuiInputBase-input': {
+                                        fontFamily: 'Poppins, sans-serif',
+                                        fontWeight: 500,
 
-                        {/* Título de la tabla */}
-                        <h3
-                            style={{
-                                textAlign: 'left',
-                                fontFamily: "Poppins",
-                                fontWeight: "500",
-                                letterSpacing: '0px',
-                                color: '#330F1B',
-                                opacity: 1,
-                                fontSize: '16px',
-                                marginTop: '20px'
-                            }}
-                        >
-                            Seleccionar usuarios para recibir notificación
-                        </h3>
-
-                        {/* Tabla de usuarios */}
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <TableContainer component={Paper} style={{
-                                background: '#FFFFFF 0% 0% no-repeat padding-box',
-                                border: '1px solid #E6E4E4',
-                                borderRadius: '8px',
-                                opacity: 1,
-                                width: '553px',
-                                maxHeight: "200px",
-                                overflowY: 'auto',
-
-                            }}>
-                                <Table
-                                    sx={{
-                                        '& .MuiTableCell-root': {
-                                            padding: '8px 6px'
+                                        // 🔽 Remueve las flechas en navegadores
+                                        MozAppearance: 'textfield', // Firefox
+                                        '&::-webkit-outer-spin-button': {
+                                            WebkitAppearance: 'none',
+                                            margin: 0,
                                         },
-                                    }}>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>
-                                                <Checkbox
-                                                    checked={Users.length > 0 && selectedUsers.length === Users.length}
-                                                    indeterminate={selectedUsers.length > 0 && selectedUsers.length < Users.length}
-                                                    onChange={handleToggleAllUsers}
-                                                    disabled={!isNotificationEnabled}
-                                                    checkedIcon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                                position: 'relative',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={IconCheckBox1}
-                                                                alt="Seleccionado"
-                                                                style={{ width: '24px', height: '24px' }}
-                                                            />
-                                                        </Box>
-                                                    }
-                                                    indeterminateIcon={
-                                                        <Box
-                                                            sx={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                                position: 'relative',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={IconCheckBox2}
-                                                                alt="Indeterminado"
-                                                                style={{ width: '24px', height: '24px' }}
-                                                            />
-                                                        </Box>
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Nombre</TableCell>
-                                            <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Rol</TableCell>
-                                            <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Ícono</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {Users.map((user) => (
-                                            <TableRow key={user.id}>
+                                        '&::-webkit-inner-spin-button': {
+                                            WebkitAppearance: 'none',
+                                            margin: 0,
+                                        },
+                                    }
+                                }}
+                            />
+
+                            {/* Título de la tabla */}
+                            <h3
+                                style={{
+                                    textAlign: 'left',
+                                    fontFamily: "Poppins",
+                                    fontWeight: "500",
+                                    letterSpacing: '0px',
+                                    color: '#330F1B',
+                                    opacity: 1,
+                                    fontSize: '16px',
+                                    marginTop: '20px'
+                                }}
+                            >
+                                Seleccionar usuarios para recibir notificación
+                            </h3>
+
+                            {/* Tabla de usuarios */}
+                            <Box className="tour-payment-users" display="flex" justifyContent="space-between" alignItems="center">
+                                <TableContainer component={Paper} style={{
+                                    background: '#FFFFFF 0% 0% no-repeat padding-box',
+                                    border: '1px solid #E6E4E4',
+                                    borderRadius: '8px',
+                                    opacity: 1,
+                                    width: '553px',
+                                    maxHeight: "200px",
+                                    overflowY: 'auto',
+
+                                }}>
+                                    <Table
+                                        sx={{
+                                            '& .MuiTableCell-root': {
+                                                padding: '8px 6px'
+                                            },
+                                        }}>
+                                        <TableHead>
+                                            <TableRow>
                                                 <TableCell>
                                                     <Checkbox
-                                                        checked={selectedUsers.includes(Number(user.id))}
-                                                        onChange={() => handleUserToggle(user.id)}
+                                                        checked={Users.length > 0 && selectedUsers.length === Users.length}
+                                                        indeterminate={selectedUsers.length > 0 && selectedUsers.length < Users.length}
+                                                        onChange={handleToggleAllUsers}
                                                         disabled={!isNotificationEnabled}
                                                         checkedIcon={
                                                             <Box
@@ -827,8 +951,6 @@ const PaymentSettings: React.FC = () => {
                                                                     width: '24px',
                                                                     height: '24px',
                                                                     position: 'relative',
-                                                                    marginTop: '0px',
-                                                                    marginLeft: '0px',
                                                                 }}
                                                             >
                                                                 <img
@@ -838,28 +960,75 @@ const PaymentSettings: React.FC = () => {
                                                                 />
                                                             </Box>
                                                         }
+                                                        indeterminateIcon={
+                                                            <Box
+                                                                sx={{
+                                                                    width: '24px',
+                                                                    height: '24px',
+                                                                    position: 'relative',
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={IconCheckBox2}
+                                                                    alt="Indeterminado"
+                                                                    style={{ width: '24px', height: '24px' }}
+                                                                />
+                                                            </Box>
+                                                        }
                                                     />
                                                 </TableCell>
-                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.name}</TableCell>
-                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.role}</TableCell>
-                                                <TableCell>{user.role === "Administrador" && (
-                                                    <img src={usrAdmin} alt="Administrador" width="32" height="32" />
-                                                )}
-                                                    {user.role === "Supervisor" && (
-                                                        <img src={usrSup} alt="Supervisor" width="32" height="32" />
-                                                    )}
-                                                    {user.role === "Monitor" && (
-                                                        <img src={usrMon} alt="Monitor" width="32" height="32" />
-                                                    )}</TableCell>
+                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Nombre</TableCell>
+                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Rol</TableCell>
+                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Ícono</TableCell>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Box>
+                                        </TableHead>
+                                        <TableBody>
+                                            {Users.map((user) => (
+                                                <TableRow key={user.id}>
+                                                    <TableCell>
+                                                        <Checkbox
+                                                            checked={selectedUsers.includes(Number(user.id))}
+                                                            onChange={() => handleUserToggle(user.id)}
+                                                            disabled={!isNotificationEnabled}
+                                                            checkedIcon={
+                                                                <Box
+                                                                    sx={{
+                                                                        width: '24px',
+                                                                        height: '24px',
+                                                                        position: 'relative',
+                                                                        marginTop: '0px',
+                                                                        marginLeft: '0px',
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={IconCheckBox1}
+                                                                        alt="Seleccionado"
+                                                                        style={{ width: '24px', height: '24px' }}
+                                                                    />
+                                                                </Box>
+                                                            }
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.name}</TableCell>
+                                                    <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.role}</TableCell>
+                                                    <TableCell>{user.role === "Administrador" && (
+                                                        <img src={usrAdmin} alt="Administrador" width="32" height="32" />
+                                                    )}
+                                                        {user.role === "Supervisor" && (
+                                                            <img src={usrSup} alt="Supervisor" width="32" height="32" />
+                                                        )}
+                                                        {user.role === "Monitor" && (
+                                                            <img src={usrMon} alt="Monitor" width="32" height="32" />
+                                                        )}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Box>
 
-                    </div>
-
+                        </div>
+                    </Box>
                 </Box>
 
                 <Box display="flex" alignItems={"flex-end"}

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useMemo } from 'react';
+﻿import React, { useState, useEffect, useRef, useMemo, type CSSProperties } from 'react';
 import {
   Typography,
   Divider,
@@ -102,6 +102,8 @@ import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import IconCheckBox2 from "../assets/IconCheckBox2.svg";
 import DynamicCampaignEditText from '../components/commons/DynamicCampaignEditText';
 import { getSelectedRoom, getSelectedRoomId, SelectedRoom } from "../utils/roomHelper";
+import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
+import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 interface Horario {
   titulo: string;
   start: Date | null;
@@ -294,6 +296,168 @@ const Campains: React.FC = () => {
 
   const [pinnedCampaignId, setPinnedCampaignId] = useState<number | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<SelectedRoom | null>(getSelectedRoom());
+  const [runCampaignTour, setRunCampaignTour] = useState(false);
+
+  const joyrideTextStyle: CSSProperties = {
+    textAlign: 'left',
+    font: 'normal normal normal 14px/20px Poppins',
+    letterSpacing: '0px',
+    color: '#574B4F',
+    opacity: 1,
+  };
+
+  const joyrideActionButtonStyle: CSSProperties = {
+    textAlign: 'center',
+    font: 'normal normal 600 14px/54px Poppins',
+    letterSpacing: '1.12px',
+    color: '#833A53',
+    textTransform: 'uppercase',
+    opacity: 1,
+    backgroundColor: 'transparent',
+    border: 'none',
+    boxShadow: 'none',
+    padding: '0 16px',
+  };
+
+  const joyrideTitle = (title: string, count: string) => (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+      }}
+    >
+      <Typography
+        sx={{
+          textAlign: 'left',
+          font: 'normal normal 500 14px/20px Poppins',
+          letterSpacing: '0px',
+          color: '#574B4F',
+          opacity: 1,
+        }}
+      >
+        {title}
+      </Typography>
+
+      <Typography
+        sx={{
+          textAlign: 'right',
+          font: 'normal normal normal 14px/20px Poppins',
+          letterSpacing: '0px',
+          color: '#9B9295',
+          opacity: 1,
+        }}
+      >
+        {count}
+      </Typography>
+    </Box>
+  );
+
+  const campaignTourSteps: Step[] = [
+    {
+      target: '.tour-campaign-actions',
+      title: joyrideTitle('Acciones sobre campañas', '1/2'),
+      skipBeacon: true,
+      placement: 'right',
+      content: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '22px',
+          }}
+        >
+          <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+            <AddIcon
+              sx={{
+                width: '24px',
+                height: '24px',
+                color: '#9B9295',
+                mt: '2px',
+              }}
+            />
+
+            <Typography sx={joyrideTextStyle}>
+              Pulsa el botón “+” para configurar una nueva campaña de SMS desde cero.
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+            <Box
+              component="img"
+              src={seachicon}
+              alt="Buscar"
+              sx={{
+                width: '24px',
+                height: '24px',
+                mt: '2px',
+              }}
+            />
+
+            <Typography sx={joyrideTextStyle}>
+              Cuando cuentes con recursos, podrás buscar un elemento en específico.
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+            <ArrowDropDownIcon
+              sx={{
+                width: '24px',
+                height: '24px',
+                color: '#9B9295',
+                mt: '2px',
+              }}
+            />
+
+            <Typography sx={joyrideTextStyle}>
+              Usa el selector de status para encontrar rápidamente campañas encendidas o detenidas.
+            </Typography>
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      target: '.tour-campaign-results',
+      title: joyrideTitle('Visualiza tus resultados', '2/2'),
+      placement: 'right',
+      content: (
+        <Typography sx={joyrideTextStyle}>
+          Aquí aparecerán todas tus campañas. Cuando crees la primera podrás revisar su estado y métricas en el lado derecho de este panel.
+        </Typography>
+      ),
+    },
+  ];
+
+  const handleCampaignJoyrideEvent = (data: EventData) => {
+    const { status, type } = data;
+
+    if (
+      type === EVENTS.TOUR_END ||
+      status === STATUS.FINISHED ||
+      status === STATUS.SKIPPED
+    ) {
+      localStorage.setItem('hasSeenCampaignOnboarding', 'true');
+      setRunCampaignTour(false);
+    }
+  };
+
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem('hasSeenCampaignOnboarding');
+
+    if (hasSeenTour || loadingPage) return;
+
+    const timer = setTimeout(() => {
+      const actionsReady = document.querySelector('.tour-campaign-actions');
+      const resultsReady = document.querySelector('.tour-campaign-results');
+
+      if (actionsReady && resultsReady) {
+        setRunCampaignTour(true);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [loadingPage]);
 
   const handleChangeHorario = (
     index: number,
@@ -304,6 +468,7 @@ const Campains: React.FC = () => {
       prev.map((h, i) => (i === index ? { ...h, [campo]: date } : h))
     );
   };
+
 
 
   useEffect(() => {
@@ -1877,6 +2042,21 @@ const Campains: React.FC = () => {
     return { text: "Iniciar", disabled: true };
   };
 
+  const getEditDisabledReason = (campaign: CampaignFullResponse | null | undefined) => {
+    if (!campaign) return "";
+
+    const buttonState = getCampaignButtonState(campaign);
+
+    if (buttonState.text === "Finalizada") {
+      return "No se puede editar esta campaña porque ya ha finalizado.";
+    }
+
+    if (buttonState.text === "Detener") {
+      return "No es posible editar mientras la campaña se encuentre en curso.";
+    }
+
+    return "";
+  };
   const { text: buttonText, disabled: buttonDisabled } =
     getCampaignButtonState(selectedCampaign);
 
@@ -1937,10 +2117,54 @@ const Campains: React.FC = () => {
 
   const MAX_CAMPAIGNS = 200;
   const isLimitReached = campaigns.length >= MAX_CAMPAIGNS;
-
+  const campaignMenu = menuIndex !== null ? filteredCampaigns[menuIndex] : null;
+  const editDisabledReason = getEditDisabledReason(campaignMenu);
   return (
 
     <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1360px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+      <Joyride
+        steps={campaignTourSteps}
+        run={runCampaignTour}
+        continuous
+        onEvent={handleCampaignJoyrideEvent}
+        locale={{
+          skip: 'SALTAR',
+          next: '›',
+          back: '‹',
+          last: 'ENTENDIDO',
+          close: 'CERRAR',
+        }}
+        options={{
+          primaryColor: '#833A53',
+          zIndex: 10000,
+          buttons: ['skip', 'back', 'primary'] as const,
+        }}
+        styles={{
+          ...joyrideBaseStyles,
+          tooltip: {
+            background: '#FFFFFF 0% 0% no-repeat padding-box',
+            boxShadow: '0px 8px 16px #00131F3D',
+            border: '1px solid #9B9295',
+            opacity: 1,
+            borderRadius: '8px',
+            padding: '20px',
+            width: '350px',
+          },
+          tooltipContainer: {
+            textAlign: 'left',
+          },
+          tooltipTitle: {
+            width: '100%',
+            marginBottom: '14px',
+          },
+          tooltipContent: {
+            padding: 0,
+          },
+          buttonSkip: joyrideActionButtonStyle,
+          buttonPrimary: joyrideActionButtonStyle,
+          buttonBack: joyrideActionButtonStyle,
+        }}
+      />
       {loadingPage && (
         <Box sx={{
           position: 'fixed',
@@ -2031,7 +2255,7 @@ const Campains: React.FC = () => {
           {/* Listado de campañas */}
 
           <Grid item sx={{ display: 'flex', }}>
-            <Box sx={{ display: "flex", }}>
+            <Box  className="tour-campaign-actions" sx={{ display: "flex", }}>
               {/* Panel de campañas */}
               {panelAbierto && (
                 <Paper
@@ -2045,6 +2269,7 @@ const Campains: React.FC = () => {
                   }}
                 >
                   <Box
+                   
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
@@ -2361,9 +2586,9 @@ const Campains: React.FC = () => {
                     </Box>
 
                   )}
-                  <List sx={{ overflowY: "auto", flexGrow: 1, overflowX: "hidden" }}>
+                  <List  className="tour-campaign-results" sx={{ overflowY: "auto", flexGrow: 1, overflowX: "hidden" }}>
                     {filteredCampaigns.length === 0 ? (
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', textAlign: 'center' }}>
+                      <Box  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', textAlign: 'center' }}>
                         <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '250px', height: 'auto' }} />
                         <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
                           No se encontraron resultados.
@@ -3041,6 +3266,7 @@ const Campains: React.FC = () => {
                 )}
 
                 {/*Paper Gestión de registros*/}
+                {/*
                 {infoChecks["Registros"] && (
 
                   <Paper sx={{ padding: "10px", marginTop: "10px", borderRadius: "10px", width: "100%", height: "auto" }}>
@@ -3149,11 +3375,6 @@ const Campains: React.FC = () => {
                                     <Box component="img" src={IconTrash} alt="Eliminar" sx={{ width: "25px", height: "25px", cursor: "pointer", opacity: 0.6 }} />
                                   </IconButton>
                                 </Tooltip>
-                                {/* 
-                                <IconButton>
-                                  <RestoreIcon sx={{ color: "#9B9295" }} />
-                                </IconButton>
-                                */}
                               </TableCell>
                             </TableRow>
                           ))}
@@ -3163,7 +3384,7 @@ const Campains: React.FC = () => {
                     </TableContainer>
                   </Paper>
                 )}
-
+*/}
                 {/*Paper Resultados de envío*/}
                 {infoChecks["Resultados de envío por día"] && (
                   <Paper sx={{ padding: "10px", marginTop: "25px", borderRadius: "10px", width: "100%", height: "auto" }}>
@@ -3434,7 +3655,6 @@ const Campains: React.FC = () => {
             {[
               "Horarios",
               "Prueba de envío de mensaje",
-              "Registros",
               "Resultados de envío por día"
             ].map((text, i) => (
               <ListItem key={i} disablePadding sx={{ marginBottom: "4px" }}>
@@ -7261,7 +7481,7 @@ const Campains: React.FC = () => {
                     }
                     handleMenuClose();
                   }}
-                  disabled={menuIndex !== null && campaigns[menuIndex]?.autoStart}
+                  disabled={!!editDisabledReason}
                   sx={{
                     opacity: menuIndex !== null && campaigns[menuIndex]?.autoStart ? 0.5 : 1,
                     fontFamily: "Poppins",
@@ -7281,7 +7501,7 @@ const Campains: React.FC = () => {
                 </MenuItem>
               </Box>
 
-              {menuIndex !== null && campaigns[menuIndex]?.autoStart && (
+              {!!editDisabledReason && (
                 <Tooltip
                   title={
                     <Box
@@ -7303,9 +7523,7 @@ const Campains: React.FC = () => {
                       }}
                     >
                       <>
-                        No es posible editar<br />
-                        mientras la campaña<br />
-                        se encuentre en curso.
+                        {editDisabledReason}
                       </>
                     </Box>
                   }

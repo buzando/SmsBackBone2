@@ -1,4 +1,4 @@
-﻿import React, { useState, useContext, useEffect } from 'react';
+﻿import React, { useState, useContext, useEffect, type CSSProperties } from 'react';
 import { Outlet } from 'react-router-dom';
 import { styled, Theme, CSSObject } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
@@ -67,7 +67,8 @@ import apihover from '../assets/apihover.svg'
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-
+import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
+import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 const drawerWidth = 278;
 
 type Page = {
@@ -253,6 +254,163 @@ const NavBarAndDrawer: React.FC<Props> = props => {
     const [isHoveringApi, setIsHoveringApi] = useState(false);
     const location = useLocation();
     const [userMenu, setUserMenu] = useState(null);
+    const [runLayoutTour, setRunLayoutTour] = useState(false);
+
+    const joyrideTextStyle = {
+        textAlign: 'left',
+        font: 'normal normal normal 14px/20px Poppins',
+        letterSpacing: '0px',
+        color: '#574B4F',
+        opacity: 1,
+    };
+
+    const joyrideActionButtonStyle: CSSProperties = {
+        textAlign: 'center',
+        font: 'normal normal 600 14px/54px Poppins',
+        letterSpacing: '1.12px',
+        color: '#833A53',
+        textTransform: 'uppercase',
+        opacity: 1,
+        backgroundColor: 'transparent',
+        border: 'none',
+        boxShadow: 'none',
+        padding: '0 16px',
+    };
+
+    const joyrideTitle = (title: string, count: string) => (
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+            }}
+        >
+            <Typography
+                sx={{
+                    textAlign: 'left',
+                    font: 'normal normal 500 14px/20px Poppins',
+                    letterSpacing: '0px',
+                    color: '#574B4F',
+                    opacity: 1,
+                }}
+            >
+                {title}
+            </Typography>
+
+            <Typography
+                sx={{
+                    textAlign: 'right',
+                    font: 'normal normal normal 14px/20px Poppins',
+                    letterSpacing: '0px',
+                    color: '#9B9295',
+                    opacity: 1,
+                }}
+            >
+                {count}
+            </Typography>
+        </Box>
+    );
+
+    const layoutSteps: Step[] = [
+        {
+            target: '.tour-layout-header',
+            title: joyrideTitle('Header', '1/4'),
+            skipBeacon: true,
+            placement: 'bottom',
+            content: (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                    <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                        <Box component="img" src={seachicon} alt="Buscar" sx={{ width: '24px', height: '24px', mt: '2px' }} />
+                        <Typography sx={joyrideTextStyle}>
+                            En esta sección podrás buscar secciones, o diferentes configuraciones.
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                        <Box component="img" src={HouseIcon} alt="Sala" sx={{ width: '24px', height: '24px', mt: '2px' }} />
+                        <Typography sx={joyrideTextStyle}>
+                            Aquí puedes realizar cambio de sala.
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                        <Box component="img" src={IconUser} alt="Usuario" sx={{ width: '24px', height: '24px', mt: '2px' }} />
+                        <Typography sx={joyrideTextStyle}>
+                            Y aquí puedes configurar tu perfil.
+                        </Typography>
+                    </Box>
+                </Box>
+            ),
+        },
+        {
+            target: '.tour-drawer-credits',
+            title: joyrideTitle('Tus créditos SMS', '2/4'),
+            placement: 'right',
+            content: (
+                <Typography sx={joyrideTextStyle}>
+                    Aquí puedes conocer tus créditos disponibles.
+                    <br />
+                    Usa Gestionar para transferir créditos entre salas o Recargar para incrementar tu saldo.
+                </Typography>
+            ),
+        }, {
+            target: '.tour-sidebar-navigation',
+            title: joyrideTitle('Menú de navegación', '3/4'),
+            placement: 'right',
+            content: (
+                <Typography sx={joyrideTextStyle}>
+                    Desde aquí, accedes a todas las secciones de SMS. Puedes crear usuarios y campañas,
+                    consultar reportes, y realizar facturación para la gestión de tus pagos.
+                </Typography>
+            ),
+        }, {
+            target: '.tour-channel-button',
+            title: joyrideTitle('Selecciona un canal', '4/4'),
+            placement: 'bottom',
+            content: (
+                <Typography sx={joyrideTextStyle}>
+                    Haz clic en &lt;&lt;Canal&gt;&gt; para elegir el tipo de envío. Es el primer paso para consultar tu actividad más reciente.
+                </Typography>
+            ),
+        },
+    ];
+
+    const handleLayoutJoyrideEvent = (data: EventData) => {
+        const { status, type } = data;
+
+        if (
+            type === EVENTS.TOUR_END ||
+            status === STATUS.FINISHED ||
+            status === STATUS.SKIPPED
+        ) {
+            localStorage.setItem('hasSeenLayoutOnboarding', 'true');
+            setRunLayoutTour(false);
+        }
+    };
+
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('hasSeenLayoutOnboarding');
+
+        if (hasSeenTour || userMenu === null) return;
+
+        const isHome = location.pathname === '/';
+
+        if (!isHome) return;
+
+        const timer = setTimeout(() => {
+            const headerReady = document.querySelector('.tour-layout-header');
+            const creditsReady = document.querySelector('.tour-drawer-credits');
+            const menuReady = document.querySelector('.tour-sidebar-navigation');
+            const channelReady = document.querySelector('.tour-channel-button');
+
+            if (headerReady && creditsReady && menuReady && channelReady) {
+                setRunLayoutTour(true);
+            }
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [userMenu, location.pathname]);
 
     const handleSelection = (link: string) => {
         setSelectedLink(link); // Cambia el enlace seleccionado
@@ -291,8 +449,21 @@ const NavBarAndDrawer: React.FC<Props> = props => {
         if (!obj?.email) return;
 
         try {
-            const request = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GetRooms}?email=${obj.email}`;
-            const response = await fetch(request);
+            let email = obj?.email;
+
+            if (obj?.rol === "Mesa") {
+                const selectedClientString = localStorage.getItem("selectedClient");
+
+                if (selectedClientString) {
+                    const selectedClient = JSON.parse(selectedClientString);
+
+                    email = selectedClient?.email;
+                }
+            }
+
+            if (!email) return;
+
+            const request = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_GetRooms}?email=${email}`; const response = await fetch(request);
 
             if (response.ok) {
                 const data = await response.json();
@@ -475,6 +646,49 @@ const NavBarAndDrawer: React.FC<Props> = props => {
     return (
         <>
             <CssBaseline />
+            <Joyride
+                steps={layoutSteps}
+                run={runLayoutTour}
+                continuous
+                onEvent={handleLayoutJoyrideEvent}
+                locale={{
+                    skip: 'SALTAR',
+                    next: '›',
+                    back: '‹',
+                    last: 'ENTENDIDO',
+                    close: 'CERRAR',
+                }}
+                options={{
+                    primaryColor: '#833A53',
+                    zIndex: 10000,
+                    buttons: ['skip', 'back', 'primary'] as const,
+                }}
+                styles={{
+                    ...joyrideBaseStyles,
+                    tooltip: {
+                        background: '#FFFFFF 0% 0% no-repeat padding-box',
+                        boxShadow: '0px 8px 16px #00131F3D',
+                        border: '1px solid #9B9295',
+                        opacity: 1,
+                        borderRadius: '8px',
+                        padding: '20px',
+                        width: '320px',
+                    },
+                    tooltipContainer: {
+                        textAlign: 'left',
+                    },
+                    tooltipTitle: {
+                        width: '100%',
+                        marginBottom: '14px',
+                    },
+                    tooltipContent: {
+                        padding: 0,
+                    },
+                    buttonSkip: joyrideActionButtonStyle,
+                    buttonPrimary: joyrideActionButtonStyle,
+                    buttonBack: joyrideActionButtonStyle,
+                }}
+            />
             <AppBar position="fixed" sx={{ bgcolor: '#290013' }}>
                 <Toolbar>
                     {/* Sección Izquierda */}
@@ -512,432 +726,442 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                     </Box>
                     <Box
+                        className="tour-layout-header"
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            position: 'relative',
-                            marginRight: '50px',
+                            gap: '16px',
                         }}
                     >
-                        {/* Buscador */}
-                        {!searchOpen ? (
-                            <IconButton color="inherit" onClick={() => setSearchOpen(true)}>
-                                <SearchIcon />
-                            </IconButton>
-                        ) : (
-                            <Box
-                                sx={{
-                                    position: 'relative',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    bgcolor: 'background.paper',
-                                    borderRadius: '5px',
-                                    boxShadow: 2,
-                                    border: '1px solid #7B354D',
-                                    height: '40px',
-                                    width: '300px',
-                                }}
-                            >
-                                {/* Campo de texto para búsqueda */}
-                                <TextField
-
-                                    placeholder="Buscar"
-                                    variant="outlined"
-                                    size="small"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    autoComplete="off"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <img
-                                                    src={searchTerm ? Iconseachred : seachicon}
-                                                    alt="Buscar"
-                                                    style={{ marginRight: 8, width: 24 }}
-                                                />
-                                            </InputAdornment>
-                                        ),
-                                        endAdornment: searchTerm && (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => setSearchTerm('')}
-                                                    sx={{ color: '#7B354D' }}
-                                                >
-                                                    <img src={iconclose} alt="Limpiar" style={{ width: '24px', height: '24px' }} />
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                        style: {
-                                            height: '100%',
-                                            textAlign: 'left',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '16px',
-                                            lineHeight: '25px',
-                                            letterSpacing: '0px',
-                                            color: '#7B354D',
-                                            opacity: 1,
-                                        },
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                position: 'relative',
+                                marginRight: '50px',
+                            }}
+                        >
+                            {/* Buscador */}
+                            {!searchOpen ? (
+                                <IconButton color="inherit" onClick={() => setSearchOpen(true)}>
+                                    <SearchIcon />
+                                </IconButton>
+                            ) : (
+                                <Box
+                                    sx={{
+                                        position: 'relative',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        bgcolor: 'background.paper',
+                                        borderRadius: '5px',
+                                        boxShadow: 2,
+                                        border: '1px solid #7B354D',
+                                        height: '40px',
+                                        width: '300px',
                                     }}
-                                />
-                                {/* Mostrar resultados filtrados */}
-                                {searchTerm ? (
-                                    filteredPages.length > 0 ? (
-                                        <Box
-                                            sx={{
-                                                position: 'absolute',
-                                                top: '40px',
-                                                left: 0,
-                                                width: '100%',
-                                                bgcolor: 'background.paper',
-                                                boxShadow: 3,
-                                                zIndex: 1500,
-                                                borderRadius: '0 0 5px 5px',
-                                                border: '1px solid #7B354D',
-                                                borderTop: 'none',
-                                                maxHeight: '200px',
-                                                overflowY: 'auto',
-                                                padding: 2,
-                                            }}
-                                        >
-                                            {filteredPages.map((page) => (
-                                                <MenuItem
-                                                    key={page.id}
-                                                    onClick={() => {
-                                                        navigate(page.path);
-                                                        setSearchOpen(false);
-                                                        setSearchTerm('');
-                                                        setAnchorEl(null);
-                                                    }}
-                                                >
-                                                    <Typography
-                                                        sx={{
-                                                            textAlign: 'left',
-                                                            fontFamily: 'Poppins, sans-serif',
-                                                            fontSize: '16px',
-                                                            lineHeight: '25px',
-                                                            color: '#7B354D',
+                                >
+                                    {/* Campo de texto para búsqueda */}
+                                    <TextField
+
+                                        placeholder="Buscar"
+                                        variant="outlined"
+                                        size="small"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        autoComplete="off"
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <img
+                                                        src={searchTerm ? Iconseachred : seachicon}
+                                                        alt="Buscar"
+                                                        style={{ marginRight: 8, width: 24 }}
+                                                    />
+                                                </InputAdornment>
+                                            ),
+                                            endAdornment: searchTerm && (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => setSearchTerm('')}
+                                                        sx={{ color: '#7B354D' }}
+                                                    >
+                                                        <img src={iconclose} alt="Limpiar" style={{ width: '24px', height: '24px' }} />
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                            style: {
+                                                height: '100%',
+                                                textAlign: 'left',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                fontSize: '16px',
+                                                lineHeight: '25px',
+                                                letterSpacing: '0px',
+                                                color: '#7B354D',
+                                                opacity: 1,
+                                            },
+                                        }}
+                                    />
+                                    {/* Mostrar resultados filtrados */}
+                                    {searchTerm ? (
+                                        filteredPages.length > 0 ? (
+                                            <Box
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: '40px',
+                                                    left: 0,
+                                                    width: '100%',
+                                                    bgcolor: 'background.paper',
+                                                    boxShadow: 3,
+                                                    zIndex: 1500,
+                                                    borderRadius: '0 0 5px 5px',
+                                                    border: '1px solid #7B354D',
+                                                    borderTop: 'none',
+                                                    maxHeight: '200px',
+                                                    overflowY: 'auto',
+                                                    padding: 2,
+                                                }}
+                                            >
+                                                {filteredPages.map((page) => (
+                                                    <MenuItem
+                                                        key={page.id}
+                                                        onClick={() => {
+                                                            navigate(page.path);
+                                                            setSearchOpen(false);
+                                                            setSearchTerm('');
+                                                            setAnchorEl(null);
                                                         }}
                                                     >
-                                                        {page.title}
-                                                    </Typography>
-                                                </MenuItem>
-                                            ))}
-                                        </Box>
-                                    ) : (
-                                        <Box
+                                                        <Typography
+                                                            sx={{
+                                                                textAlign: 'left',
+                                                                fontFamily: 'Poppins, sans-serif',
+                                                                fontSize: '16px',
+                                                                lineHeight: '25px',
+                                                                color: '#7B354D',
+                                                            }}
+                                                        >
+                                                            {page.title}
+                                                        </Typography>
+                                                    </MenuItem>
+                                                ))}
+                                            </Box>
+                                        ) : (
+                                            <Box
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: '40px',
+                                                    left: 0,
+                                                    width: '100%',
+                                                    bgcolor: 'background.paper',
+                                                    boxShadow: 3,
+                                                    zIndex: 1500,
+                                                    borderRadius: '0 0 5px 5px',
+                                                    border: '1px solid #7B354D',
+                                                    borderTop: 'none',
+                                                    maxHeight: '200px',
+                                                    overflowY: 'auto',
+                                                    padding: 2,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                }}
+                                            >
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={{
+                                                        textAlign: 'center',
+                                                        fontFamily: 'Poppins, sans-serif',
+                                                        fontSize: '16px',
+                                                        lineHeight: '25px',
+                                                        color: '#7B354D',
+                                                        opacity: 1,
+                                                    }}
+                                                >
+                                                    No se encontraron resultados
+                                                </Typography>
+                                            </Box>
+                                        )
+                                    ) : null}
+
+
+                                </Box>
+                            )}
+                        </Box>
+
+                        {userMenu !== 'Root' && (
+
+                            <Box
+                                display="flex"
+                                alignItems="center"
+                                sx={{
+                                    ml: 2,
+                                    padding: '4px 8px',
+                                    backgroundColor: '#fff',
+                                    borderRadius: '4px',
+                                    border: '1px solid #ddd',
+                                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                                    justifyContent: 'space-between',
+                                    minWidth: '300px',
+                                    maxWidth: '350px',
+                                    height: '50px',
+                                    position: 'relative', // Es importante mantener esto para el Popper
+                                    marginLeft: '-5px'
+                                }}
+                            >
+                                <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+
+                                    <img
+                                        src={HouseIcon}
+                                        alt="Room Icon"
+                                        style={{
+                                            width: '32px',
+                                            height: '32px',
+                                        }}
+                                    />
+                                    <Box sx={{ marginLeft: '10px' }}>
+
+                                        <Typography
+                                            variant="body1"
+                                            color="inherit"
                                             sx={{
-                                                position: 'absolute',
-                                                top: '40px',
-                                                left: 0,
-                                                width: '100%',
-                                                bgcolor: 'background.paper',
-                                                boxShadow: 3,
-                                                zIndex: 1500,
-                                                borderRadius: '0 0 5px 5px',
-                                                border: '1px solid #7B354D',
-                                                borderTop: 'none',
-                                                maxHeight: '200px',
-                                                overflowY: 'auto',
-                                                padding: 2,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
+                                                fontSize: '12px',
+                                                color: '#574B4F',
+                                                fontWeight: 'medium',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
                                             }}
                                         >
-                                            <Typography
-                                                variant="body2"
-                                                sx={{
-                                                    textAlign: 'center',
+                                            {selectedRoom && selectedRoom.name ? selectedRoom.name : 'Sin nombre'}
+                                        </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            color="textSecondary"
+                                            sx={{
+                                                fontSize: '9px',
+                                                color: '#574B4F',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                                fontFamily: 'Poppins, sans-serif',
+                                            }}
+                                        >
+                                            {selectedRoom && selectedRoom.description ? selectedRoom.description : 'Sin descripción'}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+
+                                <IconButton
+                                    color="inherit"
+                                    onClick={handleMenuOpen}
+                                    sx={{
+                                        color: 'black',
+                                        transform: anchorEl ? 'rotate(180deg)' : 'rotate(0deg)',
+                                        transition: 'transform 0.3s ease-in-out',
+                                    }}
+                                >
+
+                                    <img src={DropDownIcon} alt="dropdown" width="24" height="24" />
+                                </IconButton>
+
+
+                                <Popper
+                                    open={Boolean(anchorEl)}
+                                    anchorEl={anchorEl}
+                                    placement="bottom"
+                                    modifiers={[
+                                        {
+                                            name: 'offset',
+                                            options: {
+                                                offset: [-120, 8],
+                                            },
+                                        },
+                                        {
+                                            name: 'preventOverflow',
+                                            options: {
+                                                boundary: 'window',
+                                            },
+                                        },
+                                    ]}
+                                    sx={{
+                                        zIndex: 1300,
+                                        backgroundColor: 'white',
+                                        boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.2)',
+                                        borderRadius: '8px',
+                                        width: '100%',
+                                        maxWidth: '300px',
+                                        marginTop: '8px',
+                                    }}
+                                >
+
+                                    <Box sx={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
+                                        <TextField
+
+                                            placeholder="Buscar"
+                                            variant="outlined"
+                                            size="small"
+                                            value={searchTerm2}
+                                            onChange={(e) => setSearchTerm2(e.target.value)}
+                                            sx={{
+                                                '& .MuiOutlinedInput-root': {
+                                                    padding: '2px 8px',
+                                                    '& .MuiInputAdornment-root': {
+                                                        position: 'absolute',
+                                                        right: 0,
+                                                        marginRight: '8px',
+                                                    },
+                                                },
+                                            }}
+                                            InputProps={{
+                                                startAdornment: (
+                                                    <SearchIcon sx={{ color: '#7B354D', marginRight: 1 }} />
+                                                ),
+                                                endAdornment: searchTerm2 && (
+                                                    <InputAdornment position="end">
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => setSearchTerm2('')}
+                                                            sx={{ color: '#7B354D' }}
+                                                        >
+                                                            <img src={iconclose} alt="Limpiar" style={{ width: '16px', height: '16px' }} />
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                ),
+                                                style: {
+                                                    height: '100%',
+                                                    textAlign: 'left',
                                                     fontFamily: 'Poppins, sans-serif',
                                                     fontSize: '16px',
                                                     lineHeight: '25px',
+                                                    letterSpacing: '0px',
                                                     color: '#7B354D',
                                                     opacity: 1,
+                                                },
+                                            }}
+                                        />
+                                    </Box>
+
+
+                                    <MenuList sx={{ paddingLeft: 0 }}>
+                                        {/* Lista de salas o mensaje vacío */}
+                                        {rooms.filter((room) =>
+                                            room.name.toLowerCase().includes(searchTerm2.toLowerCase())
+                                        ).length > 0 ? (
+                                            <MenuList sx={{ paddingLeft: 0 }}>
+                                                {rooms
+                                                    .filter((room) =>
+                                                        room.name.toLowerCase().includes(searchTerm2.toLowerCase())
+                                                    )
+                                                    .map((room, index) => (
+                                                        <MenuItem
+                                                            key={index}
+                                                            onClick={() => handleRoomChange(room)}
+                                                            sx={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                padding: '8px 16px',
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={HouseIcon}
+                                                                alt="Room Icon"
+                                                                style={{
+                                                                    width: '32px',
+                                                                    height: '32px',
+                                                                    marginRight: '10px',
+                                                                    color: '#574B4F',
+                                                                }}
+                                                            />
+                                                            <Box sx={{ textAlign: 'left' }}>
+                                                                <Typography
+                                                                    variant="body1"
+                                                                    sx={{
+                                                                        fontSize: '12px',
+                                                                        color: '#000',
+                                                                        fontFamily: 'Poppins, sans-serif',
+                                                                    }}
+                                                                >
+                                                                    {room.name}
+                                                                </Typography>
+                                                                <Typography
+                                                                    variant="body2"
+                                                                    sx={{
+                                                                        fontSize: '9px',
+                                                                        color: '#574B4F',
+                                                                        fontFamily: 'Poppins, sans-serif',
+                                                                    }}
+                                                                >
+                                                                    {room.description}
+                                                                </Typography>
+                                                            </Box>
+                                                        </MenuItem>
+                                                    ))}
+                                            </MenuList>
+                                        ) : (
+                                            <Typography
+                                                sx={{
+                                                    textAlign: 'center',
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: 500, // "medium"
+                                                    fontSize: '14px',
+                                                    lineHeight: '18px',
+                                                    letterSpacing: '0px',
+                                                    color: '#7B354D',
+                                                    opacity: 1,
+                                                    px: 2,
+                                                    py: 1.5,
                                                 }}
                                             >
                                                 No se encontraron resultados
                                             </Typography>
-                                        </Box>
-                                    )
-                                ) : null}
+                                        )}
+
+                                    </MenuList>
+                                </Popper>
 
 
                             </Box>
                         )}
-                    </Box>
-{userMenu !== 'Root' && (
 
-                    <Box
-                        display="flex"
-                        alignItems="center"
-                        sx={{
-                            ml: 2,
-                            padding: '4px 8px',
-                            backgroundColor: '#fff',
-                            borderRadius: '4px',
-                            border: '1px solid #ddd',
-                            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                            justifyContent: 'space-between',
-                            minWidth: '300px',
-                            maxWidth: '350px',
-                            height: '50px',
-                            position: 'relative', // Es importante mantener esto para el Popper
-                            marginLeft: '-5px'
-                        }}
-                    >
-                        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-
+                        {/* Usuario */}
+                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, ml: 2 }}>
+                            {/* Ícono de usuario grande */}
                             <img
-                                src={HouseIcon}
-                                alt="Room Icon"
+                                src={IconUser}
+                                alt="User Icon"
                                 style={{
-                                    width: '32px',
-                                    height: '32px',
+                                    width: '40px',
+                                    height: '40px',
                                 }}
                             />
-                            <Box sx={{ marginLeft: '10px' }}>
 
-                                <Typography
-                                    variant="body1"
-                                    color="inherit"
-                                    sx={{
-                                        fontSize: '12px',
-                                        color: '#574B4F',
-                                        fontWeight: 'medium',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
-                                    {selectedRoom && selectedRoom.name ? selectedRoom.name : 'Sin nombre'}
-                                </Typography>
-                                <Typography
-                                    variant="body2"
-                                    color="textSecondary"
-                                    sx={{
-                                        fontSize: '9px',
-                                        color: '#574B4F',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                        fontFamily: 'Poppins, sans-serif',
-                                    }}
-                                >
-                                    {selectedRoom && selectedRoom.description ? selectedRoom.description : 'Sin descripción'}
-                                </Typography>
-                            </Box>
-                        </Box>
-
-
-                        <IconButton
-                            color="inherit"
-                            onClick={handleMenuOpen}
-                            sx={{
-                                color: 'black',
-                                transform: anchorEl ? 'rotate(180deg)' : 'rotate(0deg)',
-                                transition: 'transform 0.3s ease-in-out',
-                            }}
-                        >
-
-                            <img src={DropDownIcon} alt="dropdown" width="24" height="24" />
+                            {/* Ícono pequeño de la flecha (CHEVRON_USER) */}
+                            <img
+                                src={IconUserArrow}
+                                alt="Chevron Icon"
+                                style={{
+                                    position: 'absolute',
+                                    bottom: '2px',
+                                    right: '2px',
+                                    width: '14px',
+                                    height: '14px',
+                                    backgroundColor: '#B0B0B0',
+                                    borderRadius: '50%',
+                                    padding: '2px',
+                                    transition: 'transform 0.3s ease-in-out',
+                                    transform: anchorElUser ? 'rotate(180deg)' : 'rotate(0deg)',
+                                }}
+                            />
                         </IconButton>
 
-
-                        <Popper
-                            open={Boolean(anchorEl)}
-                            anchorEl={anchorEl}
-                            placement="bottom"
-                            modifiers={[
-                                {
-                                    name: 'offset',
-                                    options: {
-                                        offset: [-120, 8],
-                                    },
-                                },
-                                {
-                                    name: 'preventOverflow',
-                                    options: {
-                                        boundary: 'window',
-                                    },
-                                },
-                            ]}
-                            sx={{
-                                zIndex: 1300,
-                                backgroundColor: 'white',
-                                boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.2)',
-                                borderRadius: '8px',
-                                width: '100%',
-                                maxWidth: '300px',
-                                marginTop: '8px',
-                            }}
-                        >
-
-                            <Box sx={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
-                                <TextField
-
-                                    placeholder="Buscar"
-                                    variant="outlined"
-                                    size="small"
-                                    value={searchTerm2}
-                                    onChange={(e) => setSearchTerm2(e.target.value)}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            padding: '2px 8px',
-                                            '& .MuiInputAdornment-root': {
-                                                position: 'absolute',
-                                                right: 0,
-                                                marginRight: '8px',
-                                            },
-                                        },
-                                    }}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <SearchIcon sx={{ color: '#7B354D', marginRight: 1 }} />
-                                        ),
-                                        endAdornment: searchTerm2 && (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => setSearchTerm2('')}
-                                                    sx={{ color: '#7B354D' }}
-                                                >
-                                                    <img src={iconclose} alt="Limpiar" style={{ width: '16px', height: '16px' }} />
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                        style: {
-                                            height: '100%',
-                                            textAlign: 'left',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontSize: '16px',
-                                            lineHeight: '25px',
-                                            letterSpacing: '0px',
-                                            color: '#7B354D',
-                                            opacity: 1,
-                                        },
-                                    }}
-                                />
-                            </Box>
-
-
-                            <MenuList sx={{ paddingLeft: 0 }}>
-                                {/* Lista de salas o mensaje vacío */}
-                                {rooms.filter((room) =>
-                                    room.name.toLowerCase().includes(searchTerm2.toLowerCase())
-                                ).length > 0 ? (
-                                    <MenuList sx={{ paddingLeft: 0 }}>
-                                        {rooms
-                                            .filter((room) =>
-                                                room.name.toLowerCase().includes(searchTerm2.toLowerCase())
-                                            )
-                                            .map((room, index) => (
-                                                <MenuItem
-                                                    key={index}
-                                                    onClick={() => handleRoomChange(room)}
-                                                    sx={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        padding: '8px 16px',
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={HouseIcon}
-                                                        alt="Room Icon"
-                                                        style={{
-                                                            width: '32px',
-                                                            height: '32px',
-                                                            marginRight: '10px',
-                                                            color: '#574B4F',
-                                                        }}
-                                                    />
-                                                    <Box sx={{ textAlign: 'left' }}>
-                                                        <Typography
-                                                            variant="body1"
-                                                            sx={{
-                                                                fontSize: '12px',
-                                                                color: '#000',
-                                                                fontFamily: 'Poppins, sans-serif',
-                                                            }}
-                                                        >
-                                                            {room.name}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="body2"
-                                                            sx={{
-                                                                fontSize: '9px',
-                                                                color: '#574B4F',
-                                                                fontFamily: 'Poppins, sans-serif',
-                                                            }}
-                                                        >
-                                                            {room.description}
-                                                        </Typography>
-                                                    </Box>
-                                                </MenuItem>
-                                            ))}
-                                    </MenuList>
-                                ) : (
-                                    <Typography
-                                        sx={{
-                                            textAlign: 'center',
-                                            fontFamily: 'Poppins',
-                                            fontWeight: 500, // "medium"
-                                            fontSize: '14px',
-                                            lineHeight: '18px',
-                                            letterSpacing: '0px',
-                                            color: '#7B354D',
-                                            opacity: 1,
-                                            px: 2,
-                                            py: 1.5,
-                                        }}
-                                    >
-                                        No se encontraron resultados
-                                    </Typography>
-                                )}
-
-                            </MenuList>
-                        </Popper>
-
-
+                        {/* Nombre del usuario */}
+                        <Typography variant="body2" sx={{ color: '#fff', marginLeft: '8px' }}>
+                            {user.userName || 'Usuario'}
+                        </Typography>
                     </Box>
-)}
-
-                    {/* Usuario */}
-                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, ml: 2 }}>
-                        {/* Ícono de usuario grande */}
-                        <img
-                            src={IconUser}
-                            alt="User Icon"
-                            style={{
-                                width: '40px',
-                                height: '40px',
-                            }}
-                        />
-
-                        {/* Ícono pequeño de la flecha (CHEVRON_USER) */}
-                        <img
-                            src={IconUserArrow}
-                            alt="Chevron Icon"
-                            style={{
-                                position: 'absolute',
-                                bottom: '2px',
-                                right: '2px',
-                                width: '14px',
-                                height: '14px',
-                                backgroundColor: '#B0B0B0',
-                                borderRadius: '50%',
-                                padding: '2px',
-                                transition: 'transform 0.3s ease-in-out',
-                                transform: anchorElUser ? 'rotate(180deg)' : 'rotate(0deg)',
-                            }}
-                        />
-                    </IconButton>
-
-                    {/* Nombre del usuario */}
-                    <Typography variant="body2" sx={{ color: '#fff', marginLeft: '8px' }}>
-                        {user.userName || 'Usuario'}
-                    </Typography>
                     <Menu
                         anchorEl={anchorElUser}
                         open={Boolean(anchorElUser)}
@@ -1072,6 +1296,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                 {(userMenu === 'Administrador' || userMenu === 'Supervisor' || userMenu === 'Monitor' || userMenu === 'Mesa') && (
 
                     <Box
+                        className="tour-drawer-credits"
                         sx={{
                             position: 'relative',
                             background: '#FFFFFF',
@@ -1398,6 +1623,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                 )}
                 {/*Comienzo del fondo para opciones*/}
                 <Box
+                    className="tour-sidebar-navigation"
                     sx={{
                         position: "relative",
                         left: "17px",

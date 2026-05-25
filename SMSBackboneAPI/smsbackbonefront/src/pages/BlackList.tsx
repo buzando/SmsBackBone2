@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, type CSSProperties } from 'react';
 import MainIcon from '../components/commons/MainButtonIcon';
 import axios from "../components/commons/AxiosInstance";
 import ModalError from "../components/commons/ModalError"
@@ -59,6 +59,8 @@ import * as XLSX from 'xlsx';
 import DropZone from '../components/commons/DropZone';
 import { SelectChangeEvent } from '@mui/material';
 import IconSMS from '../assets/IconSMS.svg';
+import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
+import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 interface BlackList {
     id: number;
     creationDate: string;
@@ -205,6 +207,149 @@ const BlackList: React.FC = () => {
     const [openSelectId, setOpenSelectId] = useState<string | null>(null);
 
     const [allRows, setAllRows] = useState<BlackList[]>([]);
+    const [runBlackListTour, setRunBlackListTour] = useState(false);
+    const joyrideTextStyle: CSSProperties = {
+        textAlign: 'left',
+        font: 'normal normal normal 14px/20px Poppins',
+        letterSpacing: '0px',
+        color: '#574B4F',
+        opacity: 1,
+    };
+
+    const joyrideActionButtonStyle: CSSProperties = {
+        textAlign: 'center',
+        font: 'normal normal 600 14px/54px Poppins',
+        letterSpacing: '1.12px',
+        color: '#833A53',
+        textTransform: 'uppercase',
+        opacity: 1,
+        backgroundColor: 'transparent',
+        border: 'none',
+        boxShadow: 'none',
+        padding: '0 16px',
+    };
+
+    const joyrideTitle = (title: string, count: string) => (
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+            }}
+        >
+            <Typography
+                sx={{
+                    textAlign: 'left',
+                    font: 'normal normal 500 14px/20px Poppins',
+                    letterSpacing: '0px',
+                    color: '#574B4F',
+                    opacity: 1,
+                }}
+            >
+                {title}
+            </Typography>
+
+            <Typography
+                sx={{
+                    textAlign: 'right',
+                    font: 'normal normal normal 14px/20px Poppins',
+                    letterSpacing: '0px',
+                    color: '#9B9295',
+                    opacity: 1,
+                }}
+            >
+                {count}
+            </Typography>
+        </Box>
+    );
+
+    const blackListTourSteps: Step[] = [
+        {
+            target: '.tour-blacklist-search-create',
+            title: joyrideTitle('Búsqueda y creación', '1/1'),
+            skipBeacon: true,
+            placement: 'bottom',
+            content: (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '18px',
+                    }}
+                >
+                    <Typography sx={joyrideTextStyle}>
+                        En diversas secciones encontrarás estas dos opciones juntas:
+                    </Typography>
+
+                    <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                        <Typography
+                            sx={{
+                                ...joyrideTextStyle,
+                                fontSize: '30px',
+                                lineHeight: '24px',
+                                color: '#9B9295',
+                                minWidth: '24px',
+                            }}
+                        >
+                            +
+                        </Typography>
+
+                        <Typography sx={joyrideTextStyle}>
+                            Añade nuevos elementos para poder configurarlos.
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                        <Box
+                            component="img"
+                            src={seachicon}
+                            alt="Buscar"
+                            sx={{
+                                width: '24px',
+                                height: '24px',
+                                mt: '2px',
+                            }}
+                        />
+
+                        <Typography sx={joyrideTextStyle}>
+                            Cuando cuentes con recursos, podrás buscar un elemento en específico.
+                        </Typography>
+                    </Box>
+                </Box>
+            ),
+        },
+    ];
+
+    const handleBlackListJoyrideEvent = (data: EventData) => {
+        const { status, type } = data;
+
+        if (
+            type === EVENTS.TOUR_END ||
+            status === STATUS.FINISHED ||
+            status === STATUS.SKIPPED
+        ) {
+            localStorage.setItem('hasSeenBlackListOnboarding', 'true');
+            setRunBlackListTour(false);
+        }
+    };
+
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('hasSeenBlackListOnboarding');
+
+        if (hasSeenTour) return;
+
+        const timer = setTimeout(() => {
+            const targetReady = document.querySelector('.tour-blacklist-search-create');
+
+            if (targetReady) {
+                setRunBlackListTour(true);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, []);
+
     useEffect(() => {
         setAllRows(currentItems);
     }, []);
@@ -920,6 +1065,47 @@ const BlackList: React.FC = () => {
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+            <Joyride
+                steps={blackListTourSteps}
+                run={runBlackListTour}
+                continuous
+                onEvent={handleBlackListJoyrideEvent}
+                locale={{
+                    skip: 'SALTAR',
+                    next: '›',
+                    back: '‹',
+                    last: 'ENTENDIDO',
+                    close: 'CERRAR',
+                }}
+                options={{
+                    primaryColor: '#833A53',
+                    zIndex: 10000,
+                    buttons: ['primary'] as const,
+                }}
+                styles={{
+                    ...joyrideBaseStyles,
+                    tooltip: {
+                        background: '#FFFFFF 0% 0% no-repeat padding-box',
+                        boxShadow: '0px 8px 16px #00131F3D',
+                        border: '1px solid #9B9295',
+                        opacity: 1,
+                        borderRadius: '8px',
+                        padding: '20px',
+                        width: '375px',
+                    },
+                    tooltipContainer: {
+                        textAlign: 'left',
+                    },
+                    tooltipTitle: {
+                        width: '100%',
+                        marginBottom: '14px',
+                    },
+                    tooltipContent: {
+                        padding: 0,
+                    },
+                    buttonPrimary: joyrideActionButtonStyle,
+                }}
+            />
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
@@ -949,7 +1135,7 @@ const BlackList: React.FC = () => {
             </Box>
             <Box sx={{ marginLeft: "32px", }}>
                 <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
-                <Box style={{ display: 'flex', justifyContent: 'flex-end', gap: '25px', marginBottom: '20px' }}>
+                <Box className="tour-blacklist-search-create" style={{ display: 'flex', justifyContent: 'flex-end', gap: '25px', marginBottom: '20px' }}>
                     <MainIcon
                         text="Nueva Lista Negra"
                         isLoading={Loading}

@@ -371,16 +371,25 @@ const Use: React.FC = () => {
         setLoading(true);
         try {
             const request = `${import.meta.env.VITE_API_GET_USE}`;
+            const startDateTime = buildDateTime(
+                datesToUse.start,
+                datesToUse.startHour,
+                datesToUse.startMinute
+            );
 
+            const endDateTime = buildDateTime(
+                datesToUse.end,
+                datesToUse.endHour,
+                datesToUse.endMinute
+            );
             const response = await axios.post(request, {
                 RoomId: selectedRoom.id,
                 SmsType: selectedOption,
-                StartDate: datesToUse.start,
-                EndDate: datesToUse.end,
+                StartDate: startDateTime,
+                EndDate: endDateTime,
                 campaignIds: selectedCampaigns.map((c) => c.id),
                 userIds: selectedUsers.map((u) => u.id),
             });
-
             const result = response.data;
 
             const hasAnyData =
@@ -401,7 +410,9 @@ const Use: React.FC = () => {
                 { title: "Total de recargas realizadas:", value: result.totalRecharges.toString() },
                 {
                     title: "Última recarga realizada:",
-                    value: `Créditos ${result.lastRecharge.credits.toLocaleString()}\nFecha ${result.lastRecharge.date}`,
+                    value: result.lastRecharge
+                        ? `Créditos ${result.lastRecharge.credits.toLocaleString()}\nFecha ${result.lastRecharge.date}`
+                        : "Sin recargas",
                 },
             ]);
 
@@ -473,6 +484,27 @@ const Use: React.FC = () => {
 
         pdf.save("reporte-consumo.pdf");
     };
+
+    const getNiceYAxisMax = (chartData: { date: string; value: number }[]) => {
+        const maxValue = Math.max(...chartData.map((p) => p.value), 0);
+
+        if (maxValue <= 0) return 5;
+
+        const rawStep = maxValue / 5;
+        const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
+        const normalized = rawStep / magnitude;
+
+        let niceStep = 1;
+
+        if (normalized <= 1) niceStep = 1;
+        else if (normalized <= 2) niceStep = 2;
+        else if (normalized <= 5) niceStep = 5;
+        else niceStep = 10;
+
+        return niceStep * magnitude * 5;
+    };
+
+    const yAxisMax = getNiceYAxisMax(dataChart);
 
     return (
         <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
@@ -1125,36 +1157,36 @@ const Use: React.FC = () => {
 
                 {!loading && data && (
                     <>
-                        <Paper sx={paperStyle}>
-                            <Typography variant="h6" sx={{
-                                textAlign: 'left',
-                                fontSize: '16px',
-                                fontWeight: '500',
-                                fontFamily: 'Poppins, sans-serif',
-                                letterSpacing: '0px',
-                                color: '#574B4F',
-                                opacity: 1,
-                                marginBottom: '10px'
-                            }}>
-                                Detalle de consumo
-                            </Typography>
-
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    gap: 14, // controla separación entre elementos
-                                }}
-                            >
-                                {detalleResumen.map((item, index) => (
-                                    <Box key={index} sx={boxStyle}>
-                                        <Typography sx={titleBoxStyle}>{item.title}</Typography>
-                                        <Typography sx={valueBoxStyle}>{item.value}</Typography>
-                                    </Box>
-                                ))}
-                            </Box>
-                        </Paper>
                         <div ref={chartRef}>
+                            <Paper sx={paperStyle}>
+                                <Typography variant="h6" sx={{
+                                    textAlign: 'left',
+                                    fontSize: '16px',
+                                    fontWeight: '500',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    letterSpacing: '0px',
+                                    color: '#574B4F',
+                                    opacity: 1,
+                                    marginBottom: '10px'
+                                }}>
+                                    Detalle de consumo
+                                </Typography>
+
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        gap: 14, // controla separación entre elementos
+                                    }}
+                                >
+                                    {detalleResumen.map((item, index) => (
+                                        <Box key={index} sx={boxStyle}>
+                                            <Typography sx={titleBoxStyle}>{item.title}</Typography>
+                                            <Typography sx={valueBoxStyle}>{item.value}</Typography>
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </Paper>
 
 
                             <Paper sx={graphPaperStyle}>
@@ -1162,7 +1194,7 @@ const Use: React.FC = () => {
                                     Promedio de consumo
                                 </Typography>
                                 <Typography sx={{ textAlign: 'center', fontSize: '12px', color: '#574B4F', opacity: 0.8, fontFamily: "Poppins" }}>
-                                    Información de los últimos 20 días
+                                    Envíos por día del rango seleccionado
                                 </Typography>
                                 <ResponsiveContainer width="100%" height={250}>
                                     <AreaChart data={dataChart}>
@@ -1177,15 +1209,21 @@ const Use: React.FC = () => {
                                         <XAxis dataKey="date"
                                             tick={{ fontFamily: 'Poppins', fontSize: "10px", fill: '#574B4F' }}
                                         />
-                                        <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`}
+                                        <YAxis
+                                            domain={[0, yAxisMax]}
+                                            ticks={Array.from({ length: 6 }, (_, i) => (yAxisMax / 5) * i)}
+                                            tickFormatter={(value) => `${Math.round(value)}`}
                                             tick={{ fontFamily: 'Poppins', fontSize: "12px", fill: '#574B4F' }}
                                         />
-                                        <Tooltip
+                                        <RechartsTooltip
+                                            formatter={(value: any) => [`${value} envíos`, "Envíos"]}
                                             contentStyle={{
                                                 fontFamily: 'Poppins',
                                                 fontSize: '15px',
                                                 color: '#574B4F',
-                                                borderRadius: '6px', minWidth: "100px", minHeight: "40px",
+                                                borderRadius: '6px',
+                                                minWidth: "100px",
+                                                minHeight: "40px",
                                                 border: '1px solid #C6BFC2',
                                                 boxShadow: '0px 8px 16px rgba(0, 19, 31, 0.16)',
                                             }}

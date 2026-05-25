@@ -44,6 +44,9 @@ namespace Business
 
                 int qtyToSend = smsRequestDto.To.Count;
 
+                if (room.credits < qtyToSend)
+                    return "La sala no tiene créditos totales suficientes para enviar SMS.";
+
                 if (isShort)
                 {
                     if (room.short_sms < qtyToSend)
@@ -120,7 +123,12 @@ namespace Business
                     if (isShort)
                         room.short_sms -= qtyToSend;   
                     else
-                        room.long_sms -= qtyToSend;    
+                        room.long_sms -= qtyToSend;
+
+                    room.credits -= qtyToSend;
+
+                    if (room.credits < 0)
+                        room.credits = 0;
 
                     context.SaveChanges();
 

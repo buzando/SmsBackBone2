@@ -7,19 +7,19 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Modal from 'react-modal';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import '../chooseroom.css'
+import '../chooseroom.css';
 import { useNavigate } from 'react-router-dom';
 import Backdrop from "@mui/material/Backdrop";
 import HomeIcon from "@mui/icons-material/Home";
-import SearchIcon from '@mui/icons-material/Search';
-import CloseIcon from '@mui/icons-material/Close';
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
-import SecondaryButton from '../components/commons/SecondaryButton'
+import SecondaryButton from '../components/commons/SecondaryButton';
 import { Divider } from '@mui/material';
 import boxopen from '../assets/NoResultados.svg';
 import Iconseachred from "../assets/Iconseachred.svg";
 import seachicon from '../assets/icon-lupa.svg';
 import iconclose from '../assets/icon-close.svg';
+import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
+import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 
 const customStyles = {
     content: {
@@ -32,6 +32,48 @@ const customStyles = {
     },
 };
 
+const joyrideTextStyle = {
+    textAlign: 'left',
+    font: 'normal normal normal 14px/20px Poppins',
+    letterSpacing: '0px',
+    color: '#574B4F',
+    opacity: 1,
+};
+
+const joyrideTitle = (
+    <Box
+        sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+        }}
+    >
+         <Typography
+            sx={{
+                textAlign: 'left',
+                font: 'normal normal 500 14px/20px Poppins',
+                letterSpacing: '0px',
+                color: '#574B4F',
+                opacity: 1,
+            }}
+        >
+            Selección de sala
+        </Typography>
+
+        <Typography
+            sx={{
+                fontFamily: 'Poppins',
+                fontSize: '14px',
+                fontWeight: 400,
+                color: '#9B9295',
+            }}
+        >
+            1/1
+        </Typography>
+    </Box>
+);
+
 type Room = {
     id: string | number;
     name: string;
@@ -43,15 +85,88 @@ type Room = {
     short_sms: number;
 };
 
-
 const Chooseroom: React.FC = () => {
     const [loading, setLoading] = useState(false);
-    Modal.setAppElement('#root');
-    /*  let subtitle;*/
     const [modalIsOpen, setIsOpen] = useState(false);
     const [rooms, setrooms] = useState<Room[]>([]);
     const [dontAskAgain, setDontAskAgain] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [runTour, setRunTour] = useState(false);
+
+    Modal.setAppElement('#root');
+
+    const steps: Step[] = [
+        {
+            target: '.tour-selector-salas',
+            title: joyrideTitle,
+            skipBeacon: true,
+            placement: 'right',
+            content: (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '18px',
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            gap: '12px',
+                            alignItems: 'flex-start',
+                        }}
+                    >
+                        <Box
+                            component="img"
+                            src={seachicon}
+                            alt="Buscar"
+                            sx={{
+                                width: '24px',
+                                height: '24px',
+                                mt: '2px',
+                            }}
+                        />
+
+                        <Typography sx={joyrideTextStyle}>
+                            ¿Tienes varias salas? Usa el buscador para encontrar rápidamente la que necesitas.
+                        </Typography>
+                    </Box>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            gap: '12px',
+                            alignItems: 'flex-start',
+                        }}
+                    >
+                        <Box
+                            className="icon-container"
+                            sx={{
+                                width: '24px',
+                                height: '24px',
+                                minWidth: '24px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <HomeIcon
+                                sx={{
+                                    width: '20px',
+                                    height: '20px',
+                                }}
+                            />
+                        </Box>
+
+                        <Typography sx={joyrideTextStyle}>
+                            Haz clic en una sala para acceder. Podrás ver tus campañas, salas, usuarios, créditos y más información.
+                        </Typography>
+                    </Box>
+                </Box>
+            ),
+        },
+    ];
+
     function handleCheckboxChange(event: React.ChangeEvent<HTMLInputElement>) {
         setDontAskAgain(event.target.checked);
     }
@@ -60,19 +175,12 @@ const Chooseroom: React.FC = () => {
         event.preventDefault();
         setLoading(true);
 
-
         try {
             if (dontAskAgain) {
-
                 const usuario = localStorage.getItem("userData");
-
                 const obj = JSON.parse(usuario!);
-
-
                 const request = `${import.meta.env.VITE_API_AUTENTIFICATIONSAVE_ENDPOINT}?email=${obj.email}`;
-                const response = await axios.get(
-                    request
-                );
+                const response = await axios.get(request);
 
                 if (response.status === 200) {
                     obj.twoFactorAuthentication = true;
@@ -83,25 +191,20 @@ const Chooseroom: React.FC = () => {
             } else {
                 closeModal();
             }
-        }
-        catch {
+        } catch {
             setLoading(false);
-            console.log(`MODE: ${import.meta.env.MODE}`)
+            console.log(`MODE: ${import.meta.env.MODE}`);
         }
-
-    }
+    };
 
     const GetRooms = async () => {
         setLoading(true);
         const usuario = localStorage.getItem("userData");
-
         const obj = JSON.parse(usuario!);
 
         try {
             const request = `${import.meta.env.VITE_API_GetRooms}?email=${obj.email}`;
-            const response = await axios.get(
-                request
-            );
+            const response = await axios.get(request);
 
             if (response.status === 200) {
                 setrooms(response.data);
@@ -112,43 +215,64 @@ const Chooseroom: React.FC = () => {
         } finally {
             setLoading(false);
         }
+    };
 
-    }
     function openModal() {
         setIsOpen(true);
+    }
+
+    function closeModal() {
+        setIsOpen(false);
     }
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };
 
-    function closeModal() {
-        setIsOpen(false);
-    }
-
-
     useEffect(() => {
-
         const usuario = localStorage.getItem("userData");
-
         GetRooms();
+
         const obj = JSON.parse(usuario!);
         if (!obj.twoFactorAuthentication) {
             openModal();
         }
+    }, []);
 
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('hasSeenRoomOnboarding');
 
+        if (!hasSeenTour && rooms.length > 0 && !loading && !modalIsOpen) {
+            setRunTour(true);
+        }
+    }, [rooms, loading, modalIsOpen]);
 
-    }, [])
+    const handleJoyrideEvent = (data: EventData) => {
+        const { status, type } = data;
 
+        if (
+            type === EVENTS.TOUR_END ||
+            status === STATUS.FINISHED ||
+            status === STATUS.SKIPPED
+        ) {
+            localStorage.setItem('hasSeenRoomOnboarding', 'true');
+            setRunTour(false);
+        }
+    };
 
     const navigate = useNavigate();
-    const handleRoomSelection = (room: Room) => {
 
+    const handleRoomSelection = (room: Room) => {
         localStorage.setItem('selectedRoom', JSON.stringify(room));
         window.dispatchEvent(new Event('storageUpdate'));
         navigate('/');
     };
+
+    const filteredRooms = rooms.filter((room) => {
+        const term = searchTerm.toLowerCase();
+        const nameWords = room.name.toLowerCase().split(" ");
+        return nameWords.some((word) => word.startsWith(term));
+    });
 
     return (
         <Box
@@ -159,15 +283,57 @@ const Chooseroom: React.FC = () => {
                 padding: "5px",
             }}
         >
-            {/* Spinner de pantalla completa */}
+            <Joyride
+                steps={steps}
+                run={runTour}
+                continuous
+                onEvent={handleJoyrideEvent}
+                locale={{
+                    last: 'ENTENDIDO',
+                    next: 'SIGUIENTE',
+                    back: 'ATRÁS',
+                    close: 'CERRAR',
+                }}
+                options={{
+                    primaryColor: '#833A53',
+                    zIndex: 10000,
+                    buttons: ['primary'] as const,
+                }}
+                styles={{
+                    ...joyrideBaseStyles,
+                    tooltip: {
+                        background: '#FFFFFF 0% 0% no-repeat padding-box',
+                        boxShadow: '0px 8px 16px #00131F3D',
+                        border: '1px solid #9B9295',
+                        opacity: 1,
+                        borderRadius: '4px',
+                        padding: '18px',
+                    },
+                    tooltipContainer: {
+                        textAlign: 'left',
+                    },
+                    tooltipTitle: {
+                        width: '100%',
+                        marginBottom: '12px',
+                    },
+                    tooltipContent: {
+                        padding: 0,
+                    },
+                }}
+            />
+
             <Backdrop open={loading} sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                 <CircularProgress color="inherit" />
             </Backdrop>
 
-            <Box sx={{
-                display: "flex", justifyContent: "center",
-                flexDirection: "column", marginTop: "-200px"
-            }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    marginTop: "-200px",
+                }}
+            >
                 <Typography
                     variant="h5"
                     className="centered-title"
@@ -178,179 +344,207 @@ const Chooseroom: React.FC = () => {
                         color: '#330F1B',
                         opacity: 1,
                         fontSize: '28px',
-                        lineHeight: '55px', mb: "20px"
+                        lineHeight: '55px',
+                        mb: "20px",
                     }}
                 >
                     Seleccionar una sala para continuar
                 </Typography>
 
-                <div
-                    className="search-container"
-                    style={{
-                        marginLeft: "43px",
-                        width: '430px', height: "40px",
-                        backgroundColor: "#FFFFFF",
-                        border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
-                        borderRadius: "4px",
-                    }}
-                >
-                    <img
-                        src={searchTerm ? Iconseachred : seachicon}
-                        alt="Buscar"
-                        style={{ marginRight: 8, width: 24 }}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Buscar"
-                        value={searchTerm}
-                        onChange={handleSearch}
+                <Box className="tour-selector-salas">
+                    <div
+                        className="search-container"
                         style={{
-                            border: "none",
-                            outline: "none",
-                            width: "100%",
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                            color: searchTerm ? "#7B354D" : "#9B9295",
-                            backgroundColor: "transparent",
+                            marginLeft: "43px",
+                            width: '430px',
+                            height: "40px",
+                            backgroundColor: "#FFFFFF",
+                            border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
+                            borderRadius: "4px",
                         }}
-                    />
-                    {searchTerm && (
+                    >
                         <img
-                            src={iconclose}
-                            alt="Limpiar búsqueda"
-                            onClick={() => {
-                                setSearchTerm('');
-                            }}
-                            style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
+                            src={searchTerm ? Iconseachred : seachicon}
+                            alt="Buscar"
+                            style={{ marginRight: 8, width: 24 }}
                         />
-                    )}
-                </div>
-            </Box>
-
-            {/* Lista de salas */}
-            <Box sx={{ height: "445px", backgroundColor: "#F2F2F2", width: "500px", overflowY: "auto" }}>
-                {rooms.filter((room) => {
-                    const term = searchTerm.toLowerCase();
-                    const nameWords = room.name.toLowerCase().split(" ");
-                    return nameWords.some((word) => word.startsWith(term));
-                }).length === 0 ? (
-                    <Box>
-                        <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '240px', height: 'auto', mt: 3, ml: "125px" }} />
-                        <Typography variant="body1" sx={{ textAlign: "center", marginTop: "20px", color: "#833A53", fontFamily: "Poppins" }}>
-                            No se encontraron resultados.
-                        </Typography>
-                    </Box>
-                ) : (
-                    rooms
-                        .filter((room) => {
-                            const term = searchTerm.toLowerCase();
-                            const nameWords = room.name.toLowerCase().split(" ");
-                            return nameWords.some((word) => word.startsWith(term));
-                        })
-                        .map((room) => (
-
-                            <Box
-                                key={room.id}
-                                className="room-box"
-                                sx={{
-                                    backgroundColor: "#FFFFFF",
-                                    border: "1px solid #CED2D54D",
-                                    borderRadius: "4px",
-                                    opacity: 1,
-                                    width: "430px",
-                                    padding: "20px",
-                                    margin: "10px auto",
-                                    transition: "background-color 0.3s, border-color 0.3s",
-                                    '&:hover': {
-                                        backgroundColor: "#F2EBED",
-                                        borderColor: "#83395329",
-                                    },
+                        <input
+                            type="text"
+                            placeholder="Buscar"
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            style={{
+                                border: "none",
+                                outline: "none",
+                                width: "100%",
+                                fontSize: "16px",
+                                fontFamily: "Poppins",
+                                color: searchTerm ? "#7B354D" : "#9B9295",
+                                backgroundColor: "transparent",
+                            }}
+                        />
+                        {searchTerm && (
+                            <img
+                                src={iconclose}
+                                alt="Limpiar búsqueda"
+                                onClick={() => {
+                                    setSearchTerm('');
                                 }}
-                            >
-                                <div className="room-info">
-                                    <Box className="icon-container">
-                                        <HomeIcon sx={{}} />
-                                    </Box>
-                                    <Box className="room-details" style={{
-                                        marginLeft: "10px"
+                                style={{
+                                    marginLeft: 8,
+                                    width: 24,
+                                    height: 24,
+                                    cursor: 'pointer',
+                                }}
+                            />
+                        )}
+                    </div>
 
-                                    }}>
-                                        <Typography sx={{
-                                            fontSize: "16px", color: "#574B4F", fontFamily: "Poppins"
-                                        }}>
-                                            {room.name}
-                                        </Typography>
-                                        <Typography sx={{ fontSize: "14px", color: "#9B9295", fontFamily: "Poppins" }}>
-                                            {room.cliente}
-                                        </Typography>
-                                    </Box>
-
-                                </div>
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'flex-end',
-                                        gap: '4px',
+                    <Box
+                        sx={{
+                            height: "445px",
+                            backgroundColor: "#F2F2F2",
+                            width: "500px",
+                            overflowY: "auto",
+                        }}
+                    >
+                        {filteredRooms.length === 0 ? (
+                            <Box>
+                                <Box
+                                    component="img"
+                                    src={boxopen}
+                                    alt="Caja Vacía"
+                                    sx={{
+                                        width: '240px',
+                                        height: 'auto',
+                                        mt: 3,
+                                        ml: "125px",
+                                    }}
+                                />
+                                <Typography
+                                    variant="body1"
+                                    sx={{
+                                        textAlign: "center",
+                                        marginTop: "20px",
+                                        color: "#833A53",
+                                        fontFamily: "Poppins",
                                     }}
                                 >
-                                    <span
-                                        style={{
-                                            textAlign: 'right',
-                                            fontFamily: 'Poppins',
-                                            fontWeight: '500',
-                                            fontSize: '12px',
-                                            lineHeight: '18px',
-                                            letterSpacing: '0px',
-                                            color: '#8D4B62',
-                                            opacity: 1,
-                                        }}
-                                    >
-                                        SMS cortos: {room.short_sms}
-                                    </span>
-                                    <span
-                                        style={{
-                                            textAlign: 'right',
-                                            fontFamily: 'Poppins',
-                                            fontWeight: '500',
-                                            fontSize: '12px',
-                                            lineHeight: '18px',
-                                            letterSpacing: '0px',
-                                            color: '#8D4B62',
-                                            opacity: 1,
-                                        }}
-                                    >
-                                        SMS largos: {room.long_sms}
-                                    </span>
-                                </div>
-
-                                {/* Botón para seleccionar la sala */}
-                                <Button
-                                    onClick={() => handleRoomSelection(room)}
+                                    No se encontraron resultados.
+                                </Typography>
+                            </Box>
+                        ) : (
+                            filteredRooms.map((room) => (
+                                <Box
+                                    key={room.id}
+                                    className="room-box"
                                     sx={{
-                                        minWidth: 'auto',
-                                        padding: 0,
-                                        color: '#000',
-                                        backgroundColor: 'transparent',
-                                        border: 'none',
+                                        backgroundColor: "#FFFFFF",
+                                        border: "1px solid #CED2D54D",
+                                        borderRadius: "4px",
+                                        opacity: 1,
+                                        width: "430px",
+                                        padding: "20px",
+                                        margin: "10px auto",
+                                        transition: "background-color 0.3s, border-color 0.3s",
                                         '&:hover': {
-                                            backgroundColor: 'transparent',
+                                            backgroundColor: "#F2EBED",
+                                            borderColor: "#83395329",
                                         },
                                     }}
                                 >
-                                    <Box
-                                        sx={{
-                                            fontSize: '24px',
-                                            lineHeight: 1,
+                                    <div className="room-info">
+                                        <Box className="icon-container">
+                                            <HomeIcon sx={{}} />
+                                        </Box>
+
+                                        <Box className="room-details" style={{ marginLeft: "10px" }}>
+                                            <Typography
+                                                sx={{
+                                                    fontSize: "16px",
+                                                    color: "#574B4F",
+                                                    fontFamily: "Poppins",
+                                                }}
+                                            >
+                                                {room.name}
+                                            </Typography>
+                                            <Typography
+                                                sx={{
+                                                    fontSize: "14px",
+                                                    color: "#9B9295",
+                                                    fontFamily: "Poppins",
+                                                }}
+                                            >
+                                                {room.cliente}
+                                            </Typography>
+                                        </Box>
+                                    </div>
+
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'flex-end',
+                                            gap: '4px',
                                         }}
                                     >
-                                        &gt;
-                                    </Box>
-                                </Button>
-                            </Box>
+                                        <span
+                                            style={{
+                                                textAlign: 'right',
+                                                fontFamily: 'Poppins',
+                                                fontWeight: '500',
+                                                fontSize: '12px',
+                                                lineHeight: '18px',
+                                                letterSpacing: '0px',
+                                                color: '#8D4B62',
+                                                opacity: 1,
+                                            }}
+                                        >
+                                            SMS cortos: {room.short_sms}
+                                        </span>
+                                        <span
+                                            style={{
+                                                textAlign: 'right',
+                                                fontFamily: 'Poppins',
+                                                fontWeight: '500',
+                                                fontSize: '12px',
+                                                lineHeight: '18px',
+                                                letterSpacing: '0px',
+                                                color: '#8D4B62',
+                                                opacity: 1,
+                                            }}
+                                        >
+                                            SMS largos: {room.long_sms}
+                                        </span>
+                                    </div>
 
-                        ))
-                )}
+                                    <Button
+                                        onClick={() => handleRoomSelection(room)}
+                                        sx={{
+                                            minWidth: 'auto',
+                                            padding: 0,
+                                            color: '#000',
+                                            backgroundColor: 'transparent',
+                                            border: 'none',
+                                            '&:hover': {
+                                                backgroundColor: 'transparent',
+                                            },
+                                        }}
+                                    >
+                                        <Box
+                                            sx={{
+                                                fontSize: '24px',
+                                                lineHeight: 1,
+                                            }}
+                                        >
+                                            &gt;
+                                        </Box>
+                                    </Button>
+                                </Box>
+                            ))
+                        )}
+                    </Box>
+                </Box>
             </Box>
 
             <div>
@@ -364,7 +558,7 @@ const Chooseroom: React.FC = () => {
                             padding: "20px",
                             overflowX: "hidden",
                             boxShadow: "0px 0px 16px #00131F52",
-                            borderRadius: "8px"
+                            borderRadius: "8px",
                         },
                     }}
                     contentLabel="Guardar Información Modal"
@@ -383,6 +577,7 @@ const Chooseroom: React.FC = () => {
                     >
                         Guardar información
                     </Typography>
+
                     <Typography
                         variant="body1"
                         sx={{
@@ -404,7 +599,6 @@ const Chooseroom: React.FC = () => {
                                 sx={{
                                     color: '#574B4FCC',
                                     '&.Mui-checked': { color: '#6C3A52' },
-
                                 }}
                                 checkedIcon={
                                     <Box
@@ -426,7 +620,6 @@ const Chooseroom: React.FC = () => {
                                 onChange={handleCheckboxChange}
                                 color="primary"
                             />
-
                         }
                         label={
                             <Typography
@@ -434,7 +627,7 @@ const Chooseroom: React.FC = () => {
                                     color: dontAskAgain ? "#8F4D63" : "#574B4FCC",
                                     fontFamily: "Poppins",
                                     fontSize: "16px",
-                                    fontWeight: 500
+                                    fontWeight: 500,
                                 }}
                             >
                                 No preguntar esto de nuevo
@@ -442,12 +635,15 @@ const Chooseroom: React.FC = () => {
                         }
                         sx={{ marginBottom: "20px" }}
                     />
+
                     <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 2.5 }} />
+
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                         <SecondaryButton
                             onClick={closeModal}
-                            text='Cancelar'
+                            text="Cancelar"
                         />
+
                         <Button
                             onClick={SaveAutenticator}
                             variant="contained"
@@ -473,15 +669,11 @@ const Chooseroom: React.FC = () => {
                         >
                             Guardar
                         </Button>
-
                     </div>
                 </Modal>
-
             </div>
-
-
         </Box>
     );
-
 };
+
 export default Chooseroom;

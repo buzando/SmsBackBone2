@@ -2052,7 +2052,9 @@ const Clients: React.FC = () => {
                                         onChange={(e) => {
                                             const v = e.target.value;
                                             setSelectedClient(prev => ({ ...(prev as Clients), nombreCliente: v }));
-                                            setClientNameError(v.trim().length > 0 && !reClientName.test(v));
+                                            setClientNameError(
+                                                v.trim().length > 1 && !reClientName.test(v)
+                                            );
                                         }}
                                         error={clientNameError}
                                         helperText={
@@ -4091,7 +4093,7 @@ const Clients: React.FC = () => {
             <CustomDateTimePicker
                 open={datePickerOpen}
                 anchorEl={anchorEl2}
-                maxDate={new Date()} 
+                maxDate={new Date()}
                 onApply={(date, hour, minute) => {
                     const newDate = new Date(date);
                     newDate.setHours(hour);
