@@ -750,7 +750,7 @@ const PaymentSettings: React.FC = () => {
                     buttonBack: joyrideActionButtonStyle,
                 }}
             />
-       
+
             <Box sx={{ display: 'flex', alignItems: 'center', pl: '0px', mb: 1 }}>
                 <IconButton
                     onClick={() => navigate('/')}
@@ -942,110 +942,65 @@ const PaymentSettings: React.FC = () => {
                             </h3>
 
 
-                        <Box
-                            sx={{
-                                display: "flex",
-                                justifyContent: "flex-start",
-                                alignItems: "stretch",
-                                width: "100%",
-                            }}
-                        >
-                            {/* Tabla de usuarios */}
                             <Box
                                 sx={{
-                                    flex: 1,
+                                    display: "flex",
+                                    justifyContent: "flex-start",
+                                    alignItems: "stretch",
+                                    width: "100%",
                                 }}
                             >
-                                <TableContainer
-                                    component={Paper}
+                                {/* Tabla de usuarios */}
+                                <Box
                                     sx={{
-                                        background: '#FFFFFF 0% 0% no-repeat padding-box',
-
-                                        border: '1px solid #E6E4E4',
-
-                                        borderRadius: '8px',
-
-                                        opacity: 1,
-
-                                        width: '100%',
-
-                                        maxWidth: '684px',
-
-                                        maxHeight: "calc(100vh - 579px)",
-
-                                        overflowY: 'auto',
-
-                                        overflowX: 'hidden',
+                                        flex: 1,
                                     }}
                                 >
-                                    <Table
-                                        stickyHeader
+                                    <TableContainer
+                                        component={Paper}
                                         sx={{
-                                            '& .MuiTableCell-root': {
-                                                padding: '5px 6px'
-                                            },
+                                            background: '#FFFFFF 0% 0% no-repeat padding-box',
+
+                                            border: '1px solid #E6E4E4',
+
+                                            borderRadius: '8px',
+
+                                            opacity: 1,
+
+                                            width: '100%',
+
+                                            maxWidth: '684px',
+
+                                            maxHeight: "calc(100vh - 579px)",
+
+                                            overflowY: 'auto',
+
+                                            overflowX: 'hidden',
                                         }}
                                     >
-                                        <TableHead
+                                        <Table
+                                            stickyHeader
                                             sx={{
                                                 '& .MuiTableCell-root': {
-                                                    backgroundColor: '#FFFFFF',
-                                                    borderBottom: '1px solid #E6E4E4',
-                                                    zIndex: 7,
+                                                    padding: '5px 6px'
                                                 },
                                             }}
                                         >
-                                            <TableRow>
-                                                <TableCell sx={{}}>
-                                                    <Checkbox
-                                                        checked={Users.length > 0 && selectedUsers.length === Users.length}
-                                                        indeterminate={selectedUsers.length > 0 && selectedUsers.length < Users.length}
-                                                        onChange={handleToggleAllUsers}
-                                                        disabled={!isNotificationEnabled}
-                                                        checkedIcon={
-                                                            <Box
-                                                                sx={{
-                                                                    width: '24px',
-                                                                    height: '24px',
-                                                                    position: 'relative',
-                                                                }}
-                                                            >
-                                                                <img
-                                                                    src={IconCheckBox1}
-                                                                    alt="Seleccionado"
-                                                                    style={{ width: '24px', height: '24px' }}
-                                                                />
-                                                            </Box>
-                                                        }
-                                                        indeterminateIcon={
-                                                            <Box
-                                                                sx={{
-                                                                    width: '24px',
-                                                                    height: '24px',
-                                                                    position: 'relative',
-                                                                }}
-                                                            >
-                                                                <img
-                                                                    src={IconCheckBox2}
-                                                                    alt="Indeterminado"
-                                                                    style={{ width: '24px', height: '24px' }}
-                                                                />
-                                                            </Box>
-                                                        }
-                                                    />
-                                                </TableCell>
-                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Nombre</TableCell>
-                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Rol</TableCell>
-                                                <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Ícono</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {Users.map((user) => (
-                                                <TableRow key={user.id}>
-                                                    <TableCell>
+                                            <TableHead
+                                                sx={{
+                                                    '& .MuiTableCell-root': {
+                                                        backgroundColor: '#FFFFFF',
+                                                        borderBottom: '1px solid #E6E4E4',
+                                                        zIndex: 7,
+                                                    },
+                                                }}
+                                            >
+                                                <TableRow>
+                                                    <TableCell sx={{}}>
                                                         <Checkbox
-                                                            checked={selectedUsers.includes(Number(user.id))}
-                                                            onChange={() => handleUserToggle(user.id)}
+                                                            checked={Users.length > 0 && selectedUsers.length === Users.length}
+                                                            indeterminate={selectedUsers.length > 0 && selectedUsers.length < Users.length}
+                                                            onChange={handleToggleAllUsers}
                                                             disabled={!isNotificationEnabled}
                                                             checkedIcon={
                                                                 <Box
@@ -1053,8 +1008,6 @@ const PaymentSettings: React.FC = () => {
                                                                         width: '24px',
                                                                         height: '24px',
                                                                         position: 'relative',
-                                                                        marginTop: '0px',
-                                                                        marginLeft: '0px',
                                                                     }}
                                                                 >
                                                                     <img
@@ -1064,48 +1017,95 @@ const PaymentSettings: React.FC = () => {
                                                                     />
                                                                 </Box>
                                                             }
+                                                            indeterminateIcon={
+                                                                <Box
+                                                                    sx={{
+                                                                        width: '24px',
+                                                                        height: '24px',
+                                                                        position: 'relative',
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={IconCheckBox2}
+                                                                        alt="Indeterminado"
+                                                                        style={{ width: '24px', height: '24px' }}
+                                                                    />
+                                                                </Box>
+                                                            }
                                                         />
                                                     </TableCell>
-                                                    <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.name}</TableCell>
-                                                    <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.role}</TableCell>
-                                                    <TableCell>{user.role === "Administrador" && (
-                                                        <img src={usrAdmin} alt="Administrador" width="32" height="32" />
-                                                    )}
-                                                        {user.role === "Supervisor" && (
-                                                            <img src={usrSup} alt="Supervisor" width="32" height="32" />
-                                                        )}
-                                                        {user.role === "Monitor" && (
-                                                            <img src={usrMon} alt="Monitor" width="32" height="32" />
-                                                        )}</TableCell>
+                                                    <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Nombre</TableCell>
+                                                    <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Rol</TableCell>
+                                                    <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#330F1B" }}>Ícono</TableCell>
                                                 </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </Box>
+                                            </TableHead>
+                                            <TableBody>
+                                                {Users.map((user) => (
+                                                    <TableRow key={user.id}>
+                                                        <TableCell>
+                                                            <Checkbox
+                                                                checked={selectedUsers.includes(Number(user.id))}
+                                                                onChange={() => handleUserToggle(user.id)}
+                                                                disabled={!isNotificationEnabled}
+                                                                checkedIcon={
+                                                                    <Box
+                                                                        sx={{
+                                                                            width: '24px',
+                                                                            height: '24px',
+                                                                            position: 'relative',
+                                                                            marginTop: '0px',
+                                                                            marginLeft: '0px',
+                                                                        }}
+                                                                    >
+                                                                        <img
+                                                                            src={IconCheckBox1}
+                                                                            alt="Seleccionado"
+                                                                            style={{ width: '24px', height: '24px' }}
+                                                                        />
+                                                                    </Box>
+                                                                }
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.name}</TableCell>
+                                                        <TableCell sx={{ fontFamily: "Poppins", fontSize: "13px", color: "#574B4F" }}>{user.role}</TableCell>
+                                                        <TableCell>{user.role === "Administrador" && (
+                                                            <img src={usrAdmin} alt="Administrador" width="32" height="32" />
+                                                        )}
+                                                            {user.role === "Supervisor" && (
+                                                                <img src={usrSup} alt="Supervisor" width="32" height="32" />
+                                                            )}
+                                                            {user.role === "Monitor" && (
+                                                                <img src={usrMon} alt="Monitor" width="32" height="32" />
+                                                            )}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </Box>
 
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "flex-end",
-                                    minWidth: "200px",
-                                }}
-                            >
-                                <MainButton text='Guardar'
-                                    onClick={addRechargeSetting}
-                                    disabled={isAcceptButtonDisabled}
-                                    isLoading={loading} />
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "flex-end",
+                                        minWidth: "200px",
+                                    }}
+                                >
+                                    <MainButton text='Guardar'
+                                        onClick={addRechargeSetting}
+                                        disabled={isAcceptButtonDisabled}
+                                        isLoading={loading} />
+                                </Box>
                             </Box>
-                        </Box>
-                    </div>
+                        </div>
+
+                    </Box>
+
+
 
                 </Box>
-
-
-
-            </Box>
-            {/* Nueva sección: Activar Autorecarga Comentada*/}
-            {/* 
+                {/* Nueva sección: Activar Autorecarga Comentada*/}
+                {/* 
             <Divider sx={{ width: 'calc(100% + 0px)', marginLeft: '0px', mb: 2, mt: 3 }} />
             <h3 style={{
                 textAlign: 'left', fontFamily: "Poppins", letterSpacing: '0px', fontWeight: "500",
@@ -1378,452 +1378,86 @@ const PaymentSettings: React.FC = () => {
             </div>
 */}
 
-            <ModalError
-                isOpen={isErrorModalOpen}
-                title={TitleErrorModal}
-                message={MessageErrorModal}
-                buttonText="Cerrar"
-                onClose={() => setIsErrorModalOpen(false)}
-            />
+                <ModalError
+                    isOpen={isErrorModalOpen}
+                    title={TitleErrorModal}
+                    message={MessageErrorModal}
+                    buttonText="Cerrar"
+                    onClose={() => setIsErrorModalOpen(false)}
+                />
 
-            {/* Modal para agregar tarjeta */}
-            <Modal
-                open={isAddCardModalOpen}
-                onClose={handleCloseModal}
-                aria-labelledby="add-card-modal-title"
-                aria-describedby="add-card-modal-description"
-            >
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: '885px',
-                        height: '756px',
-                        bgcolor: 'background.paper',
-                        boxShadow: 24,
-                        p: 4,
-                        borderRadius: '8px',
-                        overflowY: 'auto',
-                    }}
+                {/* Modal para agregar tarjeta */}
+                <Modal
+                    open={isAddCardModalOpen}
+                    onClose={handleCloseModal}
+                    aria-labelledby="add-card-modal-title"
+                    aria-describedby="add-card-modal-description"
                 >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h2
-                            id="add-card-modal-title"
-                            style={{
-                                textAlign: "left",
-                                fontFamily: "Poppins",
-                                letterSpacing: "0px",
-                                color: "#574B4F",
-                                opacity: 1,
-                                fontSize: "20px",
-                                margin: 0
-                            }}
-                        >
-                            Agregar tarjeta
-                        </h2>
-                        <IconButton onClick={handleCloseModal} style={{ color: "#574B4F" }}>
-                            <CloseIcon />
-                        </IconButton>
-                    </div>
-                    <hr style={{ width: '100%', border: '1px solid #ccc', margin: '10px 0' }} />
-                    <form
-                        onSubmit={handleAddCardSubmit}
-                        style={{
-                            display: 'grid',
-                            gridTemplateColumns: '1fr 1fr',
-                            columnGap: '20px',
-                            rowGap: '15px',
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: '885px',
+                            height: '756px',
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            p: 4,
+                            borderRadius: '8px',
+                            overflowY: 'auto',
                         }}
                     >
-                        <div style={{ display: 'flex', gap: '20px', gridColumn: 'span 2' }}>
-                            <div style={{ flex: 1 }}>
-                                <label
-                                    style={{
-                                        textAlign: "left",
-                                        fontFamily: "Poppins",
-                                        letterSpacing: "0px",
-                                        color: "#574B4F",
-                                        opacity: 1,
-                                        fontSize: "16px",
-                                        display: "block",
-                                        marginBottom: "5px"
-                                    }}
-                                >
-                                    Número de tarjeta<span style={{ color: "#D01247" }}>*</span>
-                                </label>
-                                <TextField name="cardNumber"
-                                    value={formData.cardNumber}
-                                    onChange={handleChange}
-                                    error={Boolean(errors['cardNumber'])}
-                                    helperText={errors['cardNumber']}
-                                    fullWidth
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <WhiteTooltip title={<>
-                                                    <div>• Solo caracteres numéricos</div>
-                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
-                                                </>}>
-                                                    <img src={errors['cardNumber'] ? infoiconerror : infoicon} alt="info-icon" />
-                                                </WhiteTooltip>
-                                            </InputAdornment>
-                                        )
-                                    }}
-                                />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <label
-                                    style={{
-                                        textAlign: "left",
-                                        fontFamily: "Poppins",
-                                        letterSpacing: "0px",
-                                        color: "#574B4F",
-                                        opacity: 1,
-                                        fontSize: "16px",
-                                        display: "block",
-                                        marginBottom: "5px"
-                                    }}
-                                >
-                                    Nombre en la tarjeta<span style={{ color: "#D01247" }}>*</span>
-                                </label>
-                                <TextField name="cardName"
-                                    value={formData.cardName}
-                                    onChange={handleChange}
-                                    error={Boolean(errors.cardName)}
-                                    helperText={errors.cardName}
-                                    fullWidth
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <WhiteTooltip title={<>
-                                                    <div>• Solo caracteres numéricos</div>
-                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
-                                                </>}>
-                                                    <img src={errors.cardName ? infoiconerror : infoicon} alt="info-icon" />
-                                                </WhiteTooltip>
-                                            </InputAdornment>
-                                        )
-                                    }} />
-                            </div>
-                        </div>
-                        <div>
-                            <label
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h2
+                                id="add-card-modal-title"
                                 style={{
                                     textAlign: "left",
                                     fontFamily: "Poppins",
                                     letterSpacing: "0px",
                                     color: "#574B4F",
                                     opacity: 1,
-                                    fontSize: "16px",
-                                    display: "block",
-                                    marginBottom: "5px"
+                                    fontSize: "20px",
+                                    margin: 0
                                 }}
                             >
-                                Calle<span style={{ color: "#D01247" }}>*</span>
-                            </label>
-                            <TextField name="street"
-                                value={formData.street}
-                                onChange={handleChange}
-                                error={Boolean(errors.street)}
-                                helperText={errors.street}
-                                fullWidth
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <WhiteTooltip title={<>
-                                                <div>• Solo caracteres numéricos</div>
-                                                <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
-                                            </>}>
-                                                <img src={errors.street ? infoiconerror : infoicon} alt="info-icon" />
-                                            </WhiteTooltip>
-                                        </InputAdornment>
-                                    )
-                                }} />
+                                Agregar tarjeta
+                            </h2>
+                            <IconButton onClick={handleCloseModal} style={{ color: "#574B4F" }}>
+                                <CloseIcon />
+                            </IconButton>
                         </div>
-                        <div style={{ display: 'flex', gap: '20px' }}>
-                            <div style={{ flex: 1 }}>
-                                <label
-                                    style={{
-                                        textAlign: "left",
-                                        fontFamily: "Poppins",
-                                        letterSpacing: "0px",
-                                        color: "#574B4F",
-                                        opacity: 1,
-                                        fontSize: "16px",
-                                        display: "block",
-                                        marginBottom: "5px"
-                                    }}
-                                >
-                                    Número exterior<span style={{ color: "#D01247" }}>*</span>
-                                </label>
-                                <TextField type="number"
-                                    name="exteriorNumber"
-                                    value={formData.exteriorNumber}
-                                    onChange={handleChange}
-                                    error={Boolean(errors.exteriorNumber)}
-                                    helperText={errors.exteriorNumber}
-                                    fullWidth
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <WhiteTooltip title={<>
-                                                    <div>• Solo caracteres numéricos</div>
-                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
-                                                </>}>
-                                                    <img src={errors.exteriorNumber ? infoiconerror : infoicon} alt="info-icon" />
-                                                </WhiteTooltip>
-                                            </InputAdornment>
-                                        )
-                                    }} />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <label
-                                    style={{
-                                        textAlign: "left",
-                                        fontFamily: "Poppins",
-                                        letterSpacing: "0px",
-                                        color: "#574B4F",
-                                        opacity: 1,
-                                        fontSize: "16px",
-                                        display: "block",
-                                        marginBottom: "5px"
-                                    }}
-                                >
-                                    Número interior<span style={{ color: "#D01247" }}>*</span>
-                                </label>
-                                <TextField type="number"
-                                    name="street"
-                                    value={formData.interiorNumber}
-                                    onChange={handleChange}
-                                    error={Boolean(errors.interiorNumber)}
-                                    helperText={errors.interiorNumber}
-                                    fullWidth
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <WhiteTooltip title={<>
-                                                    <div>• Solo caracteres numéricos</div>
-                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
-                                                </>}>
-                                                    <img src={errors.interiorNumber ? infoiconerror : infoicon} alt="info-icon" />
-                                                </WhiteTooltip>
-                                            </InputAdornment>
-                                        )
-                                    }} />
-                            </div>
-                        </div>
-                        <div>
-                            <label
-                                style={{
-                                    textAlign: "left",
-                                    fontFamily: "Poppins",
-                                    letterSpacing: "0px",
-                                    color: "#574B4F",
-                                    opacity: 1,
-                                    fontSize: "16px",
-                                    display: "block",
-                                    marginBottom: "5px"
-                                }}
-                            >
-                                Colonia<span style={{ color: "#D01247" }}>*</span>
-                            </label>
-                            <TextField name="neighborhood"
-                                value={formData.neighborhood}
-                                onChange={handleChange}
-                                error={Boolean(errors.neighborhood)}
-                                helperText={errors.neighborhood}
-                                fullWidth
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <WhiteTooltip title={<>
-                                                <div>• Solo caracteres numéricos</div>
-                                                <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
-                                            </>}>
-                                                <img src={errors.neighborhood ? infoiconerror : infoicon} alt="info-icon" />
-                                            </WhiteTooltip>
-                                        </InputAdornment>
-                                    )
-                                }} />
-                        </div>
-                        <div>
-                            <label
-                                style={{
-                                    textAlign: "left",
-                                    fontFamily: "Poppins",
-                                    letterSpacing: "0px",
-                                    color: "#574B4F",
-                                    opacity: 1,
-                                    fontSize: "16px",
-                                    display: "block",
-                                    marginBottom: "5px"
-                                }}
-                            >
-                                Ciudad<span style={{ color: "#D01247" }}>*</span>
-                            </label>
-                            <TextField name="city"
-                                value={formData.city}
-                                onChange={handleChange}
-                                error={Boolean(errors.city)}
-                                helperText={errors.city}
-                                fullWidth
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <WhiteTooltip title={<>
-                                                <div>• Solo caracteres numéricos</div>
-                                                <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
-                                            </>}>
-                                                <img src={errors.city ? infoiconerror : infoicon} alt="info-icon" />
-                                            </WhiteTooltip>
-                                        </InputAdornment>
-                                    )
-                                }} />
-                        </div>
-                        <div>
-                            <label
-                                style={{
-                                    textAlign: "left",
-                                    fontFamily: "Poppins",
-                                    letterSpacing: "0px",
-                                    color: "#574B4F",
-                                    opacity: 1,
-                                    fontSize: "16px",
-                                    display: "block",
-                                    marginBottom: "5px"
-                                }}
-                            >
-                                Estado<span style={{ color: "#D01247" }}>*</span>
-                            </label>
-                            <TextField name="state"
-                                value={formData.state}
-                                onChange={handleChange}
-                                error={Boolean(errors.state)}
-                                helperText={errors.state}
-                                fullWidth
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <WhiteTooltip title={<>
-                                                <div>• Solo caracteres numéricos</div>
-                                                <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
-                                            </>}>
-                                                <img src={errors.state ? infoiconerror : infoicon} alt="info-icon" />
-                                            </WhiteTooltip>
-                                        </InputAdornment>
-                                    )
-                                }} />
-                        </div>
-                        <div>
-                            <label
-                                style={{
-                                    textAlign: "left",
-                                    fontFamily: "Poppins",
-                                    letterSpacing: "0px",
-                                    color: "#574B4F",
-                                    opacity: 1,
-                                    fontSize: "16px",
-                                    display: "block",
-                                    marginBottom: "5px"
-                                }}
-                            >
-                                CP<span style={{ color: "#D01247" }}>*</span>
-                            </label>
-                            <TextField type="number"
-                                name="postalCode"
-                                value={formData.postalCode}
-                                onChange={handleChange}
-                                error={Boolean(errors.postalCode)}
-                                helperText={errors.postalCode}
-                                fullWidth
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <WhiteTooltip title={<>
-                                                <div>• Solo caracteres numéricos</div>
-                                                <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
-                                            </>}>
-                                                <img src={errors.postalCode ? infoiconerror : infoicon} alt="info-icon" />
-                                            </WhiteTooltip>
-                                        </InputAdornment>
-                                    )
-                                }} />
-                        </div>
-                        <div style={{ display: 'flex', gap: '20px', gridColumn: 'span 2' }}>
-                            <div style={{ flex: 1 }}>
-                                <label
-                                    style={{
-                                        textAlign: "left",
-                                        fontFamily: "Poppins",
-                                        letterSpacing: "0px",
-                                        color: "#574B4F",
-                                        opacity: 1,
-                                        fontSize: "16px",
-                                        display: "inline-block",
-                                        marginBottom: "5px"
-                                    }}
-                                >
-                                    Fecha de vencimiento<span style={{ color: "#D01247" }}>*</span>
-                                </label>
-                                <label
-                                    style={{
-                                        textAlign: "left",
-                                        fontFamily: "Poppins",
-                                        letterSpacing: "0px",
-                                        color: "#574B4F",
-                                        opacity: 1,
-                                        fontSize: "16px",
-                                        display: "inline-block",
-                                        marginBottom: "5px",
-                                        marginLeft: "37px"
-                                    }}
-                                >
-                                    CVV <span style={{ color: "#D01247" }}>*</span>
-                                </label>
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                    <Select
-                                        value={formData.month.toString()}
-                                        onChange={handleChange}
-                                        required
+                        <hr style={{ width: '100%', border: '1px solid #ccc', margin: '10px 0' }} />
+                        <form
+                            onSubmit={handleAddCardSubmit}
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr',
+                                columnGap: '20px',
+                                rowGap: '15px',
+                            }}
+                        >
+                            <div style={{ display: 'flex', gap: '20px', gridColumn: 'span 2' }}>
+                                <div style={{ flex: 1 }}>
+                                    <label
                                         style={{
-                                            background: "#FFFFFF 0% 0% no-repeat padding-box",
-                                            border: "1px solid #9B9295",
-                                            borderRadius: "8px",
-                                            width: "87px",
-                                            height: "40px",
+                                            textAlign: "left",
+                                            fontFamily: "Poppins",
+                                            letterSpacing: "0px",
+                                            color: "#574B4F",
+                                            opacity: 1,
+                                            fontSize: "16px",
+                                            display: "block",
+                                            marginBottom: "5px"
                                         }}
                                     >
-                                        <MenuItem value="" disabled>Mes</MenuItem>
-                                        {months.map((month, index) => (
-                                            <MenuItem key={index} value={index + 1}>{month}</MenuItem>
-                                        ))}
-                                    </Select>
-                                    <Select
-                                        value={formData.year.toString()}
+                                        Número de tarjeta<span style={{ color: "#D01247" }}>*</span>
+                                    </label>
+                                    <TextField name="cardNumber"
+                                        value={formData.cardNumber}
                                         onChange={handleChange}
-                                        required
-                                        style={{
-                                            background: "#FFFFFF 0% 0% no-repeat padding-box",
-                                            border: "1px solid #9B9295",
-                                            borderRadius: "8px",
-                                            width: "87px",
-                                            height: "40px",
-                                        }}
-                                    >
-                                        <MenuItem value="" disabled>Año</MenuItem>
-                                        {years.map((year, index) => (
-                                            <MenuItem key={index} value={parseInt(year, 10)}>{year}</MenuItem>
-                                        ))}
-                                    </Select>
-                                    <TextField
-                                        type="number"
-                                        name="cvv"
-                                        value={formData.cvv}
-                                        onChange={handleChange}
-                                        error={Boolean(errors.cvv)}
-                                        helperText={errors.cvv}
+                                        error={Boolean(errors['cardNumber'])}
+                                        helperText={errors['cardNumber']}
                                         fullWidth
                                         InputProps={{
                                             endAdornment: (
@@ -1832,80 +1466,447 @@ const PaymentSettings: React.FC = () => {
                                                         <div>• Solo caracteres numéricos</div>
                                                         <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
                                                     </>}>
-                                                        <img src={errors.cvv ? infoiconerror : infoicon} alt="info-icon" />
+                                                        <img src={errors['cardNumber'] ? infoiconerror : infoicon} alt="info-icon" />
                                                     </WhiteTooltip>
                                                 </InputAdornment>
                                             )
                                         }}
+                                    />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label
                                         style={{
-                                            background: "#FFFFFF 0% 0% no-repeat padding-box",
-                                            border: "1px solid #9B9295",
-                                            borderRadius: "4px",
-                                            width: "132px",
-                                            height: "54px",
+                                            textAlign: "left",
+                                            fontFamily: "Poppins",
+                                            letterSpacing: "0px",
+                                            color: "#574B4F",
+                                            opacity: 1,
+                                            fontSize: "16px",
+                                            display: "block",
+                                            marginBottom: "5px"
                                         }}
+                                    >
+                                        Nombre en la tarjeta<span style={{ color: "#D01247" }}>*</span>
+                                    </label>
+                                    <TextField name="cardName"
+                                        value={formData.cardName}
+                                        onChange={handleChange}
+                                        error={Boolean(errors.cardName)}
+                                        helperText={errors.cardName}
+                                        fullWidth
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <WhiteTooltip title={<>
+                                                        <div>• Solo caracteres numéricos</div>
+                                                        <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                    </>}>
+                                                        <img src={errors.cardName ? infoiconerror : infoicon} alt="info-icon" />
+                                                    </WhiteTooltip>
+                                                </InputAdornment>
+                                            )
+                                        }} />
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "block",
+                                        marginBottom: "5px"
+                                    }}
+                                >
+                                    Calle<span style={{ color: "#D01247" }}>*</span>
+                                </label>
+                                <TextField name="street"
+                                    value={formData.street}
+                                    onChange={handleChange}
+                                    error={Boolean(errors.street)}
+                                    helperText={errors.street}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <WhiteTooltip title={<>
+                                                    <div>• Solo caracteres numéricos</div>
+                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                </>}>
+                                                    <img src={errors.street ? infoiconerror : infoicon} alt="info-icon" />
+                                                </WhiteTooltip>
+                                            </InputAdornment>
+                                        )
+                                    }} />
+                            </div>
+                            <div style={{ display: 'flex', gap: '20px' }}>
+                                <div style={{ flex: 1 }}>
+                                    <label
+                                        style={{
+                                            textAlign: "left",
+                                            fontFamily: "Poppins",
+                                            letterSpacing: "0px",
+                                            color: "#574B4F",
+                                            opacity: 1,
+                                            fontSize: "16px",
+                                            display: "block",
+                                            marginBottom: "5px"
+                                        }}
+                                    >
+                                        Número exterior<span style={{ color: "#D01247" }}>*</span>
+                                    </label>
+                                    <TextField type="number"
+                                        name="exteriorNumber"
+                                        value={formData.exteriorNumber}
+                                        onChange={handleChange}
+                                        error={Boolean(errors.exteriorNumber)}
+                                        helperText={errors.exteriorNumber}
+                                        fullWidth
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <WhiteTooltip title={<>
+                                                        <div>• Solo caracteres numéricos</div>
+                                                        <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                    </>}>
+                                                        <img src={errors.exteriorNumber ? infoiconerror : infoicon} alt="info-icon" />
+                                                    </WhiteTooltip>
+                                                </InputAdornment>
+                                            )
+                                        }} />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label
+                                        style={{
+                                            textAlign: "left",
+                                            fontFamily: "Poppins",
+                                            letterSpacing: "0px",
+                                            color: "#574B4F",
+                                            opacity: 1,
+                                            fontSize: "16px",
+                                            display: "block",
+                                            marginBottom: "5px"
+                                        }}
+                                    >
+                                        Número interior<span style={{ color: "#D01247" }}>*</span>
+                                    </label>
+                                    <TextField type="number"
+                                        name="street"
+                                        value={formData.interiorNumber}
+                                        onChange={handleChange}
+                                        error={Boolean(errors.interiorNumber)}
+                                        helperText={errors.interiorNumber}
+                                        fullWidth
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <WhiteTooltip title={<>
+                                                        <div>• Solo caracteres numéricos</div>
+                                                        <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                    </>}>
+                                                        <img src={errors.interiorNumber ? infoiconerror : infoicon} alt="info-icon" />
+                                                    </WhiteTooltip>
+                                                </InputAdornment>
+                                            )
+                                        }} />
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "block",
+                                        marginBottom: "5px"
+                                    }}
+                                >
+                                    Colonia<span style={{ color: "#D01247" }}>*</span>
+                                </label>
+                                <TextField name="neighborhood"
+                                    value={formData.neighborhood}
+                                    onChange={handleChange}
+                                    error={Boolean(errors.neighborhood)}
+                                    helperText={errors.neighborhood}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <WhiteTooltip title={<>
+                                                    <div>• Solo caracteres numéricos</div>
+                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                </>}>
+                                                    <img src={errors.neighborhood ? infoiconerror : infoicon} alt="info-icon" />
+                                                </WhiteTooltip>
+                                            </InputAdornment>
+                                        )
+                                    }} />
+                            </div>
+                            <div>
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "block",
+                                        marginBottom: "5px"
+                                    }}
+                                >
+                                    Ciudad<span style={{ color: "#D01247" }}>*</span>
+                                </label>
+                                <TextField name="city"
+                                    value={formData.city}
+                                    onChange={handleChange}
+                                    error={Boolean(errors.city)}
+                                    helperText={errors.city}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <WhiteTooltip title={<>
+                                                    <div>• Solo caracteres numéricos</div>
+                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                </>}>
+                                                    <img src={errors.city ? infoiconerror : infoicon} alt="info-icon" />
+                                                </WhiteTooltip>
+                                            </InputAdornment>
+                                        )
+                                    }} />
+                            </div>
+                            <div>
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "block",
+                                        marginBottom: "5px"
+                                    }}
+                                >
+                                    Estado<span style={{ color: "#D01247" }}>*</span>
+                                </label>
+                                <TextField name="state"
+                                    value={formData.state}
+                                    onChange={handleChange}
+                                    error={Boolean(errors.state)}
+                                    helperText={errors.state}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <WhiteTooltip title={<>
+                                                    <div>• Solo caracteres numéricos</div>
+                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                </>}>
+                                                    <img src={errors.state ? infoiconerror : infoicon} alt="info-icon" />
+                                                </WhiteTooltip>
+                                            </InputAdornment>
+                                        )
+                                    }} />
+                            </div>
+                            <div>
+                                <label
+                                    style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#574B4F",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                        display: "block",
+                                        marginBottom: "5px"
+                                    }}
+                                >
+                                    CP<span style={{ color: "#D01247" }}>*</span>
+                                </label>
+                                <TextField type="number"
+                                    name="postalCode"
+                                    value={formData.postalCode}
+                                    onChange={handleChange}
+                                    error={Boolean(errors.postalCode)}
+                                    helperText={errors.postalCode}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <WhiteTooltip title={<>
+                                                    <div>• Solo caracteres numéricos</div>
+                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                </>}>
+                                                    <img src={errors.postalCode ? infoiconerror : infoicon} alt="info-icon" />
+                                                </WhiteTooltip>
+                                            </InputAdornment>
+                                        )
+                                    }} />
+                            </div>
+                            <div style={{ display: 'flex', gap: '20px', gridColumn: 'span 2' }}>
+                                <div style={{ flex: 1 }}>
+                                    <label
+                                        style={{
+                                            textAlign: "left",
+                                            fontFamily: "Poppins",
+                                            letterSpacing: "0px",
+                                            color: "#574B4F",
+                                            opacity: 1,
+                                            fontSize: "16px",
+                                            display: "inline-block",
+                                            marginBottom: "5px"
+                                        }}
+                                    >
+                                        Fecha de vencimiento<span style={{ color: "#D01247" }}>*</span>
+                                    </label>
+                                    <label
+                                        style={{
+                                            textAlign: "left",
+                                            fontFamily: "Poppins",
+                                            letterSpacing: "0px",
+                                            color: "#574B4F",
+                                            opacity: 1,
+                                            fontSize: "16px",
+                                            display: "inline-block",
+                                            marginBottom: "5px",
+                                            marginLeft: "37px"
+                                        }}
+                                    >
+                                        CVV <span style={{ color: "#D01247" }}>*</span>
+                                    </label>
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <Select
+                                            value={formData.month.toString()}
+                                            onChange={handleChange}
+                                            required
+                                            style={{
+                                                background: "#FFFFFF 0% 0% no-repeat padding-box",
+                                                border: "1px solid #9B9295",
+                                                borderRadius: "8px",
+                                                width: "87px",
+                                                height: "40px",
+                                            }}
+                                        >
+                                            <MenuItem value="" disabled>Mes</MenuItem>
+                                            {months.map((month, index) => (
+                                                <MenuItem key={index} value={index + 1}>{month}</MenuItem>
+                                            ))}
+                                        </Select>
+                                        <Select
+                                            value={formData.year.toString()}
+                                            onChange={handleChange}
+                                            required
+                                            style={{
+                                                background: "#FFFFFF 0% 0% no-repeat padding-box",
+                                                border: "1px solid #9B9295",
+                                                borderRadius: "8px",
+                                                width: "87px",
+                                                height: "40px",
+                                            }}
+                                        >
+                                            <MenuItem value="" disabled>Año</MenuItem>
+                                            {years.map((year, index) => (
+                                                <MenuItem key={index} value={parseInt(year, 10)}>{year}</MenuItem>
+                                            ))}
+                                        </Select>
+                                        <TextField
+                                            type="number"
+                                            name="cvv"
+                                            value={formData.cvv}
+                                            onChange={handleChange}
+                                            error={Boolean(errors.cvv)}
+                                            helperText={errors.cvv}
+                                            fullWidth
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <WhiteTooltip title={<>
+                                                            <div>• Solo caracteres numéricos</div>
+                                                            <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
+                                                        </>}>
+                                                            <img src={errors.cvv ? infoiconerror : infoicon} alt="info-icon" />
+                                                        </WhiteTooltip>
+                                                    </InputAdornment>
+                                                )
+                                            }}
+                                            style={{
+                                                background: "#FFFFFF 0% 0% no-repeat padding-box",
+                                                border: "1px solid #9B9295",
+                                                borderRadius: "4px",
+                                                width: "132px",
+                                                height: "54px",
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <Checkbox
+                                        name="isDefault"
+                                        checked={formData.isDefault}
+                                        onChange={handleChange}
+                                    />
+                                    <span style={{
+                                        textAlign: "left",
+                                        fontFamily: "Poppins",
+                                        letterSpacing: "0px",
+                                        color: "#8F4D63",
+                                        opacity: 1,
+                                        fontSize: "16px",
+                                    }}>Establecer como forma de pago predeterminada.</span>
+                                </div>
+                            </div>
+                            <hr
+                                style={{
+                                    gridColumn: 'span 2',
+                                    width: '100%',
+                                    border: '1px solid #ccc',
+                                    margin: '20px 0',
+                                }}
+                            />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center', gap: '16px', width: '100%' }}>
+                                <div style={{ gridColumn: '1 / 2', display: 'flex', justifyContent: 'flex-start' }}>
+                                    <SecondaryButton onClick={() => handleCloseAddCardModal()} text="Cancel"
+
+                                    />
+                                </div>
+                                <div style={{ gridColumn: '2 / 3', display: 'flex', justifyContent: 'flex-end' }}>
+                                    <MainButton text="Agregar" isLoading={loading} onClick={() => addCreditCard()} disabled={!areRequiredFieldsFilled()}
+
                                     />
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <Checkbox
-                                    name="isDefault"
-                                    checked={formData.isDefault}
-                                    onChange={handleChange}
-                                />
-                                <span style={{
-                                    textAlign: "left",
-                                    fontFamily: "Poppins",
-                                    letterSpacing: "0px",
-                                    color: "#8F4D63",
-                                    opacity: 1,
-                                    fontSize: "16px",
-                                }}>Establecer como forma de pago predeterminada.</span>
-                            </div>
-                        </div>
-                        <hr
-                            style={{
-                                gridColumn: 'span 2',
-                                width: '100%',
-                                border: '1px solid #ccc',
-                                margin: '20px 0',
-                            }}
-                        />
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center', gap: '16px', width: '100%' }}>
-                            <div style={{ gridColumn: '1 / 2', display: 'flex', justifyContent: 'flex-start' }}>
-                                <SecondaryButton onClick={() => handleCloseAddCardModal()} text="Cancel"
-
-                                />
-                            </div>
-                            <div style={{ gridColumn: '2 / 3', display: 'flex', justifyContent: 'flex-end' }}>
-                                <MainButton text="Agregar" isLoading={loading} onClick={() => addCreditCard()} disabled={!areRequiredFieldsFilled()}
-
-                                />
-                            </div>
-                        </div>
 
 
 
-                    </form>
-                </Box>
-            </Modal>
-            <MainModal
-                isOpen={isConfirmModalOpen}
-                Title={TitleMainModal}
-                message={MessageMainModal}
-                primaryButtonText="Aceptar"
-                secondaryButtonText="Cancelar"
-                onPrimaryClick={handleConfirmAccept}
-                onSecondaryClick={handleCloseCancelationModal}
+                        </form>
+                    </Box>
+                </Modal>
+                <MainModal
+                    isOpen={isConfirmModalOpen}
+                    Title={TitleMainModal}
+                    message={MessageMainModal}
+                    primaryButtonText="Aceptar"
+                    secondaryButtonText="Cancelar"
+                    onPrimaryClick={handleConfirmAccept}
+                    onSecondaryClick={handleCloseCancelationModal}
 
-            />
-            {showChipBarCard && (
-                <ChipBar
-                    message={MessageChipBar}
-                    buttonText="Cerrar"
-                    onClose={() => setshowChipBarCard(false)}
                 />
-            )}
+                {showChipBarCard && (
+                    <ChipBar
+                        message={MessageChipBar}
+                        buttonText="Cerrar"
+                        onClose={() => setshowChipBarCard(false)}
+                    />
+                )}
+            </Box>
         </Box>
     );
 };

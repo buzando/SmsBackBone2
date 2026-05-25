@@ -50,7 +50,7 @@ const joyrideTitle = (
             width: '100%',
         }}
     >
-         <Typography
+        <Typography
             sx={{
                 textAlign: 'left',
                 font: 'normal normal 500 14px/20px Poppins',
@@ -284,6 +284,7 @@ const Chooseroom: React.FC = () => {
                 padding: "5px",
             }}
         >
+
             <Joyride
                 steps={steps}
                 run={runTour}
@@ -401,281 +402,283 @@ const Chooseroom: React.FC = () => {
                         )}
                     </div>
 
-            {/* Lista de salas */}
-            <Box sx={{
-                height: "445px",
-                backgroundColor: "#F2F2F2",
-                width: "454px",
-                overflowY: "auto",
-                borderRadius: '8px'
-            }}>
-                {rooms.filter((room) => {
-                    const term = searchTerm.toLowerCase();
-                    const nameWords = room.name.toLowerCase().split(" ");
-                    return nameWords.some((word) => word.startsWith(term));
-                }).length === 0 ? (
-                    <Box>
-                        <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '240px', height: 'auto', mt: 3, ml: "125px" }} />
-                        <Typography variant="body1" sx={{ textAlign: "center", marginTop: "20px", color: "#833A53", fontFamily: "Poppins" }}>
-                            No se encontraron resultados.
-                        </Typography>
-                    </Box>
-                ) : (
-                    rooms
-                        .filter((room) => {
+                    {/* Lista de salas */}
+                    <Box sx={{
+                        height: "445px",
+                        backgroundColor: "#F2F2F2",
+                        width: "454px",
+                        overflowY: "auto",
+                        borderRadius: '8px'
+                    }}>
+                        {rooms.filter((room) => {
                             const term = searchTerm.toLowerCase();
                             const nameWords = room.name.toLowerCase().split(" ");
                             return nameWords.some((word) => word.startsWith(term));
-                        })
-                        .map((room) => (
+                        }).length === 0 ? (
+                            <Box>
+                                <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '240px', height: 'auto', mt: 3, ml: "125px" }} />
+                                <Typography variant="body1" sx={{ textAlign: "center", marginTop: "20px", color: "#833A53", fontFamily: "Poppins" }}>
+                                    No se encontraron resultados.
+                                </Typography>
+                            </Box>
+                        ) : (
+                            rooms
+                                .filter((room) => {
+                                    const term = searchTerm.toLowerCase();
+                                    const nameWords = room.name.toLowerCase().split(" ");
+                                    return nameWords.some((word) => word.startsWith(term));
+                                })
+                                .map((room) => (
 
-                            <Box
-                                key={room.id}
-                                className="room-box"
-                                sx={{
-                                    backgroundColor: "#FFFFFF",
-                                    border: "1px solid #CED2D54D",
-                                    borderRadius: "4px",
-                                    opacity: 1,
-                                    width: "430px",
-                                    padding: "20px",
-                                    margin: "10px auto",
-                                    transition: "background-color 0.3s, border-color 0.3s",
-                                    '&:hover': {
-                                        backgroundColor: "#F2EBED",
-                                        borderColor: "#83395329",
-                                    },
-                                }}
-                            >
-                                <Box className="room-info" sx={{ display: 'flex', flexDirection: 'row' }}>
-
-                                    <img
-                                        src={HouseIcon}
-                                        alt="Rooms Icon"
-                                        style={{
-                                            width: '46px',
-                                            height: '46px',
-                                        }}
-                                    />
-
-                                    <Box className="room-details" style={{
-                                        marginLeft: "10px"
-                                    }}>
-                                        <Typography sx={{
-                                            fontSize: "16px",
-                                            fontWeight: "500",
-                                            color: "#574B4F",
-                                            fontFamily: "Poppins",
-                                        }}>
-
-                                            {room.name?.length > 16
-                                                ? `${room.name.slice(0, 16)}...`
-                                                : room.name
-                                            }
-                                        </Typography>
-                                        <Typography sx={{ fontSize: "14px", color: "#9B9295", fontFamily: "Poppins" }}>
-                                            {room.cliente}
-                                        </Typography>
-                                    </Box>
-
-                                </Box>
-
-
-                                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 5 }}>
                                     <Box
+                                        key={room.id}
+                                        className="room-box"
                                         sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'flex-end',
-                                            gap: '4px'
-                                        }}
-                                    >
-                                        <Typography
-                                            sx={{
-                                                textAlign: 'right',
-                                                fontFamily: 'Poppins',
-                                                fontWeight: '500',
-                                                fontSize: '12px',
-                                                lineHeight: '18px',
-                                                letterSpacing: '0px',
-                                                color: '#8D4B62',
-                                                opacity: 1,
-                                            }}
-                                        >
-                                            SMS cortos: {room.short_sms}
-                                        </Typography>
-                                        <Typography
-                                            sx={{
-                                                textAlign: 'right',
-                                                fontFamily: 'Poppins',
-                                                fontWeight: '500',
-                                                fontSize: '12px',
-                                                lineHeight: '18px',
-                                                letterSpacing: '0px',
-                                                color: '#8D4B62',
-                                                opacity: 1,
-                                            }}
-                                        >
-                                            SMS largos: {room.long_sms}
-                                        </Typography>
-                                    </Box>
-
-                                    {/* Botón para seleccionar la sala */}
-                                    <Button
-                                        onClick={() => handleRoomSelection(room)}
-                                        sx={{
-                                            minWidth: 'auto',
-                                            padding: 0,
-                                            color: '#000',
-                                            backgroundColor: 'transparent',
-                                            border: 'none',
+                                            backgroundColor: "#FFFFFF",
+                                            border: "1px solid #CED2D54D",
+                                            borderRadius: "4px",
+                                            opacity: 1,
+                                            width: "430px",
+                                            padding: "20px",
+                                            margin: "10px auto",
+                                            transition: "background-color 0.3s, border-color 0.3s",
                                             '&:hover': {
-                                                backgroundColor: 'transparent',
+                                                backgroundColor: "#F2EBED",
+                                                borderColor: "#83395329",
                                             },
                                         }}
                                     >
-                                        <Box
-                                            sx={{
-                                                fontSize: '24px',
-                                                lineHeight: 1,
-                                            }}
-                                        >
-                                            &gt;
+                                        <Box className="room-info" sx={{ display: 'flex', flexDirection: 'row' }}>
+
+                                            <img
+                                                src={HouseIcon}
+                                                alt="Rooms Icon"
+                                                style={{
+                                                    width: '46px',
+                                                    height: '46px',
+                                                }}
+                                            />
+
+                                            <Box className="room-details" style={{
+                                                marginLeft: "10px"
+                                            }}>
+                                                <Typography sx={{
+                                                    fontSize: "16px",
+                                                    fontWeight: "500",
+                                                    color: "#574B4F",
+                                                    fontFamily: "Poppins",
+                                                }}>
+
+                                                    {room.name?.length > 16
+                                                        ? `${room.name.slice(0, 16)}...`
+                                                        : room.name
+                                                    }
+                                                </Typography>
+                                                <Typography sx={{ fontSize: "14px", color: "#9B9295", fontFamily: "Poppins" }}>
+                                                    {room.cliente}
+                                                </Typography>
+                                            </Box>
+
                                         </Box>
-                                    </Button>
-                                </Box>
 
-                            </Box>
 
-                        ))
-                )}
-            </Box>
+                                        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 5 }}>
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'flex-end',
+                                                    gap: '4px'
+                                                }}
+                                            >
+                                                <Typography
+                                                    sx={{
+                                                        textAlign: 'right',
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight: '500',
+                                                        fontSize: '12px',
+                                                        lineHeight: '18px',
+                                                        letterSpacing: '0px',
+                                                        color: '#8D4B62',
+                                                        opacity: 1,
+                                                    }}
+                                                >
+                                                    SMS cortos: {room.short_sms}
+                                                </Typography>
+                                                <Typography
+                                                    sx={{
+                                                        textAlign: 'right',
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight: '500',
+                                                        fontSize: '12px',
+                                                        lineHeight: '18px',
+                                                        letterSpacing: '0px',
+                                                        color: '#8D4B62',
+                                                        opacity: 1,
+                                                    }}
+                                                >
+                                                    SMS largos: {room.long_sms}
+                                                </Typography>
+                                            </Box>
 
-            <div>
-                <Modal
-                    isOpen={modalIsOpen}
-                    onRequestClose={closeModal}
-                    style={{
-                        content: {
-                            ...customStyles.content,
-                            maxWidth: "500px",
-                            padding: "20px",
-                            overflowX: "hidden",
-                            boxShadow: "0px 0px 16px #00131F52",
-                            borderRadius: "8px",
-                        },
-                    }}
-                    contentLabel="Guardar Información Modal"
-                >
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            textAlign: "left",
-                            fontFamily: "Poppins",
-                            fontSize: "20px",
-                            letterSpacing: "0px",
-                            color: "#330F1B",
-                            opacity: 1,
-                            marginBottom: "16px",
-                        }}
-                    >
-                        Guardar información
-                    </Typography>
+                                            {/* Botón para seleccionar la sala */}
+                                            <Button
+                                                onClick={() => handleRoomSelection(room)}
+                                                sx={{
+                                                    minWidth: 'auto',
+                                                    padding: 0,
+                                                    color: '#000',
+                                                    backgroundColor: 'transparent',
+                                                    border: 'none',
+                                                    '&:hover': {
+                                                        backgroundColor: 'transparent',
+                                                    },
+                                                }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        fontSize: '24px',
+                                                        lineHeight: 1,
+                                                    }}
+                                                >
+                                                    &gt;
+                                                </Box>
+                                            </Button>
+                                        </Box>
 
-                    <Typography
-                        variant="body1"
-                        sx={{
-                            textAlign: "left",
-                            font: "normal normal normal 16px/20px Poppins",
-                            letterSpacing: "0px",
-                            color: "#330F1B",
-                            opacity: 1,
-                            marginBottom: "20px",
-                        }}
-                    >
-                        ¿Desea que guardemos su información para la próxima vez que inicie sesión en este dispositivo?
-                    </Typography>
-
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={dontAskAgain}
-                                sx={{
-                                    color: '#574B4FCC',
-                                    '&.Mui-checked': { color: '#6C3A52' },
-                                }}
-                                checkedIcon={
-                                    <Box
-                                        sx={{
-                                            width: '24px',
-                                            height: '24px',
-                                            position: 'relative',
-                                            marginTop: '0px',
-                                            marginLeft: '0px',
-                                        }}
-                                    >
-                                        <img
-                                            src={IconCheckBox1}
-                                            alt="Seleccionado"
-                                            style={{ width: '24px', height: '24px' }}
-                                        />
                                     </Box>
-                                }
-                                onChange={handleCheckboxChange}
-                                color="primary"
-                            />
-                        }
-                        label={
-                            <Typography
-                                sx={{
-                                    color: dontAskAgain ? "#8F4D63" : "#574B4FCC",
-                                    fontFamily: "Poppins",
-                                    fontSize: "16px",
-                                    fontWeight: 500,
-                                }}
-                            >
-                                No preguntar esto de nuevo
-                            </Typography>
-                        }
-                        sx={{ marginBottom: "20px" }}
-                    />
 
-                    <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 2.5 }} />
+                                ))
+                        )}
+                    </Box>
 
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <SecondaryButton
-                            onClick={closeModal}
-                            text="Cancelar"
-                        />
-
-                        <Button
-                            onClick={SaveAutenticator}
-                            variant="contained"
-                            color="primary"
-                            disabled={!dontAskAgain}
-                            sx={{
-                                background: "#833A53",
-                                border: "1px solid #60293C",
-                                borderRadius: "4px",
-                                color: "#FFFFFF",
-                                opacity: !dontAskAgain ? 0.4 : 1,
-                                "&:hover": {
-                                    backgroundColor: dontAskAgain ? "#a54261" : "#833A53",
-                                    borderColor: "#60293C",
-                                },
-                                "&:active": {
-                                    borderColor: "#6F1E3A",
-                                },
-                                "&:focus": {
-                                    borderColor: "#60293C",
+                    <div>
+                        <Modal
+                            isOpen={modalIsOpen}
+                            onRequestClose={closeModal}
+                            style={{
+                                content: {
+                                    ...customStyles.content,
+                                    maxWidth: "500px",
+                                    padding: "20px",
+                                    overflowX: "hidden",
+                                    boxShadow: "0px 0px 16px #00131F52",
+                                    borderRadius: "8px",
                                 },
                             }}
+                            contentLabel="Guardar Información Modal"
                         >
-                            Guardar
-                        </Button>
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    textAlign: "left",
+                                    fontFamily: "Poppins",
+                                    fontSize: "20px",
+                                    letterSpacing: "0px",
+                                    color: "#330F1B",
+                                    opacity: 1,
+                                    marginBottom: "16px",
+                                }}
+                            >
+                                Guardar información
+                            </Typography>
+
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    textAlign: "left",
+                                    font: "normal normal normal 16px/20px Poppins",
+                                    letterSpacing: "0px",
+                                    color: "#330F1B",
+                                    opacity: 1,
+                                    marginBottom: "20px",
+                                }}
+                            >
+                                ¿Desea que guardemos su información para la próxima vez que inicie sesión en este dispositivo?
+                            </Typography>
+
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={dontAskAgain}
+                                        sx={{
+                                            color: '#574B4FCC',
+                                            '&.Mui-checked': { color: '#6C3A52' },
+                                        }}
+                                        checkedIcon={
+                                            <Box
+                                                sx={{
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    position: 'relative',
+                                                    marginTop: '0px',
+                                                    marginLeft: '0px',
+                                                }}
+                                            >
+                                                <img
+                                                    src={IconCheckBox1}
+                                                    alt="Seleccionado"
+                                                    style={{ width: '24px', height: '24px' }}
+                                                />
+                                            </Box>
+                                        }
+                                        onChange={handleCheckboxChange}
+                                        color="primary"
+                                    />
+                                }
+                                label={
+                                    <Typography
+                                        sx={{
+                                            color: dontAskAgain ? "#8F4D63" : "#574B4FCC",
+                                            fontFamily: "Poppins",
+                                            fontSize: "16px",
+                                            fontWeight: 500,
+                                        }}
+                                    >
+                                        No preguntar esto de nuevo
+                                    </Typography>
+                                }
+                                sx={{ marginBottom: "20px" }}
+                            />
+
+                            <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 2.5 }} />
+
+                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <SecondaryButton
+                                    onClick={closeModal}
+                                    text="Cancelar"
+                                />
+
+                                <Button
+                                    onClick={SaveAutenticator}
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={!dontAskAgain}
+                                    sx={{
+                                        background: "#833A53",
+                                        border: "1px solid #60293C",
+                                        borderRadius: "4px",
+                                        color: "#FFFFFF",
+                                        opacity: !dontAskAgain ? 0.4 : 1,
+                                        "&:hover": {
+                                            backgroundColor: dontAskAgain ? "#a54261" : "#833A53",
+                                            borderColor: "#60293C",
+                                        },
+                                        "&:active": {
+                                            borderColor: "#6F1E3A",
+                                        },
+                                        "&:focus": {
+                                            borderColor: "#60293C",
+                                        },
+                                    }}
+                                >
+                                    Guardar
+                                </Button>
+                            </div>
+                        </Modal>
                     </div>
-                </Modal>
-            </div>
+                </Box>
+            </Box>
         </Box>
     );
 };

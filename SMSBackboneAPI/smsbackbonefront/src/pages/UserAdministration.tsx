@@ -644,7 +644,7 @@ const ManageAccounts: React.FC = () => {
 
 
 
-    return 
+    return (
     <Box p={3}
         sx={{
             width: "100%",
@@ -2239,6 +2239,8 @@ const ManageAccounts: React.FC = () => {
                 />
             )}
         </Box>
+        
+        
     );
 };
 

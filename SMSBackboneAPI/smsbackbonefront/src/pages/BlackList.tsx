@@ -1086,7 +1086,6 @@ const BlackList: React.FC = () => {
                 overflowX: "hidden", marginTop: "-80px"
             }}
         >
-        <Box p={3} sx={{ marginTop: "-80px", maxWidth: "1350px", minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}> borrar
             <Joyride
                 steps={blackListTourSteps}
                 run={runBlackListTour}

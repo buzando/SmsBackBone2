@@ -1208,7 +1208,6 @@ const Use: React.FC = () => {
                                 ))}
                             </Box>
                         </Paper>
-                        <div ref={chartRef}>
 
 
                             <Paper sx={graphPaperStyle}>
