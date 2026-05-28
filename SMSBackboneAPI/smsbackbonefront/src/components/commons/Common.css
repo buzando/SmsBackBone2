@@ -264,3 +264,19 @@
     height: 100%;
     border-radius: 4px;
 }
+
+{/*
+button[data-testid="button-primary"]::before {
+    content: '';
+
+    width: 16px;
+    height: 16px;
+
+    background-image: url('/src/assets/arrowNextIcon.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+
+    display: block;
+}
+    */}

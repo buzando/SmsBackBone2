@@ -197,6 +197,19 @@ const ManageAccounts: React.FC = () => {
                         gap: '22px',
                     }}
                 >
+                    <Typography sx={{
+                        textAlign: 'left',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontWeight: 400,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        letterSpacing: '0px',
+                        color: '#574B4F',
+                        opacity: 1, whiteSpace: 'nowrap', marginBottom: "-12px"
+                    }}>
+                        En diversas secciones encontrarás estas dos<br />
+                        opciones juntas:
+                    </Typography>
                     <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
                         <AddIcon
                             sx={{
@@ -206,9 +219,9 @@ const ManageAccounts: React.FC = () => {
                                 mt: '2px',
                             }}
                         />
-
                         <Typography sx={joyrideTextStyle}>
-                            Añade nuevos elementos para poder configurarlos.
+                            Añade nuevos elementos para poder<br />
+                            configurarlos.
                         </Typography>
                     </Box>
 
@@ -225,7 +238,8 @@ const ManageAccounts: React.FC = () => {
                         />
 
                         <Typography sx={joyrideTextStyle}>
-                            Cuando cuentes con recursos, podrás buscar un elemento en específico.
+                            Cuando cuentes con recursos, podrás <br />
+                            buscar un elemento en específico.
                         </Typography>
                     </Box>
                 </Box>
@@ -645,28 +659,28 @@ const ManageAccounts: React.FC = () => {
 
 
     return (
-    <Box p={3}
-        sx={{
-            width: "100%",
+        <Box p={3}
+            sx={{
+                width: "100%",
 
-            mx: "auto",
+                mx: "auto",
 
-            px: {
-                sm: 2,
-                md: 3,
-                lg: 3,
-            },
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
 
-            pt: {
-                sm: 2,
-                md: 3,
-            },
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
 
-            minHeight: "calc(100vh - 64px)",
+                minHeight: "calc(100vh - 64px)",
 
-            overflowX: "hidden", marginTop: "-80px"
-        }}
-    >
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
             <Joyride
                 steps={searchCreateSteps}
                 run={runSearchCreateTour}
@@ -689,11 +703,14 @@ const ManageAccounts: React.FC = () => {
                     tooltip: {
                         background: '#FFFFFF 0% 0% no-repeat padding-box',
                         boxShadow: '0px 8px 16px #00131F3D',
-                        border: '1px solid #9B9295',
                         opacity: 1,
                         borderRadius: '8px',
                         padding: '20px',
-                        width: '400px',
+                        maxWidth: '362px',
+                        height: '264px',
+                    },
+                    arrow: {
+                        color: '#FFFFFF',
                     },
                     tooltipContainer: {
                         textAlign: 'left',
@@ -708,7 +725,7 @@ const ManageAccounts: React.FC = () => {
                     buttonPrimary: joyrideActionButtonStyle,
                 }}
             />
-        
+
             <Backdrop
                 open={loading}
                 sx={{
@@ -742,63 +759,71 @@ const ManageAccounts: React.FC = () => {
 
             <Box sx={{ marginLeft: "32px", }}>
                 <Divider sx={{ marginBottom: "24px", marginTop: "18px" }} />
-                <Box className="tour-search-create" sx={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
+                <Box className="tour-search-create"
+                    sx={{
+                        display: 'flex',
+                        gap: '25px',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        maxWidth: "430px"
+                    }}
+                >
                     <Button
                         variant="contained"
                         startIcon={<AddIcon />}
-                        sx={{ mb: 3, backgroundColor: "#833A53", fontFamily: "Poppins", border: "1px solid #60293C", }}
+                        sx={{ backgroundColor: "#833A53", fontFamily: "Poppins", border: "1px solid #60293C", }}
                         onClick={handleOpenModal}
                     >
                         Añadir usuario
                     </Button>
-
-                    <Box sx={{ position: 'relative', width: '220px', mt: "-25px" }}>
-                        <Box
-                            display="flex"
-                            alignItems="center"
-                            sx={{
-                                backgroundColor: "#FFFFFF",
-                                border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
-                                borderRadius: "4px",
-                                px: 2,
-                                py: 1,
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        maxWidth={'220px'}
+                        position={'relative'}
+                        sx={{
+                            backgroundColor: "#FFFFFF",
+                            border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
+                            borderRadius: "4px",
+                            px: 2,
+                            py: 1,
+                            height: "40px"
+                        }}
+                    >
+                        <img
+                            src={searchTerm ? Iconseachred : seachicon}
+                            alt="Buscar"
+                            style={{ marginRight: 8, width: 24 }}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Buscar"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={{
+                                border: "none",
+                                outline: "none",
                                 width: "100%",
-                                height: "40px"
+                                fontSize: "16px",
+                                fontFamily: "Poppins",
+                                color: searchTerm ? "#7B354D" : "#9B9295",
+                                backgroundColor: "transparent",
                             }}
-                        >
-                            <img
-                                src={searchTerm ? Iconseachred : seachicon}
-                                alt="Buscar"
-                                style={{ marginRight: 8, width: 24 }}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Buscar"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{
-                                    border: "none",
-                                    outline: "none",
-                                    width: "100%",
-                                    fontSize: "16px",
-                                    fontFamily: "Poppins",
-                                    color: searchTerm ? "#7B354D" : "#9B9295",
-                                    backgroundColor: "transparent",
-                                }}
-                            />
-                            {searchTerm && (
-                                <img
-                                    src={iconclose}
-                                    alt="Limpiar búsqueda"
-                                    onClick={() => {
-                                        setSearchTerm('');
-                                    }}
-                                    style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
-                                />
+                        />
 
-                            )}
-                        </Box>
+                        {searchTerm && (
+                            <img
+                                src={iconclose}
+                                alt="Limpiar búsqueda"
+                                onClick={() => {
+                                    setSearchTerm('');
+                                }}
+                                style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
+                            />
+
+                        )}
                     </Box>
+
                 </Box>
                 {searchTerm && accounts.length > 0 && filteredAccounts.length === 0 && (
                     <Box
@@ -2239,8 +2264,8 @@ const ManageAccounts: React.FC = () => {
                 />
             )}
         </Box>
-        
-        
+
+
     );
 };
 

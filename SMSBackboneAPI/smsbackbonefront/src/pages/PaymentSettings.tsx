@@ -183,9 +183,32 @@ const PaymentSettings: React.FC = () => {
             title: joyrideTitle('Activa una alerta', '1/3'),
             skipBeacon: true,
             placement: 'bottom',
+            styles: {
+                tooltip: {
+                    maxWidth: '325px',
+                    height: '210px'
+                },
+                buttonPrimary: {
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #D9D9D9',
+                    borderRadius: '50%',
+
+                    width: '40px',
+                    height: '40px',
+
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+
+                    color: '#7A6F73',
+                    fontSize: '24px',
+                },
+            },
             content: (
                 <Typography sx={joyrideTextStyle}>
-                    Marca esta casilla para recibir notificaciones por correo cuando tus créditos bajen al límite que definas.
+                    Marca esta casilla para recibir<br />
+                    notificaciones por correo cuando tus<br />
+                    créditos bajen al límite que definas.
                 </Typography>
             ),
         },
@@ -193,9 +216,33 @@ const PaymentSettings: React.FC = () => {
             target: '.tour-payment-channel-threshold',
             title: joyrideTitle('Define canal y umbral', '2/3'),
             placement: 'right',
+            styles: {
+                tooltip: {
+                    width: '310px',
+                    height: '200px',
+                },
+                buttonPrimary: {
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #D9D9D9',
+                    borderRadius: '50%',
+
+                    width: '40px',
+                    height: '40px',
+
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+
+                    color: '#7A6F73',
+                    fontSize: '24px',
+                },
+            },
             content: (
                 <Typography sx={joyrideTextStyle}>
-                    Elige los canales (SMS Corto y/o Largo) que deseas monitorear e indica la cantidad mínima de créditos.
+                    Elige los canales (SMS Corto y/o<br />
+                    Largo) que deseas monitorear e<br />
+                    indica la cantidad mínima de<br />
+                    créditos.
                 </Typography>
             ),
         },
@@ -203,9 +250,19 @@ const PaymentSettings: React.FC = () => {
             target: '.tour-payment-users',
             title: joyrideTitle('Selecciona destinatarios', '3/3'),
             placement: 'right',
+            styles: {
+                tooltip: {
+                    width: '310px',
+                    height: '200px',
+                },
+                buttonPrimary: joyrideActionButtonStyle,
+            },
             content: (
                 <Typography sx={joyrideTextStyle}>
-                    Elige a los administradores, supervisores y/o monitores que recibirán la notificación cuando se alcance el límite establecido.
+                    Elige a los administradores,<br />
+                    supervisores y/o monitores que<br />
+                    recibirán la notificación cuando se<br />
+                    alcance el límite establecido.
                 </Typography>
             ),
         },
@@ -714,7 +771,7 @@ const PaymentSettings: React.FC = () => {
                 onEvent={handlePaymentJoyrideEvent}
                 locale={{
                     skip: 'SALTAR',
-                    next: '›',
+                    next: '>',
                     back: '‹',
                     last: 'ENTENDIDO',
                     close: 'CERRAR',
@@ -729,11 +786,13 @@ const PaymentSettings: React.FC = () => {
                     tooltip: {
                         background: '#FFFFFF 0% 0% no-repeat padding-box',
                         boxShadow: '0px 8px 16px #00131F3D',
-                        border: '1px solid #9B9295',
                         opacity: 1,
                         borderRadius: '8px',
                         padding: '20px',
-                        width: '325px',
+                        maxWidth: '305px',
+                    },
+                    arrow: {
+                        color: '#FFFFFF',
                     },
                     tooltipContainer: {
                         textAlign: 'left',
@@ -745,9 +804,24 @@ const PaymentSettings: React.FC = () => {
                     tooltipContent: {
                         padding: 0,
                     },
+                    buttonBack: {
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #D9D9D9',
+                        borderRadius: '50%',
+
+                        width: '40px',
+                        height: '40px',
+
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+
+                        color: '#7A6F73',
+                        fontSize: '28px',
+                    },
                     buttonSkip: joyrideActionButtonStyle,
-                    buttonPrimary: joyrideActionButtonStyle,
-                    buttonBack: joyrideActionButtonStyle,
+                    //buttonPrimary: joyrideActionButtonStyle,
+                    //buttonBack: joyrideActionButtonStyle,
                 }}
             />
 

@@ -196,6 +196,12 @@ const HomePage: React.FC = () => {
             title: joyrideTitle('Acciones', '1/1'),
             skipBeacon: true,
             placement: 'bottom',
+            styles: {
+                tooltip: {
+                    width: '318px',
+                    height: '288px',
+                },
+            },
             content: (
                 <Box
                     sx={{
@@ -205,11 +211,22 @@ const HomePage: React.FC = () => {
                     }}
                 >
                     <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                        <Typography sx={{ ...joyrideTextStyle, fontWeight: 500, minWidth: '34px' }}>
+                        <Typography sx={{
+                            textAlign: 'left',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: 600,
+                            fontSize: '12px',
+                            lineHeight: '18px',
+                            letterSpacing: '0px',
+                            color: '#9B9295',
+                            opacity: 1,
+                        }}>
                             USO
                         </Typography>
                         <Typography sx={joyrideTextStyle}>
-                            Puedes consultar la distribución de los créditos en cada campaña y por cada usuario.
+                            Puedes consultar la distribución <br />
+                            de los créditos en cada <br />
+                            campaña y por cada usuario.
                         </Typography>
                     </Box>
 
@@ -221,7 +238,8 @@ const HomePage: React.FC = () => {
                             sx={{ width: '24px', height: '24px', mt: '2px' }}
                         />
                         <Typography sx={joyrideTextStyle}>
-                            Puedes hacer pruebas rápidas de SMS.
+                            Puedes hacer pruebas rápidas <br />
+                            de SMS.
                         </Typography>
                     </Box>
 
@@ -233,7 +251,8 @@ const HomePage: React.FC = () => {
                             sx={{ width: '24px', height: '24px', mt: '2px' }}
                         />
                         <Typography sx={joyrideTextStyle}>
-                            Decide qué información deseas visualizar en tu tablero de control.
+                            Decide qué información deseas <br />
+                            visualizar en tu tablero de control.
                         </Typography>
                     </Box>
                 </Box>
@@ -670,11 +689,13 @@ const HomePage: React.FC = () => {
                     tooltip: {
                         background: '#FFFFFF 0% 0% no-repeat padding-box',
                         boxShadow: '0px 8px 16px #00131F3D',
-                        border: '1px solid #9B9295',
                         opacity: 1,
                         borderRadius: '8px',
                         padding: '20px',
                         width: '320px',
+                    },
+                    arrow: {
+                        color: '#FFFFFF',
                     },
                     tooltipContainer: {
                         textAlign: 'left',

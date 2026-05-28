@@ -42,6 +42,7 @@ import PushPinIcon from "@mui/icons-material/PushPin";
 import iconplus from "../assets/Icon-plus.svg";
 import IconArrowDown1 from "../assets/IconArrowDown1.svg";
 import SpinnerTop from "../assets/SpinnerTop.svg";
+import BoxEmpty from '../assets/Nousers.svg';
 import SpinnerBottom from "../assets/SpinnerBottom.svg";
 import CloseIcon from '@mui/icons-material/Close';
 import IconCloseModal from "../assets/IconCloseModal.svg";
@@ -104,6 +105,7 @@ import DynamicCampaignEditText from '../components/commons/DynamicCampaignEditTe
 import { getSelectedRoom, getSelectedRoomId, SelectedRoom } from "../utils/roomHelper";
 import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
 import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
+import { red } from '@mui/material/colors';
 interface Horario {
   titulo: string;
   start: Date | null;
@@ -360,6 +362,27 @@ const Campains: React.FC = () => {
       title: joyrideTitle('Acciones sobre campañas', '1/2'),
       skipBeacon: true,
       placement: 'right',
+      styles: {
+        tooltip: {
+          width: '327px',
+          height: '336px',
+        },
+        buttonPrimary: {
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #D9D9D9',
+          borderRadius: '50%',
+
+          width: '40px',
+          height: '40px',
+
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+
+          color: '#7A6F73',
+          fontSize: '24px',
+        },
+      },
       content: (
         <Box
           sx={{
@@ -379,7 +402,9 @@ const Campains: React.FC = () => {
             />
 
             <Typography sx={joyrideTextStyle}>
-              Pulsa el botón “+” para configurar una nueva campaña de SMS desde cero.
+              Pulsa el botón “+” para configurar<br />
+              una nueva campaña de SMS<br />
+              desde cero.
             </Typography>
           </Box>
 
@@ -396,7 +421,9 @@ const Campains: React.FC = () => {
             />
 
             <Typography sx={joyrideTextStyle}>
-              Cuando cuentes con recursos, podrás buscar un elemento en específico.
+              Cuando cuentes con recursos,<br />
+              podrás buscar un elemento en<br />
+              específico.
             </Typography>
           </Box>
 
@@ -411,7 +438,9 @@ const Campains: React.FC = () => {
             />
 
             <Typography sx={joyrideTextStyle}>
-              Usa el selector de status para encontrar rápidamente campañas encendidas o detenidas.
+              Usa el selector de status para<br />
+              encontrar rápidamente campañas<br />
+              encendidas o detenidas.
             </Typography>
           </Box>
         </Box>
@@ -421,9 +450,20 @@ const Campains: React.FC = () => {
       target: '.tour-campaign-results',
       title: joyrideTitle('Visualiza tus resultados', '2/2'),
       placement: 'right',
+      styles: {
+        tooltip: {
+          width: '297px',
+          height: '214px',
+        },
+        buttonPrimary: joyrideActionButtonStyle,
+      },
       content: (
         <Typography sx={joyrideTextStyle}>
-          Aquí aparecerán todas tus campañas. Cuando crees la primera podrás revisar su estado y métricas en el lado derecho de este panel.
+          Aquí aparecerán todas tus<br />
+          campañas. Cuando crees la<br />
+          primera podrás revisar su estado y<br />
+          métricas en el lado derecho de este<br />
+          panel.
         </Typography>
       ),
     },
@@ -2190,7 +2230,7 @@ const Campains: React.FC = () => {
         onEvent={handleCampaignJoyrideEvent}
         locale={{
           skip: 'SALTAR',
-          next: '›',
+          next: '>',
           back: '‹',
           last: 'ENTENDIDO',
           close: 'CERRAR',
@@ -2205,11 +2245,13 @@ const Campains: React.FC = () => {
           tooltip: {
             background: '#FFFFFF 0% 0% no-repeat padding-box',
             boxShadow: '0px 8px 16px #00131F3D',
-            border: '1px solid #9B9295',
             opacity: 1,
             borderRadius: '8px',
             padding: '20px',
             width: '350px',
+          },
+          arrow: {
+            color: '#FFFFFF',
           },
           tooltipContainer: {
             textAlign: 'left',
@@ -2221,9 +2263,24 @@ const Campains: React.FC = () => {
           tooltipContent: {
             padding: 0,
           },
+          buttonBack: {
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #D9D9D9',
+            borderRadius: '50%',
+
+            width: '40px',
+            height: '40px',
+
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+
+            color: '#7A6F73',
+            fontSize: '28px',
+          },
           buttonSkip: joyrideActionButtonStyle,
-          buttonPrimary: joyrideActionButtonStyle,
-          buttonBack: joyrideActionButtonStyle,
+          //buttonPrimary: joyrideActionButtonStyle,
+          //buttonBack: joyrideActionButtonStyle,
         }}
       />
       {loadingPage && (
@@ -2316,7 +2373,7 @@ const Campains: React.FC = () => {
           {/* Listado de campañas */}
 
           <Grid item sx={{ display: 'flex', }}>
-            <Box  className="tour-campaign-actions" sx={{ display: "flex", }}>
+            <Box sx={{ display: "flex", }}>
               {/* Panel de campañas */}
               {panelAbierto && (
                 <Paper
@@ -2329,210 +2386,214 @@ const Campains: React.FC = () => {
                     flexDirection: "column",
                   }}
                 >
-                  <Box
-                   
+                  <Box className="tour-campaign-actions"
                     sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      width: "279px",
-                      marginBottom: "10px", marginLeft: "25px"
+                      display: 'flex',
+                      flexDirection: 'column',
                     }}
                   >
-                    <Typography
-                      variant="h6"
+                    <Box
                       sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        width: "279px",
+                        marginBottom: "4px", marginLeft: "25px"
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          textAlign: "left",
+                          fontFamily: "Poppins",
+                          letterSpacing: "0px",
+                          color: "#330F1B",
+                          opacity: 1,
+                          fontSize: "18px",
+                        }}
+                      >
+                        Listado de campañas
+                      </Typography>
+                      <Tooltip
+                        title={
+                          isLimitReached
+                            ? "Has alcanzado el límite de 200 campañas. Elimina una para poder crear una nueva."
+                            : "Crear"
+                        }
+                        arrow
+                        placement="top"
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              backgroundColor: "#000000",
+                              color: "#CCC3C3",
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: "12px",
+                              padding: "6px 8px",
+                              borderRadius: "8px",
+                              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.7)"
+                            }
+                          },
+                          arrow: {
+                            sx: {
+                              color: "#000000"
+                            }
+                          }
+                        }}
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: "offset",
+                              options: {
+                                offset: [0, -15]
+                              }
+                            }
+                          ]
+                        }}
+                      >
+                        <span>
+                          <IconButton
+                            onClick={handleOpenModal}
+                            disabled={isLimitReached}
+                            sx={{
+                              opacity: isLimitReached ? 0.5 : 1,
+                              cursor: isLimitReached ? "not-allowed" : "pointer"
+                            }}
+                          >
+                            <img
+                              src={iconplus}
+                              alt="Agregar"
+                              style={{ width: "20px", height: "20px" }}
+                            />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </Box>
+
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      mb={"4px"}
+                      mt={"12px"}
+                      sx={{
+                        border: Serchterm ? "1px solid #7B354D" : "1px solid #9B9295",
+                        borderRadius: "4px",
+                        px: 2,
+                        py: 1,
+                        width: "279px",
+                        height: "40px", ml: 3.1
+                      }}
+                    >
+                      <img
+                        src={Serchterm ? Iconseachred : seachicon}
+                        alt="Buscar"
+                        style={{ marginRight: 8, width: 24 }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Buscar"
+                        value={Serchterm}
+                        onChange={handleSearch2}
+                        autoFocus
+                        onKeyDown={(e) => e.stopPropagation()}
+                        style={{
+                          border: "none",
+                          outline: "none",
+                          width: "100%",
+                          fontSize: "16px",
+                          fontFamily: "Poppins",
+                          color: Serchterm ? "#7B354D" : "#9B9295",
+                          backgroundColor: "transparent",
+                        }}
+                      />
+                      {Serchterm && (
+                        <img
+                          src={iconclose}
+                          alt="Limpiar búsqueda"
+                          onClick={() => {
+                            setSerchterm('');
+                          }}
+                          style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
+                        />
+
+                      )}
+                    </Box>
+
+                    <Select
+                      value={campaignFilter}
+                      onChange={(e) => setCampaignFilter(e.target.value as 'todas' | 'encendidas' | 'detenidas')}
+                      fullWidth
+                      size="small"
+                      displayEmpty
+                      sx={{
+                        marginTop: "10px",
+                        width: "279px", marginLeft: "25px",
+                        marginBottom: "10px",
+                        textAlign: "left",
+                        fontFamily: "Poppins, sans-serif",
+                        letterSpacing: "0px",
+                        color: "#645E60",
+                        opacity: 1,
+                        fontSize: "12px",
+                      }}
+                      renderValue={(selected) =>
+                        selected && typeof selected === "string" ? selected : (
+                          <span style={{ fontStyle: "normal" }}>Seleccionar estatus</span>
+                        )
+                      }
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            borderColor: "#9B9295",
+                            borderBottomLeftRadius: "14px",
+                            borderBottomRightRadius: "14px",
+                          }
+                        }
+                      }}
+                    >
+                      <MenuItem sx={{
+                        marginTop: "5px",
+                        marginBottom: "5px",
                         textAlign: "left",
                         fontFamily: "Poppins",
                         letterSpacing: "0px",
-                        color: "#330F1B",
+                        color: "#645E60",
                         opacity: 1,
-                        fontSize: "18px",
-                      }}
-                    >
-                      Listado de campañas
-                    </Typography>
-                    <Tooltip
-                      title={
-                        isLimitReached
-                          ? "Has alcanzado el límite de 200 campañas. Elimina una para poder crear una nueva."
-                          : "Crear"
-                      }
-                      arrow
-                      placement="top"
-                      componentsProps={{
-                        tooltip: {
-                          sx: {
-                            backgroundColor: "#000000",
-                            color: "#CCC3C3",
-                            fontFamily: "Poppins, sans-serif",
-                            fontSize: "12px",
-                            padding: "6px 8px",
-                            borderRadius: "8px",
-                            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.7)"
-                          }
-                        },
-                        arrow: {
-                          sx: {
-                            color: "#000000"
-                          }
+                        fontSize: "12px",
+                        "&:hover": {
+                          backgroundColor: "#F2EBED"
                         }
-                      }}
-                      PopperProps={{
-                        modifiers: [
-                          {
-                            name: "offset",
-                            options: {
-                              offset: [0, -15]
-                            }
-                          }
-                        ]
-                      }}
-                    >
-                      <span>
-                        <IconButton
-                          onClick={handleOpenModal}
-                          disabled={isLimitReached}
-                          sx={{
-                            opacity: isLimitReached ? 0.5 : 1,
-                            cursor: isLimitReached ? "not-allowed" : "pointer"
-                          }}
-                        >
-                          <img
-                            src={iconplus}
-                            alt="Agregar"
-                            style={{ width: "20px", height: "20px" }}
-                          />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                  </Box>
+                      }} value="todas">Todos</MenuItem>
 
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    mb={"16px"}
-                    mt={"12px"}
-                    sx={{
-                      backgroundColor: "#FFFFFF",
-                      border: Serchterm ? "1px solid #7B354D" : "1px solid #9B9295",
-                      borderRadius: "4px",
-                      px: 2,
-                      py: 1,
-                      width: "279px",
-                      height: "40px", ml: 3.1
-                    }}
-                  >
-                    <img
-                      src={Serchterm ? Iconseachred : seachicon}
-                      alt="Buscar"
-                      style={{ marginRight: 8, width: 24 }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Buscar"
-                      value={Serchterm}
-                      onChange={handleSearch2}
-                      autoFocus
-                      onKeyDown={(e) => e.stopPropagation()}
-                      style={{
-                        border: "none",
-                        outline: "none",
-                        width: "100%",
-                        fontSize: "16px",
+                      <MenuItem sx={{
+                        marginTop: "5px",
+                        marginBottom: "5px",
+                        textAlign: "left",
                         fontFamily: "Poppins",
-                        color: Serchterm ? "#7B354D" : "#9B9295",
-                        backgroundColor: "transparent",
-                      }}
-                    />
-                    {Serchterm && (
-                      <img
-                        src={iconclose}
-                        alt="Limpiar búsqueda"
-                        onClick={() => {
-                          setSerchterm('');
-                        }}
-                        style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
-                      />
-
-                    )}
-                  </Box>
-
-                  <Select
-                    value={campaignFilter}
-                    onChange={(e) => setCampaignFilter(e.target.value as 'todas' | 'encendidas' | 'detenidas')}
-                    fullWidth
-                    size="small"
-                    displayEmpty
-                    sx={{
-                      marginTop: "10px",
-                      width: "279px", marginLeft: "25px",
-                      marginBottom: "10px",
-                      textAlign: "left",
-                      fontFamily: "Poppins, sans-serif",
-                      letterSpacing: "0px",
-                      color: "#645E60",
-                      opacity: 1,
-                      fontSize: "12px",
-                    }}
-                    renderValue={(selected) =>
-                      selected && typeof selected === "string" ? selected : (
-                        <span style={{ fontStyle: "normal" }}>Seleccionar estatus</span>
-                      )
-                    }
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          borderColor: "#9B9295",
-                          borderBottomLeftRadius: "14px",
-                          borderBottomRightRadius: "14px",
+                        letterSpacing: "0px",
+                        color: "#645E60",
+                        opacity: 1,
+                        fontSize: "12px",
+                        "&:hover": {
+                          backgroundColor: "#F2EBED"
                         }
-                      }
-                    }}
-                  >
-                    <MenuItem sx={{
-                      marginTop: "5px",
-                      marginBottom: "5px",
-                      textAlign: "left",
-                      fontFamily: "Poppins",
-                      letterSpacing: "0px",
-                      color: "#645E60",
-                      opacity: 1,
-                      fontSize: "12px",
-                      "&:hover": {
-                        backgroundColor: "#F2EBED"
-                      }
-                    }} value="todas">Todos</MenuItem>
+                      }} value="encendidas">Campañas encendidas</MenuItem>
 
-                    <MenuItem sx={{
-                      marginTop: "5px",
-                      marginBottom: "5px",
-                      textAlign: "left",
-                      fontFamily: "Poppins",
-                      letterSpacing: "0px",
-                      color: "#645E60",
-                      opacity: 1,
-                      fontSize: "12px",
-                      "&:hover": {
-                        backgroundColor: "#F2EBED"
-                      }
-                    }} value="encendidas">Campañas encendidas</MenuItem>
-
-                    <MenuItem sx={{
-                      marginTop: "5px",
-                      marginBottom: "5px",
-                      textAlign: "left",
-                      fontFamily: "Poppins",
-                      letterSpacing: "0px",
-                      color: "#645E60",
-                      opacity: 1,
-                      fontSize: "12px",
-                      "&:hover": {
-                        backgroundColor: "#F2EBED"
-                      }
-                    }} value="detenidas">Campañas detenidas</MenuItem>
-                  </Select>
-
+                      <MenuItem sx={{
+                        marginTop: "5px",
+                        marginBottom: "5px",
+                        textAlign: "left",
+                        fontFamily: "Poppins",
+                        letterSpacing: "0px",
+                        color: "#645E60",
+                        opacity: 1,
+                        fontSize: "12px",
+                        "&:hover": {
+                          backgroundColor: "#F2EBED"
+                        }
+                      }} value="detenidas">Campañas detenidas</MenuItem>
+                    </Select>
+                  </Box>
 
                   {filteredCampaigns.length > 0 && (
                     <Box sx={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px", marginLeft: "8px", }}>
@@ -2647,12 +2708,13 @@ const Campains: React.FC = () => {
                     </Box>
 
                   )}
-                  <List  className="tour-campaign-results" sx={{ overflowY: "auto", flexGrow: 1, overflowX: "hidden" }}>
+                  <List className="tour-campaign-results" sx={{ overflowY: "auto", flexGrow: 1, overflowX: "hidden" }}>
                     {filteredCampaigns.length === 0 ? (
-                      <Box  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', textAlign: 'center' }}>
-                        <Box component="img" src={boxopen} alt="Caja Vacía" sx={{ width: '250px', height: 'auto' }} />
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', textAlign: 'center' }}>
+                        <Box component="img" src={BoxEmpty} alt="Caja Vacía" sx={{ width: '200px', height: 'auto', marginTop: '30px' }} />
                         <Typography sx={{ marginTop: '10px', color: '#8F4D63', fontWeight: '500', fontFamily: 'Poppins' }}>
-                          No se encontraron resultados.
+                          Añadir una campaña para < br />
+                          comenzar
                         </Typography>
                       </Box>
                     ) : (
@@ -3170,7 +3232,7 @@ const Campains: React.FC = () => {
                             {
                               name: 'offset',
                               options: {
-                                offset: [0, -15] // [horizontal, vertical] — aquí movemos 3px hacia abajo
+                                offset: [0, -15]
                               }
                             }
                           ]

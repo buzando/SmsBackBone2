@@ -60,6 +60,7 @@ import IconUserArrow from '../assets/CHEVRON_USER.svg';
 import CloseSession from '../assets/Icon-CerrarSesion.svg';
 import facturicone from '../assets/facturicone.svg';
 import Iconhelpu from '../assets/Iconhelpu.svg';
+import arrowNextIcon from '../assets/arrowNextIcon.svg';
 import ApiIconDownload from '../assets/ApiIconDownload.svg';
 import logorq from '../assets/quantum-logov25.svg';
 import PrivacityIcon from '../assets/Icon_privacidad.svg'
@@ -265,6 +266,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
         opacity: 1,
     };
 
+
     const joyrideActionButtonStyle: CSSProperties = {
         textAlign: 'center',
         font: 'normal normal 600 14px/54px Poppins',
@@ -277,6 +279,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
         boxShadow: 'none',
         padding: '0 16px',
     };
+
 
     const joyrideTitle = (title: string, count: string) => (
         <Box
@@ -319,12 +322,36 @@ const NavBarAndDrawer: React.FC<Props> = props => {
             title: joyrideTitle('Header', '1/4'),
             skipBeacon: true,
             placement: 'bottom',
+            styles: {
+                tooltip: {
+                    width: '360px',
+                    height: '241px',
+                },
+                buttonPrimary: {
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #D9D9D9',
+                    borderRadius: '50%',
+
+                    width: '40px',
+                    height: '40px',
+
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+
+                    color: '#7A6F73',
+                    fontSize: '24px',
+                },
+            },
+
             content: (
+
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                     <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                         <Box component="img" src={seachicon} alt="Buscar" sx={{ width: '24px', height: '24px', mt: '2px' }} />
                         <Typography sx={joyrideTextStyle}>
-                            En esta sección podrás buscar secciones, o diferentes configuraciones.
+                            En esta sección podrás buscar <br />
+                            secciones, o diferentes configuraciones.
                         </Typography>
                     </Box>
 
@@ -348,6 +375,27 @@ const NavBarAndDrawer: React.FC<Props> = props => {
             target: '.tour-drawer-credits',
             title: joyrideTitle('Tus créditos SMS', '2/4'),
             placement: 'right',
+            styles: {
+                tooltip: {
+                    width: '297px',
+                    height: '205px',
+                },
+                buttonPrimary: {
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #D9D9D9',
+                    borderRadius: '50%',
+
+                    width: '40px',
+                    height: '40px',
+
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+
+                    color: '#7A6F73',
+                    fontSize: '24px',
+                },
+            },
             content: (
                 <Typography sx={joyrideTextStyle}>
                     Aquí puedes conocer tus créditos disponibles.
@@ -359,6 +407,27 @@ const NavBarAndDrawer: React.FC<Props> = props => {
             target: '.tour-sidebar-navigation',
             title: joyrideTitle('Menú de navegación', '3/4'),
             placement: 'right',
+            styles: {
+                tooltip: {
+                    width: '290px',
+                    height: '207px',
+                },
+                buttonPrimary: {
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #D9D9D9',
+                    borderRadius: '50%',
+
+                    width: '40px',
+                    height: '40px',
+
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+
+                    color: '#7A6F73',
+                    fontSize: '24px',
+                },
+            },
             content: (
                 <Typography sx={joyrideTextStyle}>
                     Desde aquí, accedes a todas las secciones de SMS. Puedes crear usuarios y campañas,
@@ -369,6 +438,13 @@ const NavBarAndDrawer: React.FC<Props> = props => {
             target: '.tour-channel-button',
             title: joyrideTitle('Selecciona un canal', '4/4'),
             placement: 'bottom',
+            styles: {
+                tooltip: {
+                    width: '240px',
+                    height: '192px',
+                },
+                buttonPrimary: joyrideActionButtonStyle,
+            },
             content: (
                 <Typography sx={joyrideTextStyle}>
                     Haz clic en &lt;&lt;Canal&gt;&gt; para elegir el tipo de envío. Es el primer paso para consultar tu actividad más reciente.
@@ -654,7 +730,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                 onEvent={handleLayoutJoyrideEvent}
                 locale={{
                     skip: 'SALTAR',
-                    next: '›',
+                    next: '>',
                     back: '‹',
                     last: 'ENTENDIDO',
                     close: 'CERRAR',
@@ -669,11 +745,12 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                     tooltip: {
                         background: '#FFFFFF 0% 0% no-repeat padding-box',
                         boxShadow: '0px 8px 16px #00131F3D',
-                        border: '1px solid #9B9295',
                         opacity: 1,
                         borderRadius: '8px',
-                        padding: '20px',
-                        width: '320px',
+                        padding: '18px',
+                    },
+                    arrow: {
+                        color: '#FFFFFF',
                     },
                     tooltipContainer: {
                         textAlign: 'left',
@@ -685,9 +762,26 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                     tooltipContent: {
                         padding: 0,
                     },
+
+                    buttonBack: {
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #D9D9D9',
+                        borderRadius: '50%',
+
+                        width: '40px',
+                        height: '40px',
+
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+
+                        color: '#7A6F73',
+                        fontSize: '28px',
+                    },
+
                     buttonSkip: joyrideActionButtonStyle,
-                    buttonPrimary: joyrideActionButtonStyle,
-                    buttonBack: joyrideActionButtonStyle,
+                    //buttonPrimary: joyrideActionButtonStyle,
+                    //buttonBack: joyrideActionButtonStyle,
                 }}
             />
             <AppBar position="fixed" sx={{ bgcolor: '#290013' }}>

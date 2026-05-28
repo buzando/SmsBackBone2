@@ -107,7 +107,7 @@ const Chooseroom: React.FC = () => {
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '18px',
+                        gap: '18px'
                     }}
                 >
                     <Box
@@ -129,7 +129,9 @@ const Chooseroom: React.FC = () => {
                         />
 
                         <Typography sx={joyrideTextStyle}>
-                            ¿Tienes varias salas? Usa el buscador para encontrar rápidamente la que necesitas.
+                            ¿Tienes varias salas? Usa el<br />
+                            buscador para encontrar <br />
+                            rápidamente la que necesitas.
                         </Typography>
                     </Box>
 
@@ -151,16 +153,21 @@ const Chooseroom: React.FC = () => {
                                 justifyContent: 'center',
                             }}
                         >
-                            <HomeIcon
-                                sx={{
-                                    width: '20px',
-                                    height: '20px',
+                            <img
+                                src={HouseIcon}
+                                alt="House Icon"
+                                style={{
+                                    width: '24px',
+                                    height: '24px',
                                 }}
                             />
                         </Box>
 
                         <Typography sx={joyrideTextStyle}>
-                            Haz clic en una sala para acceder. Podrás ver tus campañas, salas, usuarios, créditos y más información.
+                            Haz clic en una sala para <br />
+                            acceder. Podrás ver tus <br />
+                            campañas, salas, usuarios, <br />
+                            créditos y más información.
                         </Typography>
                     </Box>
                 </Box>
@@ -306,10 +313,14 @@ const Chooseroom: React.FC = () => {
                     tooltip: {
                         background: '#FFFFFF 0% 0% no-repeat padding-box',
                         boxShadow: '0px 8px 16px #00131F3D',
-                        border: '1px solid #9B9295',
                         opacity: 1,
-                        borderRadius: '4px',
+                        borderRadius: '8px',
                         padding: '18px',
+                        maxWidth: '300px',
+                        height: '270px',
+                    },
+                    arrow: {
+                        color: '#FFFFFF',
                     },
                     tooltipContainer: {
                         textAlign: 'left',
@@ -333,7 +344,8 @@ const Chooseroom: React.FC = () => {
                     display: "flex",
                     justifyContent: "center",
                     flexDirection: "column",
-                    marginTop: "-200px",
+                    alignItems: 'center',
+                    marginTop: "-175px",
                 }}
             >
                 <Typography
@@ -354,10 +366,11 @@ const Chooseroom: React.FC = () => {
                 </Typography>
 
                 <Box className="tour-selector-salas">
+
                     <div
                         className="search-container"
                         style={{
-                            marginLeft: "43px",
+                            marginLeft: "12px",
                             width: '430px',
                             height: "40px",
                             backgroundColor: "#FFFFFF",
@@ -551,133 +564,134 @@ const Chooseroom: React.FC = () => {
                                 ))
                         )}
                     </Box>
+                </Box>
 
-                    <div>
-                        <Modal
-                            isOpen={modalIsOpen}
-                            onRequestClose={closeModal}
-                            style={{
-                                content: {
-                                    ...customStyles.content,
-                                    maxWidth: "500px",
-                                    padding: "20px",
-                                    overflowX: "hidden",
-                                    boxShadow: "0px 0px 16px #00131F52",
-                                    borderRadius: "8px",
-                                },
+                <div>
+                    <Modal
+                        isOpen={modalIsOpen}
+                        onRequestClose={closeModal}
+                        style={{
+                            content: {
+                                ...customStyles.content,
+                                maxWidth: "500px",
+                                padding: "20px",
+                                overflowX: "hidden",
+                                boxShadow: "0px 0px 16px #00131F52",
+                                borderRadius: "8px",
+                            },
+                        }}
+                        contentLabel="Guardar Información Modal"
+                    >
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                textAlign: "left",
+                                fontFamily: "Poppins",
+                                fontSize: "20px",
+                                letterSpacing: "0px",
+                                color: "#330F1B",
+                                opacity: 1,
+                                marginBottom: "16px",
                             }}
-                            contentLabel="Guardar Información Modal"
                         >
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    textAlign: "left",
-                                    fontFamily: "Poppins",
-                                    fontSize: "20px",
-                                    letterSpacing: "0px",
-                                    color: "#330F1B",
-                                    opacity: 1,
-                                    marginBottom: "16px",
-                                }}
-                            >
-                                Guardar información
-                            </Typography>
+                            Guardar información
+                        </Typography>
 
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    textAlign: "left",
-                                    font: "normal normal normal 16px/20px Poppins",
-                                    letterSpacing: "0px",
-                                    color: "#330F1B",
-                                    opacity: 1,
-                                    marginBottom: "20px",
-                                }}
-                            >
-                                ¿Desea que guardemos su información para la próxima vez que inicie sesión en este dispositivo?
-                            </Typography>
+                        <Typography
+                            variant="body1"
+                            sx={{
+                                textAlign: "left",
+                                font: "normal normal normal 16px/20px Poppins",
+                                letterSpacing: "0px",
+                                color: "#330F1B",
+                                opacity: 1,
+                                marginBottom: "20px",
+                            }}
+                        >
+                            ¿Desea que guardemos su información para la próxima vez que inicie sesión en este dispositivo?
+                        </Typography>
 
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={dontAskAgain}
-                                        sx={{
-                                            color: '#574B4FCC',
-                                            '&.Mui-checked': { color: '#6C3A52' },
-                                        }}
-                                        checkedIcon={
-                                            <Box
-                                                sx={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    position: 'relative',
-                                                    marginTop: '0px',
-                                                    marginLeft: '0px',
-                                                }}
-                                            >
-                                                <img
-                                                    src={IconCheckBox1}
-                                                    alt="Seleccionado"
-                                                    style={{ width: '24px', height: '24px' }}
-                                                />
-                                            </Box>
-                                        }
-                                        onChange={handleCheckboxChange}
-                                        color="primary"
-                                    />
-                                }
-                                label={
-                                    <Typography
-                                        sx={{
-                                            color: dontAskAgain ? "#8F4D63" : "#574B4FCC",
-                                            fontFamily: "Poppins",
-                                            fontSize: "16px",
-                                            fontWeight: 500,
-                                        }}
-                                    >
-                                        No preguntar esto de nuevo
-                                    </Typography>
-                                }
-                                sx={{ marginBottom: "20px" }}
-                            />
-
-                            <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 2.5 }} />
-
-                            <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                <SecondaryButton
-                                    onClick={closeModal}
-                                    text="Cancelar"
-                                />
-
-                                <Button
-                                    onClick={SaveAutenticator}
-                                    variant="contained"
-                                    color="primary"
-                                    disabled={!dontAskAgain}
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={dontAskAgain}
                                     sx={{
-                                        background: "#833A53",
-                                        border: "1px solid #60293C",
-                                        borderRadius: "4px",
-                                        color: "#FFFFFF",
-                                        opacity: !dontAskAgain ? 0.4 : 1,
-                                        "&:hover": {
-                                            backgroundColor: dontAskAgain ? "#a54261" : "#833A53",
-                                            borderColor: "#60293C",
-                                        },
-                                        "&:active": {
-                                            borderColor: "#6F1E3A",
-                                        },
-                                        "&:focus": {
-                                            borderColor: "#60293C",
-                                        },
+                                        color: '#574B4FCC',
+                                        '&.Mui-checked': { color: '#6C3A52' },
+                                    }}
+                                    checkedIcon={
+                                        <Box
+                                            sx={{
+                                                width: '24px',
+                                                height: '24px',
+                                                position: 'relative',
+                                                marginTop: '0px',
+                                                marginLeft: '0px',
+                                            }}
+                                        >
+                                            <img
+                                                src={IconCheckBox1}
+                                                alt="Seleccionado"
+                                                style={{ width: '24px', height: '24px' }}
+                                            />
+                                        </Box>
+                                    }
+                                    onChange={handleCheckboxChange}
+                                    color="primary"
+                                />
+                            }
+                            label={
+                                <Typography
+                                    sx={{
+                                        color: dontAskAgain ? "#8F4D63" : "#574B4FCC",
+                                        fontFamily: "Poppins",
+                                        fontSize: "16px",
+                                        fontWeight: 500,
                                     }}
                                 >
-                                    Guardar
-                                </Button>
-                            </div>
-                        </Modal>
-                    </div>
-                </Box>
+                                    No preguntar esto de nuevo
+                                </Typography>
+                            }
+                            sx={{ marginBottom: "20px" }}
+                        />
+
+                        <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 2.5 }} />
+
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <SecondaryButton
+                                onClick={closeModal}
+                                text="Cancelar"
+                            />
+
+                            <Button
+                                onClick={SaveAutenticator}
+                                variant="contained"
+                                color="primary"
+                                disabled={!dontAskAgain}
+                                sx={{
+                                    background: "#833A53",
+                                    border: "1px solid #60293C",
+                                    borderRadius: "4px",
+                                    color: "#FFFFFF",
+                                    opacity: !dontAskAgain ? 0.4 : 1,
+                                    "&:hover": {
+                                        backgroundColor: dontAskAgain ? "#a54261" : "#833A53",
+                                        borderColor: "#60293C",
+                                    },
+                                    "&:active": {
+                                        borderColor: "#6F1E3A",
+                                    },
+                                    "&:focus": {
+                                        borderColor: "#60293C",
+                                    },
+                                }}
+                            >
+                                Guardar
+                            </Button>
+                        </div>
+                    </Modal>
+                </div>
+
             </Box>
         </Box>
     );

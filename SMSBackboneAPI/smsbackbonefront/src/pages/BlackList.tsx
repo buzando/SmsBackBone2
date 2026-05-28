@@ -279,7 +279,8 @@ const BlackList: React.FC = () => {
                     }}
                 >
                     <Typography sx={joyrideTextStyle}>
-                        En diversas secciones encontrarás estas dos opciones juntas:
+                        En diversas secciones encontrarás estas< br />
+                        dos opciones juntas:
                     </Typography>
 
                     <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
@@ -296,7 +297,8 @@ const BlackList: React.FC = () => {
                         </Typography>
 
                         <Typography sx={joyrideTextStyle}>
-                            Añade nuevos elementos para poder configurarlos.
+                            Añade nuevos elementos para poder< br />
+                            configurarlos.
                         </Typography>
                     </Box>
 
@@ -313,7 +315,8 @@ const BlackList: React.FC = () => {
                         />
 
                         <Typography sx={joyrideTextStyle}>
-                            Cuando cuentes con recursos, podrás buscar un elemento en específico.
+                            Cuando cuentes con recursos, podrás< br />
+                            buscar un elemento en específico.
                         </Typography>
                     </Box>
                 </Box>
@@ -1108,11 +1111,14 @@ const BlackList: React.FC = () => {
                     tooltip: {
                         background: '#FFFFFF 0% 0% no-repeat padding-box',
                         boxShadow: '0px 8px 16px #00131F3D',
-                        border: '1px solid #9B9295',
                         opacity: 1,
                         borderRadius: '8px',
                         padding: '20px',
-                        width: '375px',
+                        maxWidth: '348px',
+                        height: '266px',
+                    },
+                    arrow: {
+                        color: '#FFFFFF',
                     },
                     tooltipContainer: {
                         textAlign: 'left',
@@ -1156,40 +1162,54 @@ const BlackList: React.FC = () => {
             </Box>
             <Box sx={{ marginLeft: "32px", }}>
                 <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
-                <Box className="tour-blacklist-search-create" style={{ display: 'flex', justifyContent: 'flex-end', gap: '25px', marginBottom: '20px' }}>
-                    <MainIcon
-                        text="Nueva Lista Negra"
-                        isLoading={Loading}
-                        onClick={() => {
-                            setFormData({
-                                Name: '',
-                                Phones: [''],
-                                ExpirationDate: null,
-                                File: '',
-                            });
-                            setFileSuccess(false);
-                            setFileError(false);
-                            setUploadedFile(null);
-                            setBase64File('');
-                            setUploadedFileBase64('');
-                            setIsblacklistModalOpen(true);
-                        }}
-                        width="218px"
-                    >
-                        <span className="flex items-center">
-                            <span className="mr-2">+</span> Add Card
-                        </span>
-                    </MainIcon>
-                    <Box sx={{ position: 'relative', width: '220px' }}>
+
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        gap: '25px',
+                        marginBottom: '20px'
+                    }}>
+                    <Box className="tour-blacklist-search-create"
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 3
+                        }}>
+                        <MainIcon
+                            text="Nueva Lista Negra"
+                            isLoading={Loading}
+                            onClick={() => {
+                                setFormData({
+                                    Name: '',
+                                    Phones: [''],
+                                    ExpirationDate: null,
+                                    File: '',
+                                });
+                                setFileSuccess(false);
+                                setFileError(false);
+                                setUploadedFile(null);
+                                setBase64File('');
+                                setUploadedFileBase64('');
+                                setIsblacklistModalOpen(true);
+                            }}
+                            width="218px"
+                        >
+                            <span className="flex items-center">
+                                <span className="mr-2">+</span> Add Card
+                            </span>
+                        </MainIcon>
+
                         <Box
                             display="flex"
                             alignItems="center"
                             sx={{
                                 backgroundColor: "#FFFFFF",
+                                width: '220px',
                                 border: searchTerm ? "1px solid #7B354D" : "1px solid #9B9295",
                                 borderRadius: "4px",
                                 padding: "8px 12px",
-                                width: "218px",
                                 height: "40px",
                                 boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
                             }}
@@ -1230,9 +1250,11 @@ const BlackList: React.FC = () => {
                                     }}
                                 />
                             )}
+
                         </Box>
                     </Box>
                 </Box>
+
                 {BlackList.length > 0 && (
                     <Box sx={{
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', marginTop: '-46px',
