@@ -1017,6 +1017,7 @@ const PaymentSettings: React.FC = () => {
 
 
                             <Box
+                            className="tour-payment-users"
                                 sx={{
                                     display: "flex",
                                     justifyContent: "flex-start",

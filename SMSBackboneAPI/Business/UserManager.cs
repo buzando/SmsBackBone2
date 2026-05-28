@@ -1365,37 +1365,39 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                         ? (int)Math.Round((double)totalSent / daysSinceFirstSend)
                         : 0;
 
+                    // Usuarios relacionados con la sala
                     var userIds = ctx.roomsbyuser
                         .Where(r => r.idRoom == request.RoomId)
                         .Select(r => r.idUser)
                         .Distinct()
                         .ToList();
 
+                    // ===============================
+                    // CONSUMO DE CRÉDITOS REAL
+                    // enviados hoy * tarifa del cliente
+                    // ===============================
                     decimal creditConsumption = 0;
-                    var smsChannel = request.SmsType == 1 ? "short_sms" :
-                                     request.SmsType == 2 ? "long_sms" : null;
+                    decimal smsRate = 0;
 
-                    if (smsChannel != null)
+                    var clientRate = (
+                        from rbu in ctx.roomsbyuser
+                        join u in ctx.Users on rbu.idUser equals u.Id
+                        join c in ctx.clients on u.IdCliente equals c.id
+                        where rbu.idRoom == request.RoomId
+                        select new
+                        {
+                            c.RateForShort,
+                            c.RateForLong
+                        }
+                    ).FirstOrDefault();
+
+                    if (clientRate != null)
                     {
-                        decimal totalRecharge = ctx.CreditRecharge
-                            .Where(cr =>
-                                userIds.Contains(cr.idUser) &&
-                                cr.idRoom == request.RoomId &&
-                                cr.Chanel == smsChannel)
-                            .Sum(cr => (decimal?)cr.quantityCredits) ?? 0;
+                        smsRate = request.SmsType == 1
+                            ? Convert.ToDecimal(clientRate.RateForShort)
+                            : Convert.ToDecimal(clientRate.RateForLong);
 
-                        decimal remainingCredits = smsChannel == "short_sms"
-                            ? ctx.Rooms
-                                .Where(r => r.id == request.RoomId)
-                                .Sum(r => (decimal?)r.short_sms) ?? 0
-                            : ctx.Rooms
-                                .Where(r => r.id == request.RoomId)
-                                .Sum(r => (decimal?)r.long_sms) ?? 0;
-
-                        creditConsumption = totalRecharge - remainingCredits;
-
-                        if (creditConsumption < 0)
-                            creditConsumption = 0;
+                        creditConsumption = sentToday * smsRate;
                     }
 
                     var todaySends = ctx.CampaignContactScheduleSend
@@ -1407,10 +1409,12 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                         );
 
                     int delivered = todaySends.Count(s => s.Status == "1");
+
                     int responded = todaySends.Count(s =>
                         s.ResponseMessage != null &&
                         s.ResponseMessage != ""
                     );
+
                     int notDelivered = todaySends.Count(s => s.Status == "2");
                     int waiting = todaySends.Count(s => s.Status == "0");
                     int failed = todaySends.Count(s => s.Status == "4");
@@ -1424,14 +1428,15 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                         ? (int)Math.Round((double)responded * 100 / total)
                         : 0;
 
-                    var campaigns = campaignsQuery.Where(c =>
-        c.AutoStart &&
-        ctx.CampaignSchedules.Any(s =>
-            s.CampaignId == c.Id &&
-            s.StartDateTime <= now &&
-            s.EndDateTime >= now
-        )
-    )
+                    var campaigns = campaignsQuery
+                        .Where(c =>
+                            c.AutoStart &&
+                            ctx.CampaignSchedules.Any(s =>
+                                s.CampaignId == c.Id &&
+                                s.StartDateTime <= now &&
+                                s.EndDateTime >= now
+                            )
+                        )
                         .Select(c => new CampaignFullResponse
                         {
                             Id = c.Id,
@@ -1622,30 +1627,11 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
                 return new UseResponse
                 {
-                    CreditsUsed = 12450,
-                    MessagesSent = 12450,
-                    TotalRecharges = 50000,
-                    LastRecharge = new LastRechargeInfo
-                    {
-                        Credits = 10000,
-                        Date = DateTime.Now.AddDays(-2).ToString("yyyy-MM-dd HH:mm:ss")
-                    },
-                    ChartData = Enumerable.Range(0, 30)
-        .Select(i => DateTime.Now.Date.AddDays(-29 + i))
-        .Select((date, index) => new ChartDataPoint
-        {
-            Date = date.ToString("yyyy-MM-dd"),
-            Value = new[]
-            {
-                12, 25, 8, 34, 19,
-                42, 55, 21, 13, 60,
-                48, 72, 31, 16, 85,
-                63, 44, 29, 91, 77,
-                52, 38, 69, 100, 73,
-                57, 46, 88, 35, 64
-            }[index]
-        })
-        .ToList()
+                    CreditsUsed = creditsUsed,
+                    MessagesSent = messagesSent,
+                    TotalRecharges = totalRecharges,
+                    LastRecharge = lastRechargeInfo,
+                    ChartData = chartData
                 };
             }
         }
