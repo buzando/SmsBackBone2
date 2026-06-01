@@ -1131,6 +1131,7 @@ const Use: React.FC = () => {
 
                 </Box>
                 <DatePickerUse
+                    maxDate={new Date()}
                     open={datePickerOpen}
                     anchorEl={anchorEl}
                     placement="bottom-start"
