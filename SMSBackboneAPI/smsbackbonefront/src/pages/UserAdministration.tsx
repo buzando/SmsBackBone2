@@ -32,6 +32,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import NoResult from '../assets/NoResultados.svg';
 import Iconseachred from "../assets/Iconseachred.svg";
 import seachicon from '../assets/icon-lupa.svg';
+import OnboardLupaIcon from '../assets/OnboardLupaIcon.svg';
 import { useNavigate } from "react-router-dom";
 import usrAdmin from "../assets/usrAdmin.svg";
 import usrSup from "../assets/usrSup.svg";
@@ -228,7 +229,7 @@ const ManageAccounts: React.FC = () => {
                     <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
                         <Box
                             component="img"
-                            src={seachicon}
+                            src={OnboardLupaIcon}
                             alt="Buscar"
                             sx={{
                                 width: '24px',

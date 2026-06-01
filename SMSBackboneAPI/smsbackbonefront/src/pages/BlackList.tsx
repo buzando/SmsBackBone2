@@ -37,6 +37,7 @@ import Radio from '@mui/material/Radio';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import seachicon from '../assets/icon-lupa.svg'
+import OnboardLupaIcon from '../assets/OnboardLupaIcon.svg';
 import Iconseachred from "../assets/Iconseachred.svg";
 import iconclose from "../assets/icon-close.svg"
 import BoxEmpty from '../assets/Nousers.svg';
@@ -305,7 +306,7 @@ const BlackList: React.FC = () => {
                     <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
                         <Box
                             component="img"
-                            src={seachicon}
+                            src={OnboardLupaIcon}
                             alt="Buscar"
                             sx={{
                                 width: '24px',

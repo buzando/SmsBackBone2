@@ -57,6 +57,9 @@ import Iconpeople from '../assets/Iconpeople.svg';
 import Iconmesage from '../assets/Iconmesage.svg';
 import Iconreports from '../assets/Iconreports.svg';
 import IconUserArrow from '../assets/CHEVRON_USER.svg';
+import OnboardUserIcon from '../assets/OnboardUserIcon.svg';
+import OnboardHomeIcon from '../assets/OnboardHomeIcon.svg';
+import OnboardLupaIcon from '../assets/OnboardLupaIcon.svg';
 import CloseSession from '../assets/Icon-CerrarSesion.svg';
 import facturicone from '../assets/facturicone.svg';
 import Iconhelpu from '../assets/Iconhelpu.svg';
@@ -348,7 +351,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                     <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                        <Box component="img" src={seachicon} alt="Buscar" sx={{ width: '24px', height: '24px', mt: '2px' }} />
+                        <Box component="img" src={OnboardLupaIcon} alt="Buscar" sx={{ width: '24px', height: '24px', mt: '2px' }} />
                         <Typography sx={joyrideTextStyle}>
                             En esta sección podrás buscar <br />
                             secciones, o diferentes configuraciones.
@@ -356,14 +359,14 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                     </Box>
 
                     <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                        <Box component="img" src={HouseIcon} alt="Sala" sx={{ width: '24px', height: '24px', mt: '2px' }} />
+                        <Box component="img" src={OnboardHomeIcon} alt="Sala" sx={{ width: '24px', height: '24px', mt: '2px' }} />
                         <Typography sx={joyrideTextStyle}>
                             Aquí puedes realizar cambio de sala.
                         </Typography>
                     </Box>
 
                     <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                        <Box component="img" src={IconUser} alt="Usuario" sx={{ width: '24px', height: '24px', mt: '2px' }} />
+                        <Box component="img" src={OnboardUserIcon} alt="Usuario" sx={{ width: '26px', height: '27px', mt: '2px' }} />
                         <Typography sx={joyrideTextStyle}>
                             Y aquí puedes configurar tu perfil.
                         </Typography>
@@ -777,6 +780,8 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                         color: '#7A6F73',
                         fontSize: '28px',
+
+                        marginRight: '40px',
                     },
 
                     buttonSkip: joyrideActionButtonStyle,

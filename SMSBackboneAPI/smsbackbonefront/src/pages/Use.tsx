@@ -4,7 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import BoxEmpty from '../assets/Nousers.svg';
 import MainButton from '../components/commons/MainButton'
 import SecondaryButton from '../components/commons/SecondaryButton'
-import DatePicker from '../components/commons/DatePicker';
+import DatePickerUse from '../components/commons/DatePickerUse';
 import { es } from 'date-fns/locale';
 import { format } from 'date-fns';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -154,7 +154,7 @@ const Use: React.FC = () => {
     {/*Estado spinnerimg*/ }
     const [isPdfLoading, setIsPdfLoading] = useState(false);
 
-    const closeSmsPopper = () => setAnchorEl(null);
+    const closeSmsPopper = () => setSmsAnchorEl(null);
 
     const closeCampaignPopper = () => {
         setCampaignMenuOpen(false);
@@ -299,7 +299,7 @@ const Use: React.FC = () => {
         } else {
             setButtonText("CORTOS");
         }
-        setAnchorEl(null);
+        closeSmsPopper();
     };
 
     const handleDateSelectionApply = (
@@ -417,7 +417,9 @@ const Use: React.FC = () => {
             ]);
 
             setdataChart(result.chartData);
-            setData(true);
+            //setData(true);
+            setNoResults(!hasAnyData);
+            setData(hasAnyData);
         } catch (error) {
             console.error("Error al cargar datos de uso:", error);
         } finally {
@@ -545,7 +547,7 @@ const Use: React.FC = () => {
 
                 {/* Botones de filtro */}
                 <Box sx={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                    {/* Botón con Popper (Abre en donde debe pero aun no se cierra cuando otros se abren)*/}
+                    {/* Botón con Popper */}
                     <Button
                         variant="outlined"
                         sx={buttonStyle}
@@ -1128,7 +1130,7 @@ const Use: React.FC = () => {
                     )}
 
                 </Box>
-                <DatePicker
+                <DatePickerUse
                     open={datePickerOpen}
                     anchorEl={anchorEl}
                     placement="bottom-start"
@@ -1213,120 +1215,120 @@ const Use: React.FC = () => {
 
 
                             <Paper sx={graphPaperStyle}>
-    <Typography variant="h6" sx={graphTitleStyle}>
-        Promedio de consumo
-    </Typography>
+                                <Typography variant="h6" sx={graphTitleStyle}>
+                                    Promedio de consumo
+                                </Typography>
 
-    <Typography
-        sx={{
-            textAlign: "center",
-            fontSize: "12px",
-            color: "#574B4F",
-            opacity: 0.8,
-            fontFamily: "Poppins",
-        }}
-    >
-        Envíos por día del rango seleccionado
-    </Typography>
+                                <Typography
+                                    sx={{
+                                        textAlign: "center",
+                                        fontSize: "12px",
+                                        color: "#574B4F",
+                                        opacity: 0.8,
+                                        fontFamily: "Poppins",
+                                    }}
+                                >
+                                    Envíos por día del rango seleccionado
+                                </Typography>
 
-    <Box
-        sx={{
-            width: "100%",
-            overflowX: "auto",
-            overflowY: "hidden",
-            pb: "8px",
+                                <Box
+                                    sx={{
+                                        width: "100%",
+                                        overflowX: "auto",
+                                        overflowY: "hidden",
+                                        pb: "8px",
 
-            "&::-webkit-scrollbar": {
-                height: "8px",
-            },
-            "&::-webkit-scrollbar-track": {
-                backgroundColor: "#F2F2F2",
-                borderRadius: "10px",
-            },
-            "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "#C6BFC2",
-                borderRadius: "10px",
-            },
-            "&::-webkit-scrollbar-thumb:hover": {
-                backgroundColor: "#8F4D63",
-            },
-        }}
-    >
-        <Box sx={{ width: `${chartWidth}px`, height: "250px" }}>
-            <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                    data={dataChart}
-                    margin={{ top: 10, right: 20, left: 0, bottom: 25 }}
-                >
-                    <defs>
-                        <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#833A53" stopOpacity={0.8} />
-                            <stop offset="100%" stopColor="#833A53" stopOpacity={0} />
-                        </linearGradient>
-                    </defs>
+                                        "&::-webkit-scrollbar": {
+                                            height: "8px",
+                                        },
+                                        "&::-webkit-scrollbar-track": {
+                                            backgroundColor: "#F2F2F2",
+                                            borderRadius: "10px",
+                                        },
+                                        "&::-webkit-scrollbar-thumb": {
+                                            backgroundColor: "#C6BFC2",
+                                            borderRadius: "10px",
+                                        },
+                                        "&::-webkit-scrollbar-thumb:hover": {
+                                            backgroundColor: "#8F4D63",
+                                        },
+                                    }}
+                                >
+                                    <Box sx={{ width: `${chartWidth}px`, height: "250px" }}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart
+                                                data={dataChart}
+                                                margin={{ top: 10, right: 20, left: 0, bottom: 25 }}
+                                            >
+                                                <defs>
+                                                    <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="#833A53" stopOpacity={0.8} />
+                                                        <stop offset="100%" stopColor="#833A53" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
 
-                    <CartesianGrid strokeDasharray="3 3" />
+                                                <CartesianGrid strokeDasharray="3 3" />
 
-                    <XAxis
-                        dataKey="date"
-                        interval={0}
-                        minTickGap={0}
-                        height={50}
-                        tick={{
-                            fontFamily: "Poppins",
-                            fontSize: 8,
-                            fill: "#574B4F",
-                        }}
-                        angle={-35}
-                        textAnchor="end"
-                    />
+                                                <XAxis
+                                                    dataKey="date"
+                                                    interval={0}
+                                                    minTickGap={0}
+                                                    height={50}
+                                                    tick={{
+                                                        fontFamily: "Poppins",
+                                                        fontSize: 8,
+                                                        fill: "#574B4F",
+                                                    }}
+                                                    angle={-35}
+                                                    textAnchor="end"
+                                                />
 
-                    <YAxis
-                        domain={[0, yAxisMax]}
-                        ticks={Array.from({ length: 6 }, (_, i) => (yAxisMax / 5) * i)}
-                        tickFormatter={(value) => `${Math.round(value)}`}
-                        tick={{
-                            fontFamily: "Poppins",
-                            fontSize: "12px",
-                            fill: "#574B4F",
-                        }}
-                    />
+                                                <YAxis
+                                                    domain={[0, yAxisMax]}
+                                                    ticks={Array.from({ length: 6 }, (_, i) => (yAxisMax / 5) * i)}
+                                                    tickFormatter={(value) => `${Math.round(value)}`}
+                                                    tick={{
+                                                        fontFamily: "Poppins",
+                                                        fontSize: "12px",
+                                                        fill: "#574B4F",
+                                                    }}
+                                                />
 
-                    <RechartsTooltip
-                        formatter={(value: any) => [`${value} envíos`, "Envíos"]}
-                        contentStyle={{
-                            fontFamily: "Poppins",
-                            fontSize: "15px",
-                            color: "#574B4F",
-                            borderRadius: "6px",
-                            minWidth: "100px",
-                            minHeight: "40px",
-                            border: "1px solid #C6BFC2",
-                            boxShadow: "0px 8px 16px rgba(0, 19, 31, 0.16)",
-                        }}
-                        itemStyle={{
-                            fontFamily: "Poppins",
-                            color: "#8F4D63",
-                        }}
-                        labelStyle={{
-                            fontFamily: "Poppins",
-                            fontWeight: 500,
-                            color: "#574B4F",
-                        }}
-                    />
+                                                <RechartsTooltip
+                                                    formatter={(value: any) => [`${value} envíos`, "Envíos"]}
+                                                    contentStyle={{
+                                                        fontFamily: "Poppins",
+                                                        fontSize: "15px",
+                                                        color: "#574B4F",
+                                                        borderRadius: "6px",
+                                                        minWidth: "100px",
+                                                        minHeight: "40px",
+                                                        border: "1px solid #C6BFC2",
+                                                        boxShadow: "0px 8px 16px rgba(0, 19, 31, 0.16)",
+                                                    }}
+                                                    itemStyle={{
+                                                        fontFamily: "Poppins",
+                                                        color: "#8F4D63",
+                                                    }}
+                                                    labelStyle={{
+                                                        fontFamily: "Poppins",
+                                                        fontWeight: 500,
+                                                        color: "#574B4F",
+                                                    }}
+                                                />
 
-                    <Area
-                        type="monotone"
-                        dataKey="value"
-                        stroke="#833A53"
-                        strokeWidth={2}
-                        fill="url(#colorGradient)"
-                    />
-                </AreaChart>
-            </ResponsiveContainer>
-        </Box>
-    </Box>
-</Paper>
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="value"
+                                                    stroke="#833A53"
+                                                    strokeWidth={2}
+                                                    fill="url(#colorGradient)"
+                                                />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </Box>
+                                </Box>
+                            </Paper>
                         </div>
                     </>
                 )}

@@ -50,6 +50,7 @@ import IconCheckedCircle1 from "../assets/IconCheckedCircle1.svg";
 import IconCheckedCircle2 from "../assets/IconCheckedCircle2.svg";
 import IconCheckedCircle3 from "../assets/IconCheckedCircle3.svg";
 import IconTache from "../assets/icon-close.svg";
+import OnboardLupaIcon from '../assets/OnboardLupaIcon.svg';
 import iconclose from "../assets/icon-close.svg";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CheckIcon from '@mui/icons-material/Check';
@@ -411,7 +412,7 @@ const Campains: React.FC = () => {
           <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
             <Box
               component="img"
-              src={seachicon}
+              src={OnboardLupaIcon}
               alt="Buscar"
               sx={{
                 width: '24px',
@@ -428,15 +429,15 @@ const Campains: React.FC = () => {
           </Box>
 
           <Box sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-            <ArrowDropDownIcon
+            <Box
+              component="img"
+              src={ArrowBackIosNewIcon}
               sx={{
                 width: '24px',
                 height: '24px',
-                color: '#9B9295',
-                mt: '2px',
-              }}
-            />
-
+                transform: 'rotate(180deg)',
+              }}>
+            </Box>
             <Typography sx={joyrideTextStyle}>
               Usa el selector de status para<br />
               encontrar rápidamente campañas<br />
@@ -2277,6 +2278,7 @@ const Campains: React.FC = () => {
 
             color: '#7A6F73',
             fontSize: '28px',
+            marginRight: '90px'
           },
           buttonSkip: joyrideActionButtonStyle,
           //buttonPrimary: joyrideActionButtonStyle,

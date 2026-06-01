@@ -17,6 +17,8 @@ import IconCheckBox3 from "../assets/IconCheckBox3.svg";
 import smsico from '../assets/Icon-sms.svg'
 import welcome from '../assets/icon-welcome.svg'
 import fast from '../assets/icon-fastsend.svg'
+import OboardMessageIcon from "../assets/OboardMessageIcon.svg";
+import OnboardCubesIcon from "../assets/OnboardCubesIcon.svg";
 import Secondarybutton from '../components/commons/SecondaryButton'
 import IconCirclePlus from "../assets/IconCirclePlus.svg";
 import IconTrash from "../assets/IconTrash.svg";
@@ -233,7 +235,7 @@ const HomePage: React.FC = () => {
                     <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                         <Box
                             component="img"
-                            src={fast}
+                            src={OboardMessageIcon}
                             alt="Envío rápido"
                             sx={{ width: '24px', height: '24px', mt: '2px' }}
                         />
@@ -246,7 +248,7 @@ const HomePage: React.FC = () => {
                     <Box sx={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                         <Box
                             component="img"
-                            src={welcome}
+                            src={OnboardCubesIcon}
                             alt="Editar información"
                             sx={{ width: '24px', height: '24px', mt: '2px' }}
                         />
