@@ -454,7 +454,7 @@ const PaymentMethods: React.FC = () => {
 
                 minHeight: "calc(100vh - 64px)",
 
-                overflowX: "hidden", marginTop: "-80px"
+                overflowX: "hidden", marginTop: "-10px"
             }}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>

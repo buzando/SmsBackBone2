@@ -243,7 +243,14 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
           )}
         </Menu>
       </Box>
-
+      <Typography
+        sx={{
+          fontFamily: 'Poppins',
+          fontWeight: 500,
+          fontSize: '16px', mb: 1, mt: -1
+        }}>
+        Mensaje
+      </Typography>
       <Box
         ref={editableRef}
         contentEditable={false}

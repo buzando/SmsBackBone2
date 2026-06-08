@@ -703,7 +703,7 @@ const Use: React.FC = () => {
                                         ),
                                         sx: {
                                             fontFamily: 'Poppins', fontSize: "16px", fontWeight: 400,
-                                            color: campaignSearch ? '#7B354D' : '#000',
+                                            color: campaignSearch ? '#7b354d' : '#000',
                                         }
                                     }}
                                     inputProps={{

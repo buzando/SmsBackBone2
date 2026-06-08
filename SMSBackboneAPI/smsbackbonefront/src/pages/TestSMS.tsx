@@ -364,7 +364,7 @@ export default function TestSMS() {
               onChange={(e) => {
                 let value = e.target.value;
 
-                value = value.replace(/[^a-zA-Z0-9\s]/g, '');
+                //value = value.replace(/[^a-zA-Z0-9\s]/g, '');
 
                 if (value.length > 160) {
                   value = value.slice(0, 160);
@@ -372,7 +372,11 @@ export default function TestSMS() {
 
                 setMessage(value);
 
-                setMessageError(value.trim().length > 0 && value.trim().length < 3);
+                //setMessageError(value.trim().length > 0 && value.trim().length < 3);
+
+                const hasInvalidCharacters = !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]*$/.test(value);
+
+                setMessageError(hasInvalidCharacters);
 
                 if (value.trim().length > 0) {
                   setSelectedTemplateId('');
@@ -380,7 +384,21 @@ export default function TestSMS() {
                 }
               }}
               error={messageError}
-              helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
+              helperText={
+                messageError
+                  ? "Solo se permiten caracteres alfanuméricos."
+                  : " "
+              }
+              FormHelperTextProps={{
+                sx: {
+                  fontFamily: "Poppins",
+                  fontSize: "12px",
+                  fontWeight: 400,
+                  marginLeft: "6px",
+                  position: "static",
+                  marginTop: '-2px', marginBottom: "5px"
+                }
+              }}
               inputProps={{ maxLength: 160 }}
               InputProps={{
                 sx: {
@@ -441,7 +459,7 @@ export default function TestSMS() {
                 fontFamily: "Poppins",
                 fontSize: "12px",
                 color: "#A1A1A1",
-                mt: -2, ml: 1.5
+                mt: -1, ml: 1.5
               }}
             >
               {t('pages.testSMS.charactersCounter', { count: message.length })}
