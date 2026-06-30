@@ -138,7 +138,7 @@ export default function TestSMS() {
 
         if (serverMessage === "OK") {
           setSnackMessage("Se han enviado los mensajes correctamente");
-           updateSelectedRoomCreditsAfterSend(fromNumber, payload.To.length);
+          updateSelectedRoomCreditsAfterSend(fromNumber, payload.To.length);
         } else if (serverMessage) {
           setSnackMessage(serverMessage);
         } else {
@@ -347,8 +347,7 @@ export default function TestSMS() {
                       >
                         <>
                           • Solo caracteres numéricos<br />
-                          • El teléfono debe incluir el<br />
-                          código del país
+
                         </>
                       </Box>
                     }
@@ -391,26 +390,26 @@ export default function TestSMS() {
               placeholder={t('pages.testSMS.writeMessageOrSelect')}
               disabled={!!selectedTemplateId}
               onChange={(e) => {
-  let value = e.target.value;
+                let value = e.target.value;
 
-  value = value.replace(
-    /[^0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-{}\n\r]/g,
-    ''
-  );
+                value = value.replace(
+                  /[^0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-{}\n\r]/g,
+                  ''
+                );
 
-  if (value.length > 160) {
-    value = value.slice(0, 160);
-  }
+                if (value.length > 160) {
+                  value = value.slice(0, 160);
+                }
 
-  setMessage(value);
+                setMessage(value);
 
-  setMessageError(value.trim().length > 0 && value.trim().length < 3);
+                setMessageError(value.trim().length > 0 && value.trim().length < 3);
 
-  if (value.trim().length > 0) {
-    setSelectedTemplateId('');
-    setSelectedTemplate(null);
-  }
-}}
+                if (value.trim().length > 0) {
+                  setSelectedTemplateId('');
+                  setSelectedTemplate(null);
+                }
+              }}
               error={messageError}
               helperText={
                 messageError
