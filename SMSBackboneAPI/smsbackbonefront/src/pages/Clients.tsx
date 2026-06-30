@@ -1347,7 +1347,16 @@ const Clients: React.FC = () => {
                                         Créditos SMS # Largos</th>
                                     <th style={{ padding: '5px', fontWeight: 500, whiteSpace: "nowrap", position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, borderRight: "1px solid #E6E4E4" }}>
                                         Fecha de desactivación</th>
-                                    <th style={{ padding: '5px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
+                                    <th
+                                        style={{
+                                            padding: '5px',
+                                            position: 'sticky',
+                                            top: 0,
+                                            right: 0,
+                                            backgroundColor: '#FFFFFF',
+                                            zIndex: 7,
+                                        }}
+                                    >
 
                                     </th>
                                 </tr>
@@ -1451,9 +1460,15 @@ const Clients: React.FC = () => {
                                             {Client.deactivationDate}</td>
                                         <td
                                             style={{
-                                                padding: '0px 0px', width: '50px',
+                                                padding: '0px 0px',
+                                                width: '50px',
                                                 borderLeft: '1px solid #E0E0E0',
                                                 textAlign: 'center',
+
+                                                position: 'sticky',
+                                                right: 0,
+                                                backgroundColor: Client.estatus === 0 ? '#FFFFFF' : '#F2F2F2',
+                                                zIndex: 5,
                                             }}
                                         >
                                             <IconButton onClick={(event) => handleMenuOpen(event, Client.id as number)}>
@@ -2003,10 +2018,10 @@ const Clients: React.FC = () => {
                 <Box>
                     <Divider
                         sx={{
-                            width: isEditClient ? '220px' : '170px',
+                            width: isEditClient ? '252px' : '170px',
                             position: "absolute",
                             mt: "-53px",
-                            ml: isEditClient ? "310px" : "286px",
+                            ml: isEditClient ? "332px" : "286px",
                             border: '1.5px solid',
                             borderColor: getStepColor(1),
                         }}
@@ -3821,16 +3836,23 @@ const Clients: React.FC = () => {
                         </Typography>
                         <Box
                             sx={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                gap: 2,
-                                height: '140px',
-                                overflow: 'hidden',
-                                width: '480px', marginLeft: "15px"
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(2, 150px)',
+                                columnGap: '10px',
+                                rowGap: '4px',
+                                minHeight: '100px',
+                                width: '480px',
+                                marginLeft: '15px',
                             }}
                         >
                             {getRoomsList().map((room, idx) => (
-                                <Box key={idx} sx={{ width: '45%', height: "17px" }}>
+                                <Box
+                                    key={idx}
+                                    sx={{
+                                        width: '150px',
+                                        height: '20px',
+                                    }}
+                                >
                                     <FormControlLabel
                                         control={
                                             <Checkbox
@@ -3847,7 +3869,10 @@ const Clients: React.FC = () => {
                                                         <img
                                                             src={IconCheckBox1}
                                                             alt="Seleccionado"
-                                                            style={{ width: '24px', height: '24px' }}
+                                                            style={{
+                                                                width: '24px',
+                                                                height: '24px',
+                                                            }}
                                                         />
                                                     </Box>
                                                 }
@@ -3855,10 +3880,18 @@ const Clients: React.FC = () => {
                                         }
                                         label={room}
                                         sx={{
+                                            width: '180px',
+
                                             '& .MuiFormControlLabel-label': {
                                                 fontFamily: 'Poppins',
                                                 fontSize: '14px',
                                                 color: '#574B4F',
+
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                                display: 'block',
+                                                maxWidth: '100px',
                                             },
                                         }}
                                     />

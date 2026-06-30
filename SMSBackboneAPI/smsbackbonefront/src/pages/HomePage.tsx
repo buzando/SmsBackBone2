@@ -1647,6 +1647,7 @@ const HomePage: React.FC = () => {
                                                             return (
                                                                 <Tooltip
                                                                     title="Añadir teléfono"
+                                                                    disableHoverListener={!canAdd}
                                                                     arrow
                                                                     placement="top"
                                                                     componentsProps={{

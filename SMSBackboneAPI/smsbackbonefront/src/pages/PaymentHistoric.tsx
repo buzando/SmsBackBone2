@@ -265,7 +265,7 @@ const PaymentHistoric: React.FC = () => {
 
                 minHeight: "calc(100vh - 64px)",
 
-                overflowX: "hidden", marginTop: "-80px"
+                overflowX: "hidden", marginTop: "-10px"
             }}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
@@ -439,7 +439,11 @@ const PaymentHistoric: React.FC = () => {
                             }}
                         >
                             No se encontraron resultados.
+
                         </Typography>
+                        <Button onClick={() => { handleAsyncAction('Consultar'); handleClose(); }}>
+
+                        </Button>
                     </Box>
                 ) : (
                     <Box
@@ -711,7 +715,9 @@ const PaymentHistoric: React.FC = () => {
                     top: '20%',
                     left: '35%',
                     width: '556px',
-                    height: '520px',
+                    minHeight: '520px',
+                    height: 'auto',
+                    maxHeight: '80vh',
                     backgroundColor: 'white',
                     padding: '20px',
                     borderRadius: '8px',

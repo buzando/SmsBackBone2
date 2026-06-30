@@ -1321,7 +1321,9 @@ const Rooms: React.FC = () => {
                                     },
                                     '& .MuiFormHelperText-root': {
                                         fontFamily: 'Poppins, sans-serif',
-                                    }
+                                        whiteSpace: 'nowrap',
+                                        textOverflow: 'ellipsis',
+                                    },
                                 }}
                             />
                         </Box>
@@ -1470,10 +1472,10 @@ const Rooms: React.FC = () => {
                             borderRadius: "12px",
                         }}
                     >
-                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, fontFamily: 'Poppins' }}>
                             {errorTitle}
                         </Typography>
-                        <Typography variant="body2" sx={{ mb: 3 }}>
+                        <Typography variant="body2" sx={{ mb: 3, fontFamily: "Poppins" }}>
                             Algo salió mal. Inténtelo de nuevo o regrese más tarde.
                         </Typography>
                         <Box display="flex" justifyContent="flex-end">

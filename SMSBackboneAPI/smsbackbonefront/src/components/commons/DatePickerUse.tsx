@@ -310,7 +310,7 @@ const DatePickerUse: React.FC<DatePickerUseProps> = ({
                     },
                     {
                         name: 'offset',
-                        options: { offset: [0, -10] },
+                        options: { offset: [5, 5] },
                     },
                 ]}
             >

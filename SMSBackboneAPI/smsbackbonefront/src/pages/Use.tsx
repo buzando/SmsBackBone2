@@ -70,6 +70,12 @@ const Use: React.FC = () => {
     const [data, setData] = useState(false);
     const [searchingData, setSearchingData] = useState(true);
     const handleDateClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (datePickerOpen) {
+            setDatePickerOpen(false);
+            setAnchorEl(null);
+            return;
+        }
+
         closeAllFilters();
         setAnchorEl(event.currentTarget);
         setDatePickerOpen(true);
@@ -703,7 +709,7 @@ const Use: React.FC = () => {
                                         ),
                                         sx: {
                                             fontFamily: 'Poppins', fontSize: "16px", fontWeight: 400,
-                                            color: campaignSearch ? '#7B354D' : '#000',
+                                            color: campaignSearch ? '#7b354d' : '#000',
                                         }
                                     }}
                                     inputProps={{
@@ -1131,6 +1137,7 @@ const Use: React.FC = () => {
 
                 </Box>
                 <DatePickerUse
+                    maxDate={new Date()}
                     open={datePickerOpen}
                     anchorEl={anchorEl}
                     placement="bottom-start"

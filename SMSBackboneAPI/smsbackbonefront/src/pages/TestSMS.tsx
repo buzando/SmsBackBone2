@@ -412,7 +412,21 @@ export default function TestSMS() {
   }
 }}
               error={messageError}
-              helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
+              helperText={
+                messageError
+                  ? "Solo se permiten caracteres alfanuméricos."
+                  : " "
+              }
+              FormHelperTextProps={{
+                sx: {
+                  fontFamily: "Poppins",
+                  fontSize: "12px",
+                  fontWeight: 400,
+                  marginLeft: "6px",
+                  position: "static",
+                  marginTop: '-2px', marginBottom: "5px"
+                }
+              }}
               inputProps={{ maxLength: 160 }}
               InputProps={{
                 sx: {
@@ -473,7 +487,7 @@ export default function TestSMS() {
                 fontFamily: "Poppins",
                 fontSize: "12px",
                 color: "#A1A1A1",
-                mt: -2, ml: 1.5
+                mt: -1, ml: 1.5
               }}
             >
               {t('pages.testSMS.charactersCounter', { count: message.length })}

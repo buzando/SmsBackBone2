@@ -960,58 +960,7 @@ const BillingInformation: React.FC = () => {
                                     }}
                                     SelectProps={{ displayEmpty: true }}
                                     InputProps={{
-                                        endAdornment: (
-                                            <Tooltip
-                                                title={
-                                                    <Box
-                                                        sx={{
-                                                            backgroundColor: "#FFFFFF",
-                                                            borderRadius: "8px",
-                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                                            padding: "8px 12px",
-                                                            fontSize: "14px",
-                                                            fontFamily: "Poppins",
-                                                            color: "#574B4F",
-                                                            whiteSpace: "pre-line",
-                                                            transform: "translate(-10px, -22px)",
-                                                            borderColor: "#00131F3D",
-                                                            borderStyle: "solid",
-                                                            borderWidth: "1px"
-                                                        }}
-                                                    >
-                                                        <>
-                                                            Selecciona física o moral
-                                                        </>
-                                                    </Box>
-                                                }
-                                                placement="bottom-end"
-                                                componentsProps={{
-                                                    tooltip: {
-                                                        sx: {
-                                                            backgroundColor: "transparent",
-                                                            padding: 0,
 
-                                                        },
-                                                    },
-                                                }}
-                                            >
-                                                <IconButton
-                                                    disableRipple
-                                                    sx={{
-                                                        backgroundColor: "transparent !important",
-                                                        "&:hover": {
-                                                            backgroundColor: "transparent !important",
-                                                        },
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={infoicon}
-                                                        alt="info-icon"
-                                                        style={{ width: 24, height: 24 }}
-                                                    />
-                                                </IconButton>
-                                            </Tooltip>
-                                        ),
                                     }}
                                 >
                                     <MenuItem
@@ -1565,12 +1514,12 @@ const BillingInformation: React.FC = () => {
                         </div>
 
                         <Typography
-                            style={{
+                            sx={{
                                 textAlign: 'left',
                                 font: 'normal normal normal 14px/22px Poppins',
                                 letterSpacing: '0px',
                                 color: '#330F1B',
-                                opacity: 0.3,
+                                opacity: 0.7,
                                 fontSize: '14px',
                                 marginTop: '10px',
                             }}

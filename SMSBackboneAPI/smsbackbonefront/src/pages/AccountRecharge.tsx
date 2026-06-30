@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import Errormodal from '../components/commons/ModalError'
 import IconCheckBox1 from "../assets/IconCheckBox1.svg";
 import { useSelectedRoom } from "../hooks/useSelectedRoom";
+import MainModal from "../components/commons/MainModal";
 
 export interface Clients {
     id: number;
@@ -622,64 +623,16 @@ const AccountRecharge: React.FC = () => {
             }}
         >
             {/* Modal de confirmación para eliminar */}
-            {isDeleteModalOpen && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex: 1000,
-                }}>
-                    <div style={{
-                        backgroundColor: '#fff',
-                        padding: '20px',
-                        borderRadius: '8px',
-                        width: '400px',
-                        textAlign: 'center',
-                        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}>
-                        <h3 style={{ marginBottom: '10px', color: '#4a4a4a' }}>Eliminar tarjeta</h3>
-                        <p style={{ marginBottom: '20px', color: '#6a6a6a' }}>
-                            ¿Está seguro de que desea eliminar la tarjeta? Esta acción no puede ser revertida.
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <button
-                                onClick={closeDeleteModal}
-                                style={{
-                                    backgroundColor: '#fff',
-                                    color: '#8d406d',
-                                    border: '2px solid #8d406d',
-                                    borderRadius: '5px',
-                                    padding: '10px 20px',
-                                    cursor: 'pointer',
-                                    fontWeight: 'bold',
-                                }}
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleDeleteCard}
-                                style={{
-                                    backgroundColor: '#8d406d',
-                                    color: '#fff',
-                                    border: 'none',
-                                    borderRadius: '5px',
-                                    padding: '10px 20px',
-                                    cursor: 'pointer',
-                                    fontWeight: 'bold',
-                                }}
-                            >
-                                Aceptar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <MainModal
+                isOpen={isDeleteModalOpen}
+                Title="Eliminar tarjeta"
+                message="¿Está seguro de que desea eliminar la tarjeta? Esta acción no puede ser revertida."
+                primaryButtonText="Aceptar"
+                secondaryButtonText="Cancelar"
+                onPrimaryClick={handleDeleteCard}
+                onSecondaryClick={closeDeleteModal}
+            />
+
 
             <ModalError
                 isOpen={OpenErrorModal}
@@ -690,48 +643,13 @@ const AccountRecharge: React.FC = () => {
             />
 
             {/* Modal de error */}
-            {errorModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex: 1000,
-                }}>
-                    <div style={{
-                        backgroundColor: '#fff',
-                        padding: '20px',
-                        borderRadius: '8px',
-                        width: '400px',
-                        textAlign: 'center',
-                        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}>
-                        <h3 style={{ marginBottom: '10px', color: '#4a4a4a' }}>{errorModal.title}</h3>
-                        <p style={{ marginBottom: '20px', color: '#6a6a6a' }}>
-                            {errorModal.message}
-                        </p>
-                        <button
-                            onClick={closeErrorModal}
-                            style={{
-                                backgroundColor: '#fff',
-                                color: '#8d406d',
-                                border: '2px solid #8d406d',
-                                borderRadius: '5px',
-                                padding: '10px 20px',
-                                cursor: 'pointer',
-                                fontWeight: 'bold',
-                            }}
-                        >
-                            Cerrar
-                        </button>
-                    </div>
-                </div>
-            )}
+            <ModalError
+                isOpen={Boolean(errorModal)}
+                title={errorModal?.title || ""}
+                message={errorModal?.message || ""}
+                buttonText="Cerrar"
+                onClose={closeErrorModal}
+            />
 
             <Modal open={isInvoiceModalOpen} onClose={() => setIsInvoiceModalOpen(false)}>
                 <Box sx={{
@@ -865,28 +783,51 @@ const AccountRecharge: React.FC = () => {
                                         return (
                                             <span
                                                 style={{
-                                                    textAlign: "left",
-                                                    fontFamily: "Poppins, sans-serif",
                                                     fontSize: "12px",
-                                                    lineHeight: "40px",
-                                                    letterSpacing: "0px",
-                                                    color: "#786E71",
-                                                    opacity: 1,
+                                                    fontFamily: "Poppins",
+                                                    color: "#645E60",
+                                                    opacity: 0.8,
                                                 }}
                                             >
                                                 Seleccionar canal
                                             </span>
                                         );
                                     }
-                                    return selected === "short_sms" ? "SMS, números cortos" : "SMS, números largos";
+
+                                    return (
+                                        <span
+                                            style={{
+                                                fontSize: "12px",
+                                                fontFamily: "Poppins",
+                                                color: "#645E60",
+                                                opacity: 1,
+                                            }}
+                                        >
+                                            {selected === "short_sms"
+                                                ? "SMS, números cortos"
+                                                : "SMS, números largos"}
+                                        </span>
+                                    );
                                 }}
                                 sx={{
                                     width: "208px",
                                     height: "40px",
-                                    border: "1px solid #dcdcdc",
+                                    backgroundColor: "#FFFFFF",
                                     borderRadius: "5px",
-                                    fontSize: "1rem",
-                                    fontFamily: "Poppins, sans-serif",
+
+                                    "& fieldset": {
+                                        borderColor: "#dcdcdc",
+                                    },
+
+                                    "&:hover fieldset": {
+                                        borderColor: "#dcdcdc",
+                                    },
+
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: "#dcdcdc",
+                                        borderWidth: "1px",
+                                    },
+
                                     "& .MuiSelect-select": {
                                         textAlign: "left",
                                         padding: "10px 14px",
@@ -896,8 +837,39 @@ const AccountRecharge: React.FC = () => {
                                     },
                                 }}
                             >
-                                <MenuItem value="short_sms">SMS, números cortos</MenuItem>
-                                <MenuItem value="long_sms">SMS, números largos</MenuItem>
+                                <MenuItem value="short_sms"
+                                    sx={{
+                                        fontSize: '12px',
+                                        fontFamily: 'Poppins',
+                                        color: '#645E60',
+                                        '&:hover': {
+                                            backgroundColor: '#F2EBED',
+                                        },
+                                        '&.Mui-selected': {
+                                            backgroundColor: '#F2EBED',
+                                        },
+                                        '&.Mui-selected:hover': {
+                                            backgroundColor: '#F2EBED',
+                                        }
+                                    }}
+                                >SMS, números cortos</MenuItem>
+                                <MenuItem value="long_sms"
+                                    sx={{
+                                        fontSize: '12px',
+                                        fontFamily: 'Poppins',
+                                        color: '#645E60',
+                                        opacity: 0.8,
+                                        '&:hover': {
+                                            backgroundColor: '#F2EBED',
+                                        },
+                                        '&.Mui-selected': {
+                                            backgroundColor: '#F2EBED',
+                                        },
+                                        '&.Mui-selected:hover': {
+                                            backgroundColor: '#F2EBED',
+                                        }
+                                    }}
+                                >SMS, números largos</MenuItem>
                             </Select>
 
                         </div>
@@ -1185,21 +1157,50 @@ const AccountRecharge: React.FC = () => {
                                     </label>
 
                                     {/* Botón para eliminar */}
-                                    <Tooltip title="Eliminar tarjeta" arrow>
-                                        <button
-                                            onClick={() => openDeleteModal(card)}
-                                            style={{
-                                                position: 'absolute',
-                                                top: '10px',
-                                                right: '10px',
-                                                backgroundColor: 'transparent',
-                                                border: 'none',
-                                                cursor: 'pointer',
+                                    <button
+                                        onClick={() => openDeleteModal(card)}
+                                        style={{
+                                            position: 'absolute',
+                                            marginTop: "-148px",
+                                            marginLeft: "278px",
+                                            backgroundColor: 'transparent',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        <Tooltip title="Eliminar" arrow placement="top"
+                                            componentsProps={{
+                                                tooltip: {
+                                                    sx: {
+                                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                        color: "#CCC3C3",
+                                                        fontFamily: "Poppins, sans-serif",
+                                                        fontSize: "12px",
+                                                        padding: "6px 8px",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)"
+                                                    }
+                                                },
+                                                arrow: {
+                                                    sx: {
+                                                        color: "rgba(0, 0, 0, 0.8)"
+                                                    }
+                                                }
+                                            }}
+                                            PopperProps={{
+                                                modifiers: [
+                                                    {
+                                                        name: 'offset',
+                                                        options: {
+                                                            offset: [0, -7]
+                                                        }
+                                                    }
+                                                ]
                                             }}
                                         >
                                             <img src={trash} width='24px' height='24px' />
-                                        </button>
-                                    </Tooltip>
+                                        </Tooltip>
+                                    </button>
                                 </div>
                             ))}
                         </Box>
@@ -1346,12 +1347,13 @@ const AccountRecharge: React.FC = () => {
                         </IconButton>
                     </div>
                     <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', mb: 1.5 }} />
+
                     <form
                         style={{
                             display: 'grid',
                             gridTemplateColumns: '1fr 1fr',
                             columnGap: '20px',
-                            rowGap: '15px',
+                            rowGap: '10px',
                         }}
                         onSubmit={(e) => e.preventDefault()}
                     >
@@ -1388,21 +1390,14 @@ const AccountRecharge: React.FC = () => {
                                         },
                                         endAdornment: (
                                             <InputAdornment position="end">
-                                                <WhiteTooltip title={<>
-                                                    • Solo caracteres numéricos<br />
-                                                    • Longitud min. 14 dígitos, <br />
-                                                    máx. 19 dígitos
+                                                <WhiteTooltip placement="bottom-end" title={<>
+                                                    <div>• Solo caracteres numéricos</div>
+                                                    <div>• Longitud min. 14 dígitos, máx. 19 dígitos</div>
                                                 </>}>
                                                     <img src={errors['cardNumber'] ? infoiconerror : infoicon} alt="info-icon" />
                                                 </WhiteTooltip>
                                             </InputAdornment>
-                                        ),
-                                        sx: {
-                                            fontFamily: "Poppins, sans-serif",
-                                            fontSize: "16px",
-                                            fontWeight: 500,
-                                            color: "#574B4F",
-                                        },
+                                        )
                                     }}
                                     sx={{
                                         "& .MuiFormHelperText-root": {
