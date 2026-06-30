@@ -14,6 +14,13 @@ namespace Business
 {
     public class BlackListManager
     {
+        private static bool HasPlusBeforeNumber(string? phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return false;
+
+            return phone.TrimStart().StartsWith("+");
+        }
         public List<BlackListResponse> GetRecordsByUser(int id)
         {
             var lista = new List<BlackListResponse>();
@@ -72,11 +79,12 @@ namespace Business
                         fila++;
                     }
                 }
-
                 using (var ctx = new Entities())
                 {
-
                     var entidades = telefonos
+                        .Where(t => !HasPlusBeforeNumber(t))
+                        .Select(t => t.Trim())
+                        .Where(t => !string.IsNullOrWhiteSpace(t))
                         .Distinct()
                         .Select(t => new BlackList
                         {
@@ -103,19 +111,23 @@ namespace Business
         {
             try
             {
+
                 using (var ctx = new Entities())
                 {
 
                     var entidades = blacklistfile.Phones
-                        .Distinct()
-                        .Select(t => new BlackList
-                        {
-                            Name = blacklistfile.Name,
-                            phone = t,
-                            ExpirationDate = blacklistfile.ExpirationDate,
-                            idroom = blacklistfile.IdRoom,
-                            CreationDate = DateTime.Now
-                        }).ToList();
+    .Where(t => !HasPlusBeforeNumber(t))
+    .Select(t => t.Trim())
+    .Where(t => !string.IsNullOrWhiteSpace(t))
+    .Distinct()
+    .Select(t => new BlackList
+    {
+        Name = blacklistfile.Name,
+        phone = t,
+        ExpirationDate = blacklistfile.ExpirationDate,
+        idroom = blacklistfile.IdRoom,
+        CreationDate = DateTime.Now
+    }).ToList();
 
                     ctx.BlackList.AddRange(entidades);
                     ctx.SaveChanges();

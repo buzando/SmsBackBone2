@@ -50,6 +50,7 @@ namespace Modal
         public DbSet<ShortNumberRequest> ShortNumberRequest { get; set; }
         public DbSet<LongNumberRequest> LongNumberRequest { get; set; }
         public DbSet<FacturaResumen> FacturaResumen { get; set; }
+        public virtual DbSet<UserOnboarding> UserOnboarding { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ClientRoomSummaryDTO>().HasNoKey();

@@ -456,40 +456,99 @@ const NavBarAndDrawer: React.FC<Props> = props => {
         },
     ];
 
-    const handleLayoutJoyrideEvent = (data: EventData) => {
+    const handleLayoutJoyrideEvent = async (data: EventData) => {
         const { status, type } = data;
+
+        console.log("HOME JOYRIDE EVENT:", data);
 
         if (
             type === EVENTS.TOUR_END ||
             status === STATUS.FINISHED ||
             status === STATUS.SKIPPED
         ) {
-            localStorage.setItem('hasSeenLayoutOnboarding', 'true');
+            const usuario = localStorage.getItem("userData");
+
+            if (usuario) {
+                try {
+                    const obj = JSON.parse(usuario);
+
+                    await axios.post(
+                        `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_COMPLETE_ONBOARDING}`,
+                        {
+                            idUser: obj.id ?? obj.Id,
+                            onboardingName: "homeActions",
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                            },
+                        }
+                    );
+                } catch (error) {
+                    console.error("Error al guardar onboarding de homeActions", error);
+                }
+            }
+
             setRunLayoutTour(false);
         }
     };
 
     useEffect(() => {
-        const hasSeenTour = localStorage.getItem('hasSeenLayoutOnboarding');
+        const usuario = localStorage.getItem("userData");
 
-        if (hasSeenTour || userMenu === null) return;
+        if (!usuario) return;
+        if (userMenu === null) return;
+        if (location.pathname !== "/") return;
 
-        const isHome = location.pathname === '/';
+        let intervalId: ReturnType<typeof setInterval>;
 
-        if (!isHome) return;
+        const validateHomeActionsOnboarding = async () => {
+            try {
+                const obj = JSON.parse(usuario);
 
-        const timer = setTimeout(() => {
-            const headerReady = document.querySelector('.tour-layout-header');
-            const creditsReady = document.querySelector('.tour-drawer-credits');
-            const menuReady = document.querySelector('.tour-sidebar-navigation');
-            const channelReady = document.querySelector('.tour-channel-button');
+                const response = await axios.get(
+                    `${import.meta.env.VITE_SMS_API_URL}${import.meta.env.VITE_API_GET_ONBOARDING_STATUS}`,
+                    {
+                        params: {
+                            idUser: obj.id ?? obj.Id,
+                            onboardingName: "homeActions",
+                        },
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    }
+                );
 
-            if (headerReady && creditsReady && menuReady && channelReady) {
-                setRunLayoutTour(true);
+                const isComplete = response.data?.completed;
+
+                if (isComplete) return;
+
+                intervalId = setInterval(() => {
+                    const headerReady = document.querySelector(".tour-layout-header");
+                    const creditsReady = document.querySelector(".tour-drawer-credits");
+                    const menuReady = document.querySelector(".tour-sidebar-navigation");
+                    const channelReady = document.querySelector(".tour-channel-button");
+                    console.log("targets homeActions", {
+                        headerReady: !!headerReady,
+                        creditsReady: !!creditsReady,
+                        menuReady: !!menuReady,
+                        channelReady: !!channelReady,
+                    });
+                    if (headerReady && creditsReady && menuReady) {
+                        clearInterval(intervalId);
+                        setRunLayoutTour(true);
+                    }
+                }, 300);
+            } catch (error) {
+                console.error("Error al validar onboarding de homeActions", error);
             }
-        }, 400);
+        };
 
-        return () => clearTimeout(timer);
+        validateHomeActionsOnboarding();
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
     }, [userMenu, location.pathname]);
 
     const handleSelection = (link: string) => {

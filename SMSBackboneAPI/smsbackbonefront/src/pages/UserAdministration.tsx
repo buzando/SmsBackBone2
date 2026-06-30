@@ -248,7 +248,7 @@ const ManageAccounts: React.FC = () => {
         },
     ];
 
-    const handleSearchCreateJoyrideEvent = (data: EventData) => {
+    const handleSearchCreateJoyrideEvent = async (data: EventData) => {
         const { status, type } = data;
 
         if (
@@ -256,27 +256,77 @@ const ManageAccounts: React.FC = () => {
             status === STATUS.FINISHED ||
             status === STATUS.SKIPPED
         ) {
-            localStorage.setItem('hasSeenSearchCreateOnboarding', 'true');
+            const usuario = localStorage.getItem("userData");
+
+            if (usuario) {
+                try {
+                    const obj = JSON.parse(usuario);
+
+                    await axios.post(
+                        `${import.meta.env.VITE_API_COMPLETE_ONBOARDING}`,
+                        {
+                            idUser: obj.id ?? obj.Id,
+                            onboardingName: "userAdministration",
+                        }
+                    );
+                } catch (error) {
+                    console.error("Error al guardar onboarding de usuarios", error);
+                }
+            }
+
             setRunSearchCreateTour(false);
         }
     };
 
     useEffect(() => {
-        const hasSeenTour = localStorage.getItem('hasSeenSearchCreateOnboarding');
+        const validateUserAdministrationOnboarding = async () => {
+            const usuario = localStorage.getItem("userData");
 
-        if (hasSeenTour) return;
+            if (!usuario) return;
 
-        const timer = setTimeout(() => {
-            const targetReady = document.querySelector('.tour-search-create');
+            try {
+                const obj = JSON.parse(usuario);
 
-            if (targetReady) {
-                setRunSearchCreateTour(true);
+                const response = await axios.get(
+                    `${import.meta.env.VITE_API_GET_ONBOARDING_STATUS}`,
+                    {
+                        params: {
+                            idUser: obj.id ?? obj.Id,
+                            onboardingName: "userAdministration",
+                        },
+                    }
+                );
+
+                const isComplete = response.data?.completed;
+
+                if (isComplete) return;
+
+                const timer = setTimeout(() => {
+                    const targetReady = document.querySelector('.tour-search-create');
+
+                    if (targetReady) {
+                        setRunSearchCreateTour(true);
+                    }
+                }, 300);
+
+                return () => clearTimeout(timer);
+            } catch (error) {
+                console.error("Error al validar onboarding de usuarios", error);
+
+                const timer = setTimeout(() => {
+                    const targetReady = document.querySelector('.tour-search-create');
+
+                    if (targetReady) {
+                        setRunSearchCreateTour(true);
+                    }
+                }, 300);
+
+                return () => clearTimeout(timer);
             }
-        }, 300);
+        };
 
-        return () => clearTimeout(timer);
+        validateUserAdministrationOnboarding();
     }, []);
-
     const filteredAccounts = accounts.filter((account) =>
         account.name.toLowerCase().includes(searchTerm.toLowerCase())
     );

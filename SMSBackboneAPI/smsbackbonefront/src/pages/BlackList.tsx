@@ -325,38 +325,85 @@ const BlackList: React.FC = () => {
         },
     ];
 
-    const handleBlackListJoyrideEvent = (data: EventData) => {
-        const { status, type } = data;
+    const handleBlackListJoyrideEvent = async (data: EventData) => {
+    const { status, type } = data;
 
-        if (
-            type === EVENTS.TOUR_END ||
-            status === STATUS.FINISHED ||
-            status === STATUS.SKIPPED
-        ) {
-            localStorage.setItem('hasSeenBlackListOnboarding', 'true');
-            setRunBlackListTour(false);
+    if (
+        type === EVENTS.TOUR_END ||
+        status === STATUS.FINISHED ||
+        status === STATUS.SKIPPED
+    ) {
+        const usuario = localStorage.getItem("userData");
+
+        if (usuario) {
+            try {
+                const obj = JSON.parse(usuario);
+
+                await axios.post(
+                    `${import.meta.env.VITE_API_COMPLETE_ONBOARDING}`,
+                    {
+                        idUser: obj.id ?? obj.Id,
+                        onboardingName: "blacklist",
+                    }
+                );
+            } catch (error) {
+                console.error("Error al guardar onboarding de listas negras", error);
+            }
+        }
+
+        setRunBlackListTour(false);
+    }
+};
+
+   useEffect(() => {
+    const validateBlackListOnboarding = async () => {
+        const usuario = localStorage.getItem("userData");
+
+        if (!usuario) return;
+
+        try {
+            const obj = JSON.parse(usuario);
+
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_GET_ONBOARDING_STATUS}`,
+                {
+                    params: {
+                        idUser: obj.id ?? obj.Id,
+                        onboardingName: "blacklist",
+                    },
+                }
+            );
+
+            const isComplete = response.data?.completed;
+
+            if (isComplete) return;
+
+            const timer = setTimeout(() => {
+                const targetReady = document.querySelector('.tour-blacklist-search-create');
+
+                if (targetReady) {
+                    setRunBlackListTour(true);
+                }
+            }, 300);
+
+            return () => clearTimeout(timer);
+        } catch (error) {
+            console.error("Error al validar onboarding de listas negras", error);
+
+            const timer = setTimeout(() => {
+                const targetReady = document.querySelector('.tour-blacklist-search-create');
+
+                if (targetReady) {
+                    setRunBlackListTour(true);
+                }
+            }, 300);
+
+            return () => clearTimeout(timer);
         }
     };
 
-    useEffect(() => {
-        const hasSeenTour = localStorage.getItem('hasSeenBlackListOnboarding');
-
-        if (hasSeenTour) return;
-
-        const timer = setTimeout(() => {
-            const targetReady = document.querySelector('.tour-blacklist-search-create');
-
-            if (targetReady) {
-                setRunBlackListTour(true);
-            }
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, []);
-
-    useEffect(() => {
-        setAllRows(currentItems);
-    }, []);
+    validateBlackListOnboarding();
+}, []); 
 
     const WhiteTooltip = styled(({ className, ...props }: TooltipProps) => (
         <Tooltip {...props} classes={{ popper: className }} />

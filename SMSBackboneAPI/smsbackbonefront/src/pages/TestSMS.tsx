@@ -83,6 +83,34 @@ export default function TestSMS() {
     localStorage.setItem('language', newLang);
   };
 
+  const updateSelectedRoomCreditsAfterSend = (smsType: string, quantity: number = 1) => {
+    const selectedRoomRaw = localStorage.getItem("selectedRoom");
+    if (!selectedRoomRaw) return;
+
+    const selectedRoom = JSON.parse(selectedRoomRaw);
+
+    const currentCredits = Number(selectedRoom.credits || 0);
+    const currentShort = Number(selectedRoom.short_sms || 0);
+    const currentLong = Number(selectedRoom.long_sms || 0);
+
+    const updatedRoom = {
+      ...selectedRoom,
+      credits: Math.max(currentCredits - quantity, 0),
+      short_sms:
+        smsType === "short"
+          ? Math.max(currentShort - quantity, 0)
+          : currentShort,
+      long_sms:
+        smsType === "long"
+          ? Math.max(currentLong - quantity, 0)
+          : currentLong,
+    };
+
+    localStorage.setItem("selectedRoom", JSON.stringify(updatedRoom));
+
+    window.dispatchEvent(new Event("storageUpdate"));
+  };
+
   const handleSend = async () => {
     if (!toNumber || (message.length === 0 && !selectedTemplateId)) {
       console.error('Faltan datos obligatorios');
@@ -110,6 +138,7 @@ export default function TestSMS() {
 
         if (serverMessage === "OK") {
           setSnackMessage("Se han enviado los mensajes correctamente");
+           updateSelectedRoomCreditsAfterSend(fromNumber, payload.To.length);
         } else if (serverMessage) {
           setSnackMessage(serverMessage);
         } else {
@@ -362,23 +391,26 @@ export default function TestSMS() {
               placeholder={t('pages.testSMS.writeMessageOrSelect')}
               disabled={!!selectedTemplateId}
               onChange={(e) => {
-                let value = e.target.value;
+  let value = e.target.value;
 
-                value = value.replace(/[^a-zA-Z0-9\s]/g, '');
+  value = value.replace(
+    /[^0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-{}\n\r]/g,
+    ''
+  );
 
-                if (value.length > 160) {
-                  value = value.slice(0, 160);
-                }
+  if (value.length > 160) {
+    value = value.slice(0, 160);
+  }
 
-                setMessage(value);
+  setMessage(value);
 
-                setMessageError(value.trim().length > 0 && value.trim().length < 3);
+  setMessageError(value.trim().length > 0 && value.trim().length < 3);
 
-                if (value.trim().length > 0) {
-                  setSelectedTemplateId('');
-                  setSelectedTemplate(null);
-                }
-              }}
+  if (value.trim().length > 0) {
+    setSelectedTemplateId('');
+    setSelectedTemplate(null);
+  }
+}}
               error={messageError}
               helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
               inputProps={{ maxLength: 160 }}

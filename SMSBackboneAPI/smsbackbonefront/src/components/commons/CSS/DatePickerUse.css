@@ -163,3 +163,17 @@
     border-radius: 4px;
     font-size: 16px;
 }
+/* Días deshabilitados → gris claro */
+.rdrDay.rdrDayDisabled span {
+    color: #CCCCCC !important;
+}
+
+.custom-datepicker-use .rdrDayDisabled {
+    background: transparent !important;
+    cursor: not-allowed !important;
+}
+
+.custom-datepicker-use .rdrDayDisabled .rdrDayNumber span {
+    color: #CCCCCC !important;
+    font-weight: 400 !important;
+}

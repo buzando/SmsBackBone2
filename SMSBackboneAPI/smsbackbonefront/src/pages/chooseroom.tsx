@@ -248,26 +248,72 @@ const Chooseroom: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const hasSeenTour = localStorage.getItem('hasSeenRoomOnboarding');
+        const validateRoomOnboarding = async () => {
+            const usuario = localStorage.getItem("userData");
 
-        if (!hasSeenTour && rooms.length > 0 && !loading && !modalIsOpen) {
-            setRunTour(true);
-        }
+            if (!usuario) return;
+            if (rooms.length === 0) return;
+            if (loading) return;
+            if (modalIsOpen) return;
+
+            try {
+                const obj = JSON.parse(usuario);
+
+                const response = await axios.get(
+                    `${import.meta.env.VITE_API_GET_ONBOARDING_STATUS}`,
+                    {
+                        params: {
+                            idUser: obj.id,
+                            onboardingName: "roomSelector",
+                        },
+                    }
+                );
+
+                const isComplete = response.data.completed;
+
+                if (!isComplete) {
+                    setRunTour(true);
+                }
+            } catch (error) {
+                console.error("Error al validar onboarding de salas", error);
+
+                // Si falla el back, mostramos el onboarding
+                setRunTour(true);
+            }
+        };
+
+        validateRoomOnboarding();
     }, [rooms, loading, modalIsOpen]);
 
-    const handleJoyrideEvent = (data: EventData) => {
-        const { status, type } = data;
+   const handleJoyrideEvent = async (data: EventData) => {
+    const { status, type } = data;
 
-        if (
-            type === EVENTS.TOUR_END ||
-            status === STATUS.FINISHED ||
-            status === STATUS.SKIPPED
-        ) {
-            localStorage.setItem('hasSeenRoomOnboarding', 'true');
-            setRunTour(false);
+    if (
+        type === EVENTS.TOUR_END ||
+        status === STATUS.FINISHED ||
+        status === STATUS.SKIPPED
+    ) {
+        const usuario = localStorage.getItem("userData");
+
+        if (usuario) {
+            try {
+                const obj = JSON.parse(usuario);
+
+                await axios.post(
+                    `${import.meta.env.VITE_API_COMPLETE_ONBOARDING}`,
+                    {
+                        idUser: obj.id,
+                        onboardingName: "roomSelector",
+                    }
+                );
+            } catch (error) {
+                console.error("Error al guardar onboarding de salas", error);
+            }
         }
-    };
 
+        setRunTour(false);
+    }
+};
     const navigate = useNavigate();
 
     const handleRoomSelection = (room: Room) => {

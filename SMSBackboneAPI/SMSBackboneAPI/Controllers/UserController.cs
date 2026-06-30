@@ -1,26 +1,27 @@
 ﻿using Business;
 using Contract;
+using Contract.Other;
 using Contract.Request;
 using Contract.Response;
+using log4net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using SMSBackboneAPI.Service;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using log4net;
-using System.Threading.Tasks;
-using System.Security.Policy;
-using Openpay.Entities.Request;
 using Modal;
+using Newtonsoft.Json;
+using Openpay.Entities.Request;
+using SMSBackboneAPI.Service;
 using SMSBackboneAPI.Utils;
 using System;
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Policy;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SMSBackboneAPI.Controllers
 {
@@ -1905,6 +1906,88 @@ namespace SMSBackboneAPI.Controllers
             {
                 log.Error($"[{rid}] DownloadInovice error creditId={invoice?.IdCredit}", ex);
                 return StatusCode(500, false);
+            }
+        }
+        [Authorize]
+        [HttpGet("GetOnboardingStatus")]
+        public IActionResult GetOnboardingStatus(int idUser, string onboardingName)
+        {
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+
+            try
+            {
+                log.Info($"[{rid}] GetOnboardingStatus start userId={idUser} onboardingName={onboardingName}");
+
+                if (idUser <= 0)
+                {
+                    return BadRequest("idUser inválido.");
+                }
+
+                if (string.IsNullOrWhiteSpace(onboardingName))
+                {
+                    return BadRequest("onboardingName es requerido.");
+                }
+
+                var validOnboardings = new[]
+                {
+            "roomSelector",
+            "homeActions",
+            "campaigns",
+            "blacklist",
+            "paymentSettings",
+            "userAdministration"
+        };
+
+                if (!validOnboardings.Contains(onboardingName))
+                {
+                    return BadRequest("Onboarding no válido.");
+                }
+
+                var response = new UserManager().GetOnboardingStatus(idUser, onboardingName);
+
+                log.Info($"[{rid}] GetOnboardingStatus ok userId={idUser} onboardingName={onboardingName}");
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                log.Error($"[{rid}] GetOnboardingStatus error userId={idUser} onboardingName={onboardingName}", ex);
+                return StatusCode(500, new { message = "Error en el servidor" });
+            }
+        }
+        [Authorize]
+        [HttpPost("CompleteOnboarding")]
+        public IActionResult CompleteOnboarding([FromBody] CompleteOnboardingRequest request)
+        {
+            var rid = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
+
+            try
+            {
+                log.Info($"[{rid}] CompleteOnboarding start userId={request?.idUser} onboardingName={request?.onboardingName}");
+
+                if (request == null)
+                    return Ok(false);
+
+                if (request.idUser <= 0)
+                    return Ok(false);
+
+                if (string.IsNullOrWhiteSpace(request.onboardingName))
+                    return Ok(false);
+
+                var result = new UserManager().CompleteOnboarding(
+                    request.idUser,
+                    request.onboardingName
+                );
+
+                log.Info($"[{rid}] CompleteOnboarding ok userId={request.idUser} onboardingName={request.onboardingName} result={result}");
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                log.Error($"[{rid}] CompleteOnboarding error userId={request?.idUser} onboardingName={request?.onboardingName}", ex);
+
+                return Ok(false);
             }
         }
     }

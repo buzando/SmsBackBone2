@@ -17,8 +17,6 @@ using log4net;
 using System.Threading.Tasks;
 using System.Security.Policy;
 using Azure.Core;
-
-// 👇 agregados para logs/tiempos
 using System;
 using System.Diagnostics;
 using System.Linq;

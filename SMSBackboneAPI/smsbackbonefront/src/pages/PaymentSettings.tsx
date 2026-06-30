@@ -271,36 +271,90 @@ const PaymentSettings: React.FC = () => {
         },
     ];
 
-    const handlePaymentJoyrideEvent = (data: EventData) => {
-        const { status, type } = data;
+const handlePaymentJoyrideEvent = async (data: EventData) => {
+    const { status, type } = data;
 
-        if (
-            type === EVENTS.TOUR_END ||
-            status === STATUS.FINISHED ||
-            status === STATUS.SKIPPED
-        ) {
-            localStorage.setItem('hasSeenPaymentSettingsOnboarding', 'true');
-            setRunPaymentTour(false);
+    if (
+        type === EVENTS.TOUR_END ||
+        status === STATUS.FINISHED ||
+        status === STATUS.SKIPPED
+    ) {
+        const usuario = localStorage.getItem("userData");
+
+        if (usuario) {
+            try {
+                const obj = JSON.parse(usuario);
+
+                await axios.post(
+                    `${import.meta.env.VITE_API_COMPLETE_ONBOARDING}`,
+                    {
+                        idUser: obj.id ?? obj.Id,
+                        onboardingName: "paymentSettings",
+                    }
+                );
+            } catch (error) {
+                console.error("Error al guardar onboarding de ajustes de pago", error);
+            }
+        }
+
+        setRunPaymentTour(false);
+    }
+};
+
+useEffect(() => {
+    const validatePaymentSettingsOnboarding = async () => {
+        const usuario = localStorage.getItem("userData");
+
+        if (!usuario) return;
+        if (loading) return;
+
+        try {
+            const obj = JSON.parse(usuario);
+
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_GET_ONBOARDING_STATUS}`,
+                {
+                    params: {
+                        idUser: obj.id ?? obj.Id,
+                        onboardingName: "paymentSettings",
+                    },
+                }
+            );
+
+            const isComplete = response.data?.completed;
+
+            if (isComplete) return;
+
+            const timer = setTimeout(() => {
+                const alertReady = document.querySelector('.tour-payment-alert');
+                const channelReady = document.querySelector('.tour-payment-channel-threshold');
+                const usersReady = document.querySelector('.tour-payment-users');
+
+                if (alertReady && channelReady && usersReady) {
+                    setRunPaymentTour(true);
+                }
+            }, 500);
+
+            return () => clearTimeout(timer);
+        } catch (error) {
+            console.error("Error al validar onboarding de ajustes de pago", error);
+
+            const timer = setTimeout(() => {
+                const alertReady = document.querySelector('.tour-payment-alert');
+                const channelReady = document.querySelector('.tour-payment-channel-threshold');
+                const usersReady = document.querySelector('.tour-payment-users');
+
+                if (alertReady && channelReady && usersReady) {
+                    setRunPaymentTour(true);
+                }
+            }, 500);
+
+            return () => clearTimeout(timer);
         }
     };
 
-    useEffect(() => {
-        const hasSeenTour = localStorage.getItem('hasSeenPaymentSettingsOnboarding');
-
-        if (hasSeenTour || loading) return;
-
-        const timer = setTimeout(() => {
-            const alertReady = document.querySelector('.tour-payment-alert');
-            const channelReady = document.querySelector('.tour-payment-channel-threshold');
-            const usersReady = document.querySelector('.tour-payment-users');
-
-            if (alertReady && channelReady && usersReady) {
-                setRunPaymentTour(true);
-            }
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [loading]);
+    validatePaymentSettingsOnboarding();
+}, [loading]);
 
 
     const WhiteTooltip = styled(({ className, ...props }: TooltipProps) => (

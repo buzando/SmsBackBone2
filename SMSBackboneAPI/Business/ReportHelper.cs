@@ -171,7 +171,7 @@ namespace Business
     { "User", 3.8 },
     { "MessageId", 1.5 },
     { "Message", 5.2 },
-    { "Status", 1.2 },
+    { "Status", 1.8 },
     { "ReceivedAt", 1.9 },
     { "Cost", 1.3 },
     { "Type", 1.8 }

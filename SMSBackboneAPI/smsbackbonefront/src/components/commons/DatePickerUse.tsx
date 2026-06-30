@@ -9,7 +9,7 @@ import Iconarrow from '../../assets/icon-punta-flecha-bottom.svg'
 import MainButton from '../commons/MainButton'
 import SecondaryButton from '../commons/SecondaryButton'
 import { GlobalStyles } from "@mui/material";
-import { addMonths, subMonths } from "date-fns";
+import { addMonths, subMonths, addDays, differenceInCalendarDays } from "date-fns";
 import { startOfDay } from 'date-fns';
 import CalendarAlertInfoUse from '../../assets/CalendarAlertInfoUse.svg';
 
@@ -49,7 +49,6 @@ const DatePickerUse: React.FC<DatePickerUseProps> = ({
             key: 'selection',
         },
     ]);
-
     const handleNextMonth = () => {
         setShownDate(prev => addMonths(prev, 1));
     };
@@ -64,7 +63,10 @@ const DatePickerUse: React.FC<DatePickerUseProps> = ({
     const [endHours, setEndHours] = useState(0);
     const [endMinutes, setEndMinutes] = useState(0);
     const [shownDate, setShownDate] = useState(new Date());
-    console.log("shownDate:", shownDate); // 👈 aquí
+    const [focusedRange, setFocusedRange] = useState<[number, number]>([0, 0]);
+
+
+
     const handleApply = () => {
         onApply(dateRange[0].startDate, dateRange[0].endDate, startHours, startMinutes, endHours, endMinutes);
         onClose();
@@ -403,23 +405,58 @@ const DatePickerUse: React.FC<DatePickerUseProps> = ({
                         <DateRange
                             minDate={minDate}
                             maxDate={maxDate}
-                            //key={shownDate.toString()}
                             key={`${shownDate.getFullYear()}-${shownDate.getMonth()}`}
                             locale={es}
                             editableDateInputs={true}
                             onChange={(item) => {
-                                const start = item.selection.startDate;
-                                const end = item.selection.endDate;
+                                const start = item.selection.startDate || new Date();
+                                let end = item.selection.endDate || start;
+
+                                const daysDiff = differenceInCalendarDays(
+                                    startOfDay(end),
+                                    startOfDay(start)
+                                );
+
+                                if (daysDiff > 30) {
+                                    end = addDays(startOfDay(start), 30);
+                                }
 
                                 setDateRange([{
-                                    startDate: start || new Date(),
-                                    endDate: end || new Date(),
+                                    startDate: start,
+                                    endDate: end,
                                     key: 'selection',
                                 }]);
 
                                 setIsValidRange(!!start && !!end);
                             }}
-                            //moveRangeOnFirstSelection={false}
+                            focusedRange={focusedRange}
+                            onRangeFocusChange={(range) => setFocusedRange(range as [number, number])}
+                            disabledDay={(date) => {
+                                const start = dateRange[0]?.startDate;
+                                const end = dateRange[0]?.endDate;
+
+                                if (!start) return false;
+
+                                const currentDay = startOfDay(date);
+                                const startDay = startOfDay(start);
+                                const endDay = end ? startOfDay(end) : null;
+                                const maxAllowedDay = addDays(startDay, 30);
+
+                                const hasSelectedRange =
+                                    !!start &&
+                                    !!end &&
+                                    differenceInCalendarDays(endDay!, startDay) > 0;
+
+                                if (hasSelectedRange && focusedRange[1] === 0) {
+                                    return currentDay < startDay || currentDay > endDay!;
+                                }
+
+                                if (focusedRange[1] === 1) {
+                                    return currentDay < startDay || currentDay > maxAllowedDay;
+                                }
+
+                                return false;
+                            }}
                             moveRangeOnFirstSelection={false}
                             retainEndDateOnFirstSelection={true}
                             preventSnapRefocus={true}
@@ -429,10 +466,8 @@ const DatePickerUse: React.FC<DatePickerUseProps> = ({
                             showDateDisplay={false}
                             showMonthAndYearPickers={false}
                             shownDate={shownDate}
-                            //onShownDateChange={(date) => setShownDate(date)}
                             onShownDateChange={() => { }}
                         />
-
                         <Box
                             sx={{
                                 width: "calc(100% + 0px)",

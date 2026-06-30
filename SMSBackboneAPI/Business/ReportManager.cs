@@ -60,7 +60,7 @@ namespace Business
                                         User = reader.GetString(reader.GetOrdinal("User")),
                                         MessageId = reader.GetInt32(reader.GetOrdinal("MessageId")),
                                         Message = reader.GetString(reader.GetOrdinal("Message")),
-                                        Status = reader.GetString(reader.GetOrdinal("Status")),
+                                        Status = ConvertDeliveryStatus(reader.GetString(reader.GetOrdinal("Status"))),
                                         ReceivedAt = reader.GetDateTime(reader.GetOrdinal("ReceivedAt")),
                                         Cost = reader.GetString(reader.GetOrdinal("Cost")),
                                         Type = reader.GetString(reader.GetOrdinal("Type")),
@@ -79,7 +79,7 @@ namespace Business
                                         User = reader.GetString(reader.GetOrdinal("User")),
                                         MessageId = reader.GetInt32(reader.GetOrdinal("MessageId")),
                                         Message = reader.GetString(reader.GetOrdinal("Message")),
-                                        Status = reader.GetString(reader.GetOrdinal("Status")),
+                                        Status = ConvertDeliveryStatus(reader.GetString(reader.GetOrdinal("Status"))),
                                         ReceivedAt = reader.GetDateTime(reader.GetOrdinal("ReceivedAt")),
                                         Cost = reader.GetString(reader.GetOrdinal("Cost")),
                                         Type = reader.GetString(reader.GetOrdinal("Type")),
@@ -175,7 +175,7 @@ namespace Business
                                         UserName = reader.GetString(reader.GetOrdinal("UserName")),
                                         RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
                                         PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
-                                        Status = reader.GetString(reader.GetOrdinal("Status")),
+                                        Status = ConvertDeliveryStatus(reader.GetString(reader.GetOrdinal("Status"))),
                                         ResponseMessage = reader.IsDBNull(reader.GetOrdinal("ResponseMessage")) ? null : reader.GetString(reader.GetOrdinal("ResponseMessage")),
                                         SentAt = reader.IsDBNull(reader.GetOrdinal("SentAt")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("SentAt")),
                                         UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
@@ -190,7 +190,19 @@ namespace Business
             return results;
         }
 
-
+        private static string ConvertDeliveryStatus(string status)
+        {
+            return status switch
+            {
+                "0" => "Enviando",
+                "1" => "Entregado",
+                "2" => "No entregado",
+                "3" => "No enviado",
+                "4" => "Fallido",
+                "5" => "Excepción",
+                _ => status
+            };
+        }
         public byte[] ExportReportToFile(ReportExportRequest request, string format, out string fileName)
         {
             fileName = $"Reporte_{request.ReportType ?? "global"}_{DateTime.Now:yyyyMMdd_HHmmss}.{format}";

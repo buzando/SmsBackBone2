@@ -1337,6 +1337,9 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                         .Distinct()
                         .Count();
 
+                    // ===============================
+                    // SMS ENVIADOS HOY
+                    // ===============================
                     int sentToday = ctx.CampaignContactScheduleSend
                         .Count(s =>
                             campaignIds.Contains(s.CampaignId) &&
@@ -1345,25 +1348,12 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                             s.SentAt.Value < tomorrow
                         );
 
-                    int totalSent = ctx.CampaignContactScheduleSend
-                        .Count(s => campaignIds.Contains(s.CampaignId));
-
-                    DateTime? firstSentDate = ctx.CampaignContactScheduleSend
-                        .Where(s =>
-                            campaignIds.Contains(s.CampaignId) &&
-                            s.SentAt.HasValue
-                        )
-                        .Select(s => (DateTime?)s.SentAt.Value.Date)
-                        .OrderBy(d => d)
-                        .FirstOrDefault();
-
-                    int daysSinceFirstSend = firstSentDate.HasValue
-                        ? (today - firstSentDate.Value).Days + 1
-                        : 0;
-
-                    int averagePerDay = daysSinceFirstSend > 0
-                        ? (int)Math.Round((double)totalSent / daysSinceFirstSend)
-                        : 0;
+                    // ===============================
+                    // PROMEDIO SMS POR DÍA
+                    // Basado únicamente en lo enviado hoy.
+                    // Si hoy no hay envíos, regresa 0.
+                    // ===============================
+                    int averagePerDay = sentToday;
 
                     // Usuarios relacionados con la sala
                     var userIds = ctx.roomsbyuser
@@ -1400,6 +1390,9 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                         creditConsumption = sentToday * smsRate;
                     }
 
+                    // ===============================
+                    // ESTATUS DEL DÍA
+                    // ===============================
                     var todaySends = ctx.CampaignContactScheduleSend
                         .Where(s =>
                             campaignIds.Contains(s.CampaignId) &&
@@ -1422,12 +1415,22 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                     int notSent = todaySends.Count(s => s.Status == "3");
                     int exception = todaySends.Count(s => s.Status == "5");
 
-                    int total = delivered + responded + notDelivered + waiting + failed + rejected + notSent + exception;
+                    int total = delivered
+                        + responded
+                        + notDelivered
+                        + waiting
+                        + failed
+                        + rejected
+                        + notSent
+                        + exception;
 
                     int receptionRate = total > 0
                         ? (int)Math.Round((double)responded * 100 / total)
                         : 0;
 
+                    // ===============================
+                    // CAMPAÑAS ACTIVAS
+                    // ===============================
                     var campaigns = campaignsQuery
                         .Where(c =>
                             c.AutoStart &&
@@ -1683,8 +1686,157 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
         }
 
 
+        public UserOnboardingStatusResponse GetOnboardingStatus(int idUser, string onboardingName)
+        {
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    var onboarding = ctx.UserOnboarding
+                        .FirstOrDefault(x => x.idUser == idUser);
 
+                    if (onboarding == null)
+                    {
+                        onboarding = new UserOnboarding
+                        {
+                            idUser = idUser,
+                            roomSelector = false,
+                            homeActions = false,
+                            campaigns = false,
+                            blacklist = false,
+                            paymentSettings = false,
+                            userAdministration = false,
+                            createDate = DateTime.Now,
+                            updateDate = null
+                        };
 
+                        ctx.UserOnboarding.Add(onboarding);
+                        ctx.SaveChanges();
+                    }
+
+                    bool completed;
+
+                    switch (onboardingName)
+                    {
+                        case "roomSelector":
+                            completed = onboarding.roomSelector;
+                            break;
+
+                        case "homeActions":
+                            completed = onboarding.homeActions;
+                            break;
+
+                        case "campaigns":
+                            completed = onboarding.campaigns;
+                            break;
+
+                        case "blacklist":
+                            completed = onboarding.blacklist;
+                            break;
+
+                        case "paymentSettings":
+                            completed = onboarding.paymentSettings;
+                            break;
+
+                        case "userAdministration":
+                            completed = onboarding.userAdministration;
+                            break;
+
+                        default:
+                            completed = true;
+                            break;
+                    }
+
+                    return new UserOnboardingStatusResponse
+                    {
+                        idUser = idUser,
+                        onboardingName = onboardingName,
+                        completed = completed
+                    };
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e.Message);
+
+                return new UserOnboardingStatusResponse
+                {
+                    idUser = idUser,
+                    onboardingName = onboardingName,
+                    completed = true
+                };
+            }
+        }
+        public bool CompleteOnboarding(int idUser, string onboardingName)
+        {
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    var onboarding = ctx.UserOnboarding
+                        .FirstOrDefault(x => x.idUser == idUser);
+
+                    if (onboarding == null)
+                    {
+                        onboarding = new UserOnboarding
+                        {
+                            idUser = idUser,
+                            roomSelector = false,
+                            homeActions = false,
+                            campaigns = false,
+                            blacklist = false,
+                            paymentSettings = false,
+                            userAdministration = false,
+                            createDate = DateTime.Now,
+                            updateDate = null
+                        };
+
+                        ctx.UserOnboarding.Add(onboarding);
+                        ctx.SaveChanges();
+                    }
+
+                    switch (onboardingName)
+                    {
+                        case "roomSelector":
+                            onboarding.roomSelector = true;
+                            break;
+
+                        case "homeActions":
+                            onboarding.homeActions = true;
+                            break;
+
+                        case "campaigns":
+                            onboarding.campaigns = true;
+                            break;
+
+                        case "blacklist":
+                            onboarding.blacklist = true;
+                            break;
+
+                        case "paymentSettings":
+                            onboarding.paymentSettings = true;
+                            break;
+
+                        case "userAdministration":
+                            onboarding.userAdministration = true;
+                            break;
+
+                        default:
+                            return false;
+                    }
+
+                    onboarding.updateDate = DateTime.Now;
+
+                    ctx.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e.Message);
+                return false;
+            }
+        }
 
     }
 }
