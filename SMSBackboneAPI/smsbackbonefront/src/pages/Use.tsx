@@ -70,6 +70,12 @@ const Use: React.FC = () => {
     const [data, setData] = useState(false);
     const [searchingData, setSearchingData] = useState(true);
     const handleDateClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (datePickerOpen) {
+            setDatePickerOpen(false);
+            setAnchorEl(null);
+            return;
+        }
+
         closeAllFilters();
         setAnchorEl(event.currentTarget);
         setDatePickerOpen(true);

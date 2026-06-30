@@ -313,7 +313,7 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
               contentEditable={false}
               onClick={(e) => handleChipClick(i, e)}
               sx={{
-                backgroundColor: '#C08194',
+                backgroundColor: '#7B354D',
                 color: '#fff',
                 px: '4px',
                 py: '0px',
@@ -340,15 +340,15 @@ const TemplateViewer: React.FC<Props> = ({ templates, value, onChange, onSelectT
                   marginLeft: "6px",
                   width: "18px",
                   height: "18px",
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "#ffffff",
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  border: "1px solid #C08194",
+                  border: "1px solid #7B354D",
                 }}
               >
-                <span style={{ color: "#C08194", fontSize: "12px", fontWeight: "bold", lineHeight: 1 }}>
+                <span style={{ color: "#7B354D", fontSize: "12px", fontWeight: "bold", lineHeight: 1 }}>
                   ✖
                 </span>
               </Box>
