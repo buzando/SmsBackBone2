@@ -1071,39 +1071,39 @@ const Campains: React.FC = () => {
     ));
   }, [selectedTelefonos, selectedVariables, selectedTab, columns]);
 
-const handleContinue = async () => {
-  if (activeStep === 0) {
-    if (selectedTelefonos.length === 0) {
-      setTitleErrorModal("Faltan teléfonos");
-      setMessageErrorModal("Debes seleccionar al menos una columna de teléfonos.");
-      setIsErrorModalOpen(true);
-      return;
+  const handleContinue = async () => {
+    if (activeStep === 0) {
+      if (selectedTelefonos.length === 0) {
+        setTitleErrorModal("Faltan teléfonos");
+        setMessageErrorModal("Debes seleccionar al menos una columna de teléfonos.");
+        setIsErrorModalOpen(true);
+        return;
+      }
+
+      if (selectedVariables.length === 0) {
+        setTitleErrorModal("Faltan variables");
+        setMessageErrorModal("Debes seleccionar al menos una variable para continuar.");
+        setIsErrorModalOpen(true);
+        return;
+      }
     }
 
-    if (selectedVariables.length === 0) {
-      setTitleErrorModal("Faltan variables");
-      setMessageErrorModal("Debes seleccionar al menos una variable para continuar.");
-      setIsErrorModalOpen(true);
-      return;
+    if (activeStep === 0 && !postCargaActiva) {
+      const cargaExitosa = await handleSaveTemplate();
+      if (!cargaExitosa) return;
+      setPostCargaActiva(true);
+    } else if (activeStep === 2) {
+      await handleSaveCampaign();
+    } else if (activeStep === 1) {
+      if (!mensajeAceptado) {
+        setMensajeAceptado(true);
+        return;
+      }
+      setActiveStep((prev) => prev + 1);
+    } else {
+      setActiveStep((prev) => prev + 1);
     }
-  }
-
-  if (activeStep === 0 && !postCargaActiva) {
-    const cargaExitosa = await handleSaveTemplate();
-    if (!cargaExitosa) return;
-    setPostCargaActiva(true);
-  } else if (activeStep === 2) {
-    await handleSaveCampaign();
-  } else if (activeStep === 1) {
-    if (!mensajeAceptado) {
-      setMensajeAceptado(true);
-      return;
-    }
-    setActiveStep((prev) => prev + 1);
-  } else {
-    setActiveStep((prev) => prev + 1);
-  }
-};
+  };
 
 
   const handleSheetChange = (event: SelectChangeEvent<string>) => {
@@ -1758,57 +1758,57 @@ const handleContinue = async () => {
     }
   };
 
- const handleConfirmDuplicateCampaign = async () => {
-  try {
-    const horariosInvalidos =
-      duplicateHorarios.length === 0 ||
-      duplicateHorarios.some(h =>
-        !h.start ||
-        !h.end ||
-        h.end <= h.start
+  const handleConfirmDuplicateCampaign = async () => {
+    try {
+      const horariosInvalidos =
+        duplicateHorarios.length === 0 ||
+        duplicateHorarios.some(h =>
+          !h.start ||
+          !h.end ||
+          h.end <= h.start
+        );
+
+      if (horariosInvalidos) {
+        setTitleErrorModal("Horario inválido");
+        setMessageErrorModal("Debes seleccionar una fecha de inicio y fin válida para duplicar la campaña.");
+        setIsErrorModalOpen(true);
+        return;
+      }
+
+      const payload = {
+        campaignIdToClone: selectedCampaign?.id,
+        newName: duplicateName,
+        newSchedules: duplicateHorarios.map((h, index) => ({
+          startDateTime: toLocalISOString(h.start!),
+          endDateTime: toLocalISOString(h.end!),
+          operationMode: h.operationMode ?? 1,
+          order: index + 1
+        }))
+      };
+
+      console.log("Payload duplicar campaña:", payload);
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_CLONE_CAMPAIGN}`,
+        payload,
+        { headers: { 'Content-Type': 'application/json' } }
       );
 
-    if (horariosInvalidos) {
-      setTitleErrorModal("Horario inválido");
-      setMessageErrorModal("Debes seleccionar una fecha de inicio y fin válida para duplicar la campaña.");
+      if (response.status === 200) {
+        setOpenDuplicateModal(false);
+        setMessageChipBar("Campaña duplicada con éxito");
+        setShowChipBarAdd(true);
+        setTimeout(() => setShowChipBarAdd(false), 3000);
+      }
+    } catch (error) {
+      setTitleErrorModal("Error al duplicar la campaña");
+      setMessageErrorModal("No ha sido posible duplicar la campaña. Intente más tarde.");
       setIsErrorModalOpen(true);
-      return;
-    }
-
-    const payload = {
-      campaignIdToClone: selectedCampaign?.id,
-      newName: duplicateName,
-      newSchedules: duplicateHorarios.map((h, index) => ({
-        startDateTime: toLocalISOString(h.start!),
-        endDateTime: toLocalISOString(h.end!),
-        operationMode: h.operationMode ?? 1,
-        order: index + 1
-      }))
-    };
-
-    console.log("Payload duplicar campaña:", payload);
-
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_CLONE_CAMPAIGN}`,
-      payload,
-      { headers: { 'Content-Type': 'application/json' } }
-    );
-
-    if (response.status === 200) {
+    } finally {
+      await fetchCampaigns();
       setOpenDuplicateModal(false);
-      setMessageChipBar("Campaña duplicada con éxito");
-      setShowChipBarAdd(true);
-      setTimeout(() => setShowChipBarAdd(false), 3000);
     }
-  } catch (error) {
-    setTitleErrorModal("Error al duplicar la campaña");
-    setMessageErrorModal("No ha sido posible duplicar la campaña. Intente más tarde.");
-    setIsErrorModalOpen(true);
-  } finally {
-    await fetchCampaigns();
-    setOpenDuplicateModal(false);
-  }
-};
+  };
 
   const handleStartCampaign = async (campaign: any) => {
     const updated = {
@@ -2102,7 +2102,7 @@ const handleContinue = async () => {
 
         const hasAtLeastOneVariable =
           Array.isArray(selectedVariables) &&
-          selectedVariables.length > 0; 
+          selectedVariables.length > 0;
 
         return !(
           hasValidFile &&

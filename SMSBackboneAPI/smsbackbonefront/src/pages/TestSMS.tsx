@@ -347,8 +347,7 @@ export default function TestSMS() {
                       >
                         <>
                           • Solo caracteres numéricos<br />
-                          • El teléfono debe incluir el<br />
-                          código del país
+
                         </>
                       </Box>
                     }
