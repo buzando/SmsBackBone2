@@ -138,7 +138,7 @@ export default function TestSMS() {
 
         if (serverMessage === "OK") {
           setSnackMessage("Se han enviado los mensajes correctamente");
-           updateSelectedRoomCreditsAfterSend(fromNumber, payload.To.length);
+          updateSelectedRoomCreditsAfterSend(fromNumber, payload.To.length);
         } else if (serverMessage) {
           setSnackMessage(serverMessage);
         } else {
@@ -391,42 +391,28 @@ export default function TestSMS() {
               placeholder={t('pages.testSMS.writeMessageOrSelect')}
               disabled={!!selectedTemplateId}
               onChange={(e) => {
-  let value = e.target.value;
+                let value = e.target.value;
 
-  value = value.replace(
-    /[^0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-{}\n\r]/g,
-    ''
-  );
+                value = value.replace(
+                  /[^0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-{}\n\r]/g,
+                  ''
+                );
 
-  if (value.length > 160) {
-    value = value.slice(0, 160);
-  }
+                if (value.length > 160) {
+                  value = value.slice(0, 160);
+                }
 
-  setMessage(value);
+                setMessage(value);
 
-  setMessageError(value.trim().length > 0 && value.trim().length < 3);
+                setMessageError(value.trim().length > 0 && value.trim().length < 3);
 
-  if (value.trim().length > 0) {
-    setSelectedTemplateId('');
-    setSelectedTemplate(null);
-  }
-}}
-              error={messageError}
-              helperText={
-                messageError
-                  ? "Solo se permiten caracteres alfanuméricos."
-                  : " "
-              }
-              FormHelperTextProps={{
-                sx: {
-                  fontFamily: "Poppins",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  marginLeft: "6px",
-                  position: "static",
-                  marginTop: '-2px', marginBottom: "5px"
+                if (value.trim().length > 0) {
+                  setSelectedTemplateId('');
+                  setSelectedTemplate(null);
                 }
               }}
+              error={messageError}
+              helperText={messageError ? t('pages.testSMS.invalidFormat') : " "}
               inputProps={{ maxLength: 160 }}
               InputProps={{
                 sx: {
@@ -487,7 +473,7 @@ export default function TestSMS() {
                 fontFamily: "Poppins",
                 fontSize: "12px",
                 color: "#A1A1A1",
-                mt: -1, ml: 1.5
+                mt: -2, ml: 1.5
               }}
             >
               {t('pages.testSMS.charactersCounter', { count: message.length })}

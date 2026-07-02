@@ -86,12 +86,29 @@ namespace Business
                 using (var ctx = new Entities())
                 {
                     var template = ctx.Template
-                                       .FirstOrDefault(t => t.Name == templaterequest.oldName && t.IdRoom == templaterequest.idRoom);
+                        .FirstOrDefault(t =>
+                            t.Name == templaterequest.oldName &&
+                            t.IdRoom == templaterequest.idRoom);
 
-                    if (template == null) return false;
+                    if (template == null)
+                        return false;
+
+                    var now = DateTime.Now;
+
+                    var hasNonFinishedCampaign = (
+                        from c in ctx.Campaigns
+                        join s in ctx.CampaignSchedules on c.Id equals s.CampaignId
+                        where c.TemplateId == template.Id
+                           && s.EndDateTime >= now
+                        select c.Id
+                    ).Any();
+
+                    if (hasNonFinishedCampaign)
+                        return false;
 
                     template.Name = templaterequest.newName;
                     template.Message = templaterequest.newMessage;
+
                     ctx.SaveChanges();
                     return true;
                 }
@@ -99,7 +116,6 @@ namespace Business
             catch (Exception)
             {
                 return false;
-                throw;
             }
         }
         public List<string> GetCampainsByTemplate(TemplateRequest templaterequest)
