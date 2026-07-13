@@ -707,7 +707,18 @@ const ManageAccounts: React.FC = () => {
         return isValid;
     };
 
+    const ROOM_NAME_LIMIT = 16;
 
+    const getRoomDisplayName = (name: string) => {
+        if (!name) return "";
+        return name.length > ROOM_NAME_LIMIT
+            ? `${name.substring(0, ROOM_NAME_LIMIT)}...`
+            : name;
+    };
+
+    const shouldShowRoomTooltip = (name: string) => {
+        return !!name && name.length > ROOM_NAME_LIMIT;
+    };
 
     return (
         <Box p={3}
@@ -2124,14 +2135,49 @@ const ManageAccounts: React.FC = () => {
                                                                 style={{ display: 'block' }}
                                                             />
                                                         </Box>
-                                                        <Typography sx={{
-                                                            fontWeight: "bold",
-                                                            color: selectedRooms.includes(room.id)
-                                                                ? "#833953"
-                                                                : "#574B4F",
-                                                        }}>
-                                                            {room.name}
-                                                        </Typography>
+                                                        <Tooltip
+                                                            title={shouldShowRoomTooltip(room.name) ? room.name : ""}
+                                                            placement="top"
+                                                            arrow
+                                                            componentsProps={{
+                                                                tooltip: {
+                                                                    sx: {
+                                                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                                        color: "#DEDADA",
+                                                                        fontFamily: "Poppins, sans-serif",
+                                                                        fontSize: "12px",
+                                                                        padding: "6px 8px",
+                                                                        borderRadius: "8px",
+                                                                        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)",
+                                                                        maxWidth: "260px",
+                                                                    }
+                                                                },
+                                                                arrow: {
+                                                                    sx: {
+                                                                        color: "rgba(0, 0, 0, 0.8)"
+                                                                    }
+                                                                }
+                                                            }}
+                                                        >
+                                                            <Typography
+                                                                noWrap
+                                                                sx={{
+                                                                    fontWeight: "bold",
+                                                                    color: selectedRooms.includes(room.id)
+                                                                        ? "#833953"
+                                                                        : "#574B4F",
+                                                                    fontFamily: "Poppins",
+                                                                    fontSize: "14px",
+                                                                    maxWidth: "145px",
+                                                                    overflow: "hidden",
+                                                                    textOverflow: "ellipsis",
+                                                                    whiteSpace: "nowrap",
+                                                                    cursor: shouldShowRoomTooltip(room.name) ? "pointer" : "default",
+                                                                }}
+                                                            >
+                                                                {getRoomDisplayName(room.name)}
+                                                            </Typography>
+                                                        </Tooltip>
                                                     </Grid>
                                                 </Grid>
                                             </Box>

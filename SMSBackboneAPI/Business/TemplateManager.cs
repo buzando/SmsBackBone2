@@ -15,28 +15,58 @@ namespace Business
         {
             try
             {
+                if (Addtemplate == null)
+                    return false;
 
-                var template = new Modal.Model.Model.Template
-                {
-                    Name = Addtemplate.Name,
-                    Message = Addtemplate.Message,
-                    CreationDate = DateTime.Now,
-                    IdRoom = Addtemplate.idroom
-                };
+                if (string.IsNullOrWhiteSpace(Addtemplate.Name))
+                    return false;
+
                 using (var ctx = new Entities())
                 {
+                    var templateName = Addtemplate.Name.Trim().ToLower();
+
+                    var clientIds = (
+                        from ru in ctx.roomsbyuser
+                        join u in ctx.Users on ru.idUser equals u.Id
+                        where ru.idRoom == Addtemplate.idroom
+                        select u.IdCliente
+                    )
+                    .Distinct()
+                    .ToList();
+
+                    if (!clientIds.Any())
+                        return false;
+
+
+                    var existsTemplate = (
+                        from t in ctx.Template
+                        join ru in ctx.roomsbyuser on t.IdRoom equals ru.idRoom
+                        join u in ctx.Users on ru.idUser equals u.Id
+                        where clientIds.Contains(u.IdCliente)
+                           && t.Name.Trim().ToLower() == templateName
+                        select t.Id
+                    ).Any();
+
+                    if (existsTemplate)
+                        return false;
+
+                    var template = new Modal.Model.Model.Template
+                    {
+                        Name = Addtemplate.Name.Trim(),
+                        Message = Addtemplate.Message,
+                        CreationDate = DateTime.Now,
+                        IdRoom = Addtemplate.idroom
+                    };
+
                     ctx.Template.Add(template);
                     ctx.SaveChanges();
+
+                    return true;
                 }
-                return true;
-
-
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                return false; ;
-
-                throw;
+                return false;
             }
         }
         public List<Modal.Model.Model.Template> GetTemplatesByRoom(int idRoom)

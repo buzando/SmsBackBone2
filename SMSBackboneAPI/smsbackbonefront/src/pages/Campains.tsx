@@ -1127,26 +1127,47 @@ const Campains: React.FC = () => {
     setVariables(varCols);
   };
 
-  {/* 
-  useEffect(() => {
-    if (!selectedCampaign?.startDate) return;
 
-    const interval = setInterval(() => {
-      const start = new Date(selectedCampaign.startDate).getTime();
-      const now = Date.now();
-      const diff = now - start;
+  const visibleBlacklistIds = filteredBlackLists.map(item => item.id);
 
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
+  const allVisibleBlackListsSelected =
+    visibleBlacklistIds.length > 0 &&
+    visibleBlacklistIds.every(id => selectedBlackListIds.includes(id));
 
-      const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      setElapsedTime(formattedTime);
-    }, 1000);
+  const someVisibleBlackListsSelected =
+    visibleBlacklistIds.some(id => selectedBlackListIds.includes(id));
 
-    return () => clearInterval(interval);
-  }, [selectedCampaign?.startDate]);
-*/}
+  const handleSelectAllBlackLists = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked;
+
+    if (checked) {
+      setSelectedBlackListIds(prev =>
+        Array.from(new Set([...prev, ...visibleBlacklistIds]))
+      );
+    } else {
+      setSelectedBlackListIds(prev =>
+        prev.filter(id => !visibleBlacklistIds.includes(id))
+      );
+    }
+  };
+
+  const handleToggleBlackList = (id: number) => {
+    setSelectedBlackListIds(prev =>
+      prev.includes(id)
+        ? prev.filter(item => item !== id)
+        : [...prev, id]
+    );
+  };
+
+  const handleToggleBlacklistEnabled = (checked: boolean) => {
+    setBlacklistEnabled(checked);
+
+    if (!checked) {
+      setSelectedBlackListIds([]);
+      setSearchTermBlacklist('');
+    }
+  };
+
   useEffect(() => {
     if (!selectedCampaign?.startDate || !showCounter(selectedCampaign)) {
       setElapsedTime("00:00:00");
@@ -7108,7 +7129,7 @@ const Campains: React.FC = () => {
 
                   <Switch
                     checked={blacklistEnabled}
-                    onChange={(e) => setBlacklistEnabled(e.target.checked)}
+                    onChange={(e) => handleToggleBlacklistEnabled(e.target.checked)}
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
                         color: '#8F4D63',
@@ -7197,9 +7218,9 @@ const Campains: React.FC = () => {
                                 <th style={{ textAlign: 'left', padding: '2px 4px', width: '45px', borderBottom: "1px solid #E6E4E4" }}>
                                   <Box sx={{ marginBottom: "-2px", marginTop: "-6px" }}>
                                     <Checkbox
-                                      //checked={selectedTemplates.length === templates.length && templates.length > 0}
-                                      //indeterminate={selectedTemplates.length > 0 && selectedTemplates.length < templates.length}
-                                      //onChange={handleSelectAllTemplates}
+                                      checked={allVisibleBlackListsSelected}
+                                      indeterminate={!allVisibleBlackListsSelected && someVisibleBlackListsSelected}
+                                      onChange={handleSelectAllBlackLists}
                                       sx={{
                                         color: '#574861',
                                         '&.Mui-checked': {
@@ -7210,12 +7231,7 @@ const Campains: React.FC = () => {
                                         }
                                       }}
                                       checkedIcon={
-                                        <Box
-                                          sx={{
-                                            width: '24px',
-                                            height: '24px',
-                                          }}
-                                        >
+                                        <Box sx={{ width: '24px', height: '24px' }}>
                                           <img
                                             src={IconCheckBox1}
                                             alt="Seleccionado"
@@ -7224,12 +7240,7 @@ const Campains: React.FC = () => {
                                         </Box>
                                       }
                                       indeterminateIcon={
-                                        <Box
-                                          sx={{
-                                            width: '24px',
-                                            height: '24px',
-                                          }}
-                                        >
+                                        <Box sx={{ width: '24px', height: '24px' }}>
                                           <img
                                             src={IconCheckBox2}
                                             alt="Indeterminado"
@@ -7251,13 +7262,7 @@ const Campains: React.FC = () => {
                                   <td style={{ padding: '2px 4px', borderBottom: "1px solid #E6E4E4" }}>
                                     <Checkbox
                                       checked={selectedBlackListIds.includes(list.id)}
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                          setSelectedBlackListIds(prev => [...prev, list.id]);
-                                        } else {
-                                          setSelectedBlackListIds(prev => prev.filter(id => id !== list.id));
-                                        }
-                                      }}
+                                      onChange={() => handleToggleBlackList(list.id)}
                                       sx={{
                                         color: '#574861',
                                         '&.Mui-checked': { color: '#574861' },

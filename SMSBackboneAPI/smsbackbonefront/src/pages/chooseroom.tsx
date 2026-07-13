@@ -285,35 +285,35 @@ const Chooseroom: React.FC = () => {
         validateRoomOnboarding();
     }, [rooms, loading, modalIsOpen]);
 
-   const handleJoyrideEvent = async (data: EventData) => {
-    const { status, type } = data;
+    const handleJoyrideEvent = async (data: EventData) => {
+        const { status, type } = data;
 
-    if (
-        type === EVENTS.TOUR_END ||
-        status === STATUS.FINISHED ||
-        status === STATUS.SKIPPED
-    ) {
-        const usuario = localStorage.getItem("userData");
+        if (
+            type === EVENTS.TOUR_END ||
+            status === STATUS.FINISHED ||
+            status === STATUS.SKIPPED
+        ) {
+            const usuario = localStorage.getItem("userData");
 
-        if (usuario) {
-            try {
-                const obj = JSON.parse(usuario);
+            if (usuario) {
+                try {
+                    const obj = JSON.parse(usuario);
 
-                await axios.post(
-                    `${import.meta.env.VITE_API_COMPLETE_ONBOARDING}`,
-                    {
-                        idUser: obj.id,
-                        onboardingName: "roomSelector",
-                    }
-                );
-            } catch (error) {
-                console.error("Error al guardar onboarding de salas", error);
+                    await axios.post(
+                        `${import.meta.env.VITE_API_COMPLETE_ONBOARDING}`,
+                        {
+                            idUser: obj.id,
+                            onboardingName: "roomSelector",
+                        }
+                    );
+                } catch (error) {
+                    console.error("Error al guardar onboarding de salas", error);
+                }
             }
-        }
 
-        setRunTour(false);
-    }
-};
+            setRunTour(false);
+        }
+    };
     const navigate = useNavigate();
 
     const handleRoomSelection = (room: Room) => {
@@ -492,6 +492,14 @@ const Chooseroom: React.FC = () => {
                                     <Box
                                         key={room.id}
                                         className="room-box"
+                                        onClick={() => handleRoomSelection(room)}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" || e.key === " ") {
+                                                handleRoomSelection(room);
+                                            }
+                                        }}
                                         sx={{
                                             backgroundColor: "#FFFFFF",
                                             border: "1px solid #CED2D54D",
@@ -500,6 +508,7 @@ const Chooseroom: React.FC = () => {
                                             width: "430px",
                                             padding: "20px",
                                             margin: "10px auto",
+                                            cursor: "pointer",
                                             transition: "background-color 0.3s, border-color 0.3s",
                                             '&:hover': {
                                                 backgroundColor: "#F2EBED",

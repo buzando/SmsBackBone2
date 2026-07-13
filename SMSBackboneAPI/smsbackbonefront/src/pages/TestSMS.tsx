@@ -403,8 +403,7 @@ export default function TestSMS() {
 
                 setMessage(value);
 
-                setMessageError(value.trim().length > 0 && value.trim().length < 3);
-
+                setMessageError(false);
                 if (value.trim().length > 0) {
                   setSelectedTemplateId('');
                   setSelectedTemplate(null);

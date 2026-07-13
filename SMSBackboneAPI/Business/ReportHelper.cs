@@ -174,7 +174,10 @@ namespace Business
     { "Status", 1.8 },
     { "ReceivedAt", 1.9 },
     { "Cost", 1.3 },
-    { "Type", 1.8 }
+    { "Type", 1.8 },
+    { "Fecha", 2.6 },
+{ "Cliente", 4.8 },
+{ "MensajesEnviados", 3.8 },
 };
 
             var properties = GetReadableProperties<T>();
@@ -203,13 +206,14 @@ namespace Business
             table.Format.Font.Name = "Arial";
             table.Format.Font.Size = 7;
             table.Rows.LeftIndent = 0;
-
+            table.LeftPadding = Unit.FromPoint(4);
+            table.RightPadding = Unit.FromPoint(4);
 
             foreach (var prop in properties)
             {
                 double width = columnWidths.TryGetValue(prop.Name, out var customWidth)
-                    ? customWidth
-                    : 1.4;
+    ? customWidth
+    : 2.2;
 
                 var column = table.AddColumn(Unit.FromCentimeter(width));
                 column.Format.Alignment = ParagraphAlignment.Left;

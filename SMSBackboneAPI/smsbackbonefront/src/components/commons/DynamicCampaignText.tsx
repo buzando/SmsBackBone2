@@ -1,7 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, Button, Modal } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import SecondaryButton from './SecondaryButton';
+import IconCloseRedN from "../../assets/IconCloseRedN.svg";
+
 interface Props {
   variables: string[];
   value: string;
@@ -11,17 +13,32 @@ interface Props {
   sampleData?: Record<string, string>;
 }
 
-const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allowConcatenation = false, onPreview, sampleData, }) => {
+const CHIP_STYLES = {
+  // Ya asignada
+  assignedDefaultBg: 'rgba(162, 12, 64, 0.74)',
+  assignedHoverBg: '#A20C40',
+  assignedBorder: 'rgba(167, 66, 98, 0.80)',
+  hoverShadow: '0px 0px 12px #9D697C',
+};
+
+const DynamicCampaignText: React.FC<Props> = ({
+  variables,
+  value,
+  onChange,
+  allowConcatenation = false,
+  onPreview,
+  sampleData,
+}) => {
   const editorRef = useRef<HTMLDivElement>(null);
-  const [plainText, setPlainText] = useState("");
+  const isSyncingRef = useRef(false);
+
   const [isLimitExceeded, setIsLimitExceeded] = useState(false);
   const [openPreview, setOpenPreview] = useState(false);
-  const [previewMessage, setPreviewMessage] = useState("");
+  const [previewMessage, setPreviewMessage] = useState('');
 
   const maxLength = allowConcatenation ? 360 : 160;
 
-  // ✅ Solo letras, números, acentos, espacios, puntuación básica y {}
-  // ❌ Quita emojis y símbolos raros del VALOR que se envía
+  // Solo letras, números, acentos, espacios, puntuación básica y {}
   const sanitizeText = (input: string) => {
     return input.replace(
       /[^0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-{}\n\r]/g,
@@ -29,10 +46,139 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
     );
   };
 
+  const createChip = (label: string): HTMLElement => {
+    const span = document.createElement('span');
+
+    span.dataset.value = label;
+    span.contentEditable = 'false';
+
+    span.style.display = 'inline-flex';
+    span.style.alignItems = 'center';
+    span.style.justifyContent = 'space-between';
+    span.style.background = CHIP_STYLES.assignedDefaultBg;
+    span.style.border = `1px solid ${CHIP_STYLES.assignedBorder}`;
+    span.style.color = '#FFFFFF';
+    span.style.borderRadius = '6px';
+    span.style.padding = '0 8px';
+    span.style.margin = '0 3px 6px 3px';
+    span.style.minHeight = '30px';
+    span.style.fontFamily = 'Poppins';
+    span.style.fontSize = '14px';
+    span.style.fontWeight = '600';
+    span.style.cursor = 'pointer';
+    span.style.userSelect = 'none';
+    span.style.transition =
+      'background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.2s ease';
+
+    const textWrapper = document.createElement('span');
+    textWrapper.style.display = 'inline-flex';
+    textWrapper.style.alignItems = 'center';
+
+    const left = document.createElement('span');
+    left.textContent = '{{';
+    left.contentEditable = 'false';
+
+    const labelNode = document.createElement('span');
+    labelNode.textContent = label;
+    labelNode.contentEditable = 'false';
+    labelNode.style.minWidth = '28px';
+    labelNode.style.textAlign = 'center';
+
+    const right = document.createElement('span');
+    right.textContent = '}}';
+    right.contentEditable = 'false';
+
+    textWrapper.append(left, labelNode, right);
+
+    const closeWrapper = document.createElement('span');
+    closeWrapper.contentEditable = 'false';
+    closeWrapper.style.width = '18px';
+    closeWrapper.style.minWidth = '18px';
+    closeWrapper.style.height = '18px';
+    closeWrapper.style.marginLeft = '8px';
+    closeWrapper.style.display = 'inline-flex';
+    closeWrapper.style.alignItems = 'center';
+    closeWrapper.style.justifyContent = 'center';
+    closeWrapper.style.cursor = 'pointer';
+    closeWrapper.style.opacity = '0';
+    closeWrapper.style.visibility = 'hidden';
+    closeWrapper.style.pointerEvents = 'none';
+    closeWrapper.style.transition = 'opacity 0.15s ease';
+    closeWrapper.style.position = 'relative';
+    closeWrapper.style.zIndex = '2';
+
+    const closeIcon = document.createElement('img');
+    closeIcon.src = IconCloseRedN;
+    closeIcon.alt = 'Eliminar';
+    closeIcon.draggable = false;
+    closeIcon.contentEditable = 'false';
+    closeIcon.style.width = '18px';
+    closeIcon.style.height = '18px';
+    closeIcon.style.pointerEvents = 'none';
+
+    const removeChip = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const previous = span.previousSibling;
+      const next = span.nextSibling;
+
+      span.remove();
+
+      // Limpia espacios invisibles alrededor
+      if (
+        previous?.nodeType === Node.TEXT_NODE &&
+        previous.textContent === '\u00A0'
+      ) {
+        previous.remove();
+      }
+
+      if (
+        next?.nodeType === Node.TEXT_NODE &&
+        next.textContent === '\u00A0'
+      ) {
+        next.remove();
+      }
+
+      updateRawText();
+    };
+
+    closeWrapper.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    closeWrapper.addEventListener('click', removeChip);
+
+    closeWrapper.appendChild(closeIcon);
+    span.append(textWrapper, closeWrapper);
+
+    span.addEventListener('mouseenter', () => {
+      span.style.background = CHIP_STYLES.assignedHoverBg;
+      span.style.boxShadow = CHIP_STYLES.hoverShadow;
+
+      closeWrapper.style.opacity = '1';
+      closeWrapper.style.visibility = 'visible';
+      closeWrapper.style.pointerEvents = 'auto';
+    });
+
+    span.addEventListener('mouseleave', () => {
+      span.style.background = CHIP_STYLES.assignedDefaultBg;
+      span.style.boxShadow = 'none';
+
+      closeWrapper.style.opacity = '0';
+      closeWrapper.style.visibility = 'hidden';
+      closeWrapper.style.pointerEvents = 'none';
+    });
+
+    return span;
+  };
+
   const renderVisualMessage = (raw: string) => {
     if (!editorRef.current) return;
 
-    editorRef.current.innerHTML = '';
+    const editor = editorRef.current;
+    editor.innerHTML = '';
 
     const variableRegex = /\{(.*?)\}/g;
     let lastIndex = 0;
@@ -41,50 +187,19 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
     while ((match = variableRegex.exec(raw)) !== null) {
       const textBefore = raw.slice(lastIndex, match.index);
       if (textBefore) {
-        editorRef.current.appendChild(document.createTextNode(textBefore));
+        editor.appendChild(document.createTextNode(textBefore));
       }
 
       const span = createChip(match[1]);
-      editorRef.current.appendChild(span);
-      editorRef.current.appendChild(document.createTextNode('\u00A0'));
+      editor.appendChild(span);
+      editor.appendChild(document.createTextNode('\u00A0'));
 
       lastIndex = match.index + match[0].length;
     }
 
     if (lastIndex < raw.length) {
-      editorRef.current.appendChild(document.createTextNode(raw.slice(lastIndex)));
+      editor.appendChild(document.createTextNode(raw.slice(lastIndex)));
     }
-  };
-
-  const createChip = (label: string): HTMLElement => {
-    const span = document.createElement('span');
-    span.dataset.value = label;
-    span.contentEditable = 'false';
-    span.style.display = 'inline-flex';
-    span.style.alignItems = 'center';
-    span.style.backgroundColor = '#8F4D63';
-    span.style.color = '#fff';
-    span.style.padding = '2px 8px';
-    span.style.borderRadius = '16px';
-    span.style.margin = '0 4px';
-    span.style.fontFamily = 'Poppins';
-    span.style.fontSize = '14px';
-
-    const labelNode = document.createElement('span');
-    labelNode.textContent = label;
-    span.appendChild(labelNode);
-
-    const closeButton = document.createElement('span');
-    closeButton.innerHTML = '&times;';
-    closeButton.style.marginLeft = '8px';
-    closeButton.style.cursor = 'pointer';
-    closeButton.onclick = () => {
-      span.remove();
-      updateRawText();
-    };
-    span.appendChild(closeButton);
-
-    return span;
   };
 
   const updateRawText = () => {
@@ -96,24 +211,42 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
     childNodes.forEach((node) => {
       if (node.nodeType === Node.TEXT_NODE) {
         text += node.textContent ?? '';
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        return;
+      }
+
+      if (node.nodeType === Node.ELEMENT_NODE) {
         const el = node as HTMLElement;
+
         if (el.getAttribute('contenteditable') === 'false') {
-          const variableName = el.dataset.value || el.innerText.trim();
+          const variableName = el.dataset.value || '';
+
+          // Visualmente {{Variable}}, pero al back mandamos {Variable}
           text += `{${variableName}}`;
         }
       }
     });
 
     const sanitized = sanitizeText(text);
-
     const isExceeded = sanitized.length > maxLength;
+
     setIsLimitExceeded(isExceeded);
 
     if (!isExceeded) {
       onChange(sanitized);
-      setPlainText(sanitized.replace(/\{(.*?)\}/g, ''));
     }
+  };
+
+  const placeCaretAtEnd = () => {
+    if (!editorRef.current) return;
+
+    const range = document.createRange();
+    const selection = window.getSelection();
+
+    range.selectNodeContents(editorRef.current);
+    range.collapse(false);
+
+    selection?.removeAllRanges();
+    selection?.addRange(range);
   };
 
   const handleInsertVariable = (variable: string) => {
@@ -150,6 +283,8 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
     fragment.appendChild(space);
 
     const lastNode = fragment.lastChild;
+
+    range.deleteContents();
     range.insertNode(fragment);
 
     if (lastNode && selection) {
@@ -162,10 +297,13 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
     updateRawText();
   };
 
-
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+
     const variable = e.dataTransfer.getData('text/plain');
+
+    if (!variable) return;
+
     handleInsertVariable(variable);
   };
 
@@ -176,7 +314,7 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
   const handleBeforeInput = (e: any) => {
     const input = e.data;
 
-    if (input && input.startsWith("{")) return;
+    if (input && input.startsWith('{')) return;
 
     const allowed = /^[0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-]$/;
 
@@ -186,72 +324,101 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
     }
 
     const selection = window.getSelection();
-    const selectedTextLength = selection && !selection.isCollapsed
-      ? selection.toString().length
-      : 0;
+    const selectedTextLength =
+      selection && !selection.isCollapsed
+        ? selection.toString().length
+        : 0;
 
     const totalLength = value.length - selectedTextLength;
+
     if (totalLength >= maxLength) {
       e.preventDefault();
     }
   };
-  const handlePreviewClick = () => {
-    const preview = buildPreviewMessage();
-    if (!preview || preview.trim() === "") return;
-
-    setPreviewMessage(preview);
-    setOpenPreview(true);
-
-    // Si el padre quiere hacer algo extra con el preview
-    if (onPreview) {
-      onPreview(preview);
-    }
-  };
-
 
   const buildPreviewMessage = () => {
-    if (!value || !value.trim()) return "";
+    if (!value || !value.trim()) return '';
 
     if (!sampleData || Object.keys(sampleData).length === 0) {
       return value;
     }
 
     let result = value;
+
     Object.entries(sampleData).forEach(([colName, colValue]) => {
       const token = `{${colName}}`;
-      result = result.split(token).join(colValue ?? "");
+      result = result.split(token).join(colValue ?? '');
     });
 
     return result;
   };
 
+  const handlePreviewClick = () => {
+    const preview = buildPreviewMessage();
+
+    if (!preview || preview.trim() === '') return;
+
+    setPreviewMessage(preview);
+    setOpenPreview(true);
+
+    if (onPreview) {
+      onPreview(preview);
+    }
+  };
+
+  useEffect(() => {
+    if (!editorRef.current) return;
+    if (isSyncingRef.current) return;
+
+    isSyncingRef.current = true;
+    renderVisualMessage(value || '');
+    placeCaretAtEnd();
+    isSyncingRef.current = false;
+  }, [value]);
 
   return (
-    <Box sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 2,
-      mt: 2,
-      width: "750px",
-      //backgroundColor: "red"
-    }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        mt: 2,
+        width: '750px',
+      }}
+    >
       <Typography
         sx={{
           fontFamily: 'Poppins',
           fontSize: '18px',
           color: '#330F1B',
-          fontWeight: 600
-        }}>
+          fontWeight: 600,
+        }}
+      >
         Escribir mensaje y agregar variables según se requiera.
       </Typography>
 
-      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4, width: "770px" }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: 4,
+          width: '770px',
+        }}
+      >
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '16px', color: '#330F1B', mb: 1 }}>
+          <Typography
+            sx={{
+              fontFamily: 'Poppins',
+              fontWeight: 600,
+              fontSize: '16px',
+              color: '#330F1B',
+              mb: 1,
+            }}
+          >
             Mensaje
           </Typography>
 
-          <Box sx={{ position: 'relative', marginLeft: '5px', width: "520px" }}>
+          <Box sx={{ position: 'relative', marginLeft: '5px', width: '520px' }}>
             <Box
               component="div"
               contentEditable
@@ -264,7 +431,9 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
               onBeforeInput={handleBeforeInput}
               suppressContentEditableWarning
               sx={{
-                border: isLimitExceeded ? '2px solid red' : '2px solid #9B9295CC',
+                border: isLimitExceeded
+                  ? '2px solid red'
+                  : '2px solid #9B9295CC',
                 borderRadius: '8px',
                 padding: '12px',
                 fontFamily: 'Poppins',
@@ -274,26 +443,46 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
                 overflowY: 'auto',
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
+                outline: 'none',
               }}
             />
+
             {isLimitExceeded && (
-              <Typography sx={{ color: 'red', fontSize: '12px', mt: 1, fontFamily: "Poppins" }}>
+              <Typography
+                sx={{
+                  color: 'red',
+                  fontSize: '12px',
+                  mt: 1,
+                  fontFamily: 'Poppins',
+                }}
+              >
                 Has alcanzado el límite de caracteres permitido.
               </Typography>
             )}
           </Box>
-          <Box sx={{
-            display: "flex",
-            flexDirection: "column"
-          }}>
-            <Typography sx={{ fontFamily: 'Poppins', fontSize: '12px', color: '#574B4F', mt: 1 }}>
-              {value.length}/{maxLength} caracteres para que el mensaje se realice en un sólo envío.
+
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: 'Poppins',
+                fontSize: '12px',
+                color: '#574B4F',
+                mt: 1,
+              }}
+            >
+              {value.length}/{maxLength} caracteres para que el mensaje se
+              realice en un sólo envío.
             </Typography>
+
             <Box
               sx={{
-                height: "64px",
+                height: '64px',
                 alignSelf: 'flex-end',
-
               }}
             >
               <SecondaryButton
@@ -305,33 +494,43 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
           </Box>
         </Box>
 
-        <Box sx={{
-          width: "175px",
-          height: '190px',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: "center",
-          marginLeft: "-10px",
-        }}>
-          <Typography sx={{
-            fontFamily: 'Poppins',
-            fontWeight: 600,
-            fontSize: '14px',
-            color: '#330F1B',
-            mb: 1.5,
-            alignSelf: "flex-start"
-          }}>
+        <Box
+          sx={{
+            width: '175px',
+            height: '190px',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            marginLeft: '-10px',
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: 'Poppins',
+              fontWeight: 600,
+              fontSize: '14px',
+              color: '#330F1B',
+              mb: 1.5,
+              alignSelf: 'flex-start',
+            }}
+          >
             Variables
           </Typography>
 
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignSelf: "flex-start", width: "170px", padding: "5px",
-            gap: 2, overflowX: "hidden", overflowY: "auto"
-          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignSelf: 'flex-start',
+              width: '170px',
+              padding: '5px',
+              gap: 1,
+              overflowX: 'hidden',
+              overflowY: 'auto',
+            }}
+          >
             {variables.map((variable, i) => (
               <Button
                 key={i}
@@ -342,9 +541,10 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
                 onClick={() => handleInsertVariable(variable)}
                 sx={{
                   justifyContent: 'space-between',
-                  width: "150px", height: "40px",
+                  width: '150px',
+                  height: '40px',
                   border: '1px solid #8F4D63',
-                  backgroundColor: "#FAF5F6",
+                  backgroundColor: '#FAF5F6',
                   color: '#8F4D63',
                   fontFamily: 'Poppins',
                   textTransform: 'none',
@@ -357,16 +557,24 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
                   },
                 }}
                 endIcon={
-                  <DragIndicatorIcon sx={{
-                    fontSize: '18px',
-                    color: '#576771',
-                    cursor: 'grab',
-                    width: '24px',
-                    height: '24px',
-                  }} />
+                  <DragIndicatorIcon
+                    sx={{
+                      fontSize: '18px',
+                      color: '#576771',
+                      cursor: 'grab',
+                      width: '24px',
+                      height: '24px',
+                    }}
+                  />
                 }
               >
-                <Typography sx={{ fontFamily: 'Poppins', fontSize: '16px', color: "#8F4D63" }}>
+                <Typography
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontSize: '16px',
+                    color: '#8F4D63',
+                  }}
+                >
                   {variable}
                 </Typography>
               </Button>
@@ -374,10 +582,8 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
           </Box>
         </Box>
       </Box>
-      <Modal
-        open={openPreview}
-        onClose={() => setOpenPreview(false)}
-      >
+
+      <Modal open={openPreview} onClose={() => setOpenPreview(false)}>
         <Box
           sx={{
             position: 'absolute',
@@ -391,11 +597,16 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
             p: 4,
             display: 'flex',
             flexDirection: 'column',
-            gap: 2
+            gap: 2,
           }}
         >
           <Typography
-            sx={{ fontFamily: 'Poppins', fontSize: '18px', fontWeight: 600, color: '#330F1B' }}
+            sx={{
+              fontFamily: 'Poppins',
+              fontSize: '18px',
+              fontWeight: 600,
+              color: '#330F1B',
+            }}
           >
             Vista previa del mensaje
           </Typography>
@@ -409,7 +620,7 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
               fontSize: '14px',
               color: '#574B4F',
               whiteSpace: 'pre-wrap',
-              minHeight: '120px'
+              minHeight: '120px',
             }}
           >
             {previewMessage}
@@ -423,7 +634,6 @@ const DynamicCampaignText: React.FC<Props> = ({ variables, value, onChange, allo
           </Box>
         </Box>
       </Modal>
-
     </Box>
   );
 };

@@ -516,6 +516,24 @@ const Use: React.FC = () => {
 
     const chartWidth = Math.max(dataChart.length * 70, 1200);
 
+    const getCampaignButtonText = () => {
+        const count = selectedCampaigns.length;
+
+        if (count === 0) return "CAMPAÑA";
+        if (count === 1) return "1 Campaña";
+
+        return `${count} Campañas`;
+    };
+
+    const getUserButtonText = () => {
+        const count = selectedUsers.length;
+
+        if (count === 0) return "USUARIO";
+        if (count === 1) return "1 Usuario";
+
+        return `${count} Usuarios`;
+    };
+
     return (
         <Box p={3}
             sx={{
@@ -668,9 +686,16 @@ const Use: React.FC = () => {
                     <Button
                         variant="outlined"
                         onClick={handleCampaignClick}
-                        sx={buttonStyle}
+                        sx={{
+                            ...buttonStyle,
+                            textTransform: selectedCampaigns.length > 0 ? "none" : "uppercase",
+                            color: selectedCampaigns.length > 0 ? "#8F4D63" : "#330F1B",
+                            border: selectedCampaigns.length > 0
+                                ? "1px solid #8F4D63"
+                                : "1px solid #C6BFC2",
+                        }}
                     >
-                        CAMPAÑA
+                        {getCampaignButtonText()}
                     </Button>
                     <Popper open={campaignMenuOpen} anchorEl={anchorElC} placement="bottom-start"
                         sx={{}}
@@ -852,9 +877,17 @@ const Use: React.FC = () => {
                     </Popper>
                     <Button
                         variant="outlined"
-                        sx={buttonStyle}
-                        onClick={handleUserClick}>
-                        USUARIO
+                        sx={{
+                            ...buttonStyle,
+                            textTransform: selectedUsers.length > 0 ? "none" : "uppercase",
+                            color: selectedUsers.length > 0 ? "#8F4D63" : "#330F1B",
+                            border: selectedUsers.length > 0
+                                ? "1px solid #8F4D63"
+                                : "1px solid #C6BFC2",
+                        }}
+                        onClick={handleUserClick}
+                    >
+                        {getUserButtonText()}
                     </Button>
                     {/* Popper de Usuarios */}
                     <Popper open={userMenuOpen} anchorEl={userAnchorEl} placement="bottom-start">
