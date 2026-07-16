@@ -21,11 +21,20 @@
     <PackageReference Include="System.ServiceModel.Http" Version="6.0.*" />
     <PackageReference Include="System.ServiceModel.NetTcp" Version="6.0.*" />
     <PackageReference Include="System.ServiceModel.Security" Version="6.0.*" />
+	<PackageReference Include="Svg.Skia" Version="5.1.1" />
+<PackageReference Include="SkiaSharp" Version="4.150.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Contract\Contract.csproj" />
     <ProjectReference Include="..\Modal\Modal.csproj" />
+	  <None Update="Assets\nuxiba-logo.png">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+
+  <None Update="Assets\Quantum_Logo.svg">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
   </ItemGroup>
 
 </Project>

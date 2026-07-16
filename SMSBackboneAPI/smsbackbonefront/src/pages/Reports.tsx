@@ -1605,7 +1605,7 @@ const Reports: React.FC = () => {
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis',
                                             }}>
-                                                {getStatusText(recarga.Status)}
+                                                {recarga.Status}
                                             </td>
                                             <td style={{
                                                 padding: '0 15px',

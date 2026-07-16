@@ -205,6 +205,7 @@ namespace Business
         }
         public byte[] ExportReportToFile(ReportExportRequest request, string format, out string fileName)
         {
+            var reportTitle = GetReportTitle(request.ReportType, request.PageOrigin);
             fileName = $"Reporte_{request.ReportType ?? "global"}_{DateTime.Now:yyyyMMdd_HHmmss}.{format}";
 
             var reportdata = new ReportRequest
@@ -225,30 +226,49 @@ namespace Business
                 case "global":
                 case null:
                     var globalData = GetSmsReport(reportdata, true);
-                    return GenerateFileFrom(globalData, format);
+                    return GenerateFileFrom(globalData, format, reportTitle);
 
                 case "mensajes entrantes":
                 case "mensajes enviados":
                 case "mensajes no enviados":
                 case "mensajes rechazados":
                     var deliveryData = GetSmsReportSend(reportdata, true);
-                    return GenerateFileFrom(deliveryData, format);
+                    return GenerateFileFrom(deliveryData, format, reportTitle);
 
                 case "clients":
                     var clientfilterrequest = new ClientFilterRequest {Page = 0};
                     var clientData = new ClientManager().GetClientsAdmin(clientfilterrequest);
-                    return GenerateFileFrom(clientData.Items, format);
+                    return GenerateFileFrom(clientData.Items, format, reportTitle);
 
                 case "reportesadmin":
                     var data = new ReportsAdminRequest { FechaFin = DateTime.Parse(request.EndDate), FechaInicio = DateTime.Parse(request.StartDate), Page = 0, TipoReporte = int.Parse(request.PageOrigin) };
                     var ReportData = new ClientManager().GetReportsAdmin(data);
-                    return GenerateFileFrom(ReportData.Items, format);
+                    return GenerateFileFrom(ReportData.Items, format, reportTitle);
 
                 default:
                     throw new Exception("Tipo de reporte no válido.");
             }
         }
-        public byte[] GenerateFileFrom(object data, string format)
+        private static string GetReportTitle(string? reportType, string? pageOrigin)
+        {
+            return reportType?.ToLower() switch
+            {
+                "global" => "Reporte global",
+                "mensajes entrantes" => "Reporte de mensajes entrantes",
+                "mensajes enviados" => "Reporte de mensajes enviados",
+                "mensajes no enviados" => "Reporte de mensajes no enviados",
+                "mensajes rechazados" => "Reporte de mensajes rechazados",
+                "clients" => "Reporte de clientes",
+                "reportesadmin" => pageOrigin switch
+                {
+                    "1" => "Reporte administrativo",
+                    "2" => "Reporte de consumo de sistema",
+                    _ => "Reporte administrativo"
+                },
+                _ => "Reporte"
+            };
+        }
+        public byte[] GenerateFileFrom(object data, string format, string reportTitle = "Reporte")
         {
             if (data is ReportGlobalResponse global)
                 data = global.reportGlobalResponseLists;
@@ -287,9 +307,9 @@ namespace Business
                             .MakeGenericMethod(type)
                             .Invoke(null, new[] { toList }),
                 "pdf" => (byte[])typeof(ReportHelper)
-                            .GetMethod("GeneratePdfWithMigraDoc")!
-                            .MakeGenericMethod(type)
-                            .Invoke(null, new[] { toList }),
+            .GetMethod("GeneratePdfWithMigraDoc")!
+            .MakeGenericMethod(type)
+            .Invoke(null, new object[] { toList, reportTitle }),
                 _ => throw new Exception("Formato no soportado.")
             };
         }
