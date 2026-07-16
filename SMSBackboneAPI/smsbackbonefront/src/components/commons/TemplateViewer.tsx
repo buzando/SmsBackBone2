@@ -37,7 +37,7 @@ interface Props {
 
 const CHIP_STYLES = {
   unassignedDefaultBg: 'rgba(123, 53, 77, 0.50)',
-  unassignedHoverBg: 'rgba(183, 146, 160, 0.50)',
+  unassignedHoverBg: 'rgba(183, 146, 160, 0.95)',
   unassignedSelectedBg: '#C48098',
 
   assignedDefaultBg: 'rgba(162, 12, 64, 0.74)',
@@ -390,7 +390,7 @@ const TemplateViewer: React.FC<Props> = ({
                 py: '0px',
                 borderRadius: '6px',
                 fontSize: '14px',
-                fontWeight: 600,
+                fontWeight: 500,
                 fontFamily: 'Poppins',
                 cursor: 'pointer',
                 display: 'inline-flex',

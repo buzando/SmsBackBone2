@@ -15,7 +15,7 @@ const VARIABLE_PLACEHOLDER = 'Variable';
 const CHIP_STYLES = {
   // Sin asignar
   unassignedDefaultBg: 'rgba(123, 53, 77, 0.50)',
-  unassignedHoverBg: 'rgba(183, 146, 160, 0.50)',
+  unassignedHoverBg: 'rgba(183, 146, 160, 0.90)',
   unassignedSelectedBg: '#C48098',
 
   // Asignada
@@ -71,13 +71,24 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     return value.length > 0 && value !== VARIABLE_PLACEHOLDER;
   }
 
-  function setCloseVisibility(closeWrapper: HTMLElement | null, visible: boolean) {
+  function setCloseVisibility(
+    closeWrapper: HTMLElement | null,
+    center: HTMLElement,
+    visible: boolean
+  ) {
     if (!closeWrapper) return;
 
+    const hasText = (center.textContent || '').trim().length > 0;
+
+    if (!hasText) {
+      closeWrapper.style.display = 'none';
+      return;
+    }
+
+    closeWrapper.style.display = 'inline-flex';
     closeWrapper.style.opacity = visible ? '1' : '0';
     closeWrapper.style.visibility = visible ? 'visible' : 'hidden';
     closeWrapper.style.pointerEvents = visible ? 'auto' : 'none';
-    closeWrapper.style.display = 'inline-flex';
   }
 
   function applyChipVisualState(
@@ -93,7 +104,11 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.borderWidth = '1px';
 
     // La X aparece solo en hover, aunque sea {{Variable}}
-    setCloseVisibility(closeWrapper, state === 'hover');
+    //setCloseVisibility(closeWrapper, center, state === 'hover');
+    //Se muestra siempre con texto
+    const hasText = (center.textContent || '').trim().length > 0;
+    setCloseVisibility(closeWrapper, center, hasText);
+
 
     // Selected / por asignar
     if (state === 'selected' && !assigned) {
@@ -208,7 +223,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     chip.style.margin = '0 3px 6px 3px';
     chip.style.fontFamily = 'Poppins';
     chip.style.fontSize = '14px';
-    chip.style.fontWeight = '600';
+    chip.style.fontWeight = '500';
     chip.style.color = '#FFFFFF';
     chip.style.userSelect = 'none';
     chip.style.cursor = 'pointer';
@@ -226,10 +241,10 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     const center = document.createElement('span');
     center.setAttribute('data-chip-text', 'true');
     center.contentEditable = 'true';
-    center.textContent = sanitizeVar(initialValue) || VARIABLE_PLACEHOLDER;
+    center.textContent = sanitizeVar(initialValue);
     center.style.outline = 'none';
     center.style.userSelect = 'text';
-    center.style.minWidth = '28px';
+    center.style.minWidth = '3px';
     center.style.textAlign = 'center';
     center.style.fontFamily = 'Poppins';
 
@@ -263,39 +278,25 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     closeIcon.style.height = '18px';
     closeIcon.style.pointerEvents = 'none';
 
-    const removeChip = (e: MouseEvent) => {
+    const clearChip = (e: MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
-      const previous = chip.previousSibling;
-      const next = chip.nextSibling;
+      center.textContent = '';
 
-      chip.remove();
-
-      // Limpia espacios invisibles alrededor del chip
-      if (
-        previous?.nodeType === Node.TEXT_NODE &&
-        previous.textContent === '\u00A0'
-      ) {
-        previous.remove();
-      }
-
-      if (
-        next?.nodeType === Node.TEXT_NODE &&
-        next.textContent === '\u00A0'
-      ) {
-        next.remove();
-      }
-
+      refreshChipStyle();
       updateRawMessage();
+      focusChipText();
     };
+
+    closeWrapper.addEventListener('click', clearChip);
 
     closeWrapper.addEventListener('mousedown', (e) => {
       e.preventDefault();
       e.stopPropagation();
     });
 
-    closeWrapper.addEventListener('click', removeChip);
+    //closeWrapper.addEventListener('click', clearChip);
 
     closeWrapper.appendChild(closeIcon);
     chip.append(textWrapper, closeWrapper);
@@ -344,10 +345,6 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
     });
 
     center.addEventListener('blur', () => {
-      if ((center.textContent || '').trim().length === 0) {
-        center.textContent = VARIABLE_PLACEHOLDER;
-      }
-
       refreshChipStyle();
       updateRawMessage();
     });
@@ -356,7 +353,37 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
       if (ev.key === 'Enter') {
         ev.preventDefault();
       }
+      if (
+        ev.key === 'Backspace' &&
+        (center.textContent || '').length === 0
+      ) {
+        ev.preventDefault();
+        deleteChip();
+      }
     });
+
+    const deleteChip = () => {
+      const previous = chip.previousSibling;
+      const next = chip.nextSibling;
+
+      chip.remove();
+
+      if (
+        previous?.nodeType === Node.TEXT_NODE &&
+        previous.textContent === '\u00A0'
+      ) {
+        previous.remove();
+      }
+
+      if (
+        next?.nodeType === Node.TEXT_NODE &&
+        next.textContent === '\u00A0'
+      ) {
+        next.remove();
+      }
+
+      updateRawMessage();
+    };
 
     center.addEventListener('beforeinput', (ev: any) => {
       const isInsert = ev.inputType?.startsWith('insert');
@@ -606,7 +633,7 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
       <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
         <Buttonicon
           text="Añadir variable"
-          width="200px"
+          width="202px"
           onClick={handleInsertTag}
           disabled={chipsCount >= MAX_CHIPS}
         />

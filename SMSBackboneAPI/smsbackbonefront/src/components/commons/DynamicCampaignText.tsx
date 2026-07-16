@@ -54,7 +54,9 @@ const DynamicCampaignText: React.FC<Props> = ({
 
     span.style.display = 'inline-flex';
     span.style.alignItems = 'center';
-    span.style.justifyContent = 'space-between';
+    //span.style.justifyContent = 'space-between';
+    span.style.justifyContent = 'center';
+
     span.style.background = CHIP_STYLES.assignedDefaultBg;
     span.style.border = `1px solid ${CHIP_STYLES.assignedBorder}`;
     span.style.color = '#FFFFFF';
@@ -64,7 +66,7 @@ const DynamicCampaignText: React.FC<Props> = ({
     span.style.minHeight = '30px';
     span.style.fontFamily = 'Poppins';
     span.style.fontSize = '14px';
-    span.style.fontWeight = '600';
+    span.style.fontWeight = '500';
     span.style.cursor = 'pointer';
     span.style.userSelect = 'none';
     span.style.transition =
@@ -90,85 +92,96 @@ const DynamicCampaignText: React.FC<Props> = ({
 
     textWrapper.append(left, labelNode, right);
 
-    const closeWrapper = document.createElement('span');
-    closeWrapper.contentEditable = 'false';
-    closeWrapper.style.width = '18px';
-    closeWrapper.style.minWidth = '18px';
-    closeWrapper.style.height = '18px';
-    closeWrapper.style.marginLeft = '8px';
-    closeWrapper.style.display = 'inline-flex';
-    closeWrapper.style.alignItems = 'center';
-    closeWrapper.style.justifyContent = 'center';
-    closeWrapper.style.cursor = 'pointer';
-    closeWrapper.style.opacity = '0';
-    closeWrapper.style.visibility = 'hidden';
-    closeWrapper.style.pointerEvents = 'none';
-    closeWrapper.style.transition = 'opacity 0.15s ease';
-    closeWrapper.style.position = 'relative';
-    closeWrapper.style.zIndex = '2';
+    // const closeWrapper = document.createElement('span');
+    // closeWrapper.contentEditable = 'false';
+    // closeWrapper.style.width = '18px';
+    // closeWrapper.style.minWidth = '18px';
+    // closeWrapper.style.height = '18px';
+    // closeWrapper.style.marginLeft = '8px';
+    // closeWrapper.style.display = 'inline-flex';
+    // closeWrapper.style.alignItems = 'center';
+    // closeWrapper.style.justifyContent = 'center';
+    // closeWrapper.style.cursor = 'pointer';
+    // closeWrapper.style.opacity = '0';
+    // closeWrapper.style.visibility = 'hidden';
+    // closeWrapper.style.pointerEvents = 'none';
+    // closeWrapper.style.transition = 'opacity 0.15s ease';
+    // closeWrapper.style.position = 'relative';
+    // closeWrapper.style.zIndex = '2';
 
-    const closeIcon = document.createElement('img');
-    closeIcon.src = IconCloseRedN;
-    closeIcon.alt = 'Eliminar';
-    closeIcon.draggable = false;
-    closeIcon.contentEditable = 'false';
-    closeIcon.style.width = '18px';
-    closeIcon.style.height = '18px';
-    closeIcon.style.pointerEvents = 'none';
+    // const closeIcon = document.createElement('img');
+    // closeIcon.src = IconCloseRedN;
+    // closeIcon.alt = 'Eliminar';
+    // closeIcon.draggable = false;
+    // closeIcon.contentEditable = 'false';
+    // closeIcon.style.width = '18px';
+    // closeIcon.style.height = '18px';
+    // closeIcon.style.pointerEvents = 'none';
 
-    const removeChip = (e: MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
+    // const removeChip = (e: MouseEvent) => {
+    //   e.preventDefault();
+    //   e.stopPropagation();
 
-      const previous = span.previousSibling;
-      const next = span.nextSibling;
+    //   const previous = span.previousSibling;
+    //   const next = span.nextSibling;
 
-      span.remove();
+    //   span.remove();
 
-      // Limpia espacios invisibles alrededor
-      if (
-        previous?.nodeType === Node.TEXT_NODE &&
-        previous.textContent === '\u00A0'
-      ) {
-        previous.remove();
-      }
+    //   // Limpia espacios invisibles alrededor
+    //   if (
+    //     previous?.nodeType === Node.TEXT_NODE &&
+    //     previous.textContent === '\u00A0'
+    //   ) {
+    //     previous.remove();
+    //   }
 
-      if (
-        next?.nodeType === Node.TEXT_NODE &&
-        next.textContent === '\u00A0'
-      ) {
-        next.remove();
-      }
+    //   if (
+    //     next?.nodeType === Node.TEXT_NODE &&
+    //     next.textContent === '\u00A0'
+    //   ) {
+    //     next.remove();
+    //   }
 
-      updateRawText();
-    };
+    //   updateRawText();
+    // };
 
-    closeWrapper.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
+    // closeWrapper.addEventListener('mousedown', (e) => {
+    //   e.preventDefault();
+    //   e.stopPropagation();
+    // });
 
-    closeWrapper.addEventListener('click', removeChip);
+    // closeWrapper.addEventListener('click', removeChip);
 
-    closeWrapper.appendChild(closeIcon);
-    span.append(textWrapper, closeWrapper);
+    // closeWrapper.appendChild(closeIcon);
+    //span.append(textWrapper, closeWrapper);
+    span.append(textWrapper);
 
+
+    // span.addEventListener('mouseenter', () => {
+    //   span.style.background = CHIP_STYLES.assignedHoverBg;
+    //   span.style.boxShadow = CHIP_STYLES.hoverShadow;
+
+    //   closeWrapper.style.opacity = '1';
+    //   closeWrapper.style.visibility = 'visible';
+    //   closeWrapper.style.pointerEvents = 'auto';
+    // });
+
+    // span.addEventListener('mouseleave', () => {
+    //   span.style.background = CHIP_STYLES.assignedDefaultBg;
+    //   span.style.boxShadow = 'none';
+
+    //   closeWrapper.style.opacity = '0';
+    //   closeWrapper.style.visibility = 'hidden';
+    //   closeWrapper.style.pointerEvents = 'none';
+    // });
     span.addEventListener('mouseenter', () => {
       span.style.background = CHIP_STYLES.assignedHoverBg;
       span.style.boxShadow = CHIP_STYLES.hoverShadow;
-
-      closeWrapper.style.opacity = '1';
-      closeWrapper.style.visibility = 'visible';
-      closeWrapper.style.pointerEvents = 'auto';
     });
 
     span.addEventListener('mouseleave', () => {
       span.style.background = CHIP_STYLES.assignedDefaultBg;
       span.style.boxShadow = 'none';
-
-      closeWrapper.style.opacity = '0';
-      closeWrapper.style.visibility = 'hidden';
-      closeWrapper.style.pointerEvents = 'none';
     });
 
     return span;

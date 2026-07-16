@@ -95,7 +95,7 @@ const DynamicMessageEditText: React.FC<Props> = ({ value, onChange, maxChars = 1
         }}
       />
       <Typography variant="body2" sx={{ mt: 1, color: '#5A3D42', fontFamily: 'Poppins' }}>
-        {charCount}/{maxChars} caracteres para que el mensaje se realice en un sólo envío.
+        {charCount}/{maxChars} caracterra que el mensaje se reaes palice en un sólo envío.
       </Typography>
     </Box>
   );
