@@ -123,14 +123,15 @@ namespace Business
         public async Task<bool> SimulateSmsDispatch(List<int> Campaigns)
         {
             var clientacces = new ClientAccess();
+
             try
             {
                 var campaigns = GetLightCampaigns(Campaigns);
+
                 campaigns = campaigns
-    .GroupBy(c => c.CampaignId)
-    .Select(g => g.First())
-    .ToList();
-                var rnd = new Random();
+                    .GroupBy(c => c.CampaignId)
+                    .Select(g => g.First())
+                    .ToList();
 
                 var now = DateTime.Now;
 
@@ -151,34 +152,41 @@ namespace Business
                 var tasks = validCampaigns.Select(async campaign =>
                 {
                     await throttler.WaitAsync();
+
                     try
                     {
                         var test = bool.TryParse(Common.ConfigurationManagerJson("QA"), out bool d) ? d : false;
 
                         string token = null;
+
                         if (!test)
                         {
                             using (var ctx = new Entities())
                             {
-                                clientacces = ctx.Client_Access.Where(x => x.client_id == campaign.ClientId).FirstOrDefault();
+                                clientacces = ctx.Client_Access
+                                    .FirstOrDefault(x => x.client_id == campaign.ClientId);
                             }
+
                             if (clientacces == null)
                             {
                                 _logger.Error($"❌ No se encontró acceso para el cliente con ID {campaign.ClientId} en campaña {campaign.CampaignId}.");
                                 return;
                             }
+
                             var pssw = ClientAccessManager.Decrypt(clientacces.password);
                             var loginResult = await new ApiBackBoneManager().LoginResponse(clientacces.username, pssw);
+
                             if (loginResult == null)
                             {
                                 _logger.Error($"❌ Login fallido para la campaña {campaign.Name}");
                                 return;
                             }
+
                             var creditResponse = await new ApiBackBoneManager().GetOwnCredit(loginResult.token);
                             int credit = JObject.Parse(creditResponse)["credit"].Value<int>();
+
                             if (decimal.TryParse(credit.ToString(), out var apiCredit))
                             {
-
                                 if (apiCredit <= 0)
                                 {
                                     _logger.Info($"⚠️ Crédito insuficiente en API para la campaña {campaign.Name}: {apiCredit} créditos.");
@@ -190,15 +198,19 @@ namespace Business
                                 _logger.Error($"❌ Error al interpretar el crédito del API para la campaña {campaign.Name}: '{creditResponse}'");
                                 return;
                             }
+
                             token = loginResult.token;
                         }
+
                         using (var ctx = new Entities())
                         {
                             var notif = ctx.AmountNotification.FirstOrDefault(x => x.IdRoom == campaign.RoomId);
                             var actualrooms = ctx.Rooms.FirstOrDefault(x => x.id == campaign.RoomId);
-                            if (notif != null)
+
+                            if (notif != null && actualrooms != null)
                             {
                                 bool isShort = campaign.NumberType == 1;
+
                                 decimal currentBalance = isShort
                                     ? Convert.ToDecimal(actualrooms.short_sms)
                                     : Convert.ToDecimal(actualrooms.long_sms);
@@ -217,18 +229,21 @@ namespace Business
                                     {
                                         MailManager.SendEmail(email, $"⚠️ Alerta de saldo bajo en sala {campaign.RoomName}", mensaje);
                                     }
+
                                     return;
                                 }
                             }
+
                             var sentIds = new HashSet<int>(
-    ctx.CampaignContactScheduleSend
-       .Where(s => s.CampaignId == campaign.CampaignId
-                && s.ScheduleId == campaign.ScheduleId)
-       .Select(s => s.ContactId)
-       .ToList()
-);
+                                ctx.CampaignContactScheduleSend
+                                   .Where(s => s.CampaignId == campaign.CampaignId
+                                            && s.ScheduleId == campaign.ScheduleId)
+                                   .Select(s => s.ContactId)
+                                   .ToList()
+                            );
 
                             var chuncks = int.TryParse(Common.ConfigurationManagerJson("CantidadDeChunks"), out int c) ? c : 50;
+
                             campaign.Contacts = campaign.Contacts
                                 .GroupBy(x => x.Id)
                                 .Select(g => g.First())
@@ -238,18 +253,23 @@ namespace Business
                                 .GroupBy(x => x.PhoneNumber)
                                 .Select(g => g.First())
                                 .ToList();
+
                             var chunks = campaign.Contacts.Chunk(chuncks);
 
                             foreach (var chunk in chunks)
                             {
-
                                 if (!IsWithinSchedule(campaign.StartDateTime, campaign.EndDateTime))
                                 {
                                     _logger.Error($"⏰ Fuera del horario para enviar mensajes de la campaña {campaign.Name}");
                                     break;
                                 }
+
                                 var messagesToSend = new List<MessageToSend>();
                                 var preparedContactIds = new HashSet<int>();
+
+                                // Guarda la zona resuelta para reutilizarla al registrar CampaignContactScheduleSend.
+                                var timeZoneByRegistryClient = new Dictionary<string, TimeZoneResolveResult>();
+
                                 foreach (var contact in chunk)
                                 {
                                     if (sentIds.Contains(contact.Id))
@@ -257,11 +277,11 @@ namespace Business
                                         _logger.Info($"↩️ [Skip] Ya registrado en send: Campaña {campaign.CampaignId} | ContactoId {contact.Id}");
                                         continue;
                                     }
+
                                     if (!preparedContactIds.Add(contact.Id))
                                         continue;
-                                    var lada = "";
-                                    var ladaRecord = new IFTLadas();
-                                    string estado = "";
+
+                                    string estado = "Desconocido";
 
                                     var blacklistids = ctx.blacklistcampains
                                         .Where(x => x.idcampains == campaign.CampaignId)
@@ -275,17 +295,11 @@ namespace Business
 
                                         if (isBlacklisted)
                                         {
-                                            // Guardamos el intento con status 6 sin enviar
-                                            lada = contact.PhoneNumber.Substring(0, 2);
-                                            ladaRecord = ctx.IFTLadas.FirstOrDefault(l => l.ClaveLada == lada);
+                                            // No validamos horario: está en blacklist y NO se va a enviar.
+                                            var zipCode = GetZipCodeFromContact(contact);
+                                            var timeZoneResult = ResolveContactTimeZone(ctx, zipCode, contact.PhoneNumber);
 
-                                            if (ladaRecord == null && contact.PhoneNumber.Length >= 3)
-                                            {
-                                                lada = contact.PhoneNumber.Substring(0, 3);
-                                                ladaRecord = ctx.IFTLadas.FirstOrDefault(l => l.ClaveLada == lada);
-                                            }
-
-                                            estado = ladaRecord?.Estado ?? "Desconocido";
+                                            estado = timeZoneResult.State ?? "Desconocido";
 
                                             ctx.CampaignContactScheduleSend.Add(new CampaignContactScheduleSend
                                             {
@@ -297,102 +311,124 @@ namespace Business
                                                 ResponseMessage = null,
                                                 State = estado
                                             });
+
                                             sentIds.Add(contact.Id);
                                             continue;
                                         }
                                     }
-                                    lada = contact.PhoneNumber.Substring(0, 2);
-                                    ladaRecord = ctx.IFTLadas.FirstOrDefault(l => l.ClaveLada == lada);
 
-                                    if (ladaRecord == null && contact.PhoneNumber.Length >= 3)
+                                    // 1. Resolver zona horaria:
+                                    //    - Si Misc02 trae CP válido, el SP usa PostalCode.
+                                    //    - Si no trae CP, el SP usa PhoneSeries.
+                                    var contactZipCode = GetZipCodeFromContact(contact);
+                                    var contactTimeZone = ResolveContactTimeZone(ctx, contactZipCode, contact.PhoneNumber);
+
+                                    if (contactTimeZone.TimeZoneSource == "Unknown" ||
+                                        !contactTimeZone.WinterTimeDifference.HasValue)
                                     {
-                                        lada = contact.PhoneNumber.Substring(0, 3);
-                                        ladaRecord = ctx.IFTLadas.FirstOrDefault(l => l.ClaveLada == lada);
+                                        _logger.Info(
+                                            $"⛔ {contact.PhoneNumber} sin zona horaria resuelta. " +
+                                            $"CP: {contactZipCode ?? "NULL"}"
+                                        );
+
+                                        continue;
                                     }
 
-                                    estado = ladaRecord?.Estado ?? "Desconocido";
-                                    if (!string.IsNullOrEmpty(estado))
+                                    estado = contactTimeZone.State ?? "Desconocido";
+
+                                    // 2. Validar horario local.
+                                    var horaLocal = DateTime.UtcNow.AddHours((double)contactTimeZone.WinterTimeDifference.Value);
+                                    var hora = horaLocal.TimeOfDay;
+
+                                    if (hora < HorarioInicio || hora > HorarioFin)
                                     {
-                                        var horaLocal = TimeZoneHelper.GetHoraLocal(estado);
-                                        if (horaLocal.HasValue)
-                                        {
-                                            var hora = horaLocal.Value.TimeOfDay;
-                                            if (hora < HorarioInicio || hora > HorarioFin)
-                                            {
-                                                _logger.Info($"⛔ {contact.PhoneNumber} fuera de horario (local {hora}, estado {estado})");
-                                                continue;
-                                            }
-                                        }
+                                        _logger.Info(
+                                            $"⛔ {contact.PhoneNumber} fuera de horario " +
+                                            $"(local {hora}, estado {estado}, zona {contactTimeZone.TimeZoneName}, " +
+                                            $"source {contactTimeZone.TimeZoneSource}, CP {contactZipCode ?? "NULL"})"
+                                        );
+
+                                        continue;
                                     }
+
                                     var FormatMessage = PersonalizeMessage(campaign.Message, contact);
+
                                     if (campaign.ShouldShortenUrls || campaign.shortenUrls)
                                     {
                                         FormatMessage = ShortenUrlsIfNeeded(FormatMessage, campaign.ShouldShortenUrls);
                                     }
 
-                                    // === Configuración de tipo de número y flash ===
-                                    // 1 = corto, 2 = largo (ajusta si tu tabla usa otro esquema)
                                     string senderType = campaign.NumberType == 1 ? "shortcode" : "longcode";
 
-                                    // El flash solo aplica si es número corto
                                     int encoding = (campaign.NumberType == 1 && campaign.FlashMessage) ? 1 : 0;
+
                                     if (campaign.FlashMessage)
                                     {
-
                                         encoding = 5;
                                     }
+
+                                    var registryClient = contact.Id.ToString();
 
                                     messagesToSend.Add(new MessageToSend
                                     {
                                         phoneNumber = contact.PhoneNumber,
                                         text = FormatMessage,
-                                        registryClient = contact.Id.ToString(),
+                                        registryClient = registryClient,
                                         encoding = encoding,
                                         senderType = senderType
                                     });
-                                    _logger.Info($"📝 [Preparado] Campaña: {campaign.CampaignId} | ContactoId: {contact.Id} | Tel: {contact.PhoneNumber} | senderType:{senderType} | encoding:{encoding}");
+
+                                    timeZoneByRegistryClient[registryClient] = contactTimeZone;
+
+                                    _logger.Info(
+                                        $"📝 [Preparado] Campaña: {campaign.CampaignId} | " +
+                                        $"ContactoId: {contact.Id} | Tel: {contact.PhoneNumber} | " +
+                                        $"Estado: {estado} | TZ: {contactTimeZone.TimeZoneName} | " +
+                                        $"Source: {contactTimeZone.TimeZoneSource} | " +
+                                        $"senderType:{senderType} | encoding:{encoding}"
+                                    );
                                 }
 
+                                if (messagesToSend.Count == 0)
+                                    continue;
+
                                 List<ApiResponse> sendResult;
+
                                 if (!test)
                                 {
                                     sendResult = await new ApiBackBoneManager().SendMessagesAsync(messagesToSend, token);
-                                    _logger.Info($"✅ [Producción] Se enviaron {sendResult.Count} mensajes reales para la campaña {campaign.Name}:\n" +
-                                                 string.Join("\n", sendResult.Select(r =>
-                                                     $"📤 ContactoId: {r.registryClient} | Tel: {r.phoneNumber} | Status: {r.status}")));
+
+                                    _logger.Info(
+                                        $"✅ [Producción] Se enviaron {sendResult.Count} mensajes reales para la campaña {campaign.Name}:\n" +
+                                        string.Join("\n", sendResult.Select(r =>
+                                            $"📤 ContactoId: {r.registryClient} | Tel: {r.phoneNumber} | Status: {r.status}"))
+                                    );
                                 }
                                 else
                                 {
                                     var rand = new Random();
+
                                     sendResult = messagesToSend.Select(msg => new ApiResponse
                                     {
                                         phoneNumber = msg.phoneNumber,
-                                        status = rand.Next(0, 6), // Simulación: status del 0 al 5
+                                        status = rand.Next(0, 6),
                                         registryClient = msg.registryClient
                                     }).ToList();
 
-                                    _logger.Info($"🧪 [Test] Se simularon {sendResult.Count} mensajes para la campaña {campaign.Name}:\n" +
-              string.Join("\n", sendResult.Select(r =>
-                  $"🧪 ContactoId: {r.registryClient} | Tel: {r.phoneNumber} | Status: {r.status}")));
-
+                                    _logger.Info(
+                                        $"🧪 [Test] Se simularon {sendResult.Count} mensajes para la campaña {campaign.Name}:\n" +
+                                        string.Join("\n", sendResult.Select(r =>
+                                            $"🧪 ContactoId: {r.registryClient} | Tel: {r.phoneNumber} | Status: {r.status}"))
+                                    );
                                 }
+
                                 double creditosConsumidos = 0;
 
-                                if (messagesToSend.Count == 0)
-                                    continue;
                                 foreach (var message in sendResult)
                                 {
-                                    var lada = message.phoneNumber.Substring(0, 2);
-                                    var ladaRecord = ctx.IFTLadas.FirstOrDefault(l => l.ClaveLada == lada);
+                                    timeZoneByRegistryClient.TryGetValue(message.registryClient, out var timeZoneResult);
 
-                                    if (ladaRecord == null && message.phoneNumber.Length >= 3)
-                                    {
-                                        lada = message.phoneNumber.Substring(0, 3);
-                                        ladaRecord = ctx.IFTLadas.FirstOrDefault(l => l.ClaveLada == lada);
-                                    }
-
-                                    string estado = ladaRecord?.Estado ?? "Desconocido";
-
+                                    string estado = timeZoneResult?.State ?? "Desconocido";
 
                                     ctx.CampaignContactScheduleSend.Add(new CampaignContactScheduleSend
                                     {
@@ -407,19 +443,24 @@ namespace Business
                                     });
 
                                     var room = ctx.Rooms.FirstOrDefault(r => r.id == campaign.RoomId);
+
                                     if (room != null)
                                     {
                                         if (message.status == 1 || message.status == 2)
                                         {
                                             if (campaign.NumberType == 1)
-                                                room.short_sms = Math.Max(0, room.short_sms - creditosConsumidos); // no bajar de 0
+                                                room.short_sms = Math.Max(0, room.short_sms - creditosConsumidos);
                                             else if (campaign.NumberType == 2)
                                                 room.long_sms = Math.Max(0, room.long_sms - creditosConsumidos);
                                         }
+
                                         if (notif != null)
                                         {
                                             bool isShort = campaign.NumberType == 1;
-                                            decimal newBalance = isShort ? Convert.ToDecimal(room.short_sms) : Convert.ToDecimal(room.long_sms);
+
+                                            decimal newBalance = isShort
+                                                ? Convert.ToDecimal(room.short_sms)
+                                                : Convert.ToDecimal(room.long_sms);
 
                                             if (newBalance <= notif.AmountValue)
                                             {
@@ -437,11 +478,11 @@ namespace Business
                                                 }
                                             }
                                         }
-
                                     }
-                                    sentIds.Add(int.Parse(message.registryClient));
 
+                                    sentIds.Add(int.Parse(message.registryClient));
                                 }
+
                                 ctx.SaveChanges();
                             }
                         }
@@ -465,6 +506,7 @@ namespace Business
                 return false;
             }
         }
+
 
 
         private bool IsWithinSchedule(DateTime startDateTime, DateTime endDateTime)
@@ -755,5 +797,73 @@ namespace Business
         }
 
 
+        private string GetZipCodeFromContact(CampaignContact contact)
+        {
+            // Por ahora tomamos Misc02 como Código Postal.
+            // Si Misc02 viene vacío o no trae 5 dígitos, regresa null y el SP usa fallback por teléfono.
+            return NormalizeZipCode(contact.Misc02);
+        }
+        private string NormalizeZipCode(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            var digits = new string(value.Trim().Where(char.IsDigit).ToArray());
+
+            return digits.Length == 5 ? digits : null;
+        }
+
+        private TimeZoneResolveResult ResolveContactTimeZone(Entities ctx, string zipCode, string phone)
+        {
+            var connection = (SqlConnection)ctx.Database.GetDbConnection();
+
+            if (connection.State != ConnectionState.Open)
+                connection.Open();
+
+            using (var cmd = new SqlCommand("dbo.spResolveContactTimeZone", connection))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@ZipCode",
+                    string.IsNullOrWhiteSpace(zipCode) ? (object)DBNull.Value : zipCode.Trim());
+
+                cmd.Parameters.AddWithValue("@Phone",
+                    string.IsNullOrWhiteSpace(phone) ? (object)DBNull.Value : phone.Trim());
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (!reader.Read())
+                    {
+                        return new TimeZoneResolveResult
+                        {
+                            TimeZoneSource = "Unknown"
+                        };
+                    }
+
+                    return new TimeZoneResolveResult
+                    {
+                        ZipCode = reader["ZipCode"] == DBNull.Value ? null : reader["ZipCode"].ToString(),
+                        State = reader["State"] == DBNull.Value ? null : reader["State"].ToString(),
+                        Municipality = reader["Municipality"] == DBNull.Value ? null : reader["Municipality"].ToString(),
+                        Location = reader["Location"] == DBNull.Value ? null : reader["Location"].ToString(),
+                        Description = reader["Description"] == DBNull.Value ? null : reader["Description"].ToString(),
+
+                        WinterTimeDifference = reader["WinterTimeDifference"] == DBNull.Value
+                            ? null
+                            : Convert.ToDecimal(reader["WinterTimeDifference"]),
+
+                        TimeZoneId = reader["tz_id"] == DBNull.Value
+                            ? null
+                            : Convert.ToInt32(reader["tz_id"]),
+
+                        TimeZoneName = reader["tz_name"] == DBNull.Value ? null : reader["tz_name"].ToString(),
+
+                        TimeZoneSource = reader["TimeZoneSource"] == DBNull.Value
+                            ? "Unknown"
+                            : reader["TimeZoneSource"].ToString()
+                    };
+                }
+            }
+        }
     }
 }

@@ -35,7 +35,7 @@ namespace Business
             var senderType = isShort ? "shortcode" : "longcode";
             var encoding = (isShort && smsRequestDto.Flash == true) ? 1 : 0;
 
-            using var context = new Entities();
+            using (var context = new Entities())
             {
                 var roomId = smsRequestDto.Room.Value;
                 var room = context.Rooms.FirstOrDefault(r => r.id == roomId);
@@ -121,7 +121,7 @@ namespace Business
                     }
 
                     if (isShort)
-                        room.short_sms -= qtyToSend;   
+                        room.short_sms -= qtyToSend;
                     else
                         room.long_sms -= qtyToSend;
 

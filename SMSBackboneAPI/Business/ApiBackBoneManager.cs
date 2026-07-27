@@ -151,39 +151,42 @@ namespace Business
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
-        public async Task<string> CreateUser(string token, string username, string password, string email, int rol, string uri)
+        public async Task<string> CreateUser(
+     string token,
+     string username,
+     string password,
+     string email,
+     int rol,
+     string uri)
         {
-            try
+            using var client = CreateAuthenticatedClient(token);
+            var url = $"{_baseUrl}user";
+
+            var newUser = new
             {
-                using var client = CreateAuthenticatedClient(token);
-                var url = $"{_baseUrl}user";
+                Username = username,
+                Password = password,
+                Email = email,
+                Rol = rol,
+                Uri = uri,
+                Account = username
+            };
 
-                var newUser = new
-                {
-                    Username = username,
-                    Password = password,
-                    Email = email,
-                    Rol = rol,
-                    Uri = uri
-                };
+            var content = new StringContent(
+                JsonSerializer.Serialize(newUser),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
 
-                var content = new StringContent(JsonSerializer.Serialize(newUser), System.Text.Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(url, content);
-                var responseContent = await response.Content.ReadAsStringAsync();
+            var response = await client.PostAsync(url, content);
+            var responseContent = await response.Content.ReadAsStringAsync();
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception($"Error {(int)response.StatusCode}: {response.ReasonPhrase}\n{responseContent}");
-                }
-
-                return responseContent;
-                return await response.Content.ReadAsStringAsync();
-            }
-            catch (Exception e)
+            if (!response.IsSuccessStatusCode)
             {
-
-                throw;
+                throw new Exception($"Error {(int)response.StatusCode}: {response.ReasonPhrase}\n{responseContent}");
             }
+
+            return responseContent;
         }
         public async Task<string> UpdateUser(string token, int id, string username, string email, string apiUrl)
         {

@@ -792,3 +792,52 @@ select * from CreditRecharge
 
 
 exec sp_getCampaignsReadyToSend 10
+
+CREATE TABLE ccTimeZones (
+    tz_id INT NOT NULL PRIMARY KEY,
+    tz_name VARCHAR(20) NOT NULL,
+    tz_offset DECIMAL(4,1) NOT NULL
+);
+
+CREATE TABLE ccTimeZoneAreaCP (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ZipCode VARCHAR(10) NOT NULL,
+    State VARCHAR(10) NOT NULL,
+    Municipality VARCHAR(20) NULL,
+    Location VARCHAR(20) NULL,
+    StartDate DATETIME NULL,
+    Description VARCHAR(100) NULL,
+    StartMonthSummerTime INT NULL,
+    StartDaySummerTime INT NULL,
+    SummerTimeDifference DECIMAL(4,1) NULL,
+    StartMonthWinterHours INT NULL,
+    StartDayWinterHours INT NULL,
+    WinterTimeDifference DECIMAL(4,1) NULL
+);
+
+CREATE INDEX IX_ccTimeZoneAreaCP_ZipCode
+ON ccTimeZoneAreaCP (ZipCode);
+
+CREATE INDEX IX_ccTimeZoneAreaCP_State
+ON ccTimeZoneAreaCP (State);
+
+CREATE TABLE ccPhoneSeriesMX (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ClaveCensal VARCHAR(20) NULL,
+    Poblacion VARCHAR(150) NULL,
+    Municipio VARCHAR(150) NULL,
+    Estado VARCHAR(10) NOT NULL,
+    Cld INT NOT NULL,
+    Serie INT NOT NULL,
+    NumeracionInicial INT NOT NULL,
+    NumeracionFinal INT NOT NULL,
+    TipoRed VARCHAR(20) NULL,
+    Modalidad VARCHAR(20) NULL,
+    RazonSocial VARCHAR(200) NULL
+);
+
+CREATE INDEX IX_ccPhoneSeriesMX_Search
+ON ccPhoneSeriesMX (Cld, Serie, NumeracionInicial, NumeracionFinal);
+
+CREATE INDEX IX_ccPhoneSeriesMX_Estado
+ON ccPhoneSeriesMX (Estado);
