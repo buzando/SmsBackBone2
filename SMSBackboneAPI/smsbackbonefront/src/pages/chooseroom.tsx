@@ -725,7 +725,7 @@ const Chooseroom: React.FC = () => {
                                 disabled={!dontAskAgain}
                                 sx={{
                                     background: "#833A53",
-                                    border: "1px solid #60293C",
+                                    border: "1px solid rgba(190, 147, 160, 0.4)",
                                     borderRadius: "4px",
                                     color: "#FFFFFF",
                                     opacity: !dontAskAgain ? 0.4 : 1,

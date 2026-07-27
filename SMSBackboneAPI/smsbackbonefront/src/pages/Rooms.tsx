@@ -1412,32 +1412,60 @@ const Rooms: React.FC = () => {
                             ¿Está seguro de que desea eliminar la sala? Esta acción no puede ser revertida.
                         </Typography>
 
-                        <Box mt={4} display="flex" gap={2.5} justifyContent={"flex-end"} >
-
-                            <Button onClick={handleCloseDeleteModal}
+                        <Box
+                            mt={4}
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                        >
+                            <Button
+                                onClick={handleCloseDeleteModal}
                                 sx={{
-                                    width: "112px", height: "32px", borderRadius: "4px", border: "transparent",
+                                    width: "112px",
+                                    height: "32px",
+                                    borderRadius: "4px",
+                                    border: "transparent",
                                     backgroundColor: "#FFFFFF",
                                     "&:hover": {
                                         backgroundColor: "#F2E9EC",
                                     },
                                 }}
                             >
-                                <Typography sx={{ fontFamily: "Poppins", color: "#833A53", fontSize: "14px", fontWeight: 600, letterSpacing: "1.12px" }}>
+                                <Typography
+                                    sx={{
+                                        fontFamily: "Poppins",
+                                        color: "#833A53",
+                                        fontSize: "14px",
+                                        fontWeight: 600,
+                                        letterSpacing: "1.12px",
+                                    }}
+                                >
                                     CANCELAR
                                 </Typography>
                             </Button>
 
-                            <Button onClick={handleDeleteRoom}
+                            <Button
+                                onClick={handleDeleteRoom}
                                 sx={{
-                                    width: "92px", height: "32px", borderRadius: "4px", border: "transparent",
+                                    width: "92px",
+                                    height: "32px",
+                                    borderRadius: "4px",
+                                    border: "transparent",
                                     backgroundColor: "#FFFFFF",
                                     "&:hover": {
                                         backgroundColor: "#F2E9EC",
                                     },
                                 }}
                             >
-                                <Typography sx={{ fontFamily: "Poppins", color: "#833A53", fontSize: "14px", fontWeight: 600, letterSpacing: "1.12px" }}>
+                                <Typography
+                                    sx={{
+                                        fontFamily: "Poppins",
+                                        color: "#833A53",
+                                        fontSize: "14px",
+                                        fontWeight: 600,
+                                        letterSpacing: "1.12px",
+                                    }}
+                                >
                                     ELIMINAR
                                 </Typography>
                             </Button>
@@ -1482,7 +1510,16 @@ const Rooms: React.FC = () => {
                             <Button
                                 variant="contained"
                                 onClick={handleCloseErrorModal}
-                                sx={{ backgroundColor: "#A05B71", color: "#fff" }}
+                                sx={{
+                                    width: "92px",
+                                    height: "32px",
+                                    borderRadius: "4px",
+                                    border: "transparent",
+                                    backgroundColor: "#FFFFFF",
+                                    "&:hover": {
+                                        backgroundColor: "#F2E9EC",
+                                    },
+                                }}
                             >
                                 Cerrar
                             </Button>

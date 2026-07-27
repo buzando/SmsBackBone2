@@ -10,6 +10,7 @@ import Box from '@mui/material/Box';
 import SecondaryButton from '../components/commons/SecondaryButton'
 import MainButton from '../components/commons/MainButton'
 import IconButton from '@mui/material/IconButton';
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CloseIcon from '@mui/icons-material/Close';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -536,6 +537,7 @@ const BlackList: React.FC = () => {
 
             if (response.status === 200) {
                 setBlackList(response.data);
+                setAllRows(response.data);
             }
         } catch (error) {
             setTitleErrorModal("Error al cargar listas negras");
@@ -891,6 +893,7 @@ const BlackList: React.FC = () => {
     };
     const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.checked) {
+            console.log(allRows);
             setSelectedRows(allRows);
         } else {
             setSelectedRows([]);
@@ -1471,7 +1474,7 @@ const BlackList: React.FC = () => {
                                     {selectedRows.length === 0 ? (
                                         <tr style={{ backgroundColor: '#FFFFFF', textAlign: 'left', width: '100%' }}>
                                             <th style={{ padding: '5px', position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
-                                                <Box sx={{ marginLeft: "6px" }}>
+                                                <Box sx={{ marginLeft: "6px" }}> {/*Checkbox para encabezado*/}
                                                     <Checkbox
                                                         checked={isAllSelected}
                                                         indeterminate={isIndeterminate}
@@ -1501,7 +1504,9 @@ const BlackList: React.FC = () => {
                                             </th>
                                         </tr>
                                     ) : (
-                                        <tr style={{}}>
+                                        <tr style={{
+
+                                        }}>
                                             <th
                                                 colSpan={6}
                                                 style={{
@@ -1589,7 +1594,7 @@ const BlackList: React.FC = () => {
                                                                 {
                                                                     name: 'offset',
                                                                     options: {
-                                                                        offset: [0, -12]
+                                                                        offset: [0, -10]
                                                                     }
                                                                 }
                                                             ]
@@ -1608,7 +1613,7 @@ const BlackList: React.FC = () => {
                                 <tbody>
                                     {currentItems.map((black) => (
                                         <tr key={black.id} style={{ borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #E0E0E0' }}>
-                                            <td style={{ padding: '0px', width: "4.5%" }}>
+                                            <td style={{ padding: '0px', width: "4.6%" }}>
                                                 <Box sx={{ marginLeft: "10px" }}>
                                                     <Checkbox
                                                         checked={selectedRows.some(r => r.id === black.id)}
@@ -2457,36 +2462,55 @@ const BlackList: React.FC = () => {
                             <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#330F1B', mb: 1 }}>
                                 Fecha de expiración (opcional)
                             </Typography>
-                            <Box
-                                onClick={(e) => {
-                                    setAnchorEl(e.currentTarget);
-                                    setDatePickerOpen(true);
+                            <TextField
+                                variant="outlined"
+                                value={
+                                    formData.ExpirationDate
+                                        ? formData.ExpirationDate.toLocaleString('es-MX', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })
+                                        : '00/00/00 00:00'
+                                }
+                                InputProps={{
+                                    readOnly: true,
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={(e) => {
+                                                    setAnchorEl(e.currentTarget);
+                                                    setDatePickerOpen(true);
+                                                }}
+                                                size="small"
+                                                sx={{ padding: 0 }}
+                                            >
+                                                <CalendarTodayIcon
+                                                    sx={{
+                                                        width: "15px",
+                                                        height: "15px",
+                                                        color: "#8F4D63"
+                                                    }}
+                                                />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
                                 }}
                                 sx={{
                                     width: '340px',
-                                    height: '54px',
-                                    border: '1px solid #574B4F66',
-                                    borderRadius: '4px',
-                                    padding: '10px 12px',
-                                    fontSize: '14px',
-                                    fontFamily: 'Poppins',
-                                    color: '#574B4F',
-                                    backgroundColor: '#fff',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center'
+                                    '& .MuiInputBase-input': {
+                                        fontFamily: 'Poppins',
+                                        fontSize: '14px',
+                                        color: '#574B4F',
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '54px',
+                                        backgroundColor: '#FFFFFF',
+                                    }
                                 }}
-                            >
-                                {formData.ExpirationDate
-                                    ? formData.ExpirationDate.toLocaleString('es-MX', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                    })
-                                    : '00/00/00 00:00'}
-                            </Box>
+                            />
 
                             {/* Popper personalizado */}
                             {datePickerOpen && anchorEl && (
@@ -2700,36 +2724,57 @@ const BlackList: React.FC = () => {
                             Fecha de expiración (opcional)
                         </Typography>
                         <Box>
-                            <Box
-                                onClick={(e) => {
-                                    setAnchorEl(e.currentTarget);
-                                    setDatePickerOpen(true);
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                placeholder="Selecciona fecha y hora"
+                                value={
+                                    formData.ExpirationDate
+                                        ? formData.ExpirationDate.toLocaleString('es-MX', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })
+                                        : ''
+                                }
+                                InputProps={{
+                                    readOnly: true,
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={(e) => {
+                                                    setAnchorEl(e.currentTarget);
+                                                    setDatePickerOpen(true);
+                                                }}
+                                                size="small"
+                                                sx={{ padding: 0 }}
+                                            >
+                                                <CalendarTodayIcon
+                                                    sx={{
+                                                        width: "15px",
+                                                        height: "15px",
+                                                        color: "#8F4D63"
+                                                    }}
+                                                />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
                                 }}
                                 sx={{
                                     width: '100%',
-                                    height: '54px',
-                                    border: '1px solid #D9B4C3',
-                                    borderRadius: '4px',
-                                    padding: '10px 12px',
-                                    fontSize: '14px',
-                                    fontFamily: 'Poppins',
-                                    color: '#574B4F',
-                                    backgroundColor: '#fff',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center'
+                                    '& .MuiInputBase-input': {
+                                        fontFamily: 'Poppins',
+                                        fontSize: '14px',
+                                        color: '#574B4F',
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '54px',
+                                        backgroundColor: '#FFFFFF',
+                                    }
                                 }}
-                            >
-                                {formData.ExpirationDate
-                                    ? formData.ExpirationDate.toLocaleString('es-MX', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    })
-                                    : 'Selecciona fecha y hora'}
-                            </Box>
+                            />
 
                             {datePickerOpen && anchorEl && (
                                 <CustomDateTimePicker
@@ -2752,7 +2797,7 @@ const BlackList: React.FC = () => {
                                         {
                                             name: 'offset',
                                             options: {
-                                                offset: [0, -380],
+                                                offset: [-480, -180],
                                             },
                                         },
                                     ]}
@@ -2793,7 +2838,7 @@ const BlackList: React.FC = () => {
                 </Box>
             </Modal>
 
-            <Modal open={isInspectModalOpen} onClose={() => setIsInspectModalOpen(false)}>
+            <Modal open={isInspectModalOpen} disableEscapeKeyDown onClose={(_, reason) => { if (reason !== "backdropClick") { setIsInspectModalOpen(false); } }}>
                 <Box sx={{
                     position: 'absolute',
                     marginTop: '60px',
@@ -2818,7 +2863,7 @@ const BlackList: React.FC = () => {
                         }}>
                             Inspeccionar lista negra
                         </Typography>
-                        <IconButton onClick={() => setIsInspectModalOpen(false)}
+                        <IconButton onClick={() => { setCampaignSearch(""); setInspectSearch(""); setIsInspectModalOpen(false); }}
                             sx={{ position: 'absolute', marginTop: "-40px", marginLeft: '472px' }}>
                             <img
                                 src={IconCloseModal}
@@ -2885,35 +2930,41 @@ const BlackList: React.FC = () => {
                                 justifyContent: 'flex-start',
                                 width: "490px", height: "70px", gap: 4, ml: -0.1,
                             }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: 3 }}>
-                                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#574B4F', minWidth: '80px' }}>
-                                        {Math.min(campaignPage * 50 - 49, campaignData.length)}–{Math.min(campaignPage * 50, campaignData.length)} de {campaignData.length}
-                                    </Typography>
+                                {campaignData
+                                    .filter(c =>
+                                        c.campainName.toLowerCase().includes(campaignSearch.toLowerCase())
+                                    ).length > 0 && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: 3 }}>
+                                            <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#574B4F', minWidth: '80px' }}>
+                                                {Math.min(campaignPage * 50 - 49, campaignData.length)}–{Math.min(campaignPage * 50, campaignData.length)} de {campaignData.length}
+                                            </Typography>
 
-                                    {/* Flechas */}
-                                    <IconButton onClick={() => setCampaignPage(1)} disabled={campaignPage === 1} sx={{ p: 0 }}>
-                                        <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22 }} />
-                                        <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22, marginLeft: '-16px' }} />
-                                    </IconButton>
+                                            {/* Flechas */}
+                                            <IconButton onClick={() => setCampaignPage(1)} disabled={campaignPage === 1} sx={{ p: 0 }}>
+                                                <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22 }} />
+                                                <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22, marginLeft: '-16px' }} />
+                                            </IconButton>
 
-                                    <IconButton onClick={() => setCampaignPage(prev => Math.max(prev - 1, 1))} disabled={campaignPage === 1} sx={{ p: 0 }}>
-                                        <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22 }} />
-                                    </IconButton>
+                                            <IconButton onClick={() => setCampaignPage(prev => Math.max(prev - 1, 1))} disabled={campaignPage === 1} sx={{ p: 0 }}>
+                                                <img src={campaignPage === 1 ? backarrowD : backarrow} style={{ transform: 'rotate(0deg)', width: 22 }} />
+                                            </IconButton>
 
-                                    <IconButton onClick={() => setCampaignPage(prev => prev + 1)} disabled={campaignPage * 50 >= campaignData.length} sx={{ p: 0 }}>
-                                        <img src={campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22 }} />
-                                    </IconButton>
+                                            <IconButton onClick={() => setCampaignPage(prev => prev + 1)} disabled={campaignPage * 50 >= campaignData.length} sx={{ p: 0 }}>
+                                                <img src={campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22 }} />
+                                            </IconButton>
 
-                                    <IconButton onClick={() => setCampaignPage(Math.ceil(campaignData.length / 50))} disabled={campaignPage * 50 >= campaignData.length} sx={{ p: 0 }}>
-                                        <img src={campaignData.length === 0 || campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22 }} />
-                                        <img src={campaignData.length === 0 || campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22, marginLeft: '-16px' }} />
-                                    </IconButton>
-                                </Box>
-
+                                            <IconButton onClick={() => setCampaignPage(Math.ceil(campaignData.length / 50))} disabled={campaignPage * 50 >= campaignData.length} sx={{ p: 0 }}>
+                                                <img src={campaignData.length === 0 || campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22 }} />
+                                                <img src={campaignData.length === 0 || campaignPage * 50 >= campaignData.length ? backarrowD : backarrow} style={{ transform: 'rotate(180deg)', width: 22, marginLeft: '-16px' }} />
+                                            </IconButton>
+                                        </Box>
+                                    )}
                                 <Box
                                     display="flex"
                                     alignItems="center"
                                     sx={{
+                                        ml: 'auto',
+                                        marginRight: '36px',
                                         backgroundColor: "#FFFFFF",
                                         border: campaignSearch ? "1px solid #7B354D" : "1px solid #9B9295",
                                         borderRadius: "4px",
@@ -2956,13 +3007,18 @@ const BlackList: React.FC = () => {
                             </Box>
 
                             {/* Tabla o mensaje vacío */}
-                            <Box sx={{ flex: 1, overflowY: 'auto' }}>
+                            <Box sx={{
+                                flex: 1,
+                                overflowY: 'auto',
+                                border: '1px solid transparent',
+                                maxHeight: "300px",
+                            }}>
                                 {campaignData.filter(c => c.campainName.toLowerCase().includes(campaignSearch.toLowerCase()))
                                     .slice((campaignPage - 1) * 50, campaignPage * 50).length === 0 ? (
                                     <Box
                                         sx={{
                                             width: '100%',
-                                            height: '300px',
+                                            height: '296px',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
@@ -3043,76 +3099,80 @@ const BlackList: React.FC = () => {
                                 justifyContent: 'flex-start',
                                 width: "490px", height: "70px", gap: 4, ml: -0.1,
                             }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: 3 }}>
-                                    <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#574B4F', minWidth: '80px' }}>
-                                        {Math.min(inspectPage * 50 - 49, inspectData.length)}–{Math.min(inspectPage * 50, inspectData.length)} de {inspectData.length}
-                                    </Typography>
+                                {inspectData.filter((d) => d.phone.includes(inspectSearch)).length > 0 && (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: 3 }}>
+                                        <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#574B4F', minWidth: '80px' }}>
+                                            {Math.min(inspectPage * 50 - 49, inspectData.length)}–{Math.min(inspectPage * 50, inspectData.length)} de {inspectData.length}
+                                        </Typography>
 
-                                    {/* Flechas */}
-                                    <IconButton
-                                        onClick={() => setInspectPage(1)}
-                                        disabled={inspectPage === 1}
-                                        sx={{ p: 0 }}
-                                    >
-                                        <img
-                                            src={inspectPage === 1 ? backarrowD : backarrow}
-                                            style={{ transform: 'rotate(0deg)', width: 22 }}
-                                            alt="Primera página"
-                                        />
-                                        <img
-                                            src={inspectPage === 1 ? backarrowD : backarrow}
-                                            style={{ transform: 'rotate(0deg)', width: 22, marginLeft: '-16px' }}
-                                            alt=""
-                                        />
-                                    </IconButton>
+                                        {/* Flechas */}
+                                        <IconButton
+                                            onClick={() => setInspectPage(1)}
+                                            disabled={inspectPage === 1}
+                                            sx={{ p: 0 }}
+                                        >
+                                            <img
+                                                src={inspectPage === 1 ? backarrowD : backarrow}
+                                                style={{ transform: 'rotate(0deg)', width: 22 }}
+                                                alt="Primera página"
+                                            />
+                                            <img
+                                                src={inspectPage === 1 ? backarrowD : backarrow}
+                                                style={{ transform: 'rotate(0deg)', width: 22, marginLeft: '-16px' }}
+                                                alt=""
+                                            />
+                                        </IconButton>
 
-                                    <IconButton
-                                        onClick={() => setInspectPage(prev => Math.max(prev - 1, 1))}
-                                        disabled={inspectPage === 1}
-                                        sx={{ p: 0 }}
-                                    >
-                                        <img
-                                            src={inspectPage === 1 ? backarrowD : backarrow}
-                                            style={{ transform: 'rotate(0deg)', width: 22 }}
-                                            alt="Anterior"
-                                        />
-                                    </IconButton>
+                                        <IconButton
+                                            onClick={() => setInspectPage(prev => Math.max(prev - 1, 1))}
+                                            disabled={inspectPage === 1}
+                                            sx={{ p: 0 }}
+                                        >
+                                            <img
+                                                src={inspectPage === 1 ? backarrowD : backarrow}
+                                                style={{ transform: 'rotate(0deg)', width: 22 }}
+                                                alt="Anterior"
+                                            />
+                                        </IconButton>
 
-                                    <IconButton
-                                        onClick={() => setInspectPage(prev => prev + 1)}
-                                        disabled={inspectPage * 50 >= inspectData.length}
-                                        sx={{ p: 0 }}
-                                    >
-                                        <img
-                                            src={inspectPage * 50 >= inspectData.length ? backarrowD : backarrow}
-                                            style={{ transform: 'rotate(180deg)', width: 22 }}
-                                            alt="Siguiente"
-                                        />
-                                    </IconButton>
+                                        <IconButton
+                                            onClick={() => setInspectPage(prev => prev + 1)}
+                                            disabled={inspectPage * 50 >= inspectData.length}
+                                            sx={{ p: 0 }}
+                                        >
+                                            <img
+                                                src={inspectPage * 50 >= inspectData.length ? backarrowD : backarrow}
+                                                style={{ transform: 'rotate(180deg)', width: 22 }}
+                                                alt="Siguiente"
+                                            />
+                                        </IconButton>
 
-                                    <IconButton
-                                        onClick={() => setInspectPage(Math.ceil(inspectData.length / 50))}
-                                        disabled={inspectPage * 50 >= inspectData.length}
-                                        sx={{ p: 0 }}
-                                    >
-                                        <img
-                                            src={inspectPage * 50 >= inspectData.length ? backarrowD : backarrow}
-                                            style={{ transform: 'rotate(180deg)', width: 22 }}
-                                            alt="Última página"
-                                        />
-                                        <img
-                                            src={inspectPage * 50 >= inspectData.length ? backarrowD : backarrow}
-                                            style={{ transform: 'rotate(180deg)', width: 22, marginLeft: '-16px' }}
-                                            alt=""
-                                        />
-                                    </IconButton>
-                                </Box>
+                                        <IconButton
+                                            onClick={() => setInspectPage(Math.ceil(inspectData.length / 50))}
+                                            disabled={inspectPage * 50 >= inspectData.length}
+                                            sx={{ p: 0 }}
+                                        >
+                                            <img
+                                                src={inspectPage * 50 >= inspectData.length ? backarrowD : backarrow}
+                                                style={{ transform: 'rotate(180deg)', width: 22 }}
+                                                alt="Última página"
+                                            />
+                                            <img
+                                                src={inspectPage * 50 >= inspectData.length ? backarrowD : backarrow}
+                                                style={{ transform: 'rotate(180deg)', width: 22, marginLeft: '-16px' }}
+                                                alt=""
+                                            />
+                                        </IconButton>
+                                    </Box>
+                                )}
 
                                 {/* Buscador */}
                                 <Box
                                     display="flex"
                                     alignItems="center"
                                     sx={{
+                                        ml: 'auto',
+                                        marginRight: '36px',
                                         backgroundColor: "#FFFFFF",
                                         border: inspectSearch ? "1px solid #7B354D" : "1px solid #9B9295",
                                         borderRadius: "4px",
@@ -3171,7 +3231,7 @@ const BlackList: React.FC = () => {
                                     <Box
                                         sx={{
                                             width: '100%',
-                                            height: '300px',
+                                            height: '296px',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
@@ -3193,7 +3253,7 @@ const BlackList: React.FC = () => {
                                                 fontWeight: 500,
                                                 mt: "220px",
                                                 position: "absolute",
-                                                marginLeft: '0px'
+                                                marginBottom: '0px'
                                             }}
                                         >
                                             No se encontraron resultados.
@@ -3576,29 +3636,42 @@ const BlackList: React.FC = () => {
                                     border: '1px solid #E6E4E4',
                                     borderRadius: '6px',
                                     width: '530px',
-                                    height: '57px',
+                                    minHeight: '57px',
                                     opacity: manageByIndividual ? 0.4 : 1,
                                     pointerEvents: manageByIndividual ? 'none' : 'auto'
                                 }}
                             >
-                                <Typography fontSize="18px" fontFamily={"Poppins"} marginLeft={'16px'}>Por archivo</Typography>
-                                <Switch
-                                    checked={manageByList}
-                                    onChange={() => {
-                                        const newValue = !manageByList;
-                                        setManageByList(newValue);
-                                        if (newValue) {
-                                            setManageByIndividual(false);
-                                        }
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        minHeight: '57px',
+                                        px: 2
                                     }}
-                                />
+                                >
+                                    <Typography fontSize="18px" fontFamily="Poppins">
+                                        Por archivo
+                                    </Typography>
+
+                                    <Switch
+                                        checked={manageByList}
+                                        onChange={() => {
+                                            const newValue = !manageByList;
+                                            setManageByList(newValue);
+                                            if (newValue) {
+                                                setManageByIndividual(false);
+                                            }
+                                        }}
+                                    />
+                                </Box>
                             </Box>
                         </Box>
 
                         <Box mt={-2}>
                             {manageByList && (
                                 <>
-                                    {manageOperation === 'agregar' && (
+                                    {manageByList && manageOperation === 'agregar' && (
                                         <Box sx={{ display: 'flex', gap: 2, mt: 2, alignItems: 'flex-start' }}>
 
                                             <Box
@@ -3780,7 +3853,7 @@ const BlackList: React.FC = () => {
                                                 {/*Imagen central del archivo a subir*/}
                                                 <Box
                                                     sx={{
-                                                        width: "142px", height: "100px"
+                                                        width: "142px", height: "102px"
                                                     }}
                                                 >
                                                     <img
@@ -3835,7 +3908,7 @@ const BlackList: React.FC = () => {
                                                                 color: '#574B4F',
                                                                 opacity: 0.7,
                                                                 textAlign: 'center',
-                                                                mt: '4px'
+                                                                mt: '4px',
                                                             }}
                                                         >
                                                             Total de registros:

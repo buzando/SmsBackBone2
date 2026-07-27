@@ -2205,7 +2205,7 @@ const HomePage: React.FC = () => {
                                                         color: "#574B4F",
                                                         transform: "translate(-10px, -22px)",
                                                     }}>
-                                                        · Solo caracteres tales <br />
+                                                        · Solo caracteres alfanuméricos <br />
                                                         · Longitud máxima de 40 <br />
                                                         caracteres
                                                     </Box>
@@ -2490,6 +2490,7 @@ const buttonStyle = {
     '&:hover': {
         background: '#F2E9EC',
         border: '1px solid #BE93A066',
+        color: "#843E55",
     },
     '&:active': {
         background: '#E6C2CD',

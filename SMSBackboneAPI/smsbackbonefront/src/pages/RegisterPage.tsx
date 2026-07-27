@@ -257,12 +257,13 @@ const Register: React.FC = () => {
                 display: "flex",
                 flexDirection: "column",
                 backgroundColor: "#F2F2F2",
-                height: "800px", overflowY: "hidden",
+                overflowY: "hidden",
+                minHeight: "100vh",
             }}
         >
             <PublicLayout>
                 <Container maxWidth="md">
-                    <Box mt={4}>
+                    <Box mt={4} mb={2}>
                         <Typography
                             sx={{
                                 fontStyle: "normal",

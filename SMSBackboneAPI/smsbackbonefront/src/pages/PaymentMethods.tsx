@@ -211,7 +211,7 @@ const PaymentMethods: React.FC = () => {
     const openDeleteModal = (card: CreditCard) => {
         setCardToDelete(card);
         setTitleMainModal('Eliminar Tarjeta');
-        setMessageMainModal('¿Estás seguro de que deseas eliminar la tarjeta seleccionada? Esta acción no podrá revertida.');
+        setMessageMainModal('¿Está seguro de que desea eliminar la tarjeta? Esta acción no puede ser revertida.');
         setOpenModal(true);
     };
 
@@ -683,6 +683,25 @@ const PaymentMethods: React.FC = () => {
                         </div>
                     ))}
                 </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography
+                        sx={{
+                            fontFamily: 'Poppins',
+                            fontSize: '14px',
+                            color: '#574B4F',
+                            fontWeight: 500,
+                        }}
+                    >
+                        Pagos procesados de forma segura con
+                    </Typography>
+                    <Box
+                        component="img"
+                        src={openpay}
+                        alt="Openpay"
+                        sx={{ height: '20px', objectFit: 'contain' }}
+                    />
+                </Box>
+
             </Box>
             <ModalError
                 isOpen={isErrorModalOpen}
@@ -1612,6 +1631,7 @@ const PaymentMethods: React.FC = () => {
                     </Box>
                 </Box>
             </Modal>
+
         </Box>
     );
 };

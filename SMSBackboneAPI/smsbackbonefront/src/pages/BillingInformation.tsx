@@ -295,7 +295,7 @@ const BillingInformation: React.FC = () => {
                         <div style={{ display: 'flex', gap: '20px', marginBottom: '25px' }}>
                             <div style={{ flex: 1, maxWidth: '400px' }}>
                                 <Typography
-                                    style={{
+                                    sx={{
                                         textAlign: "left",
                                         fontSize: "16px",
                                         fontFamily: "Poppins",
@@ -303,7 +303,6 @@ const BillingInformation: React.FC = () => {
                                         marginBottom: '4px',
                                         color: businessNameError ? '#D01247' : '#330F1B',
                                         opacity: 1,
-
                                     }}
                                 >
                                     Nombre o razón social

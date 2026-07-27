@@ -1123,7 +1123,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                     }}
                                 >
 
-                                    <img src={DropDownIcon} alt="dropdown" width="24" height="24" />
+                                    <img src={DropDownIcon} alt="dropdown" width="24" height="24" style={{ transform: "rotate(180deg)" }} />
                                 </IconButton>
 
 
@@ -1157,50 +1157,53 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                 >
 
                                     <Box sx={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
-                                        <TextField
-
-                                            placeholder="Buscar"
-                                            variant="outlined"
-                                            size="small"
-                                            value={searchTerm2}
-                                            onChange={(e) => setSearchTerm2(e.target.value)}
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            maxWidth={'280px'}
+                                            position={'relative'}
                                             sx={{
-                                                '& .MuiOutlinedInput-root': {
-                                                    padding: '2px 8px',
-                                                    '& .MuiInputAdornment-root': {
-                                                        position: 'absolute',
-                                                        right: 0,
-                                                        marginRight: '8px',
-                                                    },
-                                                },
+                                                backgroundColor: "#FFFFFF",
+                                                border: searchTerm2 ? "1px solid #7B354D" : "1px solid #9B9295",
+                                                borderRadius: "4px",
+                                                px: 2,
+                                                py: 1,
+                                                height: "40px"
                                             }}
-                                            InputProps={{
-                                                startAdornment: (
-                                                    <SearchIcon sx={{ color: '#7B354D', marginRight: 1 }} />
-                                                ),
-                                                endAdornment: searchTerm2 && (
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            size="small"
-                                                            onClick={() => setSearchTerm2('')}
-                                                            sx={{ color: '#7B354D' }}
-                                                        >
-                                                            <img src={iconclose} alt="Limpiar" style={{ width: '16px', height: '16px' }} />
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                ),
-                                                style: {
-                                                    height: '100%',
-                                                    textAlign: 'left',
-                                                    fontFamily: 'Poppins, sans-serif',
-                                                    fontSize: '16px',
-                                                    lineHeight: '25px',
-                                                    letterSpacing: '0px',
-                                                    color: '#7B354D',
-                                                    opacity: 1,
-                                                },
-                                            }}
-                                        />
+                                        >
+                                            <img
+                                                src={searchTerm2 ? Iconseachred : seachicon}
+                                                alt="Buscar"
+                                                style={{ marginRight: 8, width: 24 }}
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Buscar"
+                                                value={searchTerm2}
+                                                onChange={(e) => setSearchTerm2(e.target.value)}
+                                                style={{
+                                                    border: "none",
+                                                    outline: "none",
+                                                    width: "100%",
+                                                    fontSize: "16px",
+                                                    fontFamily: "Poppins",
+                                                    color: searchTerm2 ? "#7B354D" : "#9B9295",
+                                                    backgroundColor: "transparent",
+                                                }}
+                                            />
+
+                                            {searchTerm2 && (
+                                                <img
+                                                    src={iconclose}
+                                                    alt="Limpiar búsqueda"
+                                                    onClick={() => {
+                                                        setSearchTerm2('');
+                                                    }}
+                                                    style={{ marginLeft: 8, width: 24, height: 24, cursor: 'pointer' }}
+                                                />
+
+                                            )}
+                                        </Box>
                                     </Box>
 
 

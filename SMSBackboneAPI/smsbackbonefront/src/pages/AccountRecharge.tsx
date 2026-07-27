@@ -625,7 +625,7 @@ const AccountRecharge: React.FC = () => {
             {/* Modal de confirmación para eliminar */}
             <MainModal
                 isOpen={isDeleteModalOpen}
-                Title="Eliminar tarjeta"
+                Title="Eliminar Tarjeta"
                 message="¿Está seguro de que desea eliminar la tarjeta? Esta acción no puede ser revertida."
                 primaryButtonText="Aceptar"
                 secondaryButtonText="Cancelar"
@@ -1275,7 +1275,7 @@ const AccountRecharge: React.FC = () => {
                                     />
                                 </Box>
 
-                                <Box sx={{ display: 'flex', gap: '10px' }}>
+                                <Box sx={{ display: 'flex', gap: '40px' }}>
                                     <SecondaryButton text="Cancelar" onClick={resetForm} />
                                     <MainButton
                                         text="Recargar"

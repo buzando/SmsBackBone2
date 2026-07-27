@@ -7,6 +7,7 @@ import {
     Paper,
     Tooltip,
     Modal,
+    IconButton,
 } from "@mui/material";
 import axios from "../components/commons/AxiosInstance";
 import { Divider } from "@mui/material";
@@ -16,7 +17,10 @@ import { InputAdornment } from "@mui/material";
 import ChipBar from "../components/commons/ChipBar";
 import CircularProgress from "@mui/material/CircularProgress";
 import SecondaryButton from "../components/commons/SecondaryButton";
+import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
+import { useNavigate } from 'react-router-dom';
 const ManageAccount: React.FC = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -26,6 +30,7 @@ const ManageAccount: React.FC = () => {
         confirmPassword: "",
         email: "",
     });
+
     const [initialData, setInitialData] = useState<typeof formData | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
@@ -199,314 +204,653 @@ const ManageAccount: React.FC = () => {
                 overflowX: "hidden", marginTop: "-80px"
             }}
         >
-            <Typography
-                variant="h4"
-                fontFamily="Poppins"
-                sx={{ color: "#330F1B", fontSize: '26px', }}
-            >
-                Editar cuenta
-            </Typography>
-
-            <Divider sx={{ width: '100%', mb: 3 }} />
-            <Paper sx={{ p: 3, width: "80%" }}>
-                <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2}>
-                    <Box>
-                        <Typography
-                            sx={{
-                                textAlign: "left",
-                                font: "normal normal medium 16px/54px Poppins",
-                                letterSpacing: "0px",
-                                color: "black",
-                                opacity: 1,
-                                fontSize: "16px",
-                            }}
-                        >
-                            Nombre
-                            <span style={{ color: "red" }}>*</span>
-                        </Typography>
-                        <TextField
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleChange}
-                            error={!!firstNameError}
-                            helperText={firstNameError}
-                            required
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <Tooltip title="Nombre del usuario">
-                                            <img
-                                                src={
-                                                    formData.firstName.trim() === ""
-                                                        ? infoiconerror // Mostrar ícono de error si está vacío
-                                                        : infoicon // Ícono normal si no hay error
-                                                }
-                                                alt="Info"
-                                                style={{ width: 16, height: 16 }}
-                                            />
-                                        </Tooltip>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Box>
-                    <Box>
-                        <Typography
-                            sx={{
-                                textAlign: "left",
-                                font: "normal normal medium 16px/54px Poppins",
-                                letterSpacing: "0px",
-                                color: "black",
-                                opacity: 1,
-                                fontSize: "16px",
-                            }}
-                        >
-                            Apellido
-                            <span style={{ color: "red" }}>*</span>
-                        </Typography>
-                        <TextField
-                            label=""
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleChange}
-                            error={!!lastNameError}
-                            helperText={lastNameError}
-                            required
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <Tooltip title="Apellido del usuario">
-                                            <img
-                                                src={
-                                                    formData.firstName.trim() === ""
-                                                        ? infoiconerror // Mostrar ícono de error si está vacío
-                                                        : infoicon // Ícono normal si no hay error
-                                                }
-                                                alt="Info"
-                                                style={{ width: 16, height: 16 }}
-                                            />
-                                        </Tooltip>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Box>
-                    <Box>
-                        <Typography
-                            sx={{
-                                textAlign: "left",
-                                font: "normal normal medium 16px/54px Poppins",
-                                letterSpacing: "0px",
-                                color: "black",
-                                opacity: 1,
-                                fontSize: "16px",
-                            }}
-                        >
-                            Teléfono
-                            <span style={{ color: "red" }}>*</span>
-                        </Typography>
-                        <TextField
-                            label=""
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            error={!!phoneError}
-                            helperText={phoneError}
-                            required
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <Tooltip title="Introduzca 10 valores numericos">
-                                            <img
-                                                src={
-                                                    formData.firstName.trim() === ""
-                                                        ? infoiconerror // Mostrar ícono de error si está vacío
-                                                        : infoicon // Ícono normal si no hay error
-                                                }
-                                                alt="Info"
-                                                style={{ width: 16, height: 16 }}
-                                            />
-                                        </Tooltip>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Box>
-                    <Box></Box>
-                    <Box>
-                        <Typography
-                            sx={{
-                                textAlign: "left",
-                                font: "normal normal medium 16px/54px Poppins",
-                                letterSpacing: "0px",
-                                color: "black",
-                                opacity: 1,
-                                fontSize: "16px",
-                            }}
-                        >
-                            Correo Alternativo
-                            <span style={{ color: "red" }}>*</span>
-                        </Typography>
-                        <TextField
-                            label=""
-                            name="alternateEmail"
-                            value={formData.alternateEmail}
-                            onChange={handleChange}
-                            error={!!altEmailError}
-                            helperText={altEmailError}
-                            required
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <Tooltip title="Introduzca un correo electronico valido">
-                                            <img
-                                                src={
-                                                    formData.firstName.trim() === ""
-                                                        ? infoiconerror // Mostrar ícono de error si está vacío
-                                                        : infoicon // Ícono normal si no hay error
-                                                }
-                                                alt="Info"
-                                                style={{ width: 16, height: 16 }}
-                                            />
-                                        </Tooltip>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Box>
-                    <Box></Box>
-                    <Box>
-                        <Typography
-                            sx={{
-                                textAlign: "left",
-                                font: "normal normal medium 16px/54px Poppins",
-                                letterSpacing: "0px",
-                                color: "black",
-                                opacity: 1,
-                                fontSize: "16px",
-                            }}
-                        >
-                            Contraseña
-                        </Typography>
-                        <TextField
-                            label="Contraseña"
-                            name="password"
-                            type="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            error={!!passwordError}
-                            helperText={passwordError}
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <Tooltip title="Introduzca una contraseña valida">
-                                            <img
-                                                src={
-                                                    passwordError
-                                                        ? infoiconerror // Mostrar ícono de error si está vacío
-                                                        : infoicon // Ícono normal si no hay error
-                                                }
-                                                alt="Info"
-                                                style={{ width: 16, height: 16 }}
-                                            />
-                                        </Tooltip>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-
-                    </Box>
-                    <Box>
-                        <Typography
-                            sx={{
-                                textAlign: "left",
-                                font: "normal normal medium 16px/54px Poppins",
-                                letterSpacing: "0px",
-                                color: "black",
-                                opacity: 1,
-                                fontSize: "16px",
-                            }}
-                        >
-                            Confirma Contraseña
-                        </Typography>
-
-                        <TextField
-                            label="Confirmar contraseña"
-                            name="confirmPassword"
-                            type="password"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            error={!!confirmPasswordError}
-                            helperText={confirmPasswordError}
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <Tooltip title="Introduzca una contraseña valida">
-                                            <img
-                                                src={
-                                                    confirmPasswordError
-                                                        ? infoiconerror // Mostrar ícono de error si está vacío
-                                                        : infoicon // Ícono normal si no hay error
-                                                }
-                                                alt="Info"
-                                                style={{ width: 16, height: 16 }}
-                                            />
-                                        </Tooltip>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Box>
-
-
-                </Box>
-                <Typography variant="body2" color="textSecondary" mt={2}>
-                    *El asterisco indica los campos obligatorios.
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
+                <IconButton onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
+                    <img src={ArrowBackIosNewIcon} alt="Regresar" style={{ width: 24, transform: 'rotate(270deg)' }} />
+                </IconButton>
+                <Typography variant="h4" sx={{ fontWeight: 500, fontFamily: 'Poppins', fontSize: '26px', color: '#330F1B' }}>
+                    Editar cuenta
                 </Typography>
-
-            </Paper>
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                mt={3}
-            >
-
-                <SecondaryButton
-                    text="Cancelar"
-                    onClick={handleCancel}
-                    disabled={loading || !isDirty}
-                />
-
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSubmit}
-                    disabled={saveDisabled}
-                    sx={{
-                        position: "relative",
-                        backgroundColor: "#8D4B62",
-                        color: "#fff",
-                        "&:hover": {
-                            backgroundColor: "#6F3C4F",
-                        },
-                    }}
-                >
-                    {loading ? (
-                        <CircularProgress
-                            size={24}
-                            sx={{
-                                color: "#fff",
-                                position: "absolute",
-                            }}
-                        />
-                    ) : (
-                        "Guardar cambios"
-                    )}
-                </Button>
-
             </Box>
 
+            <Box sx={{ marginLeft: "32px", }}>
+                <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
+                <Paper sx={{ p: 3, width: "80%" }}>
+                    <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2}>
+                        <Box>
+                            <Typography
+                                sx={{
+                                    textAlign: "left",
+                                    fontSize: "16px",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    marginBottom: '4px',
+                                    color: "#330F1B",
+                                    opacity: 1,
+                                }}
+                            >
+                                Nombre
+                                <span style={{ color: "#D01247" }}>*</span>
+                            </Typography>
+                            <TextField
+                                name="firstName"
+                                value={formData.firstName}
+                                onChange={handleChange}
+                                error={!!firstNameError}
+                                helperText={firstNameError}
+                                required
+                                sx={{
+                                    fontFamily: "Poppins",
+                                    "& .MuiInputBase-input": {
+                                        fontFamily: "Poppins", color: "#574B4F"
+                                    },
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute", mt: 7,
+                                        fontFamily: "Poppins",
+                                        fontSize: "12px",
+                                    },
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Tooltip
+                                                title={
+                                                    <Box
+                                                        sx={{
+                                                            backgroundColor: "#FFFFFF",
+                                                            borderRadius: "8px",
+                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                            padding: "8px 12px",
+                                                            fontSize: "14px",
+                                                            fontFamily: "Poppins",
+                                                            color: "#574B4F",
+                                                            whiteSpace: "pre-line",
+                                                            transform: "translate(-10px, -22px)",
+                                                            borderColor: "#00131F3D",
+                                                            borderStyle: "solid",
+                                                            borderWidth: "1px"
+                                                        }}
+                                                    >
+                                                        <>
+                                                            Nombre del usuario
+                                                        </>
+                                                    </Box>
+                                                }
+                                                placement="bottom-end"
+                                                componentsProps={{
+                                                    tooltip: {
+                                                        sx: {
+                                                            backgroundColor: "transparent",
+                                                            padding: 0,
+
+                                                        },
+                                                    },
+                                                }}
+                                            >
+                                                <IconButton
+                                                    disableRipple
+                                                    sx={{
+                                                        backgroundColor: "transparent !important",
+                                                        "&:hover": {
+                                                            backgroundColor: "transparent !important",
+                                                        },
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={
+                                                            formData.firstName.trim() === "" || firstNameError
+                                                                ? infoiconerror
+                                                                : infoicon
+                                                        }
+                                                        alt="info-icon"
+                                                        style={{ width: 24, height: 24 }}
+                                                    />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Box>
+                        <Box>
+                            <Typography
+                                sx={{
+                                    textAlign: "left",
+                                    fontSize: "16px",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    marginBottom: '4px',
+                                    color: "#330F1B",
+                                    opacity: 1,
+                                }}
+                            >
+                                Apellido
+                                <span style={{ color: "#D01247" }}>*</span>
+                            </Typography>
+                            <TextField
+                                label=""
+                                name="lastName"
+                                value={formData.lastName}
+                                onChange={handleChange}
+                                error={!!lastNameError}
+                                helperText={lastNameError}
+                                required
+                                sx={{
+                                    fontFamily: "Poppins",
+                                    "& .MuiInputBase-input": {
+                                        fontFamily: "Poppins", color: "#574B4F"
+                                    },
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute", mt: 7,
+                                        fontFamily: "Poppins",
+                                        fontSize: "12px",
+                                    },
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Tooltip
+                                                title={
+                                                    <Box
+                                                        sx={{
+                                                            backgroundColor: "#FFFFFF",
+                                                            borderRadius: "8px",
+                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                            padding: "8px 12px",
+                                                            fontSize: "14px",
+                                                            fontFamily: "Poppins",
+                                                            color: "#574B4F",
+                                                            whiteSpace: "pre-line",
+                                                            transform: "translate(-10px, -22px)",
+                                                            borderColor: "#00131F3D",
+                                                            borderStyle: "solid",
+                                                            borderWidth: "1px"
+                                                        }}
+                                                    >
+                                                        <>
+                                                            Apellido del usuario
+                                                        </>
+                                                    </Box>
+                                                }
+                                                placement="bottom-end"
+                                                componentsProps={{
+                                                    tooltip: {
+                                                        sx: {
+                                                            backgroundColor: "transparent",
+                                                            padding: 0,
+
+                                                        },
+                                                    },
+                                                }}
+                                            >
+                                                <IconButton
+                                                    disableRipple
+                                                    sx={{
+                                                        backgroundColor: "transparent !important",
+                                                        "&:hover": {
+                                                            backgroundColor: "transparent !important",
+                                                        },
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={formData.firstName.trim() === "" ? infoiconerror : infoicon}
+                                                        alt="info-icon"
+                                                        style={{ width: 24, height: 24 }}
+                                                    />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Box>
+                        <Box>
+                            <Typography
+                                sx={{
+                                    textAlign: "left",
+                                    fontSize: "16px",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    marginBottom: '4px',
+                                    color: "#330F1B",
+                                    opacity: 1,
+                                }}
+                            >
+                                Teléfono
+                                <span style={{ color: "#D01247" }}>*</span>
+                            </Typography>
+                            <TextField
+                                label=""
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                error={!!phoneError}
+                                helperText={phoneError}
+                                required
+                                sx={{
+                                    fontFamily: "Poppins",
+                                    "& .MuiInputBase-input": {
+                                        fontFamily: "Poppins", color: "#574B4F"
+                                    },
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute", mt: 7,
+                                        fontFamily: "Poppins",
+                                        fontSize: "12px",
+                                    },
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Tooltip
+                                                title={
+                                                    <Box
+                                                        sx={{
+                                                            backgroundColor: "#FFFFFF",
+                                                            borderRadius: "8px",
+                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                            padding: "8px 12px",
+                                                            fontSize: "14px",
+                                                            fontFamily: "Poppins",
+                                                            color: "#574B4F",
+                                                            whiteSpace: "pre-line",
+                                                            transform: "translate(-10px, -22px)",
+                                                            borderColor: "#00131F3D",
+                                                            borderStyle: "solid",
+                                                            borderWidth: "1px"
+                                                        }}
+                                                    >
+                                                        <>
+                                                            Introduzca 10 valores numericos
+                                                        </>
+                                                    </Box>
+                                                }
+                                                placement="bottom-end"
+                                                componentsProps={{
+                                                    tooltip: {
+                                                        sx: {
+                                                            backgroundColor: "transparent",
+                                                            padding: 0,
+
+                                                        },
+                                                    },
+                                                }}
+                                            >
+                                                <IconButton
+                                                    disableRipple
+                                                    sx={{
+                                                        backgroundColor: "transparent !important",
+                                                        "&:hover": {
+                                                            backgroundColor: "transparent !important",
+                                                        },
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={
+                                                            formData.firstName.trim() === "" || phoneError
+                                                                ? infoiconerror
+                                                                : infoicon
+                                                        }
+                                                        alt="info-icon"
+                                                        style={{ width: 24, height: 24 }}
+                                                    />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Box>
+                        <Box>
+
+                        </Box>
+                        <Box>
+                            <Typography
+                                sx={{
+                                    textAlign: "left",
+                                    fontSize: "16px",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    marginBottom: '4px',
+                                    color: "#330F1B",
+                                    opacity: 1,
+                                }}
+                            >
+                                Correo Alternativo
+                                <span style={{ color: "#D01247" }}>*</span>
+                            </Typography>
+                            <TextField
+                                label=""
+                                name="alternateEmail"
+                                value={formData.alternateEmail}
+                                onChange={handleChange}
+                                error={!!altEmailError}
+                                helperText={altEmailError}
+                                required
+                                sx={{
+                                    fontFamily: "Poppins",
+                                    "& .MuiInputBase-input": {
+                                        fontFamily: "Poppins", color: "#574B4F"
+                                    },
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute", mt: 7,
+                                        fontFamily: "Poppins",
+                                        fontSize: "12px",
+                                    },
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Tooltip
+                                                title={
+                                                    <Box
+                                                        sx={{
+                                                            backgroundColor: "#FFFFFF",
+                                                            borderRadius: "8px",
+                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                            padding: "8px 12px",
+                                                            fontSize: "14px",
+                                                            fontFamily: "Poppins",
+                                                            color: "#574B4F",
+                                                            whiteSpace: "pre-line",
+                                                            transform: "translate(-10px, -22px)",
+                                                            borderColor: "#00131F3D",
+                                                            borderStyle: "solid",
+                                                            borderWidth: "1px"
+                                                        }}
+                                                    >
+                                                        <>
+                                                            Introduzca un correo electronico valido
+                                                        </>
+                                                    </Box>
+                                                }
+                                                placement="bottom-end"
+                                                componentsProps={{
+                                                    tooltip: {
+                                                        sx: {
+                                                            backgroundColor: "transparent",
+                                                            padding: 0,
+
+                                                        },
+                                                    },
+                                                }}
+                                            >
+                                                <IconButton
+                                                    disableRipple
+                                                    sx={{
+                                                        backgroundColor: "transparent !important",
+                                                        "&:hover": {
+                                                            backgroundColor: "transparent !important",
+                                                        },
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={
+                                                            formData.firstName.trim() === "" || altEmailError
+                                                                ? infoiconerror
+                                                                : infoicon
+                                                        }
+                                                        alt="info-icon"
+                                                        style={{ width: 24, height: 24 }}
+                                                    />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Box>
+                        <Box></Box>
+                        <Box>
+                            <Typography
+                                sx={{
+                                    textAlign: "left",
+                                    fontSize: "16px",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    marginBottom: '4px',
+                                    color: "#330F1B",
+                                    opacity: 1,
+                                }}
+                            >
+                                Contraseña
+                            </Typography>
+                            <TextField
+                                placeholder="Contraseña"
+                                name="password"
+                                type="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                error={!!passwordError}
+                                helperText={passwordError}
+                                sx={{
+                                    "& .MuiInputLabel-root": {
+                                        fontFamily: "Poppins",
+                                    },
+                                    "& .MuiInputBase-input": {
+                                        fontFamily: "Poppins",
+                                        color: "#574B4F",
+                                    },
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        mt: 7,
+                                        fontFamily: "Poppins",
+                                        fontSize: "12px",
+                                    },
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Tooltip
+                                                title={
+                                                    <Box
+                                                        sx={{
+                                                            backgroundColor: "#FFFFFF",
+                                                            borderRadius: "8px",
+                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                            padding: "8px 12px",
+                                                            fontSize: "14px",
+                                                            fontFamily: "Poppins",
+                                                            color: "#574B4F",
+                                                            whiteSpace: "pre-line",
+                                                            transform: "translate(-10px, -22px)",
+                                                            borderColor: "#00131F3D",
+                                                            borderStyle: "solid",
+                                                            borderWidth: "1px"
+                                                        }}
+                                                    >
+                                                        <>
+                                                            Introduzca una contraseña valida
+                                                        </>
+                                                    </Box>
+                                                }
+                                                placement="bottom-end"
+                                                componentsProps={{
+                                                    tooltip: {
+                                                        sx: {
+                                                            backgroundColor: "transparent",
+                                                            padding: 0,
+
+                                                        },
+                                                    },
+                                                }}
+                                            >
+                                                <IconButton
+                                                    disableRipple
+                                                    sx={{
+                                                        backgroundColor: "transparent !important",
+                                                        "&:hover": {
+                                                            backgroundColor: "transparent !important",
+                                                        },
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={
+                                                            passwordError
+                                                                ? infoiconerror
+                                                                : infoicon
+                                                        }
+                                                        alt="info-icon"
+                                                        style={{ width: 24, height: 24 }}
+                                                    />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+
+                        </Box>
+                        <Box>
+                            <Typography
+                                sx={{
+                                    textAlign: "left",
+                                    fontSize: "16px",
+                                    fontFamily: "Poppins",
+                                    letterSpacing: "0px",
+                                    marginBottom: '4px',
+                                    color: "#330F1B",
+                                    opacity: 1,
+                                }}
+                            >
+                                Confirma Contraseña
+                            </Typography>
+
+                            <TextField
+                                placeholder="Confirmar contraseña"
+                                name="confirmPassword"
+                                type="password"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                error={!!confirmPasswordError}
+                                helperText={confirmPasswordError}
+                                sx={{
+                                    "& .MuiInputLabel-root": {
+                                        fontFamily: "Poppins",
+                                    },
+                                    "& .MuiInputBase-input": {
+                                        fontFamily: "Poppins",
+                                        color: "#574B4F",
+                                    },
+                                    "& .MuiFormHelperText-root": {
+                                        position: "absolute",
+                                        mt: 7,
+                                        fontFamily: "Poppins",
+                                        fontSize: "12px",
+                                    },
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Tooltip
+                                                title={
+                                                    <Box
+                                                        sx={{
+                                                            backgroundColor: "#FFFFFF",
+                                                            borderRadius: "8px",
+                                                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                                            padding: "8px 12px",
+                                                            fontSize: "14px",
+                                                            fontFamily: "Poppins",
+                                                            color: "#574B4F",
+                                                            whiteSpace: "pre-line",
+                                                            transform: "translate(-10px, -22px)",
+                                                            borderColor: "#00131F3D",
+                                                            borderStyle: "solid",
+                                                            borderWidth: "1px"
+                                                        }}
+                                                    >
+                                                        <>
+                                                            Introduzca una contraseña valida
+                                                        </>
+                                                    </Box>
+                                                }
+                                                placement="bottom-end"
+                                                componentsProps={{
+                                                    tooltip: {
+                                                        sx: {
+                                                            backgroundColor: "transparent",
+                                                            padding: 0,
+
+                                                        },
+                                                    },
+                                                }}
+                                            >
+                                                <IconButton
+                                                    disableRipple
+                                                    sx={{
+                                                        backgroundColor: "transparent !important",
+                                                        "&:hover": {
+                                                            backgroundColor: "transparent !important",
+                                                        },
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={
+                                                            confirmPasswordError
+                                                                ? infoiconerror
+                                                                : infoicon
+                                                        }
+                                                        alt="info-icon"
+                                                        style={{ width: 24, height: 24 }}
+                                                    />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Box>
+
+
+                    </Box>
+                    <Typography variant="body2" color="textSecondary" mt={3.5} mb={-1.5}
+                        sx={{ fontFamily: "Poppins", }}>
+                        *El asterisco indica los campos obligatorios.
+                    </Typography>
+
+                </Paper>
+                <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mt={3}
+                >
+
+                    <SecondaryButton
+                        text="Cancelar"
+                        onClick={handleCancel}
+                        disabled={loading || !isDirty}
+                    />
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleSubmit}
+                        disabled={saveDisabled}
+                        sx={{
+                            position: "relative",
+                            backgroundColor: "#8D4B62",
+                            color: "#fff",
+                            "&:hover": {
+                                backgroundColor: "#6F3C4F",
+                            },
+                        }}
+                    >
+                        {loading ? (
+                            <CircularProgress
+                                size={24}
+                                sx={{
+                                    color: "#fff",
+                                    position: "absolute",
+                                }}
+                            />
+                        ) : (
+                            "Guardar cambios"
+                        )}
+                    </Button>
+
+                </Box>
+            </Box>
             {/* Modal de error */}
             <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
                 <Box

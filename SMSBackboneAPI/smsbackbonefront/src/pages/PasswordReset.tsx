@@ -1264,7 +1264,7 @@ const TermsAndConditions: React.FC = () => {
                                             disabled={authCode.some((digit) => digit === "") || codeExpired} // Desactiva si faltan dígitos o expiró el tiempo
                                             sx={{
                                                 background: "#833A53 0% 0% no-repeat padding-box",
-                                                border: "1px solid #D0CDCD",
+                                                border: "1px solid rgba(190, 147, 160, 0.4)",
                                                 borderRadius: "4px",
                                                 opacity: 0.9,
                                                 color: "#FFFFFF",
@@ -1514,7 +1514,7 @@ const TermsAndConditions: React.FC = () => {
                                                 setLoading(false);
                                             }}
                                             sx={{
-                                                border: "1px solid #60293C",
+                                                border: "1px solid rgba(190, 147, 160, 0.4)",
                                                 borderRadius: "4px",
                                                 color: "#833A53",
                                                 backgroundColor: "transparent",
@@ -1536,7 +1536,8 @@ const TermsAndConditions: React.FC = () => {
                                             }
                                             sx={{
                                                 background: "#833A53 0% 0% no-repeat padding-box",
-                                                border: "1px solid #D0CDCD",
+                                                //border: "1px solid #D0CDCD",
+                                                border: "1px solid rgba(190, 147, 160, 0.4)",
                                                 fontFamily: "Poppins",
                                                 borderRadius: "4px",
                                                 opacity: 0.9,

@@ -2491,7 +2491,16 @@ const Campains: React.FC = () => {
                     padding: "15px",
                     borderRadius: "8px 0 0 8px",
                     width: "370px",
-                    height: "581px",
+                    minHeight: {
+                      xs: "391px",
+                      md: "431px",
+                      lg: "520px",
+                    },
+                    maxHeight: {
+                      xs: "478px",
+                      md: "588px",
+                      lg: "698px",
+                    },
                     display: "flex",
                     flexDirection: "column",
                   }}
@@ -2979,7 +2988,16 @@ const Campains: React.FC = () => {
               <IconButton
                 onClick={() => setPanelAbierto(!panelAbierto)}
                 sx={{
-                  height: "581px",
+                  minHeight: {
+                    xs: "391px",
+                    md: "431px",
+                    lg: "520px",
+                  },
+                  maxHeight: {
+                    xs: "478px",
+                    md: "588px",
+                    lg: "698px",
+                  },
                   width: "30px",
                   borderRadius: "0 8px 8px 0",
                   borderLeft: "1px solid #D6D6D6",
@@ -3004,7 +3022,7 @@ const Campains: React.FC = () => {
           {/* Visualización de campaña */}
           {filteredCampaigns.length > 0 && (
             <Grid item xs >
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1, }}>
 
                 <Typography
                   variant="h6"
@@ -3065,12 +3083,22 @@ const Campains: React.FC = () => {
 
               <Box
                 sx={{
-                  height: "540px",
+                  minHeight: {
+                    xs: "391px",
+                    md: "431px",
+                    lg: "520px",
+                  },
+                  maxHeight: {
+                    xs: "431px",
+                    md: "541px",
+                    lg: "651px",
+                  },
                   overflowY: "auto",
                   pr: 1,
                   display: "flex",
                   flexDirection: "column",
-                  gap: 2
+                  gap: 2,
+
                 }}
               >
                 <Paper sx={{ padding: "10px", marginTop: "10px", borderRadius: "10px", width: "100%", maxWidth: "100%", height: "auto" }}>
@@ -6362,7 +6390,6 @@ const Campains: React.FC = () => {
                   display: 'flex', flexDirection: 'column',
                   overflowX: "hidden",
                   marginTop: "20px",
-                  //backgroundColor: "purple"
                 }}>
                   {/* Componente editor de mensaje */}
                   <DynamicCampaignText
@@ -10178,14 +10205,16 @@ const Campains: React.FC = () => {
           </DialogActions>
         </Box>
       </Dialog>
-      {showChipBarAdd && (
-        <Chipbar
-          message={messageChipBar}
-          buttonText="Cerrar"
-          onClose={() => setShowChipBarAdd(false)}
-        />
-      )}
-    </Box>
+      {
+        showChipBarAdd && (
+          <Chipbar
+            message={messageChipBar}
+            buttonText="Cerrar"
+            onClose={() => setShowChipBarAdd(false)}
+          />
+        )
+      }
+    </Box >
   );
 
 };

@@ -1143,7 +1143,14 @@ const ManageAccounts: React.FC = () => {
                                                     onClose={handleMenuClose}
                                                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                                                     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                                    sx={{}}
+                                                    slotProps={{
+                                                        paper: {
+                                                            sx: {
+                                                                boxShadow: "0px 4px 8px rgba(0, 19, 31, 0.12)",
+                                                                borderRadius: "8px",
+                                                            },
+                                                        },
+                                                    }}
                                                 >
                                                     <MenuItem
                                                         onClick={() => {
@@ -1835,6 +1842,9 @@ const ManageAccounts: React.FC = () => {
                                         width: "224px", height: "224px",
                                         cursor: "pointer",
                                         backgroundColor: formData.profile === "Monitor" ? "#9100FF1A" : "white",
+                                        "&:hover": {
+                                            backgroundColor: "#9100FF1A",
+                                        },
                                     }}
                                 >
                                     <Radio
@@ -1869,6 +1879,9 @@ const ManageAccounts: React.FC = () => {
                                         width: "224px", height: "224px",
                                         cursor: "pointer",
                                         backgroundColor: formData.profile === "Supervisor" ? "#FEF6E3" : "white",
+                                        "&:hover": {
+                                            backgroundColor: "#FEF6E3",
+                                        },
                                     }}
                                 >
                                     <Radio
@@ -1904,6 +1917,10 @@ const ManageAccounts: React.FC = () => {
                                         width: "224px", height: "224px",
                                         cursor: "pointer",
                                         backgroundColor: formData.profile === "Administrador" ? "#FDEEF3" : "white",
+                                        "&:hover": {
+                                            backgroundColor: "#FDEEF3",
+                                        },
+
                                     }}
                                 >
                                     <Radio
@@ -2162,7 +2179,7 @@ const ManageAccounts: React.FC = () => {
                                                             <Typography
                                                                 noWrap
                                                                 sx={{
-                                                                    fontWeight: "bold",
+                                                                    fontWeight: "500",
                                                                     color: selectedRooms.includes(room.id)
                                                                         ? "#833953"
                                                                         : "#574B4F",
