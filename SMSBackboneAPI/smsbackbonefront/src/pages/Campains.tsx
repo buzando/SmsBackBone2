@@ -106,7 +106,7 @@ import DynamicCampaignEditText from '../components/commons/DynamicCampaignEditTe
 import { getSelectedRoom, getSelectedRoomId, SelectedRoom } from "../utils/roomHelper";
 import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
 import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
-import { red } from '@mui/material/colors';
+import { purple, red } from '@mui/material/colors';
 interface Horario {
   titulo: string;
   start: Date | null;
@@ -242,6 +242,7 @@ const Campains: React.FC = () => {
   const [MessageErrorModal, setMessageErrorModal] = useState('');
   const [currentHorarioIndex, setCurrentHorarioIndex] = useState<number | null>(null);
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignFullResponse | null>(null);
+  const [mostrarValidacionCP, setMostrarValidacionCP] = useState(false);
   const [tooltipContent, setTooltipContent] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuIndex, setMenuIndex] = useState<number | null>(null);
@@ -251,6 +252,7 @@ const Campains: React.FC = () => {
   const [editHorarios, setEditHorarios] = useState<Horario[]>([]);
   const [campaignToEdit, setCampaignToEdit] = useState<CampaignFullResponse | null>(null);
   const [editAutoStart, setEditAutoStart] = useState(false);
+  const [selectPostalCode, setSelectPostalCode] = useState("");
   const [editVariables, setEditVariables] = useState<string[]>([]);
   const [EditMensaje, setEditMensaje] = useState<string>('');
   const [editGuardarComoPlantilla, setEditGuardarComoPlantilla] = useState(false);
@@ -278,6 +280,7 @@ const Campains: React.FC = () => {
   const [shouldShortenUrls, setShouldShortenUrls] = useState(false);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [templateName, setTemplateName] = useState('');
+  const [sinCodigoPostal, setSinCodigoPostal] = useState(false);
   const [stateRespondedCounts, setStateRespondedCounts] = useState<{ stateName: string; messages: number }[]>([]);
   const [showChipBarAdd, setShowChipBarAdd] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -741,6 +744,9 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
     return phoneRegex.test(value);
   };
 
+  const validacionCompleta =
+    sinCodigoPostal || selectPostalCode !== "";
+
   const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setPhone(value);
@@ -1089,10 +1095,24 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
     }
 
     if (activeStep === 0 && !postCargaActiva) {
+
+      // Primer clic
+      if (!mostrarValidacionCP) {
+        setMostrarValidacionCP(true);
+        return;
+      }
+
+      // Segundo clic
       const cargaExitosa = await handleSaveTemplate();
+
       if (!cargaExitosa) return;
+
+      setMostrarValidacionCP(false);
       setPostCargaActiva(true);
-    } else if (activeStep === 2) {
+
+      return;
+    }
+    else if (activeStep === 2) {
       await handleSaveCampaign();
     } else if (activeStep === 1) {
       if (!mensajeAceptado) {
@@ -1431,6 +1451,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
     setRecycleCount(1);
     setBlacklistEnabled(false);
     setSelectedBlackListIds([]);
+    setSinCodigoPostal(false);
     setHorarios([{
       titulo: "Horario 1",
       start: null,
@@ -1464,6 +1485,8 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
     closeCalendar();
     setAnchorEl(null);
     resetUploadState();
+    setMostrarValidacionCP(false);
+    setSelectPostalCode("");
   };
 
 
@@ -2152,6 +2175,9 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
 
     // En cualquier otro caso, retroceder de paso normalmente
     setActiveStep((prev) => prev - 1);
+    setMostrarValidacionCP(false);
+    setSinCodigoPostal(false);
+    setSelectPostalCode("");
   };
 
 
@@ -4751,14 +4777,18 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  gap: 27, marginBottom: "-10px", mt: 1
+                  marginBottom: "-10px", mt: 1,
+                  marginLeft: mostrarValidacionCP ? "-50px" : "0px",
+                  gap: mostrarValidacionCP ? 21 : 27
                 }}
                 >
                   <Typography sx={{ fontFamily: 'Poppins', fontSize: '18px', color: '#330F1B', textAlign: 'left' }}>
                     Archivo cargado
                   </Typography>
                   <Typography sx={{ fontFamily: 'Poppins', fontSize: '18px', color: '#330F1B', textAlign: 'right' }}>
-                    Seleccionar datos
+                    {mostrarValidacionCP
+                      ? "Validación de código postal"
+                      : "Seleccionar datos"}
                   </Typography>
                 </Box>
               )}
@@ -4768,7 +4798,8 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                   justifyContent: 'space-between',
                   gap: 4,
                   width: '100%',
-                  marginTop: '16px', overflowY: "hidden"
+                  marginTop: '16px',
+                  overflowY: mostrarValidacionCP ? "hidden" : "visible",
                 }}
               >
 
@@ -4830,7 +4861,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                         <Box
                           sx={{
                             position: 'absolute',
-                            marginTop: "-140px",
+                            marginTop: "-148px",
                             marginRight: '-140px',
                             width: 24,
                             height: 24,
@@ -4995,7 +5026,9 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                             }}
                           >
                             {fileSuccess && uploadedFile
-                              ? uploadedFile.name
+                              ? uploadedFile.name.length > 30
+                                ? `${uploadedFile.name.slice(0, 30)}...`
+                                : uploadedFile.name
                               : 'Arrastre un archivo aquí, o selecciónelo.'}
                           </Typography>
                           {fileSuccess && (
@@ -5123,7 +5156,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                 )}
                 {/* DropZon´t para pagina siguiente (Archivo cargado / Seleccionar datos)*/}
                 {!postCargaActiva && uploadedFile && (
-                  <Box sx={{ width: "320px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <Box sx={{ width: "320px", display: "flex", flexDirection: "column", alignItems: "center", marginLeft: mostrarValidacionCP ? "-40px" : "0px", }}>
                     <Box
                       marginBottom={'20px'} marginTop={'10px'}
                       onClick={() => fileInputRef.current?.click()}
@@ -5138,9 +5171,9 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                       }}
                       sx={{
                         display: 'flex',
-                        justifyContent: fileSuccess ? 'flex-start' : 'center', // 👈 aquí está la magia
+                        justifyContent: fileSuccess ? 'flex-start' : 'center',
                         alignItems: 'center',
-                        width: '100%',
+                        width: '100%'
                       }}
                     >
                       <Box
@@ -5172,14 +5205,14 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           color: '#330F1B',
                           cursor: 'pointer',
                           px: 1,
-                          marginLeft: fileSuccess ? '80px' : '380px',
+                          marginLeft: fileSuccess ? '76px' : '380px',
                         }}
                       >
                         {/*Tooltip */}
                         <Box
                           sx={{
                             position: 'absolute',
-                            marginTop: "-140px",
+                            marginTop: "-148px",
                             marginRight: '-140px',
                             width: 24,
                             height: 24,
@@ -5229,7 +5262,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                                 {
                                   name: 'offset',
                                   options: {
-                                    offset: [104, -260] //  [horizontal, vertical]
+                                    offset: [104, -30]
                                   }
                                 }
                               ]
@@ -5241,12 +5274,12 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                               style={{ width: '24px', height: '24px', pointerEvents: 'auto', cursor: 'default' }}
                             />
                           </Tooltip>
-                          {!postCargaActiva && uploadedFile && (
+                          {!postCargaActiva && uploadedFile && !mostrarValidacionCP && (
                             <Tooltip title="Eliminar" arrow placement="top"
                               componentsProps={{
                                 tooltip: {
                                   sx: {
-                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                    backgroundColor: "rgba(0, 0, 0, 0.9)",
                                     color: "#CCC3C3",
                                     fontFamily: "Poppins, sans-serif",
                                     fontSize: "12px",
@@ -5346,7 +5379,9 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                             }}
                           >
                             {fileSuccess && uploadedFile
-                              ? uploadedFile.name
+                              ? uploadedFile.name.length > 30
+                                ? `${uploadedFile.name.slice(0, 30)}...`
+                                : uploadedFile.name
                               : 'Arrastre un archivo aquí, o selecciónelo.'}
                           </Typography>
                           {fileSuccess && (
@@ -5410,6 +5445,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                         <Select
                           value={selectedSheet}
                           onChange={handleSheetChange}
+                          disabled={mostrarValidacionCP}
                           displayEmpty
                           renderValue={(selected) =>
                             selected ? (
@@ -5429,7 +5465,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                             width: '200px',
                             height: '40px',
                             borderRadius: '8px',
-                            backgroundColor: '#FFFFFF',
+                            backgroundColor: mostrarValidacionCP ? "#E3E2E2" : "#FFFFFF",
                             fontFamily: 'Poppins',
                             fontSize: '12px',
                             mb: 0
@@ -5467,11 +5503,11 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                 )}
 
                 {/*Caja visual para archivos subidos en (Archivo cargado / Seleccionar datos)*/}
-                {!postCargaActiva && uploadedFile && (
+                {!postCargaActiva && !mostrarValidacionCP && uploadedFile && (
                   <Box
                     sx={{
                       position: "absolute", width: "312px", height: "305px", borderRadius: '15px', marginBottom: "-10px",
-                      border: "1px solid #E6E4E4", marginLeft: "25px", marginTop: "-5px", pointerEvents: "none",
+                      border: "1px solid #E6E4E4", marginLeft: "20px", marginTop: "-5px", pointerEvents: "none",
                     }}
                   >
                     <Divider sx={{
@@ -5480,10 +5516,10 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                   </Box>
                 )}
                 {/*Teléfonos y Variables en (Archivo cargado / Seleccionar datos)*/}
-                {!postCargaActiva && uploadedFile && (
+                {!postCargaActiva && !mostrarValidacionCP && uploadedFile && (
                   <Box sx={{
-                    width: 380, border: '1px solid #E0E0E0', borderRadius: '12px', padding: '20px',
-                    marginTop: '-0px', fontFamily: 'Poppins',
+                    width: 400, height: 305, border: '1px solid #E0E0E0', borderRadius: '12px', padding: '20px',
+                    marginTop: '-5px', fontFamily: 'Poppins'
                   }}>
                     <Tabs
                       value={selectedTab}
@@ -5495,7 +5531,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                         marginTop: '-20px',
                         marginBottom: '14px',
                         '.MuiTabs-flexContainer': {
-                          width: '100%',
+                          width: '100%'
                         },
                         '.MuiTab-root': {
                           fontFamily: 'Poppins',
@@ -5504,7 +5540,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           textTransform: 'none',
                           color: '#7B354D',
                           paddingBottom: '6px',
-                          flex: 1, // <-- esto reparte mitad y mitad
+                          flex: 1, // esto separa
                           justifyContent: 'center',
                           marginBottom: '10px',
                           '&:hover': {
@@ -5542,43 +5578,78 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                                       sx={{
                                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                                         border: '1px solid #A46F80', borderRadius: '4px', padding: '6px 12px',
-                                        marginBottom: '10px', backgroundColor: '#F2EBED', width: '192px', height: "40px", cursor: 'grab'
+                                        marginBottom: '10px', backgroundColor: '#F2EBED', width: '318px',
+                                        height: "40px", cursor: 'grab'
                                       }}
                                     >
                                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <Checkbox checked onChange={toggleValue}
                                           icon={
-                                            <Box
-                                              sx={{
-                                                width: 24,
-                                                height: 24,
-                                                border: '2px solid #8F4E63',
-                                                borderRadius: '2px',
-                                              }}
+                                            <Box sx={{
+                                              width: 24,
+                                              height: 24,
+                                              border: '2px solid #8F4E63',
+                                              borderRadius: '2px',
+                                            }}
                                             />
                                           }
                                           checkedIcon={
-                                            <Box
-                                              sx={{
-                                                width: '24px',
-                                                height: '24px',
-                                                position: 'relative',
-                                                marginTop: '0px',
-                                                marginLeft: '0px',
-                                              }}
+                                            <Box sx={{
+                                              width: '24px',
+                                              height: '24px',
+                                              position: 'relative',
+                                              marginTop: '0px',
+                                              marginLeft: '0px',
+                                            }}
                                             >
-                                              <img
-                                                src={IconCheckBox1}
-                                                alt="Seleccionado"
-                                                style={{ width: '24px', height: '24px' }}
-                                              />
+                                              <img src={IconCheckBox1} alt="Seleccionado"
+                                                style={{ width: '24px', height: '24px' }} />
                                             </Box>
                                           }
                                           sx={{ '&.Mui-checked': { color: '#7B354D' } }} />
-                                        <Typography sx={{
-                                          fontFamily: 'Poppins', fontSize: '16px', color: "#8F4D63"
-
-                                        }}>{col}</Typography>
+                                        <Tooltip
+                                          title={col.length > 20 ? col : ""}
+                                          arrow placement="top"
+                                          disableHoverListener={col.length <= 20}
+                                          componentsProps={{
+                                            tooltip: {
+                                              sx: {
+                                                backgroundColor: "rgb(43, 42, 42)",
+                                                color: "#cecece",
+                                                fontFamily: "Poppins, sans-serif",
+                                                fontSize: "12px",
+                                                padding: "8px 16px",
+                                                borderRadius: "8px",
+                                                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.4)"
+                                              }
+                                            },
+                                            arrow: {
+                                              sx: {
+                                                color: "rgba(0, 0, 0, 0.8)"
+                                              }
+                                            }
+                                          }}
+                                          PopperProps={{
+                                            modifiers: [
+                                              {
+                                                name: 'offset',
+                                                options: {
+                                                  offset: [0, -8]
+                                                }
+                                              }
+                                            ]
+                                          }}
+                                        >
+                                          <Typography sx={{
+                                            fontFamily: 'Poppins', fontSize: '16px', color: "#8F4D63",
+                                            maxWidth: "190px",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
+                                          }}>
+                                            {col}
+                                          </Typography>
+                                        </Tooltip>
                                       </Box>
                                       <DragIndicatorIcon sx={{ fontSize: '18px', color: '#576771', cursor: 'grab', width: '24px', height: "24px" }} />
                                     </Box>
@@ -5606,13 +5677,73 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                                     sx={{
                                       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                                       border: '1px solid #786F72', borderRadius: '4px', padding: '6px 12px',
-                                      marginBottom: '10px', backgroundColor: '#FFF', width: '192px',
+                                      marginBottom: '10px', backgroundColor: '#FFF', width: '318px',
                                       opacity: isDisabled ? 0.6 : 1, height: "40px",
                                     }}
                                   >
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, }}>
-                                      <Checkbox checked={false} onChange={toggleValue} disabled={isDisabled} sx={{ '&.Mui-checked': { color: '#7B354D' } }} />
-                                      <Typography sx={{ fontFamily: 'Poppins', fontSize: '16px', color: "#574B4F", opacity: 0.9 }}>{col}</Typography>
+                                      <Checkbox checked={false} onChange={toggleValue} disabled={isDisabled}
+                                        icon={
+                                          isDisabled ? (
+                                            <img
+                                              src={IconCheckBox1}
+                                              alt="Checkbox deshabilitado"
+                                              style={{
+                                                width: 24,
+                                                height: 24,
+                                                opacity: 0.5,
+                                                filter: "grayscale(100%)",
+                                              }}
+                                            />
+                                          ) : (
+                                            undefined
+                                          )}
+                                        sx={{ '&.Mui-checked': { color: '#7B354D' } }}
+                                      />
+
+                                      <Tooltip
+                                        title={col.length > 20 ? col : ""}
+                                        arrow placement="top"
+                                        disableHoverListener={col.length <= 20}
+                                        componentsProps={{
+                                          tooltip: {
+                                            sx: {
+                                              backgroundColor: "rgb(43, 42, 42)",
+                                              color: "#cecece",
+                                              fontFamily: "Poppins, sans-serif",
+                                              fontSize: "12px",
+                                              padding: "8px 16px",
+                                              borderRadius: "8px",
+                                              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.4)"
+                                            }
+                                          },
+                                          arrow: {
+                                            sx: {
+                                              color: "rgba(0, 0, 0, 0.8)"
+                                            }
+                                          }
+                                        }}
+                                        PopperProps={{
+                                          modifiers: [
+                                            {
+                                              name: 'offset',
+                                              options: {
+                                                offset: [0, -8]
+                                              }
+                                            }
+                                          ]
+                                        }}
+                                      >
+                                        <Typography sx={{
+                                          fontFamily: 'Poppins', fontSize: '16px', color: "#574B4F", opacity: 0.9,
+                                          maxWidth: "190px",
+                                          overflow: "hidden",
+                                          textOverflow: "ellipsis",
+                                          whiteSpace: "nowrap",
+                                        }}>
+                                          {col}
+                                        </Typography>
+                                      </Tooltip>
                                     </Box>
                                     <DragIndicatorIcon sx={{ fontSize: '18px', color: '#576771', width: '24px', height: "24px", fontFamily: "Poppins", opacity: 0.8 }} />
                                   </Box>
@@ -5625,25 +5756,191 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                   </Box>
                 )}
 
+                {/*Validación de código postal*/}
+                {mostrarValidacionCP && !postCargaActiva && (
+                  <>
+                    <Box
+                      sx={{
+                        position: "absolute", width: "268px", height: "305px", borderRadius: '15px', marginBottom: "-10px",
+                        border: "1px solid #E6E4E4", marginTop: "-5px", pointerEvents: "none", marginLeft: "4px"
+                      }}
+                    >
+                      <Divider sx={{
+                        width: 'calc(100% + 0px)', marginTop: '240px',
+                      }} />
+                    </Box>
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        width: "454px", height: "305px", borderRadius: '15px', marginBottom: "0px",
+                        border: "1px solid #E6E4E4", marginTop: "-5px", marginLeft: "290px",
+                        //backgroundColor: "red"
+                      }}
+                    ></Box>
+
+                    {/*Texto, select y Chechbox de código postal*/}
+                    <Box sx={{
+                      display: "flex", overflowX: "hidden",
+                      flexDirection: "column",
+                      gap: 2, width: "454px", height: "305px", marginTop: "4px", marginLeft: "-16px",
+                      //backgroundColor: "red"
+                    }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-start",
+                          width: "100%",
+                          padding: '14px'
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: "16px",
+                            fontFamily: "Poppins, sans-serif",
+                            color: "#574B4F",
+                            textAlign: "left",
+                          }}
+                        >
+                          Selecciona la columna con el código postal (CP)<br />
+                          de cada registro. Los CP válidos deberán<br />
+                          encontrarse en el rango de 01000 a 99998.
+                        </Typography>
+                      </Box>
+
+                      <FormControl fullWidth
+                        disabled={sinCodigoPostal}
+                        sx={{
+                          width: "420px",
+                          alignSelf: "center",
+                        }}>
+                        <Select
+                          value={selectPostalCode}
+                          onChange={(e) => setSelectPostalCode(e.target.value)}
+                          displayEmpty
+                          renderValue={(selected) =>
+                            selected ? (
+                              <span
+                                style={{
+                                  color: "#786E71",
+                                  fontFamily: "Poppins, sans-serif",
+                                  fontSize: "12px",
+                                }}
+                              >
+                                {selected}
+                              </span>
+                            ) : (
+                              <span
+                                style={{
+                                  color: "#786E71",
+                                  fontFamily: "Poppins, sans-serif",
+                                  fontSize: "12px",
+                                }}
+                              >
+                                Seleccionar
+                              </span>
+                            )
+                          }
+                          sx={{
+                            color: "#786E71",
+                            width: "420px",
+                            height: "40px",
+                            borderRadius: "8px",
+                            backgroundColor: sinCodigoPostal ? "#E3E2E2" : "#FFFFFF",
+                            fontFamily: "Poppins",
+                            fontSize: "12px",
+                          }}
+                        >
+                          <MenuItem value="Seleccionar"
+                            sx={{
+                              fontFamily: 'Poppins, sans-serif',
+                              fontSize: '12px',
+                              color: '#9B9295',
+                              '&:hover': {
+                                backgroundColor: '#F2EBED', // color solo al pasar el mouse
+                              },
+                              '&.Mui-selected': {
+                                backgroundColor: 'transparent', //  quita el fondo cuando está seleccionado
+                              },
+                              '&.Mui-selected:hover': {
+                                backgroundColor: '#F2EBED', //  mantiene el hover cuando está seleccionado
+                              },
+                            }}
+                          >Contenido de Código postal</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          width: "100%",
+                          mt: 0.5, ml: 1.2
+                        }}
+                      >
+                        {/* Checkbox */}
+                        <Checkbox
+                          checked={sinCodigoPostal}
+                          onChange={(e) => setSinCodigoPostal(e.target.checked)}
+                          checkedIcon={
+                            <Box sx={{
+                              width: '24px',
+                              height: '24px',
+                              position: 'relative',
+                            }}
+                            >
+                              <img src={IconCheckBox1} alt="Seleccionado"
+                                style={{ width: '24px', height: '24px' }} />
+                            </Box>
+                          }
+                        />
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: "13px",
+                            fontFamily: "Poppins, sans-serif",
+                            color: sinCodigoPostal ? "#8F4D63" : "#574B4F",
+                            textAlign: "left",
+                            lineHeight: "18px",
+                          }}
+                        >
+                          No cuento con dato de código postal, acepto que la<br />
+                          validación de horarios será mi responsabilidad.
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </>
+                )}
                 {/*Box con Estados y Registros (Detalle de carga)*/}
                 {postCargaActiva && estadisticasCarga && (
                   <Box sx={{
                     position: "relative", width: "1000px",
                     minHeight: "500px", // altura fija
                     backgroundColor: "#FFFFFF",
-                    overflowY: "auto"
+                    overflowY: "auto",
+                    overflowX: "hidden"
                   }}>
-                    <Typography sx={{
-                      marginLeft: "30px", mt: -0, mb: "16px",
-                      fontFamily: 'Poppins', color: '#330F1B', fontWeight: 600, fontSize: '18px',
+                    <Box sx={{
+                      width: '708px', height: '55px',
+                      marginLeft: "20px",
+                      borderTop: "1px solid #E6E4E4",
+                      borderRight: "1px solid #E6E4E4",
+                      borderLeft: "1px solid #E6E4E4",
+                      borderBottom: "none",
+                      borderRadius: "12px 12px 0 0",
                     }}>
-                      Detalles de Carga
-                    </Typography>
+                      <Typography sx={{
+                        marginLeft: 2.8, mt: 1.5, mb: "16px",
+                        fontFamily: 'Poppins', color: '#330F1B', fontWeight: 500, fontSize: '18px',
+                      }}>
+                        Detalles de Carga
+                      </Typography>
+                    </Box>
                     <Box
                       sx={{
                         display: 'flex',
                         flexWrap: 'wrap', border: "1px solid #E6E4E4", marginLeft: "20px",
-                        width: '658px', height: '600px', gap: "2px", borderRadius: "12px",
+                        width: '708px', height: '463px', gap: "2px",
+                        borderRadius: "0 0 12px 12px",
                       }}
                     >
                       <Box sx={{
@@ -5663,7 +5960,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                             }
                           }}
                           sx={{
-                            justifyContent: fileSuccess ? 'flex-start' : 'center', // 👈 aquí está la magia
+                            justifyContent: fileSuccess ? 'flex-start' : 'center',
 
                             width: '200px',
                           }}
@@ -5704,7 +6001,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                             <Box
                               sx={{
                                 marginTop: "-42px",
-                                marginRight: '-140px',
+                                marginRight: '-148px',
                                 width: 24,
                                 height: 24,
 
@@ -5753,7 +6050,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                                     {
                                       name: 'offset',
                                       options: {
-                                        offset: [104, -260]
+                                        offset: [104, -30]
                                       }
                                     }
                                   ]
@@ -5877,7 +6174,9 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                                 }}
                               >
                                 {fileSuccess && uploadedFile
-                                  ? uploadedFile.name
+                                  ? uploadedFile.name.length > 30
+                                    ? `${uploadedFile.name.slice(0, 30)}...`
+                                    : uploadedFile.name
                                   : 'Arrastre un archivo aquí, o selecciónelo.'}
                               </Typography>
                               {fileSuccess && (
@@ -5902,7 +6201,8 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                         sx={{
                           display: 'flex',
                           flexWrap: 'wrap', height: "220px",
-                          width: '416px', marginTop: "16px", marginLeft: "86px"
+                          width: '464px', marginTop: "16px", marginLeft: "86px",
+                          //backgroundColor: "blue"
                         }}
                       >
                         {/* Box 1 de textos - Estados 1*/}
@@ -5910,7 +6210,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           sx={{
                             display: 'flex',
                             flexDirection: 'column',
-                            width: "100px",
+                            width: "188px",
                             height: "74px", mr: 1
                           }}
                         >
@@ -5941,7 +6241,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           sx={{
                             display: 'flex',
                             flexDirection: 'column',
-                            width: "100px",
+                            width: "90px",
                             height: "74px", mr: 1
                           }}
                         >
@@ -6033,7 +6333,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           sx={{
                             display: 'flex',
                             flexDirection: 'column',
-                            width: "100px",
+                            width: "188px",
                             height: "74px", mt: -0, mr: 0
                           }}
                         >
@@ -6057,6 +6357,20 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           }}
                           >No cargados
                           </Typography>
+
+                          <Typography sx={{
+                            fontWeight: 500, fontSize: '12px', fontFamily: 'Poppins, sans-serif',
+                            marginBottom: '6px', color: '#574B4F'
+                          }}
+                          >Cargados con código postal
+                          </Typography>
+
+                          <Typography sx={{
+                            fontWeight: 500, fontSize: '12px', fontFamily: 'Poppins, sans-serif',
+                            marginBottom: '6px', color: '#574B4F'
+                          }}
+                          >Cargados sin código postal
+                          </Typography>
                         </Box>
 
                         {/* Box 5 de textos - Teléfonos */}
@@ -6064,8 +6378,8 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           sx={{
                             display: 'flex',
                             flexDirection: 'column',
-                            width: "100px",
-                            height: "74px", mt: -0
+                            width: "90px",
+                            height: "74px", mt: -0, marginLeft: "10px",
                           }}
                         >
                           <Typography sx={{
@@ -6088,22 +6402,36 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           }}
                           > {estadisticasCarga.telefonosFallidos}
                           </Typography>
+
+                          <Typography sx={{
+                            fontWeight: 500, fontSize: '12px', fontFamily: 'Poppins, sans-serif',
+                            marginBottom: '6px', color: '#574B4F'
+                          }}
+                          > 0
+                          </Typography>
+
+                          <Typography sx={{
+                            fontWeight: 500, fontSize: '12px', fontFamily: 'Poppins, sans-serif',
+                            marginBottom: '6px', color: '#574B4F'
+                          }}
+                          > 0
+                          </Typography>
                         </Box>
 
                       </Box>
                       <Divider
                         sx={{
                           position: "absolute",
-                          width: 'calc(80% + 60px)',
-                          marginTop: '230px',
+                          width: 'calc(80% + 112px)',
+                          marginTop: '260px',
                         }}
                       />
                       <Box sx={{
-                        width: "658px", height: "30px", marginTop: "-116px"
+                        width: "708px", height: "30px", marginTop: "30px"
                       }}>
                         <Typography sx={{
-                          fontFamily: "Poppins", fontSize: "16px", fontWeight: 600,
-                          color: "#330F1B", ml: 2
+                          fontFamily: "Poppins", fontSize: "18px", fontWeight: 500,
+                          color: "#330F1B", ml: 2.8
                         }}>
                           Datos seleccionados
                         </Typography>
@@ -6111,16 +6439,17 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
 
                       <Box sx={{
                         display: 'flex', flexDirection: 'row',
-                        gap: 0, marginTop: "-205px", ml: "-1px"
+                        gap: 0, marginTop: "4px", ml: "-1px", width: '%100',
+                        flex: 1,
                       }}>
                         {/*Teléfonos*/}
                         <Box
                           sx={{
-                            flex: 1,
-                            border: '1px solid #E6E4E4',
+                            borderTop: "1px solid #E6E4E4",
+                            borderRight: "1px solid #E6E4E4",
                             padding: '12px',
-                            maxHeight: '200px', width: "329px",
-                            overflowY: 'auto',
+                            maxHeight: '137px',
+                            overflowY: 'auto', width: '50%'
                           }}
                         >
                           <Typography sx={{
@@ -6137,21 +6466,21 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                                 sx={{
                                   justifyContent: 'space-between',
                                   border: '1px solid #A46F80',
-                                  width: '192px', height: "40px",
+                                  width: '260px', height: "40px",
                                   color: '#8F4D63',
                                   fontFamily: 'Poppins',
                                   textTransform: 'none',
                                   borderRadius: '4px',
                                   fontSize: '14px',
-                                  padding: '6px 12px',
+                                  padding: '6px 12px', backgroundColor: "#E5CBD333",
                                   '&:hover': {
                                     backgroundColor: '#F2EBED',
                                     borderColor: '#8F4D63',
                                   },
                                 }}
                               >
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: -1 }}>
-                                  <Checkbox checked={true}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: 1 }}>
+                                  {/* <Checkbox checked={true}
                                     icon={
                                       <Box
                                         sx={{
@@ -6179,16 +6508,50 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                                         />
                                       </Box>
                                     }
-                                    sx={{ '&.Mui-checked': { color: '#7B354D' } }} />
-                                  <Typography
-                                    sx={{
-                                      fontFamily: 'Poppins',
-                                      color: '#8F4D63',
-                                      fontSize: '16px',
+                                    sx={{ '&.Mui-checked': { color: '#7B354D' } }} /> */}
+                                  <Tooltip
+                                    title={variable.length > 20 ? variable : ""}
+                                    arrow placement="top"
+                                    disableHoverListener={variable.length <= 20}
+                                    componentsProps={{
+                                      tooltip: {
+                                        sx: {
+                                          backgroundColor: "rgb(43, 42, 42)",
+                                          color: "#cecece",
+                                          fontFamily: "Poppins, sans-serif",
+                                          fontSize: "12px",
+                                          padding: "6px 8px",
+                                          borderRadius: "8px",
+                                          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.4)"
+                                        }
+                                      },
+                                      arrow: {
+                                        sx: {
+                                          color: "rgba(0, 0, 0, 0.8)"
+                                        }
+                                      }
+                                    }}
+                                    PopperProps={{
+                                      modifiers: [
+                                        {
+                                          name: 'offset',
+                                          options: {
+                                            offset: [0, -8]
+                                          }
+                                        }
+                                      ]
                                     }}
                                   >
-                                    {variable}
-                                  </Typography>
+                                    <Typography sx={{
+                                      fontFamily: 'Poppins', fontSize: '16px', color: "#8F4D63",
+                                      maxWidth: "190px",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                    }}>
+                                      {variable}
+                                    </Typography>
+                                  </Tooltip>
                                 </Box>
                               </Button>
                             ))}
@@ -6198,11 +6561,10 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                         {/*Variables*/}
                         <Box
                           sx={{
-                            flex: 1,
-                            border: '1px solid #E6E4E4',
+                            borderTop: "1px solid #E6E4E4",
                             padding: '12px',
-                            maxHeight: '200px', width: "329px",
-                            overflowY: 'auto',
+                            maxHeight: '137px',
+                            overflowY: 'auto', width: '50%'
                           }}
                         >
                           <Typography sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '14px', color: '#330F1B', mb: 1 }}>
@@ -6216,21 +6578,21 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                                 sx={{
                                   justifyContent: 'space-between',
                                   border: '1px solid #A46F80',
-                                  width: '192px', height: "40px",
+                                  width: '260px', height: "40px",
                                   color: '#8F4D63',
                                   fontFamily: 'Poppins',
                                   textTransform: 'none',
                                   borderRadius: '4px',
                                   fontSize: '14px',
-                                  padding: '6px 12px',
+                                  padding: '6px 12px', backgroundColor: "#E5CBD333",
                                   '&:hover': {
                                     backgroundColor: '#F2EBED',
                                     borderColor: '#8F4D63',
                                   },
                                 }}
                               >
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: -1 }}>
-                                  <Checkbox checked={true}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, ml: 1 }}>
+                                  {/* <Checkbox checked={true}
                                     icon={
                                       <Box
                                         sx={{
@@ -6258,16 +6620,50 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                                         />
                                       </Box>
                                     }
-                                    sx={{ '&.Mui-checked': { color: '#7B354D' } }} />
-                                  <Typography
-                                    sx={{
-                                      fontFamily: 'Poppins',
-                                      color: '#8F4D63',
-                                      fontSize: '16px',
+                                    sx={{ '&.Mui-checked': { color: '#7B354D' } }} /> */}
+                                  <Tooltip
+                                    title={variable.length > 20 ? variable : ""}
+                                    arrow placement="top"
+                                    disableHoverListener={variable.length <= 20}
+                                    componentsProps={{
+                                      tooltip: {
+                                        sx: {
+                                          backgroundColor: "rgb(43, 42, 42)",
+                                          color: "#cecece",
+                                          fontFamily: "Poppins, sans-serif",
+                                          fontSize: "12px",
+                                          padding: "6px 8px",
+                                          borderRadius: "8px",
+                                          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.4)"
+                                        }
+                                      },
+                                      arrow: {
+                                        sx: {
+                                          color: "rgba(0, 0, 0, 0.8)"
+                                        }
+                                      }
+                                    }}
+                                    PopperProps={{
+                                      modifiers: [
+                                        {
+                                          name: 'offset',
+                                          options: {
+                                            offset: [0, -8]
+                                          }
+                                        }
+                                      ]
                                     }}
                                   >
-                                    {variable}
-                                  </Typography>
+                                    <Typography sx={{
+                                      fontFamily: 'Poppins', fontSize: '16px', color: "#8F4D63",
+                                      maxWidth: "190px",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                    }}>
+                                      {variable}
+                                    </Typography>
+                                  </Tooltip>
                                 </Box>
                               </Button>
                             ))}
@@ -7394,8 +7790,12 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
             <Button
               variant="contained"
               onClick={handleContinue}
-              disabled={isNextDisabled}
+              disabled={
+                isNextDisabled ||
+                (mostrarValidacionCP && !validacionCompleta)
+              }
               loading={loading}
+
               sx={{
                 width: "118px",
                 height: "36px",
@@ -7409,14 +7809,14 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                 letterSpacing: "1.12px",
               }}
             >
-              {activeStep === 2 || (activeStep === 0 && !postCargaActiva) ? "Crear" : "Siguiente"}
+              {activeStep === 2 || (activeStep === 0 && !postCargaActiva) ? "Siguiente" : "Siguiente"}
 
             </Button>
           </Box>
         </DialogActions>
 
 
-      </Dialog>
+      </Dialog >
 
 
       <CustomDateTimePicker
