@@ -164,7 +164,7 @@ export interface CampaignFullResponse {
   exceptionRate: number;
   schedules: CampaignScheduleDto[];
   recycleSetting?: CampaignRecycleSettingDto;
-  contacts: CampaignContactDto[];
+  contacts?: CampaignContactDto[];
   saveAsTemplate: boolean;
   templateName: String;
   campaignContactScheduleSendDTO?: CampaignContactScheduleSendDTO[];
@@ -612,8 +612,8 @@ const Campains: React.FC = () => {
       setEditSelectedBlackListIds([]);
     }
 
-    const tieneDato = campaign.contacts.some(c => !!c.dato);
-    const tieneID = campaign.contacts.some(c => !!c.datoId);
+const tieneDato = (campaign.contacts ?? []).some(c => !!c.dato);
+const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
     const vars: string[] = [];
     if (tieneDato) vars.push("Dato");
     if (tieneID) vars.push("ID");

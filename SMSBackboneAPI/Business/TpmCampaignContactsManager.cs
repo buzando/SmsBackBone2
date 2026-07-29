@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ClosedXML.Excel;
+﻿using ClosedXML.Excel;
 using Contract.Other;
 using Contract.Request;
 using Contract.Response;
 using DocumentFormat.OpenXml.Office2013.Excel;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Modal;
-using Modal.Model.Model; // Asegúrate que tu contexto y entidad estén aquí
+using Modal.Model.Model;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace Business
 {
@@ -20,7 +23,8 @@ namespace Business
             try
             {
                 var archivoBytes = Convert.FromBase64String(dto.Base64File);
-                var lista = new List<tpm_CampaignContacts>();
+                var table = CreateTmpContactsTable();
+                const int batchSize = 5000;
 
                 using (var stream = new MemoryStream(archivoBytes))
                 using (var workbook = new XLWorkbook(stream))
@@ -44,7 +48,16 @@ namespace Business
                             }
 
                             ObtenerDatosDetallados(hoja, fila, headers, dto.DatoColumns, out string dato, out string datoId, out string misc01);
+                            var cpRaw = ObtenerValorColumna(hoja, fila, headers, dto.CpColumn);
+                            var cp = NormalizeZipCode(cpRaw);
 
+                            var cpVacio = string.IsNullOrWhiteSpace(cpRaw);
+                            var cpInvalido = !cpVacio && string.IsNullOrWhiteSpace(cp);
+
+                            if (cpInvalido)
+                            {
+                                resultado.CodigosPostalesFallidos++;
+                            }
                             var telefonos = phoneConcat.Split('|', StringSplitOptions.RemoveEmptyEntries);
                             int telefonosValidos = 0;
 
@@ -52,16 +65,29 @@ namespace Business
                             {
                                 if (EsTelefonoValido(telefono))
                                 {
-                                    lista.Add(new tpm_CampaignContacts
+                                    table.Rows.Add(
+                                        dto.SessionId,
+                                        telefono,
+                                        dato,
+                                        datoId,
+                                        misc01,
+                                        null, // Misc02
+                                        cp,   // CP válido o null
+                                        DateTime.Now,
+                                        dto.CreatedBy
+                                    );
+
+                                    if (!string.IsNullOrWhiteSpace(cp))
                                     {
-                                        SessionId = dto.SessionId,
-                                        PhoneNumber = telefono,
-                                        Dato = dato,
-                                        DatoId = datoId,
-                                        Misc01 = misc01,
-                                        CreatedAt = DateTime.Now,
-                                        CreatedBy = dto.CreatedBy
-                                    });
+                                        resultado.CodigosPostalesCargados++;
+                                    }
+
+                                    if (table.Rows.Count >= batchSize)
+                                    {
+                                        BulkInsertTmpContacts(table);
+                                        table.Clear();
+                                    }
+
                                     telefonosValidos++;
                                 }
                                 else
@@ -86,10 +112,10 @@ namespace Business
 
                 }
 
-                using (var ctx = new Entities())
+                if (table.Rows.Count > 0)
                 {
-                    ctx.tpm_CampaignContacts.AddRange(lista);
-                    ctx.SaveChanges();
+                    BulkInsertTmpContacts(table);
+                    table.Clear();
                 }
 
 
@@ -129,6 +155,11 @@ namespace Business
         {
             dato = string.Empty;
             datoId = string.Empty;
+            misc01 = string.Empty;
+
+            if (columnas == null || columnas.Count == 0)
+                return;
+
             var otros = new List<string>();
 
             foreach (var nombre in columnas)
@@ -176,6 +207,90 @@ namespace Business
                 && numero.All(char.IsDigit)
                 && numero.Length >= 10
                 && numero.Length <= 15;
+        }
+
+        private string ObtenerValorColumna(
+    IXLWorksheet hoja,
+    int fila,
+    List<HeaderInfo> headers,
+    string columna)
+        {
+            if (string.IsNullOrWhiteSpace(columna))
+                return null;
+
+            var header = headers.FirstOrDefault(h =>
+                string.Equals(h.Header?.Trim(), columna.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            if (header == null)
+                return null;
+
+            return hoja.Cell(fila, header.Index).GetFormattedString()?.Trim();
+        }
+
+        private string NormalizeZipCode(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            var digits = new string(value.Trim().Where(char.IsDigit).ToArray());
+
+            // Por si Excel trae 01000 como número y lo convierte en 1000
+            if (digits.Length == 4)
+                digits = digits.PadLeft(5, '0');
+
+            return digits.Length == 5 ? digits : null;
+        }
+
+        private DataTable CreateTmpContactsTable()
+        {
+            var table = new DataTable();
+
+            table.Columns.Add("SessionId", typeof(string));
+            table.Columns.Add("PhoneNumber", typeof(string));
+            table.Columns.Add("Dato", typeof(string));
+            table.Columns.Add("DatoId", typeof(string));
+            table.Columns.Add("Misc01", typeof(string));
+            table.Columns.Add("Misc02", typeof(string));
+            table.Columns.Add("CP", typeof(string));
+            table.Columns.Add("CreatedAt", typeof(DateTime));
+            table.Columns.Add("CreatedBy", typeof(string));
+
+            return table;
+        }
+
+        private void BulkInsertTmpContacts(DataTable table)
+        {
+            if (table == null || table.Rows.Count == 0)
+                return;
+
+            using var ctx = new Entities();
+
+            var connectionString = ctx.Database.GetDbConnection().ConnectionString;
+
+            using var connection = new SqlConnection(connectionString);
+            connection.Open();
+
+            using var bulk = new SqlBulkCopy(
+    connection,
+    SqlBulkCopyOptions.Default,
+    null
+);
+
+            bulk.DestinationTableName = "dbo.tpm_CampaignContacts";
+            bulk.BatchSize = 5000;
+            bulk.BulkCopyTimeout = 300;
+
+            bulk.ColumnMappings.Add("SessionId", "SessionId");
+            bulk.ColumnMappings.Add("PhoneNumber", "PhoneNumber");
+            bulk.ColumnMappings.Add("Dato", "Dato");
+            bulk.ColumnMappings.Add("DatoId", "DatoId");
+            bulk.ColumnMappings.Add("Misc01", "Misc01");
+            bulk.ColumnMappings.Add("Misc02", "Misc02");
+            bulk.ColumnMappings.Add("CP", "CP");
+            bulk.ColumnMappings.Add("CreatedAt", "CreatedAt");
+            bulk.ColumnMappings.Add("CreatedBy", "CreatedBy");
+
+            bulk.WriteToServer(table);
         }
     }
 }

@@ -386,36 +386,35 @@ namespace Business
         {
             try
             {
-                using (var ctx = new Entities())
-                {
-                    var contactosTemporales = ctx.tpm_CampaignContacts
-                        .Where(c => c.SessionId == sessionId)
-                        .ToList();
+                using var ctx = new Entities();
 
-                    if (!contactosTemporales.Any())
-                        return false;
+                var inserted = ctx.Database.ExecuteSqlRaw(@"
+            INSERT INTO dbo.CampaignContacts
+            (
+                CampaignId,
+                PhoneNumber,
+                Dato,
+                DatoId,
+                Misc01,
+                Misc02,
+                CP
+            )
+            SELECT
+                {0},
+                PhoneNumber,
+                Dato,
+                DatoId,
+                Misc01,
+                Misc02,
+                CP
+            FROM dbo.tpm_CampaignContacts
+            WHERE SessionId = {1};
+        ", campaignId, sessionId);
 
-
-                    var contactosDefinitivos = contactosTemporales.Select(temp => new CampaignContacts
-                    {
-                        CampaignId = campaignId,
-                        PhoneNumber = temp.PhoneNumber,
-                        Dato = temp.Dato,
-                        DatoId = temp.DatoId,
-                        Misc01 = temp.Misc01,
-                        Misc02 = temp.Misc02
-                    }).ToList();
-
-
-                    ctx.CampaignContacts.AddRange(contactosDefinitivos);
-                    ctx.SaveChanges();
-
-                    return true;
-                }
+                return inserted > 0;
             }
-            catch (Exception ex)
+            catch
             {
-                // Aquí puedes loguear el error si usas algún sistema de logging
                 return false;
             }
         }
@@ -471,7 +470,8 @@ namespace Business
                                     Dato = cc.Dato,
                                     DatoId = cc.DatoId,
                                     Misc01 = cc.Misc01,
-                                    Misc02 = cc.Misc02
+                                    Misc02 = cc.Misc02,
+                                    CP = cc.CP
                                 }).ToList(),
 
                             CampaignContactScheduleSendDTO = ctx.CampaignContactScheduleSend
@@ -650,30 +650,9 @@ namespace Business
                         // ============================
                         // Resultset 4: Contacts
                         // ============================
+                        // Ya no se cargan contactos completos en el listado.
+                        // Para campañas grandes esto provoca timeout.
                         reader.NextResult();
-                        while (reader.Read())
-                        {
-                            int campaignId = reader.GetInt32(reader.GetOrdinal("CampaignId"));
-                            var contact = new CampaignContactDto
-                            {
-                                PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
-                                Dato = reader.IsDBNull(reader.GetOrdinal("Dato"))
-                                    ? null
-                                    : reader.GetString(reader.GetOrdinal("Dato")),
-                                DatoId = reader.IsDBNull(reader.GetOrdinal("DatoId"))
-                                    ? null
-                                    : reader.GetString(reader.GetOrdinal("DatoId")),
-                                Misc01 = reader.IsDBNull(reader.GetOrdinal("Misc01"))
-                                    ? null
-                                    : reader.GetString(reader.GetOrdinal("Misc01")),
-                                Misc02 = reader.IsDBNull(reader.GetOrdinal("Misc02"))
-                                    ? null
-                                    : reader.GetString(reader.GetOrdinal("Misc02"))
-                            };
-
-                            var campaign = campaigns.FirstOrDefault(c => c.Id == campaignId);
-                            campaign?.Contacts.Add(contact);
-                        }
 
                         // ============================
                         // Resultset 5: CampaignContactScheduleSendDTO
@@ -977,7 +956,8 @@ namespace Business
                             Dato = c.Dato,
                             DatoId = c.DatoId,
                             Misc01 = c.Misc01,
-                            Misc02 = c.Misc02
+                            Misc02 = c.Misc02,
+                            CP = c.CP
                         });
                     }
 

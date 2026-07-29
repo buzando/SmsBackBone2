@@ -34,5 +34,6 @@ namespace Modal.Model.Model
 
         [MaxLength(100)]
         public string CreatedBy { get; set; }
+        public string CP { get; set; }
     }
 }

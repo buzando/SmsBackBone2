@@ -16,7 +16,8 @@ namespace Contract.Request
         public List<string> DatoColumns { get; set; }   
 
         public string SessionId { get; set; }           
-        public string CreatedBy { get; set; }          
+        public string CreatedBy { get; set; }
+        public string? CpColumn { get; set; }
 
     }
 }

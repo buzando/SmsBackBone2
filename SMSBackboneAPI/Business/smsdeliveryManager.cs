@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO.Pipelines;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Contract;
 using Contract.Other;
 using Contract.Response;
-using DocumentFormat.OpenXml.Spreadsheet;
 using log4net;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Modal;
 using Modal.Model.Model;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Business
@@ -23,7 +19,9 @@ namespace Business
     {
         private static readonly TimeSpan HorarioInicio = new TimeSpan(7, 0, 0);  // 07:00
         private static readonly TimeSpan HorarioFin = new TimeSpan(21, 0, 0);    // 21:00
-        private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private static readonly ILog _logger =
+            LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public List<LightCampaignResult> GetLightCampaigns(List<int> campaigns)
         {
@@ -32,6 +30,7 @@ namespace Business
 
             var campaignIdsTable = new DataTable();
             campaignIdsTable.Columns.Add("Value", typeof(int));
+
             foreach (var id in campaigns)
                 campaignIdsTable.Rows.Add(id);
 
@@ -40,21 +39,28 @@ namespace Business
                 using (var ctx = new Entities())
                 {
                     var connection = (SqlConnection)ctx.Database.GetDbConnection();
-                    connection.Open();
+
+                    if (connection.State != ConnectionState.Open)
+                        connection.Open();
 
                     using (var cmd = new SqlCommand("sp_getPendingContacts", connection))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.CommandTimeout = 120;
 
                         var param = cmd.Parameters.AddWithValue("@CampaignIds", campaignIdsTable);
                         param.SqlDbType = SqlDbType.Structured;
                         param.TypeName = "dbo.IntList";
 
                         cmd.Parameters.AddWithValue("@TopContacts",
-                            string.IsNullOrWhiteSpace(topcontacts) ? (object)DBNull.Value : int.Parse(topcontacts));
+                            string.IsNullOrWhiteSpace(topcontacts)
+                                ? (object)DBNull.Value
+                                : int.Parse(topcontacts));
 
                         using (var reader = cmd.ExecuteReader())
                         {
+                            int cpOrdinal = TryGetOrdinal(reader, "CP");
+
                             while (reader.Read())
                             {
                                 var campaignId = reader.GetInt32(reader.GetOrdinal("CampaignId"));
@@ -68,7 +74,9 @@ namespace Business
                                         Name = reader.GetString(reader.GetOrdinal("Name")),
                                         Message = reader.GetString(reader.GetOrdinal("Message")),
                                         UseTemplate = reader.GetBoolean(reader.GetOrdinal("UseTemplate")),
-                                        TemplateId = reader.IsDBNull(reader.GetOrdinal("TemplateId")) ? null : reader.GetInt32(reader.GetOrdinal("TemplateId")),
+                                        TemplateId = reader.IsDBNull(reader.GetOrdinal("TemplateId"))
+                                            ? null
+                                            : reader.GetInt32(reader.GetOrdinal("TemplateId")),
                                         FlashMessage = reader.GetBoolean(reader.GetOrdinal("FlashMessage")),
                                         CustomANI = reader.GetBoolean(reader.GetOrdinal("CustomANI")),
                                         NumberType = reader.GetInt32(reader.GetOrdinal("NumberType")),
@@ -96,10 +104,19 @@ namespace Business
                                     Id = reader.GetInt32(reader.GetOrdinal("ContactId")),
                                     CampaignId = campaignId,
                                     PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
-                                    Dato = reader.IsDBNull(reader.GetOrdinal("Dato")) ? null : reader.GetString(reader.GetOrdinal("Dato")),
-                                    DatoId = reader.IsDBNull(reader.GetOrdinal("DatoId")) ? null : reader.GetString(reader.GetOrdinal("DatoId")),
-                                    Misc01 = reader.IsDBNull(reader.GetOrdinal("Misc01")) ? null : reader.GetString(reader.GetOrdinal("Misc01")),
-                                    Misc02 = reader.IsDBNull(reader.GetOrdinal("Misc02")) ? null : reader.GetString(reader.GetOrdinal("Misc02"))
+                                    Dato = reader.IsDBNull(reader.GetOrdinal("Dato"))
+                                        ? null
+                                        : reader.GetString(reader.GetOrdinal("Dato")),
+                                    DatoId = reader.IsDBNull(reader.GetOrdinal("DatoId"))
+                                        ? null
+                                        : reader.GetString(reader.GetOrdinal("DatoId")),
+                                    Misc01 = reader.IsDBNull(reader.GetOrdinal("Misc01"))
+                                        ? null
+                                        : reader.GetString(reader.GetOrdinal("Misc01")),
+                                    Misc02 = reader.IsDBNull(reader.GetOrdinal("Misc02"))
+                                        ? null
+                                        : reader.GetString(reader.GetOrdinal("Misc02")),
+                                    CP = GetNullableString(reader, cpOrdinal)
                                 };
 
                                 campaign.Contacts.Add(contact);
@@ -110,15 +127,11 @@ namespace Business
             }
             catch (Exception ex)
             {
-                _logger.Error($"❌ Error en GetLightCampaigns: {ex.Message}");
+                _logger.Error($"❌ Error en GetLightCampaigns: {ex.Message}", ex);
             }
 
             return result;
         }
-
-
-
-
 
         public async Task<bool> SimulateSmsDispatch(List<int> Campaigns)
         {
@@ -145,7 +158,7 @@ namespace Business
 #if DEBUG
                     1
 #else
-            10
+                    10
 #endif
                 );
 
@@ -242,7 +255,27 @@ namespace Business
                                    .ToList()
                             );
 
-                            var chuncks = int.TryParse(Common.ConfigurationManagerJson("CantidadDeChunks"), out int c) ? c : 50;
+                            var blacklistids = ctx.blacklistcampains
+                                .Where(x => x.idcampains == campaign.CampaignId)
+                                .Select(x => x.idblacklist)
+                                .ToList();
+
+                            var blacklistedPhones = new HashSet<string>(StringComparer.Ordinal);
+
+                            if (blacklistids != null && blacklistids.Count > 0)
+                            {
+                                blacklistedPhones = new HashSet<string>(
+                                    ctx.BlackList
+                                        .Where(bl => blacklistids.Contains(bl.Id))
+                                        .Select(bl => bl.phone)
+                                        .ToList(),
+                                    StringComparer.Ordinal
+                                );
+                            }
+
+                            var chuncks = int.TryParse(Common.ConfigurationManagerJson("CantidadDeChunks"), out int c)
+                                ? c
+                                : 50;
 
                             campaign.Contacts = campaign.Contacts
                                 .GroupBy(x => x.Id)
@@ -253,6 +286,14 @@ namespace Business
                                 .GroupBy(x => x.PhoneNumber)
                                 .Select(g => g.First())
                                 .ToList();
+
+                            var timeZoneCache = new Dictionary<string, TimeZoneResolveResult>();
+
+                            _logger.Info(
+                                $"🚀 Iniciando envío campaña {campaign.CampaignId} - {campaign.Name}. " +
+                                $"Contactos cargados en memoria: {campaign.Contacts.Count}. " +
+                                $"ScheduleId: {campaign.ScheduleId}. QA: {test}"
+                            );
 
                             var chunks = campaign.Contacts.Chunk(chuncks);
 
@@ -267,87 +308,83 @@ namespace Business
                                 var messagesToSend = new List<MessageToSend>();
                                 var preparedContactIds = new HashSet<int>();
 
-                                // Guarda la zona resuelta para reutilizarla al registrar CampaignContactScheduleSend.
                                 var timeZoneByRegistryClient = new Dictionary<string, TimeZoneResolveResult>();
+
+                                int skippedAlreadySent = 0;
+                                int skippedDuplicatedInChunk = 0;
+                                int skippedNoTimezone = 0;
+                                int skippedOutOfSchedule = 0;
+                                int blacklistedCount = 0;
 
                                 foreach (var contact in chunk)
                                 {
                                     if (sentIds.Contains(contact.Id))
                                     {
-                                        _logger.Info($"↩️ [Skip] Ya registrado en send: Campaña {campaign.CampaignId} | ContactoId {contact.Id}");
+                                        skippedAlreadySent++;
                                         continue;
                                     }
 
                                     if (!preparedContactIds.Add(contact.Id))
+                                    {
+                                        skippedDuplicatedInChunk++;
                                         continue;
+                                    }
 
                                     string estado = "Desconocido";
 
-                                    var blacklistids = ctx.blacklistcampains
-                                        .Where(x => x.idcampains == campaign.CampaignId)
-                                        .Select(x => x.idblacklist)
-                                        .ToList();
-
-                                    if (blacklistids != null && blacklistids.Count > 0)
+                                    if (blacklistedPhones.Count > 0 &&
+                                        blacklistedPhones.Contains(contact.PhoneNumber))
                                     {
-                                        bool isBlacklisted = ctx.BlackList
-                                            .Any(bl => bl.phone == contact.PhoneNumber && blacklistids.Contains(bl.Id));
+                                        var zipCode = GetZipCodeFromContact(contact);
+                                        var timeZoneResult = ResolveContactTimeZoneCached(
+                                            ctx,
+                                            timeZoneCache,
+                                            zipCode,
+                                            contact.PhoneNumber
+                                        );
 
-                                        if (isBlacklisted)
+                                        estado = timeZoneResult.State ?? "Desconocido";
+
+                                        ctx.CampaignContactScheduleSend.Add(new CampaignContactScheduleSend
                                         {
-                                            // No validamos horario: está en blacklist y NO se va a enviar.
-                                            var zipCode = GetZipCodeFromContact(contact);
-                                            var timeZoneResult = ResolveContactTimeZone(ctx, zipCode, contact.PhoneNumber);
+                                            CampaignId = campaign.CampaignId,
+                                            ContactId = contact.Id,
+                                            ScheduleId = campaign.ScheduleId,
+                                            SentAt = DateTime.Now,
+                                            Status = "6",
+                                            ResponseMessage = null,
+                                            State = estado
+                                        });
 
-                                            estado = timeZoneResult.State ?? "Desconocido";
-
-                                            ctx.CampaignContactScheduleSend.Add(new CampaignContactScheduleSend
-                                            {
-                                                CampaignId = campaign.CampaignId,
-                                                ContactId = contact.Id,
-                                                ScheduleId = campaign.ScheduleId,
-                                                SentAt = DateTime.Now,
-                                                Status = "6",
-                                                ResponseMessage = null,
-                                                State = estado
-                                            });
-
-                                            sentIds.Add(contact.Id);
-                                            continue;
-                                        }
+                                        sentIds.Add(contact.Id);
+                                        blacklistedCount++;
+                                        continue;
                                     }
 
-                                    // 1. Resolver zona horaria:
-                                    //    - Si Misc02 trae CP válido, el SP usa PostalCode.
-                                    //    - Si no trae CP, el SP usa PhoneSeries.
                                     var contactZipCode = GetZipCodeFromContact(contact);
-                                    var contactTimeZone = ResolveContactTimeZone(ctx, contactZipCode, contact.PhoneNumber);
+
+                                    var contactTimeZone = ResolveContactTimeZoneCached(
+                                        ctx,
+                                        timeZoneCache,
+                                        contactZipCode,
+                                        contact.PhoneNumber
+                                    );
 
                                     if (contactTimeZone.TimeZoneSource == "Unknown" ||
                                         !contactTimeZone.WinterTimeDifference.HasValue)
                                     {
-                                        _logger.Info(
-                                            $"⛔ {contact.PhoneNumber} sin zona horaria resuelta. " +
-                                            $"CP: {contactZipCode ?? "NULL"}"
-                                        );
-
+                                        skippedNoTimezone++;
                                         continue;
                                     }
 
                                     estado = contactTimeZone.State ?? "Desconocido";
 
-                                    // 2. Validar horario local.
                                     var horaLocal = DateTime.UtcNow.AddHours((double)contactTimeZone.WinterTimeDifference.Value);
                                     var hora = horaLocal.TimeOfDay;
 
                                     if (hora < HorarioInicio || hora > HorarioFin)
                                     {
-                                        _logger.Info(
-                                            $"⛔ {contact.PhoneNumber} fuera de horario " +
-                                            $"(local {hora}, estado {estado}, zona {contactTimeZone.TimeZoneName}, " +
-                                            $"source {contactTimeZone.TimeZoneSource}, CP {contactZipCode ?? "NULL"})"
-                                        );
-
+                                        skippedOutOfSchedule++;
                                         continue;
                                     }
 
@@ -379,18 +416,23 @@ namespace Business
                                     });
 
                                     timeZoneByRegistryClient[registryClient] = contactTimeZone;
-
-                                    _logger.Info(
-                                        $"📝 [Preparado] Campaña: {campaign.CampaignId} | " +
-                                        $"ContactoId: {contact.Id} | Tel: {contact.PhoneNumber} | " +
-                                        $"Estado: {estado} | TZ: {contactTimeZone.TimeZoneName} | " +
-                                        $"Source: {contactTimeZone.TimeZoneSource} | " +
-                                        $"senderType:{senderType} | encoding:{encoding}"
-                                    );
                                 }
 
+                                _logger.Info(
+                                    $"📦 Chunk campaña {campaign.CampaignId}: " +
+                                    $"preparados={messagesToSend.Count}, " +
+                                    $"yaEnviados={skippedAlreadySent}, " +
+                                    $"duplicadosChunk={skippedDuplicatedInChunk}, " +
+                                    $"blacklist={blacklistedCount}, " +
+                                    $"sinZona={skippedNoTimezone}, " +
+                                    $"fueraHorario={skippedOutOfSchedule}"
+                                );
+
                                 if (messagesToSend.Count == 0)
+                                {
+                                    ctx.SaveChanges();
                                     continue;
+                                }
 
                                 List<ApiResponse> sendResult;
 
@@ -399,9 +441,7 @@ namespace Business
                                     sendResult = await new ApiBackBoneManager().SendMessagesAsync(messagesToSend, token);
 
                                     _logger.Info(
-                                        $"✅ [Producción] Se enviaron {sendResult.Count} mensajes reales para la campaña {campaign.Name}:\n" +
-                                        string.Join("\n", sendResult.Select(r =>
-                                            $"📤 ContactoId: {r.registryClient} | Tel: {r.phoneNumber} | Status: {r.status}"))
+                                        $"✅ [Producción] Campaña {campaign.CampaignId}: enviados reales={sendResult.Count}"
                                     );
                                 }
                                 else
@@ -416,9 +456,7 @@ namespace Business
                                     }).ToList();
 
                                     _logger.Info(
-                                        $"🧪 [Test] Se simularon {sendResult.Count} mensajes para la campaña {campaign.Name}:\n" +
-                                        string.Join("\n", sendResult.Select(r =>
-                                            $"🧪 ContactoId: {r.registryClient} | Tel: {r.phoneNumber} | Status: {r.status}"))
+                                        $"🧪 [Test] Campaña {campaign.CampaignId}: simulados={sendResult.Count}"
                                     );
                                 }
 
@@ -442,16 +480,14 @@ namespace Business
                                         State = estado
                                     });
 
-                                    var room = ctx.Rooms.FirstOrDefault(r => r.id == campaign.RoomId);
-
-                                    if (room != null)
+                                    if (actualrooms != null)
                                     {
                                         if (message.status == 1 || message.status == 2)
                                         {
                                             if (campaign.NumberType == 1)
-                                                room.short_sms = Math.Max(0, room.short_sms - creditosConsumidos);
+                                                actualrooms.short_sms = Math.Max(0, actualrooms.short_sms - creditosConsumidos);
                                             else if (campaign.NumberType == 2)
-                                                room.long_sms = Math.Max(0, room.long_sms - creditosConsumidos);
+                                                actualrooms.long_sms = Math.Max(0, actualrooms.long_sms - creditosConsumidos);
                                         }
 
                                         if (notif != null)
@@ -459,8 +495,8 @@ namespace Business
                                             bool isShort = campaign.NumberType == 1;
 
                                             decimal newBalance = isShort
-                                                ? Convert.ToDecimal(room.short_sms)
-                                                : Convert.ToDecimal(room.long_sms);
+                                                ? Convert.ToDecimal(actualrooms.short_sms)
+                                                : Convert.ToDecimal(actualrooms.long_sms);
 
                                             if (newBalance <= notif.AmountValue)
                                             {
@@ -489,7 +525,7 @@ namespace Business
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error($"Error en campaña ID {campaign.CampaignId}: {ex.Message}");
+                        _logger.Error($"❌ Error en campaña ID {campaign.CampaignId}: {ex.Message}", ex);
                     }
                     finally
                     {
@@ -502,12 +538,10 @@ namespace Business
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error general: {ex.Message}");
+                _logger.Error($"❌ Error general en SimulateSmsDispatch: {ex.Message}", ex);
                 return false;
             }
         }
-
-
 
         private bool IsWithinSchedule(DateTime startDateTime, DateTime endDateTime)
         {
@@ -515,9 +549,10 @@ namespace Business
             return now >= startDateTime && now <= endDateTime;
         }
 
-        public static string PersonalizeMessage(string message, Contract.Other.CampaignContact contact)
+        public static string PersonalizeMessage(string message, CampaignContact contact)
         {
-            if (string.IsNullOrWhiteSpace(message)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(message))
+                return string.Empty;
 
             message = message.Replace("{{Dato}}", contact.Dato ?? "");
             message = message.Replace("{{DatoId}}", contact.DatoId ?? "");
@@ -529,18 +564,22 @@ namespace Business
                 foreach (var pair in pairs)
                 {
                     var keyValue = pair.Split(':');
+
                     if (keyValue.Length == 2)
                     {
                         var key = keyValue[0].Trim();
                         var value = keyValue[1].Trim();
+
                         message = message.Replace($"{{{key}}}", value + " ");
                     }
                 }
             }
+
             message = message
-    .Replace('\u00A0', ' ')
-    .Replace('\u2007', ' ')
-    .Replace('\u202F', ' ');
+                .Replace('\u00A0', ' ')
+                .Replace('\u2007', ' ')
+                .Replace('\u202F', ' ');
+
             return message;
         }
 
@@ -553,12 +592,15 @@ namespace Business
                 using (var ctx = new Entities())
                 {
                     var connection = (SqlConnection)ctx.Database.GetDbConnection();
-                    connection.Open();
+
+                    if (connection.State != ConnectionState.Open)
+                        connection.Open();
 
                     using (var cmd = connection.CreateCommand())
                     {
                         cmd.CommandText = "sp_getCampaignsReadyToSend";
                         cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.CommandTimeout = 120;
                         cmd.Parameters.AddWithValue("@top", top);
 
                         using (var reader = cmd.ExecuteReader())
@@ -577,17 +619,26 @@ namespace Business
             }
             catch (Exception ex)
             {
-                _logger.Error("❌ Error en GetCampaignsReadyToSend: " + ex.Message);
+                _logger.Error("❌ Error en GetCampaignsReadyToSend: " + ex.Message, ex);
                 return new List<int>();
             }
         }
 
         private string ShortenUrlsIfNeeded(string message, bool shouldShorten)
         {
-            if (!shouldShorten || string.IsNullOrWhiteSpace(message)) return message;
+            if (!shouldShorten || string.IsNullOrWhiteSpace(message))
+                return message;
 
-            var urlRegex = new System.Text.RegularExpressions.Regex(@"\b(?:https?://|www\.)\S+\b", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-            var urls = urlRegex.Matches(message).Cast<System.Text.RegularExpressions.Match>().Select(m => m.Value).Distinct();
+            var urlRegex = new System.Text.RegularExpressions.Regex(
+                @"\b(?:https?://|www\.)\S+\b",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+
+            var urls = urlRegex
+                .Matches(message)
+                .Cast<System.Text.RegularExpressions.Match>()
+                .Select(m => m.Value)
+                .Distinct();
 
             foreach (var url in urls)
             {
@@ -600,7 +651,6 @@ namespace Business
 
         private string ShortenUrl(string url)
         {
-            // Por ahora puedes simularlo así, o llamar una API real tipo Bitly/TinyURL
             return $"https://corta.link/{Guid.NewGuid().ToString().Substring(0, 6)}";
         }
 
@@ -610,19 +660,18 @@ namespace Business
             {
                 using var ctx = new Entities();
 
-                // 1️⃣ Obtenemos los clientes con mensajes pendientes (buscando por el usuario)
                 var clientsWithPending = (
-     from s in ctx.CampaignContactScheduleSend
-     join c in ctx.Campaigns on s.CampaignId equals c.Id
-     join r in ctx.Rooms on c.RoomId equals r.id
-     join ru in ctx.roomsbyuser on r.id equals ru.idRoom
-     join u in ctx.Users on ru.idUser equals u.Id
-     join cli in ctx.clients on u.IdCliente equals cli.id
-     where s.Status == "0" && s.IdBackBone != null
-     select cli.id
- )
- .Distinct()
- .ToList();
+                    from s in ctx.CampaignContactScheduleSend
+                    join c in ctx.Campaigns on s.CampaignId equals c.Id
+                    join r in ctx.Rooms on c.RoomId equals r.id
+                    join ru in ctx.roomsbyuser on r.id equals ru.idRoom
+                    join u in ctx.Users on ru.idUser equals u.Id
+                    join cli in ctx.clients on u.IdCliente equals cli.id
+                    where s.Status == "0" && s.IdBackBone != null
+                    select cli.id
+                )
+                .Distinct()
+                .ToList();
 
                 if (!clientsWithPending.Any())
                 {
@@ -630,42 +679,43 @@ namespace Business
                     return true;
                 }
 
-                // 2️⃣ Recorremos cliente por cliente
                 foreach (var clientId in clientsWithPending)
                 {
                     var access = ctx.Client_Access.FirstOrDefault(a => a.client_id == clientId);
+
                     if (access == null)
                     {
                         _logger.Warn($"⚠️ Cliente {clientId} no tiene credenciales Backbone.");
                         continue;
                     }
+
                     var pssw = ClientAccessManager.Decrypt(access.password);
                     var login = await new ApiBackBoneManager().LoginResponse(access.username, pssw);
+
                     if (login == null)
                     {
                         _logger.Error($"❌ No se pudo autenticar el cliente {clientId} en Backbone.");
                         continue;
                     }
 
-                    // 3️⃣ Obtenemos los mensajes pendientes de ese cliente
                     var pending = (
-      from s in ctx.CampaignContactScheduleSend
-      join c in ctx.Campaigns on s.CampaignId equals c.Id
-      join r in ctx.Rooms on c.RoomId equals r.id
-      join ru in ctx.roomsbyuser on r.id equals ru.idRoom
-      join u in ctx.Users on ru.idUser equals u.Id
-      join cli in ctx.clients on u.IdCliente equals cli.id
-      where cli.id == clientId
-            && s.Status == "0"                          // pendientes
-            && s.IdBackBone != null
-            && s.IdBackBone != ""                       // evita vacíos
-      select new { s.Id, s.IdBackBone, s.SentAt }
-  )
-  .AsNoTracking()
-  .ToList();
+                        from s in ctx.CampaignContactScheduleSend
+                        join c in ctx.Campaigns on s.CampaignId equals c.Id
+                        join r in ctx.Rooms on c.RoomId equals r.id
+                        join ru in ctx.roomsbyuser on r.id equals ru.idRoom
+                        join u in ctx.Users on ru.idUser equals u.Id
+                        join cli in ctx.clients on u.IdCliente equals cli.id
+                        where cli.id == clientId
+                              && s.Status == "0"
+                              && s.IdBackBone != null
+                              && s.IdBackBone != ""
+                        select new { s.Id, s.IdBackBone, s.SentAt }
+                    )
+                    .AsNoTracking()
+                    .ToList();
 
-
-                    if (!pending.Any()) continue;
+                    if (!pending.Any())
+                        continue;
 
                     _logger.Info($"🔄 Cliente {clientId} - {pending.Count} mensajes pendientes para verificar.");
 
@@ -676,9 +726,12 @@ namespace Business
                         try
                         {
                             var st = await api.GetMessageStatusAsync(login.token, msg.IdBackBone);
-                            if (st == null) continue;
+
+                            if (st == null)
+                                continue;
 
                             var record = ctx.CampaignContactScheduleSend.FirstOrDefault(x => x.Id == msg.Id);
+
                             if (record != null)
                             {
                                 record.Status = st.status.ToString();
@@ -686,7 +739,7 @@ namespace Business
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error($"❌ Error verificando estado para mensaje {msg.IdBackBone}: {ex.Message}");
+                            _logger.Error($"❌ Error verificando estado para mensaje {msg.IdBackBone}: {ex.Message}", ex);
                         }
                     }
 
@@ -698,7 +751,7 @@ namespace Business
             }
             catch (Exception ex)
             {
-                _logger.Error($"Error general en UpdateSmsStatusesByClient: {ex.Message}");
+                _logger.Error($"❌ Error general en UpdateSmsStatusesByClient: {ex.Message}", ex);
                 return false;
             }
         }
@@ -709,7 +762,6 @@ namespace Business
             {
                 using var ctx = new Entities();
 
-                // 1) Clientes que tienen TestMessage pendientes (Status = "0") con IdBackBone set
                 var clientsWithPending = (
                     from t in ctx.TestMessage
                     join u in ctx.Users on t.UserId equals u.Id
@@ -729,6 +781,7 @@ namespace Business
                 foreach (var clientId in clientsWithPending)
                 {
                     var access = ctx.Client_Access.FirstOrDefault(a => a.client_id == clientId);
+
                     if (access == null)
                     {
                         _logger.Warn($"⚠️ Cliente {clientId} no tiene credenciales Backbone para TestMessage.");
@@ -737,20 +790,21 @@ namespace Business
 
                     var pssw = ClientAccessManager.Decrypt(access.password);
                     var login = await new ApiBackBoneManager().LoginResponse(access.username, pssw);
+
                     if (login == null)
                     {
                         _logger.Error($"❌ No se pudo autenticar el cliente {clientId} en Backbone (TestMessage).");
                         continue;
                     }
 
-                    // 2) Pendientes de ese cliente
                     var pending = (
                         from t in ctx.TestMessage
                         join u in ctx.Users on t.UserId equals u.Id
                         join cli in ctx.clients on u.IdCliente equals cli.id
                         where cli.id == clientId
                               && t.Status == "0"
-                              && t.IdBackBone != null && t.IdBackBone != ""
+                              && t.IdBackBone != null
+                              && t.IdBackBone != ""
                         select new { t.Id, t.IdBackBone }
                     )
                     .AsNoTracking()
@@ -768,18 +822,20 @@ namespace Business
                         try
                         {
                             var st = await api.GetMessageStatusAsync(login.token, msg.IdBackBone);
-                            if (st == null) continue;
+
+                            if (st == null)
+                                continue;
 
                             var record = ctx.TestMessage.FirstOrDefault(x => x.Id == msg.Id);
+
                             if (record != null)
                             {
                                 record.Status = st.status.ToString();
-
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error($"❌ Error verificando estado (TestMessage) {msg.IdBackBone}: {ex.Message}");
+                            _logger.Error($"❌ Error verificando estado (TestMessage) {msg.IdBackBone}: {ex.Message}", ex);
                         }
                     }
 
@@ -791,18 +847,16 @@ namespace Business
             }
             catch (Exception ex)
             {
-                _logger.Error($"Error general en UpdateTestSmsStatusesByClient: {ex.Message}");
+                _logger.Error($"❌ Error general en UpdateTestSmsStatusesByClient: {ex.Message}", ex);
                 return false;
             }
         }
 
-
         private string GetZipCodeFromContact(CampaignContact contact)
         {
-            // Por ahora tomamos Misc02 como Código Postal.
-            // Si Misc02 viene vacío o no trae 5 dígitos, regresa null y el SP usa fallback por teléfono.
-            return NormalizeZipCode(contact.Misc02);
+            return NormalizeZipCode(contact.CP);
         }
+
         private string NormalizeZipCode(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -810,7 +864,39 @@ namespace Business
 
             var digits = new string(value.Trim().Where(char.IsDigit).ToArray());
 
+            if (digits.Length == 4)
+                digits = digits.PadLeft(5, '0');
+
             return digits.Length == 5 ? digits : null;
+        }
+
+        private TimeZoneResolveResult ResolveContactTimeZoneCached(
+            Entities ctx,
+            Dictionary<string, TimeZoneResolveResult> cache,
+            string zipCode,
+            string phone)
+        {
+            var normalizedZipCode = NormalizeZipCode(zipCode);
+
+            string key;
+
+            if (!string.IsNullOrWhiteSpace(normalizedZipCode))
+            {
+                key = $"CP:{normalizedZipCode}";
+            }
+            else
+            {
+                key = $"PHONE:{phone}";
+            }
+
+            if (cache.TryGetValue(key, out var cached))
+                return cached;
+
+            var result = ResolveContactTimeZone(ctx, normalizedZipCode, phone);
+
+            cache[key] = result;
+
+            return result;
         }
 
         private TimeZoneResolveResult ResolveContactTimeZone(Entities ctx, string zipCode, string phone)
@@ -823,12 +909,17 @@ namespace Business
             using (var cmd = new SqlCommand("dbo.spResolveContactTimeZone", connection))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandTimeout = 60;
 
                 cmd.Parameters.AddWithValue("@ZipCode",
-                    string.IsNullOrWhiteSpace(zipCode) ? (object)DBNull.Value : zipCode.Trim());
+                    string.IsNullOrWhiteSpace(zipCode)
+                        ? (object)DBNull.Value
+                        : zipCode.Trim());
 
                 cmd.Parameters.AddWithValue("@Phone",
-                    string.IsNullOrWhiteSpace(phone) ? (object)DBNull.Value : phone.Trim());
+                    string.IsNullOrWhiteSpace(phone)
+                        ? (object)DBNull.Value
+                        : phone.Trim());
 
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -856,7 +947,9 @@ namespace Business
                             ? null
                             : Convert.ToInt32(reader["tz_id"]),
 
-                        TimeZoneName = reader["tz_name"] == DBNull.Value ? null : reader["tz_name"].ToString(),
+                        TimeZoneName = reader["tz_name"] == DBNull.Value
+                            ? null
+                            : reader["tz_name"].ToString(),
 
                         TimeZoneSource = reader["TimeZoneSource"] == DBNull.Value
                             ? "Unknown"
@@ -864,6 +957,29 @@ namespace Business
                     };
                 }
             }
+        }
+
+        private int TryGetOrdinal(SqlDataReader reader, string columnName)
+        {
+            try
+            {
+                return reader.GetOrdinal(columnName);
+            }
+            catch
+            {
+                return -1;
+            }
+        }
+
+        private string GetNullableString(SqlDataReader reader, int ordinal)
+        {
+            if (ordinal < 0)
+                return null;
+
+            if (reader.IsDBNull(ordinal))
+                return null;
+
+            return reader.GetString(ordinal);
         }
     }
 }
