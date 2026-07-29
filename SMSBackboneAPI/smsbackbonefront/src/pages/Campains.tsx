@@ -280,6 +280,7 @@ const Campains: React.FC = () => {
   const [shouldShortenUrls, setShouldShortenUrls] = useState(false);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [templateName, setTemplateName] = useState('');
+  const [sinCodigoPostal, setSinCodigoPostal] = useState(false);
   const [stateRespondedCounts, setStateRespondedCounts] = useState<{ stateName: string; messages: number }[]>([]);
   const [showChipBarAdd, setShowChipBarAdd] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -742,6 +743,9 @@ const Campains: React.FC = () => {
     const phoneRegex = /^\d{10,12}$/; // Acepta entre 10 y 12 dígitos
     return phoneRegex.test(value);
   };
+
+  const validacionCompleta =
+    sinCodigoPostal || selectPostalCode !== "";
 
   const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -1447,6 +1451,7 @@ const Campains: React.FC = () => {
     setRecycleCount(1);
     setBlacklistEnabled(false);
     setSelectedBlackListIds([]);
+    setSinCodigoPostal(false);
     setHorarios([{
       titulo: "Horario 1",
       start: null,
@@ -1480,6 +1485,8 @@ const Campains: React.FC = () => {
     closeCalendar();
     setAnchorEl(null);
     resetUploadState();
+    setMostrarValidacionCP(false);
+    setSelectPostalCode("");
   };
 
 
@@ -2168,6 +2175,9 @@ const Campains: React.FC = () => {
 
     // En cualquier otro caso, retroceder de paso normalmente
     setActiveStep((prev) => prev - 1);
+    setMostrarValidacionCP(false);
+    setSinCodigoPostal(false);
+    setSelectPostalCode("");
   };
 
 
@@ -4767,8 +4777,9 @@ const Campains: React.FC = () => {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  gap: 20, marginBottom: "-10px", mt: 1
-                  , marginLeft: mostrarValidacionCP ? "-50px" : "0px"
+                  marginBottom: "-10px", mt: 1,
+                  marginLeft: mostrarValidacionCP ? "-50px" : "0px",
+                  gap: mostrarValidacionCP ? 21 : 27
                 }}
                 >
                   <Typography sx={{ fontFamily: 'Poppins', fontSize: '18px', color: '#330F1B', textAlign: 'left' }}>
@@ -5798,6 +5809,7 @@ const Campains: React.FC = () => {
                       </Box>
 
                       <FormControl fullWidth
+                        disabled={sinCodigoPostal}
                         sx={{
                           width: "420px",
                           alignSelf: "center",
@@ -5834,7 +5846,7 @@ const Campains: React.FC = () => {
                             width: "420px",
                             height: "40px",
                             borderRadius: "8px",
-                            backgroundColor: "#FFFFFF",
+                            backgroundColor: sinCodigoPostal ? "#E3E2E2" : "#FFFFFF",
                             fontFamily: "Poppins",
                             fontSize: "12px",
                           }}
@@ -5867,6 +5879,8 @@ const Campains: React.FC = () => {
                       >
                         {/* Checkbox */}
                         <Checkbox
+                          checked={sinCodigoPostal}
+                          onChange={(e) => setSinCodigoPostal(e.target.checked)}
                           checkedIcon={
                             <Box sx={{
                               width: '24px',
@@ -5884,7 +5898,7 @@ const Campains: React.FC = () => {
                             fontWeight: 500,
                             fontSize: "13px",
                             fontFamily: "Poppins, sans-serif",
-                            color: "#574B4F",
+                            color: sinCodigoPostal ? "#8F4D63" : "#574B4F",
                             textAlign: "left",
                             lineHeight: "18px",
                           }}
@@ -7776,8 +7790,12 @@ const Campains: React.FC = () => {
             <Button
               variant="contained"
               onClick={handleContinue}
-              disabled={isNextDisabled}
+              disabled={
+                isNextDisabled ||
+                (mostrarValidacionCP && !validacionCompleta)
+              }
               loading={loading}
+
               sx={{
                 width: "118px",
                 height: "36px",
