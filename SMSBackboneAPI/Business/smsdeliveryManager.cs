@@ -17,7 +17,7 @@ namespace Business
 {
     public class smsdeliveryManager
     {
-        private static readonly TimeSpan HorarioInicio = new TimeSpan(7, 0, 0);  // 07:00
+        private static readonly TimeSpan HorarioInicio = new TimeSpan(8, 0, 0);  // 08:00
         private static readonly TimeSpan HorarioFin = new TimeSpan(21, 0, 0);    // 21:00
 
         private static readonly ILog _logger =
@@ -382,12 +382,25 @@ namespace Business
                                     var horaLocal = DateTime.UtcNow.AddHours((double)contactTimeZone.WinterTimeDifference.Value);
                                     var hora = horaLocal.TimeOfDay;
 
-                                    if (hora < HorarioInicio || hora > HorarioFin)
+                                    if (!IsWithinContactLocalAllowedTime(contactTimeZone, out var horaLocalContacto))
                                     {
                                         skippedOutOfSchedule++;
+
+                                        _logger.Info(
+                                            $"⛔ Fuera de horario local. " +
+                                            $"Campaña={campaign.CampaignId} | " +
+                                            $"ContactoId={contact.Id} | " +
+                                            $"Tel={contact.PhoneNumber} | " +
+                                            $"CP={contactZipCode ?? "NULL"} | " +
+                                            $"Estado={estado} | " +
+                                            $"Zona={contactTimeZone.TimeZoneName} | " +
+                                            $"OffsetUTC={contactTimeZone.WinterTimeDifference} | " +
+                                            $"HoraLocal={horaLocalContacto:yyyy-MM-dd HH:mm:ss} | " +
+                                            $"HorarioPermitido={HorarioInicio:hh\\:mm}-{HorarioFin:hh\\:mm}"
+                                        );
+
                                         continue;
                                     }
-
                                     var FormatMessage = PersonalizeMessage(campaign.Message, contact);
 
                                     if (campaign.ShouldShortenUrls || campaign.shortenUrls)
@@ -667,7 +680,9 @@ namespace Business
                     join ru in ctx.roomsbyuser on r.id equals ru.idRoom
                     join u in ctx.Users on ru.idUser equals u.Id
                     join cli in ctx.clients on u.IdCliente equals cli.id
-                    where s.Status == "0" && s.IdBackBone != null
+                    where s.Status == "0"
+                          && s.IdBackBone != null
+                          && s.IdBackBone != ""
                     select cli.id
                 )
                 .Distinct()
@@ -709,10 +724,23 @@ namespace Business
                               && s.Status == "0"
                               && s.IdBackBone != null
                               && s.IdBackBone != ""
-                        select new { s.Id, s.IdBackBone, s.SentAt }
+                        select new
+                        {
+                            s.Id,
+                            s.IdBackBone,
+                            s.SentAt,
+                            CampaignId = c.Id,
+                            RoomId = r.id,
+                            NumberType = c.NumberType
+                        }
                     )
                     .AsNoTracking()
                     .ToList();
+
+                    pending = pending
+                        .GroupBy(x => x.Id)
+                        .Select(g => g.First())
+                        .ToList();
 
                     if (!pending.Any())
                         continue;
@@ -730,12 +758,28 @@ namespace Business
                             if (st == null)
                                 continue;
 
-                            var record = ctx.CampaignContactScheduleSend.FirstOrDefault(x => x.Id == msg.Id);
+                            var record = ctx.CampaignContactScheduleSend
+                                .FirstOrDefault(x => x.Id == msg.Id);
 
-                            if (record != null)
-                            {
-                                record.Status = st.status.ToString();
-                            }
+                            if (record == null)
+                                continue;
+
+                            var oldStatus = record.Status;
+                            var newStatus = st.status.ToString();
+
+                            // Siempre actualiza estatus
+                            record.Status = newStatus;
+
+                            DescontarCreditoRoom(
+                                ctx,
+                                msg.RoomId,
+                                msg.NumberType,
+                                oldStatus,
+                                newStatus,
+                                msg.IdBackBone,
+                                msg.Id,
+                                "CampaignContactScheduleSend"
+                            );
                         }
                         catch (Exception ex)
                         {
@@ -851,6 +895,70 @@ namespace Business
                 return false;
             }
         }
+
+        private void DescontarCreditoRoom(
+     Entities ctx,
+     int roomId,
+     int numberType,
+     string oldStatus,
+     string newStatus,
+     string backboneId,
+     int messageId,
+     string origen)
+        {
+            var yaEraCobrable = oldStatus == "1" || oldStatus == "2";
+            var ahoraEsCobrable = newStatus == "1" || newStatus == "2";
+
+            if (yaEraCobrable || !ahoraEsCobrable)
+                return;
+
+            var room = ctx.Rooms.FirstOrDefault(x => x.id == roomId);
+
+            if (room == null)
+            {
+                _logger.Warn(
+                    $"⚠️ No se encontró RoomId={roomId} para descontar crédito. " +
+                    $"Origen={origen}, MessageId={messageId}, BackboneId={backboneId}"
+                );
+                return;
+            }
+
+            const double creditosConsumidos = 1;
+
+            if (numberType == 1)
+            {
+                var saldoAnterior = room.short_sms;
+                room.short_sms = Math.Max(0, room.short_sms - creditosConsumidos);
+
+                _logger.Info(
+                    $"💰 Crédito corto descontado. " +
+                    $"Origen={origen}, MessageId={messageId}, BackboneId={backboneId}, " +
+                    $"RoomId={roomId}, StatusAnterior={oldStatus}, StatusNuevo={newStatus}, " +
+                    $"SaldoAnterior={saldoAnterior}, SaldoNuevo={room.short_sms}"
+                );
+            }
+            else if (numberType == 2)
+            {
+                var saldoAnterior = room.long_sms;
+                room.long_sms = Math.Max(0, room.long_sms - creditosConsumidos);
+
+                _logger.Info(
+                    $"💰 Crédito largo descontado. " +
+                    $"Origen={origen}, MessageId={messageId}, BackboneId={backboneId}, " +
+                    $"RoomId={roomId}, StatusAnterior={oldStatus}, StatusNuevo={newStatus}, " +
+                    $"SaldoAnterior={saldoAnterior}, SaldoNuevo={room.long_sms}"
+                );
+            }
+            else
+            {
+                _logger.Warn(
+                    $"⚠️ NumberType no reconocido para descontar crédito. " +
+                    $"Origen={origen}, MessageId={messageId}, BackboneId={backboneId}, " +
+                    $"RoomId={roomId}, NumberType={numberType}"
+                );
+            }
+        }
+
 
         private string GetZipCodeFromContact(CampaignContact contact)
         {
@@ -980,6 +1088,23 @@ namespace Business
                 return null;
 
             return reader.GetString(ordinal);
+        }
+        private bool IsWithinContactLocalAllowedTime(TimeZoneResolveResult timeZoneResult, out DateTime horaLocal)
+        {
+            horaLocal = DateTime.MinValue;
+
+            if (timeZoneResult == null || !timeZoneResult.WinterTimeDifference.HasValue)
+                return false;
+
+            // WinterTimeDifference debe ser offset contra UTC.
+            // Ejemplo:
+            // CDMX UTC-6 => DateTime.UtcNow.AddHours(-6)
+            // Zona 2 horas adelante de CDMX => UTC-4
+            horaLocal = DateTime.UtcNow.AddHours((double)timeZoneResult.WinterTimeDifference.Value);
+
+            var hora = horaLocal.TimeOfDay;
+
+            return hora >= HorarioInicio && hora <= HorarioFin;
         }
     }
 }

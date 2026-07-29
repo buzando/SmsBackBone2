@@ -15,6 +15,6 @@ namespace Modal.Model.Model
         public string? DatoId { get; set; }
         public string? Misc01 { get; set; }
         public string? Misc02 { get; set; }
-        public string CP { get; set; }
+        public string? CP { get; set; }
     }
 }

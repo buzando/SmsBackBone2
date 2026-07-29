@@ -14,6 +14,6 @@ namespace Contract.Response
         public int TelefonosFallidos { get; set; }
         public int CodigosPostalesCargados { get; set; }
         public int CodigosPostalesFallidos { get; set; }
-        public string CpColumn { get; set; }
+        public string? CpColumn { get; set; }
     }
 }

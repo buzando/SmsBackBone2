@@ -19,7 +19,10 @@ namespace Business
         public ChargeNumbersComplete InsertBatchFromExcel(CampainContacttpmrequest dto)
         {
             var resultado = new ChargeNumbersComplete();
-
+            resultado.CpColumn = string.IsNullOrWhiteSpace(dto.CpColumn)
+    ? null
+    : dto.CpColumn.Trim();
+            resultado.CpColumn = dto.CpColumn;
             try
             {
                 var archivoBytes = Convert.FromBase64String(dto.Base64File);

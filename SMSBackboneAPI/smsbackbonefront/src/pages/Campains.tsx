@@ -615,8 +615,8 @@ const Campains: React.FC = () => {
       setEditSelectedBlackListIds([]);
     }
 
-const tieneDato = (campaign.contacts ?? []).some(c => !!c.dato);
-const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
+    const tieneDato = (campaign.contacts ?? []).some(c => !!c.dato);
+    const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
     const vars: string[] = [];
     if (tieneDato) vars.push("Dato");
     if (tieneID) vars.push("ID");
@@ -648,6 +648,10 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
     registrosFallidos: number;
     telefonosCargados: number;
     telefonosFallidos: number;
+    codigosPostalesCargados: number;
+    codigosPostalesFallidos: number;
+    cpColumn?: string | null;
+
   } | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const dataCountry = [
@@ -744,8 +748,6 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
     return phoneRegex.test(value);
   };
 
-  const validacionCompleta =
-    sinCodigoPostal || selectPostalCode !== "";
 
   const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -790,7 +792,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
   const [calendarTarget, setCalendarTarget] = useState<"start" | "end" | null>(null);
   const [calendarInitialDate, setCalendarInitialDate] = useState<Date | null>(null);
   const handleManageFile = (file: File) => {
-    console.log("📁 Archivo recibido:", file.name);
+    if (archivoBloqueado) return;
     const isValid = file.name.endsWith('.xlsx');
 
     if (!isValid) {
@@ -849,7 +851,18 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
   const [campaignToDelete, setCampaignToDelete] = useState<CampaignFullResponse | null>(null);
   const [stateMessageCounts, setStateMessageCounts] = useState<{ stateName: string; messages: number }[]>([]);
   const pinnedKey = (roomId: number) => `o2c_pinnedCampaignIds_${roomId}`;
-
+  const archivoBloqueado =
+    uploadedFile !== null ||
+    uploadedFileBase64 !== "" ||
+    fileSuccess ||
+    postCargaActiva ||
+    estadisticasCarga !== null;
+  const bloquearCambioArchivo =
+    uploadedFile !== null ||
+    uploadedFileBase64 !== "" ||
+    fileSuccess ||
+    postCargaActiva ||
+    estadisticasCarga !== null;
   const [pinnedCampaignIds, setPinnedCampaignIds] = useState<number[]>([]);
 
   const orderedCampaigns = useMemo(() => {
@@ -1096,13 +1109,14 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
 
     if (activeStep === 0 && !postCargaActiva) {
 
-      // Primer clic
+
       if (!mostrarValidacionCP) {
         setMostrarValidacionCP(true);
         return;
       }
-
-      // Segundo clic
+      if (!sinCodigoPostal && !validateCpColumnPreview()) {
+        return;
+      }
       const cargaExitosa = await handleSaveTemplate();
 
       if (!cargaExitosa) return;
@@ -1269,6 +1283,187 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
   };
 
   const [selectedCampaigns, setSelectedCampaigns] = useState<number[]>([]);
+  const [validandoCp, setValidandoCp] = useState(false);
+  const [cpSelectError, setCpSelectError] = useState(false);
+  const [cpSelectErrorMessage, setCpSelectErrorMessage] = useState("");
+  const [cpValidationResult, setCpValidationResult] = useState<{
+    columna: string;
+    muestra: number;
+    validos: number;
+    invalidos: number;
+    vacios: number;
+    ejemplosInvalidos: string[];
+  } | null>(null);
+
+  const normalizeCpFront = (value: any): string | null => {
+    if (value === undefined || value === null) return null;
+
+    const raw = String(value).trim();
+    if (!raw) return null;
+
+    let digits = raw.replace(/\D/g, "");
+
+    // Si Excel convirtió 01000 en 1000
+    if (digits.length === 4) {
+      digits = digits.padStart(5, "0");
+    }
+
+    if (digits.length !== 5) return null;
+
+    const cpNumber = Number(digits);
+
+    // Rango permitido: 01000 a 99998
+    if (cpNumber < 1000 || cpNumber > 99998) return null;
+
+    return digits;
+  };
+
+  const validateCpColumnPreview = (columnName?: string): boolean => {
+    const cpColumn = columnName ?? selectPostalCode;
+
+    if (sinCodigoPostal) {
+      setCpValidationResult(null);
+      setCpSelectError(false);
+      setCpSelectErrorMessage("");
+      return true;
+    }
+
+    if (!cpColumn || cpColumn === "Seleccionar") {
+      setCpValidationResult(null);
+      setCpSelectError(true);
+      setCpSelectErrorMessage(
+        "Ingresa un dato válido para cada teléfono registrado, los códigos postales válidos deberán encontrarse en el rango de 01000 a 99998."
+      );
+      return false;
+    }
+
+    const colIndex = columns.indexOf(cpColumn);
+
+    if (colIndex < 0) {
+      setCpValidationResult(null);
+      setCpSelectError(true);
+      setCpSelectErrorMessage(
+        "Ingresa un dato válido para cada teléfono registrado, los códigos postales válidos deberán encontrarse en el rango de 01000 a 99998."
+      );
+      return false;
+    }
+
+    // Importante:
+    // excelData[0] es encabezado, porque de ahí salen columns.
+    // Por eso SIEMPRE empezamos en slice(1).
+    const rows = excelData
+      .slice(1)
+      .filter(row =>
+        row &&
+        row.some(cell =>
+          cell !== undefined &&
+          cell !== null &&
+          String(cell).trim() !== ""
+        )
+      )
+      .slice(0, 1000);
+
+    let revisados = 0;
+    let validos = 0;
+    let invalidos = 0;
+    let vacios = 0;
+    const ejemplosInvalidos: string[] = [];
+
+    for (const row of rows) {
+      const rawValue = row?.[colIndex];
+      revisados++;
+
+      if (
+        rawValue === undefined ||
+        rawValue === null ||
+        String(rawValue).trim() === ""
+      ) {
+        vacios++;
+
+        if (ejemplosInvalidos.length < 5) {
+          ejemplosInvalidos.push("(vacío)");
+        }
+
+        continue;
+      }
+
+      const normalized = normalizeCpFront(rawValue);
+
+      if (normalized) {
+        validos++;
+      } else {
+        invalidos++;
+
+        if (ejemplosInvalidos.length < 5) {
+          ejemplosInvalidos.push(String(rawValue));
+        }
+      }
+    }
+
+    setCpValidationResult({
+      columna: cpColumn,
+      muestra: revisados,
+      validos,
+      invalidos,
+      vacios,
+      ejemplosInvalidos,
+    });
+
+    console.log("Validación CP:", {
+      columna: cpColumn,
+      muestra: revisados,
+      validos,
+      invalidos,
+      vacios,
+      ejemplosInvalidos,
+    });
+
+    const esValida =
+      rows.length > 0 &&
+      validos > 0 &&
+      invalidos === 0 &&
+      vacios === 0;
+
+    if (!esValida) {
+      setCpSelectError(true);
+      setCpSelectErrorMessage(
+        "Ingresa un dato válido para cada teléfono registrado, los códigos postales válidos deberán encontrarse en el rango de 01000 a 99998."
+      );
+      return false;
+    }
+
+    setCpSelectError(false);
+    setCpSelectErrorMessage("");
+    return true;
+  };
+
+  const handleCpColumnChange = (value: string) => {
+    setSelectPostalCode(value);
+
+    if (value) {
+      setSinCodigoPostal(false);
+    }
+
+    setCpSelectError(false);
+    setCpSelectErrorMessage("");
+    setCpValidationResult(null);
+
+    if (!value || value === "Seleccionar") {
+      return;
+    }
+
+    setLoadingTemplates(true);
+    setLoading(true);
+
+    window.setTimeout(() => {
+      try {
+        validateCpColumnPreview(value);
+      } finally {
+        setLoadingTemplates(false);
+        setLoading(false);
+      }
+    }, 80);
+  };
 
   const isFinalizada = (c: any) => {
     if (!c.schedules || c.schedules.length === 0) return true;
@@ -1348,6 +1543,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
 
   const navigate = useNavigate();
 
+
   const handleSaveTemplate = async (): Promise<boolean> => {
     setLoadingTemplates(true);
     setLoading(true);
@@ -1361,11 +1557,17 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
         throw new Error("Faltan campos requeridos");
       }
 
+      const cpColumn =
+        sinCodigoPostal || !selectPostalCode
+          ? null
+          : selectPostalCode;
+
       const payload = {
         Base64File: uploadedFileBase64,
         SheetName: sheetName,
         PhoneColumns: selectedTelefonos,
-        DatoColumns: selectedVariables,
+        DatoColumns: selectedVariables.filter(v => v !== cpColumn),
+        CpColumn: cpColumn,
         SessionId: sessionIdRef.current,
         CreatedBy: createdBy
       };
@@ -1403,6 +1605,20 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
   const porcentajeTelefonosCargados = totalTelefonos > 0
     ? Math.round((estadisticasCarga?.telefonosCargados || 0) * 100 / totalTelefonos)
     : 0;
+
+  const cpColumnSelected =
+    estadisticasCarga?.cpColumn ??
+    (
+      sinCodigoPostal || !selectPostalCode || selectPostalCode === "Seleccionar"
+        ? null
+        : selectPostalCode
+    );
+
+  const selectedTelefonosConCp = cpColumnSelected &&
+    !selectedTelefonos.includes(cpColumnSelected)
+    ? [...selectedTelefonos, cpColumnSelected]
+    : selectedTelefonos;
+
 
   const resetUploadState = () => {
     setUploadedFile(null);
@@ -2105,6 +2321,14 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
 
   const isRequiredEmpty =
     duplicateName.trim().length === 0 && duplicateName;
+
+  const validacionCompleta =
+    sinCodigoPostal ||
+    (
+      selectPostalCode !== "" &&
+      selectPostalCode !== "Seleccionar" &&
+      !cpSelectError
+    );
 
 
   const canDuplicate =
@@ -4808,11 +5032,31 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                   <Box sx={{ width: "320px", display: "flex", flexDirection: "column", alignItems: "center" }}>
                     <Box
                       marginBottom={'20px'} marginTop={'10px'}
-                      onClick={() => fileInputRef.current?.click()}
-                      onDragOver={(e) => e.preventDefault()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+
+                        if (bloquearCambioArchivo) return;
+
+                        fileInputRef.current?.click();
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+
+                        if (bloquearCambioArchivo) {
+                          e.dataTransfer.dropEffect = "none";
+                          return;
+                        }
+
+                        e.dataTransfer.dropEffect = "copy";
+                      }}
                       onDrop={(e) => {
                         e.preventDefault();
+                        e.stopPropagation();
+
+                        if (bloquearCambioArchivo) return;
+
                         const file = e.dataTransfer.files?.[0];
+
                         if (file) {
                           setUploadedFile(file);
                           handleManageFile(file);
@@ -4976,8 +5220,20 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           type="file"
                           hidden
                           ref={fileInputRef}
+                          disabled={bloquearCambioArchivo}
+                          onClick={(e) => {
+                            if (bloquearCambioArchivo) {
+                              e.preventDefault();
+                            }
+                          }}
                           onChange={(e) => {
+                            if (bloquearCambioArchivo) {
+                              e.target.value = "";
+                              return;
+                            }
+
                             const file = e.target.files?.[0];
+
                             if (file) {
                               setUploadedFile(file);
                               handleManageFile(file);
@@ -5158,16 +5414,22 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                 {!postCargaActiva && uploadedFile && (
                   <Box sx={{ width: "320px", display: "flex", flexDirection: "column", alignItems: "center", marginLeft: mostrarValidacionCP ? "-40px" : "0px", }}>
                     <Box
-                      marginBottom={'20px'} marginTop={'10px'}
-                      onClick={() => fileInputRef.current?.click()}
-                      onDragOver={(e) => e.preventDefault()}
+                      marginBottom={'20px'}
+                      marginTop={'10px'}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        return;
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+
+                        e.dataTransfer.dropEffect = "none";
+                      }}
                       onDrop={(e) => {
                         e.preventDefault();
-                        const file = e.dataTransfer.files?.[0];
-                        if (file) {
-                          setUploadedFile(file);
-                          handleManageFile(file);
-                        }
+                        e.stopPropagation();
+
+                        return;
                       }}
                       sx={{
                         display: 'flex',
@@ -5203,7 +5465,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           fontFamily: 'Poppins',
                           fontSize: '13px',
                           color: '#330F1B',
-                          cursor: 'pointer',
+                          cursor: 'default',
                           px: 1,
                           marginLeft: fileSuccess ? '76px' : '380px',
                         }}
@@ -5329,12 +5591,10 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           type="file"
                           hidden
                           ref={fileInputRef}
+                          disabled={true}
                           onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              setUploadedFile(file);
-                              handleManageFile(file);
-                            }
+                            e.target.value = "";
+                            return;
                           }}
                         />
 
@@ -5816,7 +6076,10 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                         }}>
                         <Select
                           value={selectPostalCode}
-                          onChange={(e) => setSelectPostalCode(e.target.value)}
+                          error={cpSelectError}
+                          onChange={(e) => {
+                            handleCpColumnChange(e.target.value);
+                          }}
                           displayEmpty
                           renderValue={(selected) =>
                             selected ? (
@@ -5849,25 +6112,77 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                             backgroundColor: sinCodigoPostal ? "#E3E2E2" : "#FFFFFF",
                             fontFamily: "Poppins",
                             fontSize: "12px",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: cpSelectError ? "#EF5466" : "#D9D9D9",
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                              borderColor: cpSelectError ? "#EF5466" : "#8F4D63",
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                              borderColor: cpSelectError ? "#EF5466" : "#8F4D63",
+                            },
                           }}
                         >
-                          <MenuItem value="Seleccionar"
+                          <MenuItem
+                            value=""
                             sx={{
                               fontFamily: 'Poppins, sans-serif',
                               fontSize: '12px',
                               color: '#9B9295',
                               '&:hover': {
-                                backgroundColor: '#F2EBED', // color solo al pasar el mouse
+                                backgroundColor: '#F2EBED',
                               },
                               '&.Mui-selected': {
-                                backgroundColor: 'transparent', //  quita el fondo cuando está seleccionado
+                                backgroundColor: 'transparent',
                               },
                               '&.Mui-selected:hover': {
-                                backgroundColor: '#F2EBED', //  mantiene el hover cuando está seleccionado
+                                backgroundColor: '#F2EBED',
                               },
                             }}
-                          >Contenido de Código postal</MenuItem>
+                          >
+                            Contenido de Código postal
+                          </MenuItem>
+
+                          {columns
+                            .filter(col => !selectedTelefonos.includes(col))
+                            .map((col) => (
+                              <MenuItem
+                                key={col}
+                                value={col}
+                                sx={{
+                                  fontFamily: 'Poppins, sans-serif',
+                                  fontSize: '12px',
+                                  color: '#574B4F',
+                                  '&:hover': {
+                                    backgroundColor: '#F2EBED',
+                                  },
+                                  '&.Mui-selected': {
+                                    backgroundColor: 'transparent',
+                                  },
+                                  '&.Mui-selected:hover': {
+                                    backgroundColor: '#F2EBED',
+                                  },
+                                }}
+                              >
+                                {col}
+                              </MenuItem>
+                            ))}
                         </Select>
+                        {cpSelectError && cpSelectErrorMessage && (
+                          <Typography
+                            sx={{
+                              fontFamily: "Poppins",
+                              fontSize: "12px",
+                              color: "#EF5466",
+                              marginTop: "6px",
+                              marginLeft: "16px",
+                              lineHeight: "18px",
+                              maxWidth: "360px",
+                            }}
+                          >
+                            {cpSelectErrorMessage}
+                          </Typography>
+                        )}
                       </FormControl>
                       <Box
                         sx={{
@@ -5880,7 +6195,14 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                         {/* Checkbox */}
                         <Checkbox
                           checked={sinCodigoPostal}
-                          onChange={(e) => setSinCodigoPostal(e.target.checked)}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setSinCodigoPostal(checked);
+
+                            if (checked) {
+                              setSelectPostalCode("");
+                            }
+                          }}
                           checkedIcon={
                             <Box sx={{
                               width: '24px',
@@ -6407,14 +6729,14 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                             fontWeight: 500, fontSize: '12px', fontFamily: 'Poppins, sans-serif',
                             marginBottom: '6px', color: '#574B4F'
                           }}
-                          > 0
+                          > {estadisticasCarga?.codigosPostalesCargados ?? 0}
                           </Typography>
 
                           <Typography sx={{
                             fontWeight: 500, fontSize: '12px', fontFamily: 'Poppins, sans-serif',
                             marginBottom: '6px', color: '#574B4F'
                           }}
-                          > 0
+                          > {estadisticasCarga?.codigosPostalesFallidos ?? 0}
                           </Typography>
                         </Box>
 
@@ -6460,7 +6782,7 @@ const tieneID = (campaign.contacts ?? []).some(c => !!c.datoId);
                           </Typography>
 
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {selectedTelefonos.map((variable, i) => (
+                            {selectedTelefonosConCp.map((variable, i) => (
                               <Button
                                 key={i}
                                 sx={{
