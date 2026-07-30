@@ -2,6 +2,7 @@
 using ClosedXML.Excel;
 using Contract;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
 using Modal;
 using Modal.Model;
 using Modal.Model.Model;
@@ -32,7 +33,7 @@ internal class Program
      @"Server=192.168.1.5;Database=SMS_WEB_API;User Id=sa;Password=nuxiba;Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True;";
 
     private const string UrlSitioRecuperacion =
-        "https://localhost:7054/api/User/confirmationEmail";
+        "https://quantum.nuxibacloud.com/quantum/api/User/confirmationEmail";
 
     private const string UrlSitio =
         "https://quantum.nuxibacloud.com/quantum";
@@ -129,8 +130,8 @@ internal class Program
         "https://quantum.nuxibacloud.com/QuantumAPI/img/banner.png";
 
     private const bool UseExistingBackboneUserForRecovery = true;
-    private const int ExistingBackboneIdForRecovery = 1071;
-    private const string ExistingBackboneUsernameForRecovery = "H_Prueba_Carol_Quantum_001";
+    private const int ExistingBackboneIdForRecovery = 1072;
+    private const string ExistingBackboneUsernameForRecovery = "H_SICREA";
     private static void Main()
     {
         Console.WriteLine("Pon la ruta de tu archivo");
@@ -314,7 +315,7 @@ internal class Program
                         extension = null
                     };
 
-                    user.passwordHash = HashUserPassword(TemporaryPassword);
+                    user.passwordHash = SecurityHelper.GenerarPasswordHash(TemporaryPassword);
 
                     ctx.Users.Add(user);
                     ctx.SaveChanges();
