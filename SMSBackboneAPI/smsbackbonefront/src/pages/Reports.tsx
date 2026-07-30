@@ -66,6 +66,7 @@ interface Reports {
 interface ReporteGlobal {
     Date: string;
     Phone: string;
+    CP?: string | null;
     Room: string;
     Campaign: string;
     CampaignId: number;
@@ -87,6 +88,7 @@ interface ReporteSMS {
     userName: string;
     roomName: string;
     phoneNumber: string;
+    cp?: string;
     status?: string;
     responseMessage?: string;
     sentAt?: string;
@@ -361,6 +363,7 @@ const Reports: React.FC = () => {
             Message: item.message,
             MessageId: item.messageId,
             Phone: item.phone,
+            CP: item.cp,
             ReceivedAt: item.receivedAt,
             Room: item.room,
             Status: item.status,
@@ -1463,6 +1466,20 @@ const Reports: React.FC = () => {
                                     <th style={{ padding: '0 16px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Teléfono
                                     </th>
+
+                                    <th
+                                        style={{
+                                            padding: '0 16px',
+                                            fontWeight: 500,
+                                            position: 'sticky',
+                                            top: 0,
+                                            backgroundColor: '#FFFFFF',
+                                            zIndex: 6,
+                                        }}
+                                    >
+                                        CP
+                                    </th>
+
                                     <th style={{ padding: '0px', fontWeight: 500, position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 6, }}>
                                         Sala
                                     </th>
@@ -1521,6 +1538,23 @@ const Reports: React.FC = () => {
                                             }}>
                                                 {recarga.Phone}
                                             </td>
+
+                                            <td
+                                                style={{
+                                                    padding: '0 20px',
+                                                    fontFamily: 'Poppins, sans-serif',
+                                                    fontSize: '13px',
+                                                    color: '#574B4F',
+                                                    letterSpacing: "0.03",
+                                                    textAlign: 'left',
+                                                    whiteSpace: 'nowrap',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                }}
+                                            >
+                                                {recarga.CP ?? "N/A"}
+                                            </td>
+
                                             <td style={{
                                                 padding: '10px',
                                                 fontFamily: 'Poppins, sans-serif',
@@ -1582,7 +1616,7 @@ const Reports: React.FC = () => {
                                                 {recarga.MessageId}
                                             </td>
                                             <td style={{
-                                                padding: '0 20px',
+                                                padding: '0 45px',
                                                 fontFamily: 'Poppins, sans-serif',
                                                 fontSize: '13px',
                                                 color: '#574B4F',
@@ -1591,8 +1625,54 @@ const Reports: React.FC = () => {
                                                 whiteSpace: 'nowrap',
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis',
+                                                maxWidth: '300px',
                                             }}>
-                                                {recarga.Message}
+                                                <Tooltip
+                                                    title={recarga.Message?.length > 25 ? recarga.Message : ""}
+                                                    arrow
+                                                    placement="top"
+                                                    disableHoverListener={recarga.Message?.length <= 25}
+                                                    componentsProps={{
+                                                        tooltip: {
+                                                            sx: {
+                                                                backgroundColor: "rgb(43, 42, 42)",
+                                                                color: "#cecece",
+                                                                fontFamily: "Poppins, sans-serif",
+                                                                fontSize: "12px",
+                                                                padding: "8px 16px",
+                                                                borderRadius: "8px",
+                                                                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.4)"
+                                                            }
+                                                        },
+                                                        arrow: {
+                                                            sx: {
+                                                                color: "rgba(0, 0, 0, 0.8)"
+                                                            }
+                                                        }
+                                                    }}
+                                                    PopperProps={{
+                                                        modifiers: [
+                                                            {
+                                                                name: "offset",
+                                                                options: {
+                                                                    offset: [0, -8]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }}
+                                                >
+                                                    <div
+                                                        style={{
+                                                            maxWidth: "200px",
+                                                            overflow: "hidden",
+                                                            textOverflow: "ellipsis",
+                                                            whiteSpace: "nowrap",
+                                                            cursor: "default",
+                                                        }}
+                                                    >
+                                                        {recarga.Message}
+                                                    </div>
+                                                </Tooltip>
                                             </td>
                                             <td style={{
                                                 padding: '10px',

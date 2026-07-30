@@ -54,6 +54,7 @@ namespace Business
                                     {
                                         Date = reader.GetDateTime(reader.GetOrdinal("Date")),
                                         Phone = reader.GetString(reader.GetOrdinal("Phone")),
+                                        CP = reader.IsDBNull(reader.GetOrdinal("CP")) ? null : reader.GetString(reader.GetOrdinal("CP")),
                                         Room = reader.GetString(reader.GetOrdinal("Room")),
                                         Campaign = reader.GetString(reader.GetOrdinal("Campaign")),
                                         CampaignId = reader.GetInt32(reader.GetOrdinal("CampaignId")),
@@ -73,6 +74,7 @@ namespace Business
                                     {
                                         Date = reader.GetDateTime(reader.GetOrdinal("Date")),
                                         Phone = reader.GetString(reader.GetOrdinal("Phone")),
+                                        CP = reader.IsDBNull(reader.GetOrdinal("CP")) ? null : reader.GetString(reader.GetOrdinal("CP")),
                                         Room = reader.GetString(reader.GetOrdinal("Room")),
                                         Campaign = reader.GetString(reader.GetOrdinal("Campaign")),
                                         CampaignId = reader.GetInt32(reader.GetOrdinal("CampaignId")),
@@ -157,6 +159,7 @@ namespace Business
                                         UserName = reader.GetString(reader.GetOrdinal("UserName")),
                                         RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
                                         PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                        CP = reader.IsDBNull(reader.GetOrdinal("CP")) ? null : reader.GetString(reader.GetOrdinal("CP")),
                                         Status = reader.GetString(reader.GetOrdinal("Status")),
                                         ResponseMessage = reader.IsDBNull(reader.GetOrdinal("ResponseMessage")) ? null : reader.GetString(reader.GetOrdinal("ResponseMessage")),
                                         SentAt = reader.IsDBNull(reader.GetOrdinal("SentAt")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("SentAt")),
@@ -175,6 +178,7 @@ namespace Business
                                         UserName = reader.GetString(reader.GetOrdinal("UserName")),
                                         RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
                                         PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                        CP = reader.IsDBNull(reader.GetOrdinal("CP")) ? null : reader.GetString(reader.GetOrdinal("CP")),
                                         Status = ConvertDeliveryStatus(reader.GetString(reader.GetOrdinal("Status"))),
                                         ResponseMessage = reader.IsDBNull(reader.GetOrdinal("ResponseMessage")) ? null : reader.GetString(reader.GetOrdinal("ResponseMessage")),
                                         SentAt = reader.IsDBNull(reader.GetOrdinal("SentAt")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("SentAt")),

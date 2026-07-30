@@ -24,6 +24,9 @@ namespace Contract.Response
         public string UserName { get; set; }
         public string RoomName { get; set; }
         public string PhoneNumber { get; set; }
+
+        public string? CP { get; set; }
+
         public string Status { get; set; }
         public string? ResponseMessage { get; set; }
         public DateTime? SentAt { get; set; }

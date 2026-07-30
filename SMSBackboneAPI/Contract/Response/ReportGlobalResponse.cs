@@ -17,6 +17,9 @@ namespace Contract.Response
     {
         public DateTime Date { get; set; }
         public string Phone { get; set; }
+
+        public string? CP { get; set; }
+
         public string Room { get; set; }
         public string Campaign { get; set; }
         public int CampaignId { get; set; }
