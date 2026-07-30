@@ -841,3 +841,241 @@ ON ccPhoneSeriesMX (Cld, Serie, NumeracionInicial, NumeracionFinal);
 
 CREATE INDEX IX_ccPhoneSeriesMX_Estado
 ON ccPhoneSeriesMX (Estado);
+
+
+ALTER TABLE dbo.tpm_CampaignContacts
+ADD CP VARCHAR(5) NULL;
+
+ALTER TABLE dbo.CampaignContacts
+ADD CP VARCHAR(5) NULL;
+
+CREATE INDEX IX_tpm_CampaignContacts_SessionId
+ON dbo.tpm_CampaignContacts(SessionId);
+
+EXEC dbo.spResolveContactTimeZone
+    @ZipCode = '01000',
+    @Phone = '5512345678';
+
+	IF OBJECT_ID('dbo.ccStateCodeMap', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.ccStateCodeMap
+    (
+        Id INT IDENTITY(1,1) NOT NULL,
+        SourceSystem VARCHAR(30) NOT NULL,
+        SourceState VARCHAR(20) NOT NULL,
+        TargetState VARCHAR(20) NOT NULL,
+        StateName VARCHAR(100) NULL,
+
+        CONSTRAINT PK_ccStateCodeMap PRIMARY KEY CLUSTERED (Id)
+    );
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'IX_ccStateCodeMap_Source'
+      AND object_id = OBJECT_ID('dbo.ccStateCodeMap')
+)
+BEGIN
+    CREATE INDEX IX_ccStateCodeMap_Source
+    ON dbo.ccStateCodeMap(SourceSystem, SourceState);
+END
+GO
+
+ALTER TABLE dbo.tpm_CampaignContacts
+ADD CP VARCHAR(5) NULL;
+GO
+
+ALTER TABLE dbo.CampaignContacts
+ADD CP VARCHAR(5) NULL;
+GO
+
+USE [SMS_WEB_API]
+GO
+/****** Object:  StoredProcedure [dbo].[spResolveContactTimeZone]    Script Date: 28/07/2026 10:17:08 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER   PROCEDURE [dbo].[spResolveContactTimeZone]
+    @ZipCode VARCHAR(10) = NULL,
+    @Phone VARCHAR(30) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @Result TABLE (
+        ZipCode VARCHAR(10) NULL,
+        State VARCHAR(10) NULL,
+        Municipality VARCHAR(150) NULL,
+        Location VARCHAR(150) NULL,
+        Description VARCHAR(100) NULL,
+        WinterTimeDifference DECIMAL(4,1) NULL,
+        tz_id INT NULL,
+        tz_name VARCHAR(20) NULL,
+        TimeZoneSource VARCHAR(30) NOT NULL
+    );
+
+    DECLARE @CleanZipCode VARCHAR(10);
+    DECLARE @Phone10 VARCHAR(10);
+
+    SET @CleanZipCode = NULLIF(LTRIM(RTRIM(@ZipCode)), '');
+
+    -- 1. Flujo principal: Código Postal
+    IF @CleanZipCode IS NOT NULL
+    BEGIN
+        INSERT INTO @Result (
+            ZipCode,
+            State,
+            Municipality,
+            Location,
+            Description,
+            WinterTimeDifference,
+            tz_id,
+            tz_name,
+            TimeZoneSource
+        )
+        SELECT TOP 1
+            cp.ZipCode,
+            cp.State,
+            cp.Municipality,
+            cp.Location,
+            cp.Description,
+            cp.WinterTimeDifference,
+            cp.tz_id,
+            tz.tz_name,
+            'PostalCode'
+        FROM dbo.ccTimeZoneAreaCP cp
+        INNER JOIN dbo.ccTimeZones tz
+            ON tz.tz_id = cp.tz_id
+        WHERE cp.ZipCode = @CleanZipCode
+        ORDER BY cp.ZipCode;
+
+        IF EXISTS (SELECT 1 FROM @Result)
+        BEGIN
+            SELECT * FROM @Result;
+            RETURN;
+        END
+    END;
+
+    -- 2. Fallback: Teléfono / COFETEL
+    IF NULLIF(LTRIM(RTRIM(@Phone)), '') IS NOT NULL
+    BEGIN
+        SET @Phone10 = RIGHT(
+            REPLACE(
+            REPLACE(
+            REPLACE(
+            REPLACE(
+            REPLACE(
+            REPLACE(
+            REPLACE(@Phone, '+52', ''),
+                ' ', ''),
+                '-', ''),
+                '(', ''),
+                ')', ''),
+                '.', ''),
+                '/', ''),
+            10
+        );
+
+        ;WITH PhoneCandidates AS (
+            -- Lada 2 dígitos: 33 + 1000 + 1234
+            SELECT
+                TRY_CONVERT(INT, LEFT(@Phone10, 2)) AS Cld,
+                TRY_CONVERT(INT, SUBSTRING(@Phone10, 3, 4)) AS Serie,
+                TRY_CONVERT(INT, RIGHT(@Phone10, 4)) AS Num4,
+                1 AS Priority
+
+            UNION ALL
+
+            -- Lada 3 dígitos: 449 + 100 + 1234
+            SELECT
+                TRY_CONVERT(INT, LEFT(@Phone10, 3)) AS Cld,
+                TRY_CONVERT(INT, SUBSTRING(@Phone10, 4, 3)) AS Serie,
+                TRY_CONVERT(INT, RIGHT(@Phone10, 4)) AS Num4,
+                2 AS Priority
+        )
+        INSERT INTO @Result (
+            ZipCode,
+            State,
+            Municipality,
+            Location,
+            Description,
+            WinterTimeDifference,
+            tz_id,
+            tz_name,
+            TimeZoneSource
+        )
+        SELECT TOP 1
+            NULL AS ZipCode,
+            ISNULL(m.TargetState, ps.Estado) AS State,
+            ps.Municipio AS Municipality,
+            ps.Poblacion AS Location,
+            cp.Description,
+            cp.WinterTimeDifference,
+            cp.tz_id,
+            tz.tz_name,
+            'PhoneSeries'
+        FROM PhoneCandidates pc
+        INNER JOIN dbo.ccPhoneSeriesMX ps
+            ON ps.Cld = pc.Cld
+           AND ps.Serie = pc.Serie
+           AND pc.Num4 BETWEEN ps.NumeracionInicial AND ps.NumeracionFinal
+        LEFT JOIN dbo.ccStateCodeMap m
+            ON m.SourceSystem = 'COFETEL'
+           AND m.SourceState = ps.Estado
+        CROSS APPLY (
+            SELECT TOP 1
+                cp.ZipCode,
+                cp.Description,
+                cp.WinterTimeDifference,
+                cp.tz_id
+            FROM dbo.ccTimeZoneAreaCP cp
+            WHERE cp.State = ISNULL(m.TargetState, ps.Estado)
+            ORDER BY cp.ZipCode
+        ) cp
+        INNER JOIN dbo.ccTimeZones tz
+            ON tz.tz_id = cp.tz_id
+        WHERE LEN(@Phone10) = 10
+        ORDER BY
+            pc.Priority,
+            cp.ZipCode;
+
+        IF EXISTS (SELECT 1 FROM @Result)
+        BEGIN
+            SELECT * FROM @Result;
+            RETURN;
+        END
+    END;
+
+    -- 3. No encontrado
+    SELECT
+        CAST(NULL AS VARCHAR(10)) AS ZipCode,
+        CAST(NULL AS VARCHAR(10)) AS State,
+        CAST(NULL AS VARCHAR(150)) AS Municipality,
+        CAST(NULL AS VARCHAR(150)) AS Location,
+        CAST(NULL AS VARCHAR(100)) AS Description,
+        CAST(NULL AS DECIMAL(4,1)) AS WinterTimeDifference,
+        CAST(NULL AS INT) AS tz_id,
+        CAST(NULL AS VARCHAR(20)) AS tz_name,
+        CAST('Unknown' AS VARCHAR(30)) AS TimeZoneSource;
+END;
+
+sp_help ccStateCodeMap
+
+IF COL_LENGTH('dbo.ccTimeZoneAreaCP', 'tz_id') IS NULL
+BEGIN
+    ALTER TABLE dbo.ccTimeZoneAreaCP
+    ADD tz_id INT NULL;
+END
+GO
+
+UPDATE cp
+SET cp.tz_id = tz.tz_id
+FROM dbo.ccTimeZoneAreaCP cp
+INNER JOIN dbo.ccTimeZones tz
+    ON tz.tz_offset = cp.WinterTimeDifference
+WHERE cp.tz_id IS NULL;
+GO
