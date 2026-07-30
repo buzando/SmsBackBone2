@@ -1,4 +1,4 @@
-use [SMS_WEB_API]
+ï»¿use [SMS_WEB_API]
 
 CREATE TABLE UserAccountRecovery (
     id INT PRIMARY KEY IDENTITY(1,1),
@@ -60,12 +60,12 @@ CREATE TABLE creditcards (
     updated_at DATETIME,
     Type NVARCHAR(50),
 	street NVARCHAR(255) NOT NULL, -- Calle
-    exterior_number NVARCHAR(50) NOT NULL, -- Número exterior
-    interior_number NVARCHAR(50) NULL, -- Número interior
+    exterior_number NVARCHAR(50) NOT NULL, -- NÃºmero exterior
+    interior_number NVARCHAR(50) NULL, -- NÃºmero interior
     neighborhood NVARCHAR(255) NOT NULL, -- Colonia
     city NVARCHAR(255) NOT NULL, -- Ciudad
     state NVARCHAR(255) NOT NULL, -- Estado
-    postal_code NVARCHAR(10) NOT NULL, -- Código postal (máx. 10 caracteres)
+    postal_code NVARCHAR(10) NOT NULL, -- CÃ³digo postal (mÃ¡x. 10 caracteres)
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
@@ -106,13 +106,13 @@ CREATE TABLE MyNumbers (
 CREATE TABLE BillingInformation (
     id INT PRIMARY KEY IDENTITY(1,1),
     userId INT NOT NULL,
-    businessName NVARCHAR(255) NOT NULL, -- Nombre o razón social
+    businessName NVARCHAR(255) NOT NULL, -- Nombre o razÃ³n social
     taxId NVARCHAR(50) NOT NULL,        -- RFC
-    taxRegime NVARCHAR(255) NOT NULL,  -- Régimen fiscal
+    taxRegime NVARCHAR(255) NOT NULL,  -- RÃ©gimen fiscal
     cfdi NVARCHAR(255) NOT NULL,       -- CFDI
-    postalCode NVARCHAR(10) NOT NULL,  -- Código postal
-    createdAt DATETIME NOT NULL DEFAULT GETDATE(), -- Fecha de creación
-    updatedAt DATETIME NULL,           -- Fecha de última actualización
+    postalCode NVARCHAR(10) NOT NULL,  -- CÃ³digo postal
+    createdAt DATETIME NOT NULL DEFAULT GETDATE(), -- Fecha de creaciÃ³n
+    updatedAt DATETIME NULL,           -- Fecha de Ãºltima actualizaciÃ³n
     FOREIGN KEY (userId) REFERENCES Users(id)
 );
 
@@ -326,7 +326,7 @@ alter table creditrecharge add EstatusError nvarchar(100) null
 ALTER TABLE AmountNotification
 ADD IdRoom INT;
 
--- 2. Crear la relación foránea
+-- 2. Crear la relaciÃ³n forÃ¡nea
 ALTER TABLE AmountNotification
 ADD CONSTRAINT FK_AmountNotification_Rooms
 FOREIGN KEY (IdRoom)
@@ -391,13 +391,13 @@ BEGIN
 
 	  DECLARE @TypeNumber INT = NULL;
 
-    -- Convertimos el tipo de SMS a número si aplica
+    -- Convertimos el tipo de SMS a nÃºmero si aplica
     SET @TypeNumber = CASE 
                         WHEN @SmsType = 'short' THEN 1
                         WHEN @SmsType = 'long' THEN 2
                         ELSE NULL
                       END;
-    -- Resultset 1: Info general de la campaña
+    -- Resultset 1: Info general de la campaÃ±a
     SELECT 
         c.Id,
         c.Name,
@@ -433,7 +433,7 @@ BEGIN
         (SELECT COUNT(*) FROM CampaignContactScheduleSend s WHERE s.CampaignId = c.Id AND s.Status = '4') AS FailedCount,
         (SELECT COUNT(*) FROM CampaignContactScheduleSend s WHERE s.CampaignId = c.Id AND s.Status = '5') AS ExceptionCount,
 
-        -- númeroInicial según regla de duplicados
+        -- nÃºmeroInicial segÃºn regla de duplicados
         (
             CASE 
                 WHEN (SELECT COUNT(*) FROM CampaignSchedules s WHERE s.CampaignId = c.Id AND s.OperationMode = 2 AND s.EndDateTime <= GETDATE()) > 1
@@ -521,8 +521,8 @@ BEGIN
             END, 'C', 'es-MX'
         ) AS Cost,
         CASE 
-            WHEN cp.NumberType = 1 THEN 'Número corto'
-            WHEN cp.NumberType = 2 THEN 'Número largo'
+            WHEN cp.NumberType = 1 THEN 'NÃºmero corto'
+            WHEN cp.NumberType = 2 THEN 'NÃºmero largo'
             ELSE 'Desconocido'
         END AS Type
     FROM Campaigns cp
@@ -713,14 +713,14 @@ use SMS_WEB_API
 
 CREATE TABLE TestMessage (
     Id INT IDENTITY(1,1) PRIMARY KEY,
-    ToNumber NVARCHAR(20) NOT NULL,               -- Número destino
-    FromNumber NVARCHAR(20) NULL,                 -- Número origen (puede ser null)
+    ToNumber NVARCHAR(20) NOT NULL,               -- NÃºmero destino
+    FromNumber NVARCHAR(20) NULL,                 -- NÃºmero origen (puede ser null)
     Message NVARCHAR(500) NULL,                   -- Mensaje enviado (si aplica)
-    TemplateId INT NULL,                          -- ID de plantilla (si se usó)
-    UserId INT NOT NULL,                          -- Usuario que envió el mensaje
-    Status NVARCHAR(50) NOT NULL,                 -- Resultado ("Enviado", "Falló", etc)
+    TemplateId INT NULL,                          -- ID de plantilla (si se usÃ³)
+    UserId INT NOT NULL,                          -- Usuario que enviÃ³ el mensaje
+    Status NVARCHAR(50) NOT NULL,                 -- Resultado ("Enviado", "FallÃ³", etc)
     ResponseMessage NVARCHAR(500) NULL,           -- Mensaje detallado del resultado
-    CreatedAt DATETIME NOT NULL DEFAULT GETDATE() -- Fecha de envío
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE() -- Fecha de envÃ­o
 );
 
 select * from TestMessage
@@ -923,7 +923,7 @@ BEGIN
 
     SET @CleanZipCode = NULLIF(LTRIM(RTRIM(@ZipCode)), '');
 
-    -- 1. Flujo principal: Código Postal
+    -- 1. Flujo principal: CÃ³digo Postal
     IF @CleanZipCode IS NOT NULL
     BEGIN
         INSERT INTO @Result (
@@ -960,7 +960,7 @@ BEGIN
         END
     END;
 
-    -- 2. Fallback: Teléfono / COFETEL
+    -- 2. Fallback: TelÃ©fono / COFETEL
     IF NULLIF(LTRIM(RTRIM(@Phone)), '') IS NOT NULL
     BEGIN
         SET @Phone10 = RIGHT(
@@ -981,7 +981,7 @@ BEGIN
         );
 
         ;WITH PhoneCandidates AS (
-            -- Lada 2 dígitos: 33 + 1000 + 1234
+            -- Lada 2 dÃ­gitos: 33 + 1000 + 1234
             SELECT
                 TRY_CONVERT(INT, LEFT(@Phone10, 2)) AS Cld,
                 TRY_CONVERT(INT, SUBSTRING(@Phone10, 3, 4)) AS Serie,
@@ -990,7 +990,7 @@ BEGIN
 
             UNION ALL
 
-            -- Lada 3 dígitos: 449 + 100 + 1234
+            -- Lada 3 dÃ­gitos: 449 + 100 + 1234
             SELECT
                 TRY_CONVERT(INT, LEFT(@Phone10, 3)) AS Cld,
                 TRY_CONVERT(INT, SUBSTRING(@Phone10, 4, 3)) AS Serie,
@@ -1079,3 +1079,183 @@ INNER JOIN dbo.ccTimeZones tz
     ON tz.tz_offset = cp.WinterTimeDifference
 WHERE cp.tz_id IS NULL;
 GO
+
+USE [SMS_WEB_API]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_getGlobalReport]    Script Date: 30/07/2026 03:15:48 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ 
+ALTER PROCEDURE [dbo].[sp_getGlobalReport]
+    @StartDate DATETIME,
+    @EndDate DATETIME,
+    @RoomId INT,
+    @PageNumber INT = 1,
+    @PageSize INT = 50,
+    @Export BIT = 0  -- Nuevo parÃ¡metro opcional
+AS
+BEGIN
+    SET NOCOUNT ON;
+ 
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+ 
+    ;WITH ResultSet AS (
+        SELECT
+            cc.SentAt AS [Date],
+            cct.PhoneNumber AS Phone,
+			cct.CP,
+            r.name AS Room,
+            cp.Name AS Campaign,
+            cp.Id AS CampaignId,
+            u.userName AS [User],
+            cc.Id AS MessageId,
+            ISNULL(cp.Message, t.Message) AS Message,
+            cc.Status,
+            cc.SentAt AS ReceivedAt,
+            FORMAT(
+                CASE 
+                    WHEN mn.Type = 'long' THEN cl.RateForLong
+                    ELSE cl.RateForShort
+                END, 'C', 'es-MX'
+            ) AS Cost,
+            CASE 
+                WHEN cp.NumberType = 1 THEN 'NÃºmero corto'
+                WHEN cp.NumberType = 2 THEN 'NÃºmero largo'
+                ELSE 'Desconocido'
+            END AS Type,
+            ROW_NUMBER() OVER (ORDER BY cc.SentAt DESC) AS RowNum,
+            COUNT(*) OVER() AS TotalCount
+        FROM Campaigns cp
+        INNER JOIN CampaignContacts cct ON cp.Id = cct.CampaignId
+        INNER JOIN CampaignContactScheduleSend cc ON cc.ContactId = cct.Id
+        LEFT JOIN Template t ON cp.TemplateId = t.Id
+        LEFT JOIN rooms r ON cp.RoomId = r.id
+        LEFT JOIN roomsbyuser ru ON ru.idRoom = r.id
+        LEFT JOIN users u ON ru.idUser = u.id
+        LEFT JOIN clients cl ON u.idCliente = cl.id
+        LEFT JOIN MyNumbers mn ON mn.Number = cct.PhoneNumber AND mn.idClient = cl.id
+        WHERE cp.RoomId = @RoomId
+          AND cc.SentAt BETWEEN @StartDate AND @EndDate
+    )
+    SELECT *
+    FROM ResultSet
+    WHERE (@Export = 1 OR RowNum BETWEEN @Offset + 1 AND @Offset + @PageSize)
+    ORDER BY RowNum;
+END
+
+USE [SMS_WEB_API]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_getSmsDeliveryReport]    Script Date: 30/07/2026 03:12:06 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_getSmsDeliveryReport]
+    @StartDate DATETIME,
+    @EndDate DATETIME,
+    @RoomId INT,
+    @ReportType NVARCHAR(20), -- 'entrantes', 'enviados', 'noenviados', 'rechazados'
+    @UserIds NVARCHAR(MAX) = NULL,
+    @CampaignIds NVARCHAR(MAX) = NULL,
+    @PageNumber INT = 1,
+    @PageSize INT = 50,
+    @Export BIT = 0 -- ðŸ‘ˆ nuevo parÃ¡metro
+AS
+BEGIN
+    SET NOCOUNT ON;
+ 
+    -- Convertir listas separadas por comas a tablas
+    DECLARE @UserIdTable TABLE (Id INT);
+    DECLARE @CampaignIdTable TABLE (Id INT);
+ 
+    IF @UserIds IS NOT NULL AND @UserIds <> ''
+    BEGIN
+        INSERT INTO @UserIdTable (Id)
+        SELECT CAST(value AS INT)
+        FROM STRING_SPLIT(@UserIds, ',')
+        WHERE TRY_CAST(value AS INT) IS NOT NULL;
+    END
+ 
+    IF @CampaignIds IS NOT NULL AND @CampaignIds <> ''
+    BEGIN
+        INSERT INTO @CampaignIdTable (Id)
+        SELECT CAST(value AS INT)
+        FROM STRING_SPLIT(@CampaignIds, ',')
+        WHERE TRY_CAST(value AS INT) IS NOT NULL;
+    END
+ 
+    -- Calcular OFFSET
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+ 
+    -- TotalCount
+    SELECT COUNT(*) AS TotalCount
+    FROM (
+        SELECT 1 AS DummyColumn
+        FROM CampaignContactScheduleSend ccs
+        INNER JOIN Campaigns c ON c.Id = ccs.CampaignId
+        INNER JOIN Rooms r ON r.Id = c.RoomId
+        INNER JOIN CampaignContacts cc ON cc.Id = ccs.ContactId
+        INNER JOIN Roomsbyuser ru ON ru.idRoom = r.Id
+        INNER JOIN Users u ON u.id = ru.idUser
+        WHERE 
+            c.RoomId = @RoomId
+            AND ccs.SentAt BETWEEN @StartDate AND @EndDate
+            AND (
+                @UserIds IS NULL OR u.id IN (SELECT Id FROM @UserIdTable)
+            )
+            AND (
+                @CampaignIds IS NULL OR c.Id IN (SELECT Id FROM @CampaignIdTable)
+            )
+            AND (
+                (@ReportType = 'entrantes' AND LTRIM(RTRIM(ccs.ResponseMessage)) <> '')
+                OR (@ReportType = 'enviados' AND ccs.Status IN ('0', '1'))
+                OR (@ReportType = 'noenviados' AND ccs.Status IN ('2', '3'))
+                OR (@ReportType = 'rechazados' AND ccs.Status IN ('4', '5'))
+            )
+    ) AS CountResult;
+ 
+    -- Datos
+    WITH ResultSet AS (
+        SELECT 
+            ccs.Id AS MessageId,
+            c.Message,
+            c.Name AS CampaignName,
+            c.Id AS CampaignId,
+            u.id AS UserId,
+            u.userName AS UserName,
+            r.name AS RoomName,
+            cc.PhoneNumber,
+			cc.CP,
+            ccs.Status,
+            ccs.ResponseMessage,
+            ccs.SentAt,
+            ROW_NUMBER() OVER (ORDER BY ccs.SentAt DESC) AS RowNum
+        FROM CampaignContactScheduleSend ccs
+        INNER JOIN Campaigns c ON c.Id = ccs.CampaignId
+        INNER JOIN Rooms r ON r.Id = c.RoomId
+        INNER JOIN CampaignContacts cc ON cc.Id = ccs.ContactId
+        INNER JOIN Roomsbyuser ru ON ru.idRoom = r.Id
+        INNER JOIN Users u ON u.id = ru.idUser
+        WHERE 
+            c.RoomId = @RoomId
+            AND ccs.SentAt BETWEEN @StartDate AND @EndDate
+            AND (
+                @UserIds IS NULL OR u.id IN (SELECT Id FROM @UserIdTable)
+            )
+            AND (
+                @CampaignIds IS NULL OR c.Id IN (SELECT Id FROM @CampaignIdTable)
+            )
+            AND (
+                (@ReportType = 'entrantes' AND LTRIM(RTRIM(ccs.ResponseMessage)) <> '')
+                OR (@ReportType = 'enviados' AND ccs.Status IN ('0', '1'))
+                OR (@ReportType = 'noenviados' AND ccs.Status IN ('2', '3'))
+                OR (@ReportType = 'rechazados' AND ccs.Status IN ('4', '5'))
+            )
+    )
+    SELECT *
+    FROM ResultSet
+    WHERE (@Export = 1 OR RowNum BETWEEN @Offset + 1 AND @Offset + @PageSize) -- ðŸ‘ˆ clave
+    ORDER BY RowNum;
+END
