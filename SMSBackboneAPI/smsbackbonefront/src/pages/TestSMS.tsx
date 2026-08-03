@@ -393,7 +393,7 @@ export default function TestSMS() {
                 let value = e.target.value;
 
                 value = value.replace(
-                  /[^0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-{}\n\r]/g,
+                  /[^0-9A-Za-zÜüÑñ .,;:!?()$\-{}\n\r]/g,
                   ''
                 );
 
