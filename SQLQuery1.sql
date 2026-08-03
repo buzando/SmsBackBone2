@@ -1259,3 +1259,99 @@ BEGIN
     WHERE (@Export = 1 OR RowNum BETWEEN @Offset + 1 AND @Offset + @PageSize) -- 👈 clave
     ORDER BY RowNum;
 END
+USE [SMS_WEB_API]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[sp_getGlobalReport]
+    @StartDate DATETIME = NULL,
+    @EndDate DATETIME = NULL,
+    @RoomId INT,
+    @PageNumber INT = 1,
+    @PageSize INT = 50,
+    @Export BIT = 0,
+    @CampaignIds NVARCHAR(MAX) = NULL,
+    @UserIds NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+
+    ;WITH CampaignFilter AS (
+        SELECT DISTINCT TRY_CAST(LTRIM(RTRIM(value)) AS INT) AS CampaignId
+        FROM STRING_SPLIT(ISNULL(@CampaignIds, ''), ',')
+        WHERE TRY_CAST(LTRIM(RTRIM(value)) AS INT) IS NOT NULL
+    ),
+    UserFilter AS (
+        SELECT DISTINCT TRY_CAST(LTRIM(RTRIM(value)) AS INT) AS UserId
+        FROM STRING_SPLIT(ISNULL(@UserIds, ''), ',')
+        WHERE TRY_CAST(LTRIM(RTRIM(value)) AS INT) IS NOT NULL
+    ),
+    ResultSet AS (
+        SELECT
+            cc.SentAt AS [Date],
+            cct.PhoneNumber AS Phone,
+            cct.CP,
+            r.name AS Room,
+            cp.Name AS Campaign,
+            cp.Id AS CampaignId,
+            u.userName AS [User],
+            u.id AS UserId,
+            cc.Id AS MessageId,
+            ISNULL(cp.Message, t.Message) AS Message,
+            cc.Status,
+            cc.SentAt AS ReceivedAt,
+            FORMAT(
+                CASE 
+                    WHEN mn.Type = 'long' THEN cl.RateForLong
+                    ELSE cl.RateForShort
+                END, 'C', 'es-MX'
+            ) AS Cost,
+            CASE 
+                WHEN cp.NumberType = 1 THEN 'Número corto'
+                WHEN cp.NumberType = 2 THEN 'Número largo'
+                ELSE 'Desconocido'
+            END AS Type,
+            ROW_NUMBER() OVER (ORDER BY cc.SentAt DESC) AS RowNum,
+            COUNT(*) OVER() AS TotalCount
+        FROM Campaigns cp
+        INNER JOIN CampaignContacts cct 
+            ON cp.Id = cct.CampaignId
+        INNER JOIN CampaignContactScheduleSend cc 
+            ON cc.ContactId = cct.Id
+        LEFT JOIN Template t 
+            ON cp.TemplateId = t.Id
+        LEFT JOIN rooms r 
+            ON cp.RoomId = r.id
+        LEFT JOIN roomsbyuser ru 
+            ON ru.idRoom = r.id
+        LEFT JOIN users u 
+            ON ru.idUser = u.id
+        LEFT JOIN clients cl 
+            ON u.idCliente = cl.id
+        LEFT JOIN MyNumbers mn 
+            ON mn.Number = cct.PhoneNumber 
+           AND mn.idClient = cl.id
+        WHERE cp.RoomId = @RoomId
+          AND (@StartDate IS NULL OR cc.SentAt >= @StartDate)
+          AND (@EndDate IS NULL OR cc.SentAt <= @EndDate)
+          AND (
+                NOT EXISTS (SELECT 1 FROM CampaignFilter)
+                OR cp.Id IN (SELECT CampaignId FROM CampaignFilter)
+              )
+          AND (
+                NOT EXISTS (SELECT 1 FROM UserFilter)
+                OR u.id IN (SELECT UserId FROM UserFilter)
+              )
+    )
+    SELECT *
+    FROM ResultSet
+    WHERE (@Export = 1 OR RowNum BETWEEN @Offset + 1 AND @Offset + @PageSize)
+    ORDER BY RowNum;
+END
+GO

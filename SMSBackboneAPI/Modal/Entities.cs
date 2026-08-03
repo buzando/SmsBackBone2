@@ -51,6 +51,8 @@ namespace Modal
         public DbSet<LongNumberRequest> LongNumberRequest { get; set; }
         public DbSet<FacturaResumen> FacturaResumen { get; set; }
         public virtual DbSet<UserOnboarding> UserOnboarding { get; set; }
+        public virtual DbSet<SmsBalanceReconciliationDetail> SmsBalanceReconciliationDetail { get; set; }
+        public virtual DbSet<SmsBalanceReconciliation> SmsBalanceReconciliation { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ClientRoomSummaryDTO>().HasNoKey();

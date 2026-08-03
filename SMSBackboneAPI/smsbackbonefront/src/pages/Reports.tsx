@@ -722,7 +722,16 @@ const Reports: React.FC = () => {
 
                 {/* Filtros de Fecha, Campaña y Usuario */}
 
-                <Box display="flex" gap={2} mb={4} marginBottom={2}>
+                <Box
+                    display="flex"
+                    gap={2}
+                    sx={{
+                        mb: 2,
+                        position: "relative",
+                        zIndex: 1500,
+                        backgroundColor: "#F6F6F6",
+                    }}
+                >
                     <Button
                         disabled={selectedSmsOption === "SMS"}
                         variant="outlined"
@@ -760,7 +769,12 @@ const Reports: React.FC = () => {
                 </Box>
 
                 {/* Popper Campañas */}
-                <Popper open={campaignMenuOpen} anchorEl={anchorElC} placement="bottom-start">
+                <Popper
+                    open={campaignMenuOpen}
+                    anchorEl={anchorElC}
+                    placement="bottom-start"
+                    style={{ zIndex: 99999 }}
+                >
                     <Paper ref={campaignPopperRef} sx={{
                         padding: 1,
                         width: "280px",
@@ -941,7 +955,7 @@ const Reports: React.FC = () => {
                 </Popper>
 
                 {/* Popper Usuarios */}
-                <Popper open={userMenuOpen} anchorEl={userAnchorEl} placement="bottom-start">
+                <Popper open={userMenuOpen} anchorEl={userAnchorEl} placement="bottom-start" style={{ zIndex: 99999 }}>
                     <Paper
                         sx={{
                             padding: 1,

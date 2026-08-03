@@ -66,7 +66,10 @@ namespace Business
                         campaign.TemplateId = newTemplate.Id;
                         campaign.UseTemplate = true;
                     }
-
+                    campaign.ShowCharts = true;
+                    campaign.ShowRecordsManager = true;
+                    campaign.ShowSchedules = true;
+                    campaign.ShowTestSend = true;
                     // 5️⃣ Guardar campaña
                     ctx.Campaigns.Add(campaign);
                     ctx.SaveChanges();

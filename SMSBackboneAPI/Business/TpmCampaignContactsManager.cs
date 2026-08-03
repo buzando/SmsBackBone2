@@ -57,7 +57,7 @@ namespace Business
                             var cpVacio = string.IsNullOrWhiteSpace(cpRaw);
                             var cpInvalido = !cpVacio && string.IsNullOrWhiteSpace(cp);
 
-                            if (cpInvalido)
+                            if (cpInvalido || cpVacio)
                             {
                                 resultado.CodigosPostalesFallidos++;
                             }

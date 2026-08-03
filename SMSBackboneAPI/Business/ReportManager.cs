@@ -35,7 +35,19 @@ namespace Business
                         command.Parameters.AddWithValue("@PageNumber", request.Page > 0 ? request.Page : 1);
                         command.Parameters.AddWithValue("@PageSize", total);
                         command.Parameters.AddWithValue("@Export", Complete);
+                        command.Parameters.AddWithValue(
+    "@CampaignIds",
+    request.CampaignIds != null && request.CampaignIds.Any()
+        ? string.Join(",", request.CampaignIds)
+        : (object)DBNull.Value
+);
 
+                        command.Parameters.AddWithValue(
+                            "@UserIds",
+                            request.UserIds != null && request.UserIds.Any()
+                                ? string.Join(",", request.UserIds)
+                                : (object)DBNull.Value
+                        );
                         connection.Open();
 
                         using (var reader = command.ExecuteReader())
@@ -240,7 +252,7 @@ namespace Business
                     return GenerateFileFrom(deliveryData, format, reportTitle);
 
                 case "clients":
-                    var clientfilterrequest = new ClientFilterRequest {Page = 0};
+                    var clientfilterrequest = new ClientFilterRequest { Page = 0 };
                     var clientData = new ClientManager().GetClientsAdmin(clientfilterrequest);
                     return GenerateFileFrom(clientData.Items, format, reportTitle);
 

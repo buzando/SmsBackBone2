@@ -78,7 +78,7 @@ import boxopen from '../assets/NoResultados.svg';
 import * as XLSX from 'xlsx';
 import RemoveIcon from "@mui/icons-material/Remove";
 import IconPlus2 from '../assets/IconPlus2.svg';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import {
   DragDropContext,
@@ -90,7 +90,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import RestoreIcon from "@mui/icons-material/Restore";
 import { Tooltip } from "@mui/material";
 import IconSMS from '../assets/IconSMS.svg';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Tooltip as RechartsTooltip } from "recharts";
 import { scaleLinear } from "d3-scale";
 import DropZone from '../components/commons/DropZone';
 import { Tabs, Tab } from '@mui/material';
@@ -303,6 +303,25 @@ const Campains: React.FC = () => {
   const [pinnedCampaignId, setPinnedCampaignId] = useState<number | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<SelectedRoom | null>(getSelectedRoom());
   const [runCampaignTour, setRunCampaignTour] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const requestedCampaignId = useMemo(() => {
+    const state = location.state as { selectedCampaignId?: number | string } | null;
+
+    const queryId = new URLSearchParams(location.search).get("campaignId");
+    const storageId = localStorage.getItem("campaignToOpenId");
+
+    const rawId =
+      state?.selectedCampaignId ??
+      queryId ??
+      storageId;
+
+    const id = Number(rawId);
+
+    return Number.isFinite(id) && id > 0 ? id : null;
+  }, [location.state, location.search]);
 
   const joyrideTextStyle: CSSProperties = {
     textAlign: 'left',
@@ -1202,6 +1221,7 @@ const Campains: React.FC = () => {
     }
   };
 
+
   useEffect(() => {
     if (!selectedCampaign?.startDate || !showCounter(selectedCampaign)) {
       setElapsedTime("00:00:00");
@@ -1211,15 +1231,12 @@ const Campains: React.FC = () => {
     const updateElapsedTime = () => {
       const start = new Date(selectedCampaign.startDate).getTime();
 
-      // Fecha inválida
       if (isNaN(start)) {
         setElapsedTime("00:00:00");
         return;
       }
 
       const now = Date.now();
-
-      // Evita negativos
       const diff = Math.max(now - start, 0);
 
       const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -1234,19 +1251,18 @@ const Campains: React.FC = () => {
       setElapsedTime(formattedTime);
     };
 
-    // Ejecuta inmediatamente
     updateElapsedTime();
 
     const interval = setInterval(updateElapsedTime, 1000);
 
     return () => clearInterval(interval);
-
-  }, [selectedCampaign]);
+  }, [selectedCampaign?.id, selectedCampaign?.startDate]);
 
   const fetchCampaigns = async (roomId?: number | null) => {
     setLoadingPage(true);
 
     const salaId = roomId ?? selectedRoom?.id;
+
     if (!salaId) {
       setCampaigns([]);
       setSelectedCampaign(null);
@@ -1260,17 +1276,39 @@ const Campains: React.FC = () => {
       const response = await axios.get(url);
 
       if (response.status === 200) {
-        setCampaigns(response.data);
+        const campaignsData = response.data as CampaignFullResponse[];
 
-        const firstCampaign = response.data[0];
+        setCampaigns(campaignsData);
 
-        if (selectedCampaignId) {
-          const exists = response.data.some((c: { id: number }) => c.id === selectedCampaignId);
-          if (!exists) {
-            setSelectedCampaignId(firstCampaign?.id || null);
-            setSelectedCampaign(firstCampaign || null);
+        const firstCampaign = campaignsData[0];
+
+        console.log("CampaignId solicitado desde Home:", requestedCampaignId);
+        console.table(
+          campaignsData.map(c => ({
+            id: c.id,
+            name: c.name,
+          }))
+        );
+
+        const campaignToSelect = requestedCampaignId
+          ? campaignsData.find(c => Number(c.id) === Number(requestedCampaignId))
+          : selectedCampaignId
+            ? campaignsData.find(c => Number(c.id) === Number(selectedCampaignId))
+            : firstCampaign;
+
+        if (campaignToSelect) {
+          setSelectedCampaignId(campaignToSelect.id);
+          setSelectedCampaign(campaignToSelect);
+
+          if (requestedCampaignId && Number(campaignToSelect.id) === Number(requestedCampaignId)) {
+            localStorage.removeItem("campaignToOpenId");
           }
         } else {
+          console.warn(
+            "No se encontró la campaña solicitada en el listado:",
+            requestedCampaignId
+          );
+
           setSelectedCampaignId(firstCampaign?.id || null);
           setSelectedCampaign(firstCampaign || null);
         }
@@ -1281,6 +1319,27 @@ const Campains: React.FC = () => {
       setLoadingPage(false);
     }
   };
+
+  useEffect(() => {
+    if (!requestedCampaignId) return;
+    if (!campaigns || campaigns.length === 0) return;
+
+    const campaign = campaigns.find(
+      c => Number(c.id) === Number(requestedCampaignId)
+    );
+
+    if (!campaign) {
+      console.warn(
+        "La campaña enviada por URL no existe en campaigns:",
+        requestedCampaignId
+      );
+      return;
+    }
+
+    setSelectedCampaignId(campaign.id);
+    setSelectedCampaign(campaign);
+    localStorage.removeItem("campaignToOpenId");
+  }, [requestedCampaignId, campaigns]);
 
   const [selectedCampaigns, setSelectedCampaigns] = useState<number[]>([]);
   const [validandoCp, setValidandoCp] = useState(false);
@@ -1540,9 +1599,6 @@ const Campains: React.FC = () => {
     resetUploadState();
     setOpenCreateCampaignModal(true);
   };
-
-  const navigate = useNavigate();
-
 
   const handleSaveTemplate = async (): Promise<boolean> => {
     setLoadingTemplates(true);
@@ -1878,6 +1934,13 @@ const Campains: React.FC = () => {
 
   const handleSelectCampaign = (selected: CampaignFullResponse) => {
     if (selectedCampaign?.id === selected.id) return;
+
+    localStorage.removeItem("campaignToOpenId");
+
+    if (location.search.includes("campaignId")) {
+      navigate(location.pathname, { replace: true });
+    }
+
     setSelectedCampaignId(selected.id);
 
     setInfoChecks({
@@ -2558,6 +2621,180 @@ const Campains: React.FC = () => {
   const isLimitReached = campaigns.length >= MAX_CAMPAIGNS;
   const campaignMenu = menuIndex !== null ? filteredCampaigns[menuIndex] : null;
   const editDisabledReason = getEditDisabledReason(campaignMenu);
+
+  const STATUS_CONFIG = {
+    inProcess: {
+      key: "inProcess",
+      label: "Enviados",
+      tooltipLabel: "Mensaje en proceso.",
+      color: "#9674BF",
+    },
+    delivered: {
+      key: "delivered",
+      label: "Entregados",
+      tooltipLabel: "Exitoso. Descuenta 1 crédito.",
+      color: "#D9A93D",
+    },
+    notDelivered: {
+      key: "notDelivered",
+      label: "No entregado",
+      tooltipLabel: "Por el carrier / Se envió al carrier pero éste no pudo entregarlo. Descuenta 1 crédito.",
+      color: "#18ACED",
+    },
+    notSent: {
+      key: "notSent",
+      label: "No enviado",
+      tooltipLabel: "Por falta de carrier / no hubo un carrier disponible para enviarlo. No descuenta crédito.",
+      color: "#FB8FB8",
+    },
+    failed: {
+      key: "failed",
+      label: "Fallido",
+      tooltipLabel: "Falla en el envío al carrier: se intentó enviar al carrier pero hubo un error. No descuenta crédito.",
+      color: "#9B9295",
+    },
+    exception: {
+      key: "exception",
+      label: "Excepción",
+      tooltipLabel: "Excepción no controlada en el sistema. No descuenta crédito.",
+      color: "#6EB139",
+    },
+  };
+
+  const formatCompactCount = (value: number) => {
+    if (value >= 1000000) {
+      const formatted = (value / 1000000).toFixed(1).replace(".0", "");
+      return `${formatted} M`;
+    }
+
+    if (value >= 1000) {
+      const formatted = (value / 1000).toFixed(1).replace(".0", "");
+      return `${formatted} k`;
+    }
+
+    return value.toLocaleString("es-MX");
+  };
+
+  const chartData = [
+    {
+      key: STATUS_CONFIG.inProcess.key,
+      label: STATUS_CONFIG.inProcess.label,
+      tooltipLabel: STATUS_CONFIG.inProcess.tooltipLabel,
+      value: selectedCampaign?.inProcessCount ?? 0,
+      percentage: getRatePercent(selectedCampaign?.inProcessCount ?? 0),
+      fill: STATUS_CONFIG.inProcess.color,
+    },
+    {
+      key: STATUS_CONFIG.delivered.key,
+      label: STATUS_CONFIG.delivered.label,
+      tooltipLabel: STATUS_CONFIG.delivered.tooltipLabel,
+      value: selectedCampaign?.deliveredCount ?? 0,
+      percentage: getRatePercent(selectedCampaign?.deliveredCount ?? 0),
+      fill: STATUS_CONFIG.delivered.color,
+    },
+    {
+      key: STATUS_CONFIG.notDelivered.key,
+      label: STATUS_CONFIG.notDelivered.label,
+      tooltipLabel: STATUS_CONFIG.notDelivered.tooltipLabel,
+      value: selectedCampaign?.notDeliveredCount ?? 0,
+      percentage: getRatePercent(selectedCampaign?.notDeliveredCount ?? 0),
+      fill: STATUS_CONFIG.notDelivered.color,
+    },
+    {
+      key: STATUS_CONFIG.notSent.key,
+      label: STATUS_CONFIG.notSent.label,
+      tooltipLabel: STATUS_CONFIG.notSent.tooltipLabel,
+      value: selectedCampaign?.notSentCount ?? 0,
+      percentage: getRatePercent(selectedCampaign?.notSentCount ?? 0),
+      fill: STATUS_CONFIG.notSent.color,
+    },
+    {
+      key: STATUS_CONFIG.failed.key,
+      label: STATUS_CONFIG.failed.label,
+      tooltipLabel: STATUS_CONFIG.failed.tooltipLabel,
+      value: selectedCampaign?.failedCount ?? 0,
+      percentage: getRatePercent(selectedCampaign?.failedCount ?? 0),
+      fill: STATUS_CONFIG.failed.color,
+    },
+    {
+      key: STATUS_CONFIG.exception.key,
+      label: STATUS_CONFIG.exception.label,
+      tooltipLabel: STATUS_CONFIG.exception.tooltipLabel,
+      value: selectedCampaign?.exceptionCount ?? 0,
+      percentage: getRatePercent(selectedCampaign?.exceptionCount ?? 0),
+      fill: STATUS_CONFIG.exception.color,
+    },
+  ];
+
+  const topCards = chartData.map((item) => ({
+    label: item.label,
+    value: `${item.percentage}%`,
+    color: item.fill,
+    tooltip: item.tooltipLabel,
+  }));
+
+  const CustomBarTooltip = ({ active, payload }: any) => {
+    if (!active || !payload || !payload.length) return null;
+
+    const item = payload[0]?.payload;
+    if (!item) return null;
+
+    return (
+      <Box
+        sx={{
+          position: "relative",
+          background: "#2F2A2D",
+          color: "#FFFFFF",
+          borderRadius: "10px",
+          padding: "8px 14px",
+          boxShadow: "0px 8px 18px rgba(0,0,0,0.25)",
+          textAlign: "center",
+          minWidth: "150px",
+          maxWidth: "190px",
+          fontFamily: "Poppins, sans-serif",
+          "&::after": {
+            content: '\"\"',
+            position: "absolute",
+            left: "50%",
+            bottom: "-8px",
+            transform: "translateX(-50%)",
+            width: 0,
+            height: 0,
+            borderLeft: "8px solid transparent",
+            borderRight: "8px solid transparent",
+            borderTop: "8px solid #2F2A2D",
+          },
+        }}
+      >
+        <Typography
+          sx={{
+            fontFamily: "Poppins, sans-serif",
+            fontSize: "14px",
+            fontWeight: 600,
+            lineHeight: "18px",
+            color: "#FFFFFF",
+            mb: "2px",
+          }}
+        >
+          {Number(item.value ?? 0).toLocaleString("es-MX")}
+        </Typography>
+
+        <Typography
+          sx={{
+            fontFamily: "Poppins, sans-serif",
+            fontSize: "12px",
+            fontWeight: 400,
+            lineHeight: "16px",
+            color: "#FFFFFF",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {item.label} {item.percentage}%
+        </Typography>
+      </Box>
+    );
+  };
+
   return (
 
     <Box p={3}
@@ -3940,9 +4177,20 @@ const Campains: React.FC = () => {
                         </IconButton>
                       </Tooltip>
                     </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", padding: "10px", border: "2px solid #F2F2F2", borderRadius: "10px", marginBottom: "20px", }}>
-                      {indicadores.map((indicador, index) => (
-                        <Box key={index} sx={{ textAlign: "center" }}>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "10px",
+                        border: "2px solid #F2F2F2",
+                        borderRadius: "10px",
+                        marginBottom: "20px",
+                        gap: "12px",
+                      }}
+                    >
+                      {topCards.map((item, index) => (
+                        <Box key={index} sx={{ textAlign: "center", flex: 1 }}>
                           <Tooltip
                             placement="bottom-start"
                             arrow
@@ -3956,7 +4204,7 @@ const Campains: React.FC = () => {
                                   padding: "8px 12px",
                                   borderRadius: "10px",
                                   boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-                                  maxWidth: 220,
+                                  maxWidth: 240,
                                   border: "1px solid #9B9295"
                                 }
                               },
@@ -3977,20 +4225,18 @@ const Campains: React.FC = () => {
                               ]
                             }}
                             title={
-                              <Box>
-                                {mensajesIndicadores[index].map((mensaje, i) => (
-                                  <Typography key={i} component="div" sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
-                                    {mensaje}
-                                  </Typography>
-                                ))}
-                              </Box>
+                              <Typography component="div" sx={{ fontFamily: "Poppins", fontSize: "14px", color: "#574B4F" }}>
+                                {item.tooltip}
+                              </Typography>
                             }
                           >
                             <img src={infoicon} width="24px" height="24px" style={{ cursor: "pointer" }} />
                           </Tooltip>
-                          <Typography sx={{ fontSize: "18px", color: indicador.color, fontWeight: "500", fontFamily: "Poppins" }}>
-                            {indicador.value}
+
+                          <Typography sx={{ fontSize: "18px", color: item.color, fontWeight: "500", fontFamily: "Poppins" }}>
+                            {item.value}
                           </Typography>
+
                           <Typography
                             sx={{
                               fontSize: "14px",
@@ -4000,30 +4246,52 @@ const Campains: React.FC = () => {
                               whiteSpace: "pre-line",
                               lineHeight: "16px"
                             }}
-                            dangerouslySetInnerHTML={{
-                              __html: indicador.label.replace("Tasa de ", "Tasa de<br/>")
-                            }}
-                          />
-
+                          >
+                            {item.label}
+                          </Typography>
                         </Box>
-
                       ))}
                     </Box>
-                    <ResponsiveContainer width="100%" height={250}>
-                      <BarChart data={barData} margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name"
+
+                    <ResponsiveContainer width="100%" height={275}>
+                      <BarChart data={chartData} margin={{ top: 35, right: 20, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical stroke="#D9D9D9" />
+                        <XAxis
+                          dataKey="label"
                           tick={{
-                            fontFamily: 'Poppins', fontSize: "10px"
-                          }} />
+                            fontFamily: 'Poppins',
+                            fontSize: "12px",
+                            fill: "#574B4F"
+                          }}
+                          axisLine={{ stroke: "#9B9295" }}
+                          tickLine={false}
+                        />
                         <YAxis
+                          allowDecimals={false}
                           tick={{
-                            fontFamily: 'Poppins', fontSize: "12px"
-                          }} />
+                            fontFamily: 'Poppins',
+                            fontSize: "12px",
+                            fill: "#7E7477"
+                          }}
+                          axisLine={{ stroke: "#9B9295" }}
+                          tickLine={false}
+                        />
+
+                        <RechartsTooltip
+                          cursor={{ fill: "transparent" }}
+                          content={<CustomBarTooltip />}
+                          wrapperStyle={{
+                            pointerEvents: "none",
+                            marginLeft: "-65px",
+                            marginTop: "-60px",
+                          }}
+                          allowEscapeViewBox={{ x: true, y: true }}
+                          offset={12}
+                        />
 
                         <Bar dataKey="value">
-                          {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          {chartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
                           ))}
                         </Bar>
                       </BarChart>
@@ -6140,7 +6408,7 @@ const Campains: React.FC = () => {
                               },
                             }}
                           >
-                            Contenido de Código postal
+                            Seleccionar
                           </MenuItem>
 
                           {columns
@@ -6270,21 +6538,26 @@ const Campains: React.FC = () => {
                         alignItems: "center", marginLeft: "-51px", marginTop: "16px"
                       }}>
                         <Box
-                          marginBottom={'0px'} marginTop={'0px'} marginRight={"20px"}
-                          onClick={() => fileInputRef.current?.click()}
-                          onDragOver={(e) => e.preventDefault()}
+                          marginBottom={'0px'}
+                          marginTop={'0px'}
+                          marginRight={"20px"}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            return;
+                          }}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = "none";
+                          }}
                           onDrop={(e) => {
                             e.preventDefault();
-                            const file = e.dataTransfer.files?.[0];
-                            if (file) {
-                              setUploadedFile(file);
-                              handleManageFile(file);
-                            }
+                            e.stopPropagation();
+                            return;
                           }}
                           sx={{
                             justifyContent: fileSuccess ? 'flex-start' : 'center',
-
                             width: '200px',
+                            cursor: 'default',
                           }}
                         >
                           <Box
@@ -6314,7 +6587,7 @@ const Campains: React.FC = () => {
                               fontFamily: 'Poppins',
                               fontSize: '13px',
                               color: '#330F1B',
-                              cursor: 'pointer',
+                              cursor: 'default',
                               px: 1,
                               marginLeft: fileSuccess ? '80px' : '380px',
                             }}

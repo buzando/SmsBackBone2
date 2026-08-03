@@ -108,8 +108,15 @@ const HomePage: React.FC = () => {
         { name: string; numeroInicial: number; numeroActual: number }[]
     >([]);
     const [data, setdata] = useState<
-        { label: string; value: number; color: string; tooltip: string }[]
+        {
+            label: string;
+            value: number;
+            percentage: number;
+            color: string;
+            tooltip: string;
+        }[]
     >([]);
+    const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(null);
 
     const hasChanges =
         settings.listadoCampanas !== savedSettings.listadoCampanas ||
@@ -384,6 +391,25 @@ const HomePage: React.FC = () => {
         }
     };
 
+    const getPercentageValue = (value: number, total: number) => {
+        if (!total || total <= 0) return 0;
+        return Math.round((value / total) * 100);
+    };
+
+    const formatCompactCount = (value: number) => {
+        if (value >= 1000000) {
+            const formatted = (value / 1000000).toFixed(1).replace(".0", "");
+            return `${formatted} M`;
+        }
+
+        if (value >= 1000) {
+            const formatted = (value / 1000).toFixed(1).replace(".0", "");
+            return `${formatted} k`;
+        }
+
+        return value.toString();
+    };
+
     const handleApplyFilters = async () => {
 
         if (!roomId) return;
@@ -399,7 +425,14 @@ const HomePage: React.FC = () => {
             const response = await axios.post(`${import.meta.env.VITE_API_GET_DASHBOARDINFO}`, payload);
             const data: CampaignKPIResponse = response.data;
 
-            // Aquí ya no dependes del estado selectedOption
+            const totalResultados =
+                (response.data.waitingCount ?? 0) +
+                (response.data.deliveredCount ?? 0) +
+                (response.data.notDeliveredCount ?? 0) +
+                (response.data.notSentCount ?? 0) +
+                (response.data.failedCount ?? 0) +
+                (response.data.exceptionCount ?? 0);
+
             setKpi(data);
             setDataOptions([
                 { title: "Campañas activas", value: (data?.activeCampaigns ?? 0).toString() },
@@ -410,56 +443,55 @@ const HomePage: React.FC = () => {
 
             setcampaigns(
                 response.data.campaigns?.map((c: any) => ({
+                    id:c.id,
                     name: c.name,
                     numeroInicial: c.numeroInicial,
                     numeroActual: c.numeroActual
                 })) ?? []
             );
-            const total = response.data.deliveredCount +
-                response.data.notDeliveredCount +
-                response.data.waitingCount +
-                response.data.failedCount +
-                response.data.rejectedCount +
-                response.data.notSentCount +
-                response.data.exceptionCount +
-                response.data.respondedRecords;
 
             setdata([
                 {
                     label: "En proceso",
-                    value: total > 0 ? +(response.data.respondedRecords / total * 100).toFixed(1) : 0,
+                    value: response.data.waitingCount ?? 0,
+                    percentage: getPercentageValue(response.data.waitingCount ?? 0, totalResultados),
                     color: "#9674BF",
-                    tooltip: `Los mensajes se están enviando en este momento.`
+                    tooltip: "Mensaje en proceso."
                 },
                 {
                     label: "Entregados",
-                    value: total > 0 ? +(response.data.deliveredCount / total * 100).toFixed(1) : 0,
+                    value: response.data.deliveredCount ?? 0,
+                    percentage: getPercentageValue(response.data.deliveredCount ?? 0, totalResultados),
                     color: "#D9A93D",
-                    tooltip: `Mensajes entregados con éxito al destinatario.`
+                    tooltip: "Exitoso. Descuenta 1 crédito."
                 },
                 {
                     label: "No entregados",
-                    value: total > 0 ? +(response.data.notDeliveredCount / total * 100).toFixed(1) : 0,
+                    value: response.data.notDeliveredCount ?? 0,
+                    percentage: getPercentageValue(response.data.notDeliveredCount ?? 0, totalResultados),
                     color: "#18ACED",
-                    tooltip: `El mensaje llegó al operador, pero no pudo entregarse al teléfono.`
+                    tooltip: "Por el carrier / Se envió al carrier pero éste no pudo entregarlo. Descuenta 1 crédito."
                 },
                 {
                     label: "No enviados",
-                    value: total > 0 ? +(response.data.notSentCount / total * 100).toFixed(1) : 0,
+                    value: response.data.notSentCount ?? 0,
+                    percentage: getPercentageValue(response.data.notSentCount ?? 0, totalResultados),
                     color: "#FB8FB8",
-                    tooltip: `No se envió porque no había un operador disponible.`
+                    tooltip: "Por falta de carrier / no hubo un carrier disponible para enviarlo. No descuenta crédito."
                 },
                 {
                     label: "Fallidos",
-                    value: total > 0 ? +(response.data.failedCount / total * 100).toFixed(1) : 0,
-                    color: "#DD8E26",
-                    tooltip: `Hubo un error al intentar enviarlo.`
+                    value: response.data.failedCount ?? 0,
+                    percentage: getPercentageValue(response.data.failedCount ?? 0, totalResultados),
+                    color: "#9B9295",
+                    tooltip: "Falla en el envío al carrier: se intentó enviar al carrier pero hubo un error. No descuenta crédito."
                 },
                 {
                     label: "Excepción",
-                    value: total > 0 ? +(response.data.exceptionCount / total * 100).toFixed(1) : 0,
+                    value: response.data.exceptionCount ?? 0,
+                    percentage: getPercentageValue(response.data.exceptionCount ?? 0, totalResultados),
                     color: "#6EB139",
-                    tooltip: `Ocurrió un error inesperado en el sistema.`
+                    tooltip: "Excepción no controlada en el sistema. No descuenta crédito."
                 }
             ]);
 
@@ -657,6 +689,37 @@ const HomePage: React.FC = () => {
         }));
     };
 
+    const maxResultadoEnvio = Math.max(...data.map(item => item.value), 0);
+
+    const maxEjeResultadoEnvio = Math.max(maxResultadoEnvio, 1);
+
+    const ticksResultadoEnvio =
+        maxEjeResultadoEnvio <= 10
+            ? Array.from(
+                { length: maxEjeResultadoEnvio + 1 },
+                (_, index) => maxEjeResultadoEnvio - index
+            )
+            : Array.from(
+                { length: 6 },
+                (_, index) => {
+                    const value = Math.round(maxEjeResultadoEnvio - ((maxEjeResultadoEnvio / 5) * index));
+                    return value < 0 ? 0 : value;
+                }
+            );
+
+    const handleOpenCampaign = (campaign: any) => {
+        const campaignId = campaign.id ?? campaign.campaignId;
+
+        if (!campaignId) return;
+
+        localStorage.setItem("campaignToOpenId", String(campaignId));
+
+        navigate(`/campains?campaignId=${campaignId}`, {
+            state: {
+                selectedCampaignId: campaignId,
+            },
+        });
+    };
     return (
         <Box sx={{
             padding: '30px',
@@ -1200,7 +1263,7 @@ const HomePage: React.FC = () => {
                                                                 {campaign.numeroActual}/{campaign.numeroInicial}
                                                             </Typography>
 
-                                                            <IconButton sx={{ p: 0 }} onClick={() => navigate("/Campains")}>
+                                                            <IconButton sx={{ p: 0 }} onClick={() => handleOpenCampaign(campaign)}>
                                                                 <img src={smsico} alt="SMS" style={{ width: 20, height: 20 }} />
                                                             </IconButton>
                                                         </Box>
@@ -1314,122 +1377,203 @@ const HomePage: React.FC = () => {
                                                                 fontFamily: "Poppins",
                                                             }}
                                                         >
-                                                            {item.value}%
+                                                            {item.percentage}%
                                                         </Typography>
                                                     </Box>
                                                 ))}
                                             </Box>
 
 
-                                            <Box sx={{ width: "100%", overflowX: "auto" }}>
+                                            <Box sx={{ width: "100%", overflow: "hidden" }}>
                                                 <Box
                                                     sx={{
-                                                        display: "flex",
-                                                        alignItems: "flex-end",
-                                                        justifyContent: "center",
-                                                        height: "180px",
+                                                        width: "100%",
+                                                        height: "215px",
                                                         marginTop: 4,
                                                         position: "relative",
-                                                        paddingBottom: 2,
-                                                        minWidth: "900px", // 👈 se mantiene como la traías para que no se rompa en pantallas chicas
                                                     }}
                                                 >
                                                     {/* Líneas del eje Y */}
                                                     <Box
                                                         sx={{
                                                             position: "absolute",
-                                                            left: 0,
-                                                            bottom: 10,
-                                                            height: "100%",
-                                                            width: "100%",
+                                                            left: "50px",
+                                                            right: "0px",
+                                                            top: 0,
+                                                            height: "170px",
                                                             display: "flex",
                                                             flexDirection: "column",
                                                             justifyContent: "space-between",
-                                                            alignItems: "flex-start",
-                                                            paddingLeft: "40px",
+                                                            alignItems: "stretch",
                                                         }}
                                                     >
-                                                        {[100, 80, 60, 40, 20, 0].map((percent) => (
+                                                        {ticksResultadoEnvio.map((tick) => (
                                                             <Box
-                                                                key={percent}
+                                                                key={tick}
                                                                 sx={{
                                                                     width: "100%",
                                                                     display: "flex",
                                                                     alignItems: "center",
+                                                                    transform: "translateX(-50px)",
                                                                 }}
                                                             >
                                                                 <Typography
                                                                     sx={{
+                                                                        width: "32px",
                                                                         fontFamily: "Poppins",
                                                                         fontSize: "12px",
                                                                         fontWeight: "400",
                                                                         color: "#8F8F8F",
                                                                         lineHeight: "12px",
                                                                         marginRight: "10px",
+                                                                        textAlign: "right",
                                                                     }}
                                                                 >
-                                                                    {percent}%
+                                                                    {tick}
                                                                 </Typography>
-                                                                <Box sx={{ flexGrow: 1, borderBottom: "1px dashed #E0E0E0" }} />
+
+                                                                <Box
+                                                                    sx={{
+                                                                        flexGrow: 1,
+                                                                        borderBottom: "1px dashed #E0E0E0",
+                                                                        minWidth: 0,
+                                                                    }}
+                                                                />
                                                             </Box>
                                                         ))}
                                                     </Box>
 
+                                                    {/* Eje Y vertical */}
                                                     <Box
                                                         sx={{
+                                                            width: "1px",
+                                                            height: "170px",
+                                                            backgroundColor: "#574B4F",
+                                                            opacity: 0.3,
+                                                            position: "absolute",
+                                                            left: "50px",
+                                                            top: "0px",
+                                                        }}
+                                                    />
+
+                                                    {/* Eje X horizontal */}
+                                                    <Box
+                                                        sx={{
+                                                            width: "calc(100% - 50px)",
+                                                            height: "1px",
+                                                            backgroundColor: "#574B4F",
+                                                            opacity: 0.3,
+                                                            position: "absolute",
+                                                            left: "50px",
+                                                            top: "170px",
+                                                        }}
+                                                    />
+
+                                                    {/* Barras */}
+                                                    <Box
+                                                        sx={{
+                                                            position: "absolute",
+                                                            left: "50px",
+                                                            right: "0px",
+                                                            top: 0,
+                                                            height: "170px",
                                                             display: "flex",
                                                             alignItems: "flex-end",
                                                             justifyContent: "space-around",
-                                                            width: "100%",
-                                                            paddingLeft: "40px",
                                                         }}
                                                     >
-                                                        {/* Ejes X/Y */}
-                                                        <Box
-                                                            sx={{
-                                                                width: "1px",
-                                                                height: "165px",
-                                                                backgroundColor: "#574B4F",
-                                                                opacity: 0.3,
-                                                                position: "absolute",
-                                                                left: "40px",
-                                                                bottom: "0px",
-                                                            }}
-                                                        />
-                                                        <Box
-                                                            sx={{
-                                                                width: "calc(100% - 40px)",
-                                                                height: "1px",
-                                                                backgroundColor: "#574B4F",
-                                                                opacity: 0.3,
-                                                                position: "absolute",
-                                                                left: "40px",
-                                                                bottom: "0px",
-                                                            }}
-                                                        />
-
-                                                        {/* Barras */}
                                                         {data.map((item, index) => (
                                                             <Box
                                                                 key={index}
                                                                 sx={{
                                                                     textAlign: "center",
                                                                     width: "90px",
+                                                                    height: "170px",
                                                                     position: "relative",
-                                                                    zIndex: 2,
+                                                                    display: "flex",
+                                                                    alignItems: "flex-end",
+                                                                    justifyContent: "center",
                                                                 }}
                                                             >
                                                                 <Box
+                                                                    onMouseEnter={() => setHoveredBarIndex(index)}
+                                                                    onMouseLeave={() => setHoveredBarIndex(null)}
                                                                     sx={{
                                                                         width: "90px",
-                                                                        height: `${(item.value / 100) * 120}px`,
-                                                                        maxHeight: "120px",
+                                                                        height: maxEjeResultadoEnvio > 0
+                                                                            ? `${(item.value / maxEjeResultadoEnvio) * 170}px`
+                                                                            : "0px",
+                                                                        maxHeight: "170px",
                                                                         backgroundColor: item.color,
                                                                         borderRadius: "0px",
                                                                         transition: "height 0.5s ease-in-out",
-                                                                        margin: "auto",
+                                                                        position: "relative",
+                                                                        cursor: "pointer",
                                                                     }}
-                                                                />
+                                                                >
+
+
+                                                                    {/* Tooltip custom */}
+                                                                    {hoveredBarIndex === index && (
+                                                                        <Box
+                                                                            sx={{
+                                                                                position: "absolute",
+                                                                                left: "50%",
+                                                                                top: "12px",
+                                                                                transform: "translateX(-50%)",
+                                                                                backgroundColor: "#2D292B",
+                                                                                color: "#FFFFFF",
+                                                                                borderRadius: "10px",
+                                                                                padding: "8px 12px",
+                                                                                minWidth: "170px",
+                                                                                maxWidth: "190px",
+                                                                                textAlign: "center",
+                                                                                boxShadow: "0px 8px 18px rgba(0,0,0,0.25)",
+                                                                                zIndex: 20,
+                                                                                "&::after": {
+                                                                                    content: '""',
+                                                                                    position: "absolute",
+                                                                                    left: "50%",
+                                                                                    top: "-8px",
+                                                                                    transform: "translateX(-50%)",
+                                                                                    width: 0,
+                                                                                    height: 0,
+                                                                                    borderLeft: "8px solid transparent",
+                                                                                    borderRight: "8px solid transparent",
+                                                                                    borderBottom: "8px solid #2D292B",
+                                                                                },
+                                                                            }}
+                                                                        >
+                                                                            <Typography
+                                                                                sx={{
+                                                                                    fontFamily: "Poppins, sans-serif",
+                                                                                    fontSize: "12px",
+                                                                                    fontWeight: 400,
+                                                                                    color: "#FFFFFF",
+                                                                                    lineHeight: "16px",
+                                                                                    mb: "2px",
+                                                                                }}
+                                                                            >
+                                                                                {item.value >= 1000
+                                                                                    ? formatCompactCount(item.value)
+                                                                                    : item.value.toLocaleString("es-MX")}
+                                                                            </Typography>
+
+                                                                            <Typography
+                                                                                sx={{
+                                                                                    fontFamily: "Poppins, sans-serif",
+                                                                                    fontSize: "12px",
+                                                                                    fontWeight: 400,
+                                                                                    color: "#FFFFFF",
+                                                                                    lineHeight: "16px",
+                                                                                    textAlign: "center",
+                                                                                }}
+                                                                            >
+                                                                                {item.label} {item.percentage}%
+                                                                            </Typography>
+                                                                        </Box>
+                                                                    )}
+                                                                </Box>
 
                                                                 <Typography
                                                                     sx={{
@@ -1437,22 +1581,16 @@ const HomePage: React.FC = () => {
                                                                         textAlign: "center",
                                                                         fontSize: "12px",
                                                                         fontWeight: "500",
-                                                                        marginTop: "18px",
                                                                         color: "#574B4F",
                                                                         position: "absolute",
-                                                                        bottom: "-18px",
-                                                                        width: "90px",
+                                                                        top: "180px",
+                                                                        width: "110px",
+                                                                        left: "50%",
+                                                                        transform: "translateX(-50%)",
                                                                         whiteSpace: "nowrap",
                                                                     }}
                                                                 >
-                                                                    {[
-                                                                        "Recibidos",
-                                                                        "Entregados",
-                                                                        "No entregados",
-                                                                        "No enviados",
-                                                                        "Fallidos",
-                                                                        "Excepción",
-                                                                    ][index]}
+                                                                    {item.label}
                                                                 </Typography>
                                                             </Box>
                                                         ))}

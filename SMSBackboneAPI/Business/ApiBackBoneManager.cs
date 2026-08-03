@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http.Headers;
-using System.Text.Json;
+﻿using Contract;
 using Contract.Other;
-using Contract;
-using Openpay.Entities;
+using log4net;
+using Microsoft.EntityFrameworkCore;
+using Modal;
+using Modal.Model.Model;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace Business
 {
     public class ApiBackBoneManager
     {
+        private static readonly ILog _logger =
+            LogManager.GetLogger(typeof(SmsBalanceCheckManager));
+
         public static string _baseUrl = Common.ConfigurationManagerJson("BackBoneURL");
         public async Task<LoginResponse> LoginResponse(string usr, string pss)
         {
@@ -272,6 +274,54 @@ namespace Business
                 Console.WriteLine($"❌ Error en GetMessageStatusAsync({messageId}): {ex.Message}");
                 return null;
             }
+        }
+
+
+        private bool TryFindCreditValue(JsonElement element, out double credit)
+        {
+            credit = 0;
+
+            if (element.ValueKind == JsonValueKind.Number && element.TryGetDouble(out credit))
+                return true;
+
+            if (element.ValueKind == JsonValueKind.String &&
+                double.TryParse(element.GetString(), out credit))
+                return true;
+
+            if (element.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var prop in element.EnumerateObject())
+                {
+                    var name = prop.Name.ToLower();
+
+                    if (
+                        name == "credit" ||
+                        name == "credits" ||
+                        name == "saldo" ||
+                        name == "balance" ||
+                        name == "currentcredit" ||
+                        name == "currentcredits"
+                    )
+                    {
+                        if (TryFindCreditValue(prop.Value, out credit))
+                            return true;
+                    }
+
+                    if (TryFindCreditValue(prop.Value, out credit))
+                        return true;
+                }
+            }
+
+            if (element.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var item in element.EnumerateArray())
+                {
+                    if (TryFindCreditValue(item, out credit))
+                        return true;
+                }
+            }
+
+            return false;
         }
 
     }

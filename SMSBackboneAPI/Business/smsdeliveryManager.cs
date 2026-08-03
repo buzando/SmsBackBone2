@@ -379,28 +379,28 @@ namespace Business
 
                                     estado = contactTimeZone.State ?? "Desconocido";
 
-                                    var horaLocal = DateTime.UtcNow.AddHours((double)contactTimeZone.WinterTimeDifference.Value);
-                                    var hora = horaLocal.TimeOfDay;
+                                    //var horaLocal = DateTime.UtcNow.AddHours((double)contactTimeZone.WinterTimeDifference.Value);
+                                    //var hora = horaLocal.TimeOfDay;
 
-                                    if (!IsWithinContactLocalAllowedTime(contactTimeZone, out var horaLocalContacto))
-                                    {
-                                        skippedOutOfSchedule++;
+                                    //if (!IsWithinContactLocalAllowedTime(contactTimeZone, out var horaLocalContacto))
+                                    //{
+                                    //    skippedOutOfSchedule++;
 
-                                        _logger.Info(
-                                            $"⛔ Fuera de horario local. " +
-                                            $"Campaña={campaign.CampaignId} | " +
-                                            $"ContactoId={contact.Id} | " +
-                                            $"Tel={contact.PhoneNumber} | " +
-                                            $"CP={contactZipCode ?? "NULL"} | " +
-                                            $"Estado={estado} | " +
-                                            $"Zona={contactTimeZone.TimeZoneName} | " +
-                                            $"OffsetUTC={contactTimeZone.WinterTimeDifference} | " +
-                                            $"HoraLocal={horaLocalContacto:yyyy-MM-dd HH:mm:ss} | " +
-                                            $"HorarioPermitido={HorarioInicio:hh\\:mm}-{HorarioFin:hh\\:mm}"
-                                        );
+                                    //    _logger.Info(
+                                    //        $"⛔ Fuera de horario local. " +
+                                    //        $"Campaña={campaign.CampaignId} | " +
+                                    //        $"ContactoId={contact.Id} | " +
+                                    //        $"Tel={contact.PhoneNumber} | " +
+                                    //        $"CP={contactZipCode ?? "NULL"} | " +
+                                    //        $"Estado={estado} | " +
+                                    //        $"Zona={contactTimeZone.TimeZoneName} | " +
+                                    //        $"OffsetUTC={contactTimeZone.WinterTimeDifference} | " +
+                                    //        $"HoraLocal={horaLocalContacto:yyyy-MM-dd HH:mm:ss} | " +
+                                    //        $"HorarioPermitido={HorarioInicio:hh\\:mm}-{HorarioFin:hh\\:mm}"
+                                    //    );
 
-                                        continue;
-                                    }
+                                    //    continue;
+                                    //}
                                     var FormatMessage = PersonalizeMessage(campaign.Message, contact);
 
                                     if (campaign.ShouldShortenUrls || campaign.shortenUrls)
