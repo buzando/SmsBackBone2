@@ -32,7 +32,7 @@ const CHIP_STYLES = {
   selectedShadow: '0px 0px 12px #C17D91',
 };
 
-const ALLOWED_EDITOR_WHITELIST = /^[\p{L}0-9\.,\$\s{}]+$/u;
+const ALLOWED_EDITOR_WHITELIST = /^[a-zA-Z0-9.,$\s{}]+$/;
 const CLEAN_EDITOR = /[^\p{L}0-9\.,\$\s{}]/gu;
 const ALLOWED_VAR = /[^A-Za-z0-9_]/g;
 

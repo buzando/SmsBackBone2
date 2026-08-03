@@ -1477,19 +1477,43 @@ const Campains: React.FC = () => {
       ejemplosInvalidos,
     });
 
-    const esValida =
-      rows.length > 0 &&
-      validos > 0 &&
-      invalidos === 0 &&
-      vacios === 0;
+    // const esValida =
+    //   rows.length > 0 &&
+    //   validos > 0 &&
+    //   invalidos === 0 &&
+    //   vacios === 0;
 
-    if (!esValida) {
+    // if (!esValida) {
+    //   setCpSelectError(true);
+    //   setCpSelectErrorMessage(
+    //     "Ingresa un dato válido para cada teléfono registrado, los códigos postales válidos deberán encontrarse en el rango de 01000 a 99998."
+    //   );
+    //   return false;
+    // }
+
+    // Escenario 1: La columna seleccionada no contiene ningún CP válido
+    if (validos === 0) {
       setCpSelectError(true);
       setCpSelectErrorMessage(
-        "Ingresa un dato válido para cada teléfono registrado, los códigos postales válidos deberán encontrarse en el rango de 01000 a 99998."
+        "Columna no válida. Elige una columna con códigos postales asignados a cada teléfono. El código postal debe contar con 5 dígitos numéricos y estar en el rango de 01000 a 99998."
       );
       return false;
     }
+
+    // Escenario 2: Existen códigos postales inválidos
+    const totalInvalidos = invalidos + vacios;
+
+    if (totalInvalidos > 0) {
+      setCpSelectError(true);
+      setCpSelectErrorMessage(
+        `Se encontraron ${totalInvalidos} códigos postales inválidos. Asegúrate que tengan 5 dígitos numéricos y estén en el rango de 01000 a 99998.`
+      );
+      return false;
+    }
+
+    setCpSelectError(false);
+    setCpSelectErrorMessage("");
+    return true;
 
     setCpSelectError(false);
     setCpSelectErrorMessage("");
@@ -1764,16 +1788,26 @@ const Campains: React.FC = () => {
 
   const handleRemoveUploadedFile = (e: React.MouseEvent) => {
     e.stopPropagation();
+
     setUploadedFile(null);
     setUploadedFileBase64('');
     setFileError(false);
     setFileSuccess(false);
+
     setWorkbook(null);
     setSheetNames([]);
     setSelectedSheet('');
     setColumns([]);
     setExcelData([]);
     setBase64File('');
+
+    setTelefonos([]);
+    setVariables([]);
+
+    setSelectedTelefonos([]);
+    setSelectedVariables([]);
+    setCheckedTelefonos([]);
+
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }

@@ -1245,7 +1245,7 @@ const BlackList: React.FC = () => {
                                 setUploadedFileBase64('');
                                 setIsblacklistModalOpen(true);
                             }}
-                            width="218px"
+                            width="224px"
                         >
                             <span className="flex items-center">
                                 <span className="mr-2">+</span> Add Card

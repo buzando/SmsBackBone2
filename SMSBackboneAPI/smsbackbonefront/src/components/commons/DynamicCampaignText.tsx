@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography, Button, Modal } from '@mui/material';
+import { Box, Typography, Button, Modal, IconButton, Tooltip } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import SecondaryButton from './SecondaryButton';
+import infoicon from '../../assets/Icon-info.svg';
 import IconCloseRedN from "../../assets/IconCloseRedN.svg";
 
 interface Props {
@@ -41,7 +42,7 @@ const DynamicCampaignText: React.FC<Props> = ({
   // Solo letras, números, acentos, espacios, puntuación básica y {}
   const sanitizeText = (input: string) => {
     return input.replace(
-      /[^0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-{}\n\r]/g,
+      /[^0-9A-Za-zÜüÑñ .,;:!?()$\-{}\n\r]/g,
       ''
     );
   };
@@ -329,7 +330,7 @@ const DynamicCampaignText: React.FC<Props> = ({
 
     if (input && input.startsWith('{')) return;
 
-    const allowed = /^[0-9A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,;:!?()\-]$/;
+    const allowed = /^[0-9A-Za-zÜüÑñ .,;:!?()$\-]$/;
 
     if (input && !allowed.test(input)) {
       e.preventDefault();
@@ -449,10 +450,11 @@ const DynamicCampaignText: React.FC<Props> = ({
                   : '2px solid #9B9295CC',
                 borderRadius: '8px',
                 padding: '12px',
+                paddingRight: '45px',
                 fontFamily: 'Poppins',
                 fontSize: '14px',
                 minHeight: '140px',
-                backgroundColor: '#fff',
+                backgroundColor: '#FFF',
                 overflowY: 'auto',
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
@@ -460,24 +462,71 @@ const DynamicCampaignText: React.FC<Props> = ({
               }}
             />
 
-            {isLimitExceeded && (
-              <Typography
+            <Tooltip
+              title={
+                <Box
+                  sx={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '8px',
+                    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                    padding: '8px 12px',
+                    fontFamily: 'Poppins',
+                    fontSize: '14px',
+                    color: '#574B4F',
+                    whiteSpace: 'pre-line',
+                    borderColor: '#00131F3D',
+                    borderStyle: 'solid',
+                    borderWidth: '1px',
+                  }}
+                >
+                  <>
+                    • Máximo 7 variables.
+                    <br />
+                    • No se aceptan caracteres
+                    <br />
+                    especiales, excepto:
+                    <br />
+                    números, punto (.), coma
+                    <br />
+                    (,) y símbolo de dinero ($).
+                  </>
+                </Box>
+              }
+              placement="bottom-end"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: 'transparent',
+                    padding: 0,
+                  },
+                },
+              }}
+            >
+              <IconButton
+                size="small"
                 sx={{
-                  color: 'red',
-                  fontSize: '12px',
-                  mt: 1,
-                  fontFamily: 'Poppins',
+                  position: 'absolute',
+                  top: '6px',
+                  right: '6px',
+                  zIndex: 2,
                 }}
               >
-                Has alcanzado el límite de caracteres permitido.
-              </Typography>
-            )}
+                <img
+                  src={infoicon}
+                  alt="info"
+                  style={{
+                    width: 24,
+                    height: 24,
+                  }}
+                />
+              </IconButton>
+            </Tooltip>
           </Box>
 
           <Box
             sx={{
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'column'
             }}
           >
             <Typography
