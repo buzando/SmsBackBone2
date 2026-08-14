@@ -1355,3 +1355,74 @@ BEGIN
     ORDER BY RowNum;
 END
 GO
+
+CREATE TABLE dbo.SmsBalanceReconciliation
+(
+    Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+
+    ClientId INT NOT NULL,
+    AccessId INT NOT NULL,
+    FechaRevision DATE NOT NULL,
+
+    BackboneCredit DECIMAL(18,2) NOT NULL,
+    PortalShortBefore DECIMAL(18,2) NOT NULL,
+    PortalLongBefore DECIMAL(18,2) NOT NULL,
+    PortalTotalBefore DECIMAL(18,2) NOT NULL,
+
+    PortalShortAfter DECIMAL(18,2) NULL,
+    PortalLongAfter DECIMAL(18,2) NULL,
+    PortalTotalAfter DECIMAL(18,2) NULL,
+
+    Diferencia DECIMAL(18,2) NOT NULL,
+
+    SmsJustificados INT NOT NULL DEFAULT 0,
+    AjusteAdministrativo DECIMAL(18,2) NOT NULL DEFAULT 0,
+
+    Status VARCHAR(40) NOT NULL,
+    Notes NVARCHAR(500) NULL,
+
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+
+    CONSTRAINT FK_SmsBalanceReconciliation_Client
+        FOREIGN KEY (ClientId) REFERENCES dbo.clients(id),
+
+    CONSTRAINT FK_SmsBalanceReconciliation_ClientAccess
+        FOREIGN KEY (AccessId) REFERENCES dbo.Client_Access(id)
+);
+GO
+
+CREATE UNIQUE INDEX UX_SmsBalanceReconciliation_Client_Access_Date
+ON dbo.SmsBalanceReconciliation(ClientId, AccessId, FechaRevision);
+GO
+
+CREATE TABLE dbo.SmsBalanceReconciliationDetail
+(
+    Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+
+    ReconciliationId INT NOT NULL,
+    RoomId INT NOT NULL,
+
+    ShortBefore DECIMAL(18,2) NOT NULL DEFAULT 0,
+    LongBefore DECIMAL(18,2) NOT NULL DEFAULT 0,
+
+    ShortDelta DECIMAL(18,2) NOT NULL DEFAULT 0,
+    LongDelta DECIMAL(18,2) NOT NULL DEFAULT 0,
+
+    ShortAfter DECIMAL(18,2) NOT NULL DEFAULT 0,
+    LongAfter DECIMAL(18,2) NOT NULL DEFAULT 0,
+
+    Reason VARCHAR(60) NOT NULL,
+
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+
+    CONSTRAINT FK_SmsBalanceReconciliationDetail_Header
+        FOREIGN KEY (ReconciliationId) REFERENCES dbo.SmsBalanceReconciliation(Id),
+
+    CONSTRAINT FK_SmsBalanceReconciliationDetail_Room
+        FOREIGN KEY (RoomId) REFERENCES dbo.Rooms(id)
+);
+GO
+
+CREATE INDEX IX_SmsBalanceReconciliationDetail_ReconciliationId
+ON dbo.SmsBalanceReconciliationDetail(ReconciliationId);
+GO

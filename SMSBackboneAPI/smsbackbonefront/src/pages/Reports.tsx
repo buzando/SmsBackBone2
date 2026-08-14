@@ -692,8 +692,13 @@ const Reports: React.FC = () => {
                         {selectedSmsOption === "SMS" ? "SMS" : `SMS - ${selectedSmsOption}`}
                     </Box>
 
-                    <Popper open={smsMenuOpen} anchorEl={smsAnchorEl} placement="bottom-start">
-                        <Paper sx={{ width: 330 }}>
+                    <Popper open={smsMenuOpen} anchorEl={smsAnchorEl} placement="bottom-start" style={{ zIndex: 99999 }}>
+                        <Paper sx={{
+                            width: 330, position: "relative",
+                            zIndex: 99999,
+                            borderRadius: "0px 0px 8px 8px",
+                            boxShadow: "0px 8px 16px #00131F29",
+                        }}>
                             {smsOptions
                                 .filter((option) => option !== "SMS")
                                 .map((option) => (
