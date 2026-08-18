@@ -33,8 +33,6 @@ import TestSMS from './pages/TestSMS'
 import Clients from './pages/Clients'
 import RoomsAdmin from './pages/RoomsAdmin'
 import ReportsAdmin from './pages/ReportsAdmin'
-//import UsersPage from './pages/private/UsersPage';
-import PrivateRoute from './components/PrivateRoute';
 import AutentificationRoute from './components/AutentificationRoute'
 import { AppContextProvider } from './hooks/useContextInitialState'
 import Reports from './pages/Reports'
@@ -43,20 +41,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import 'dayjs/locale/es-mx';
 import PrivacyNotice from './pages/PrivacyNotice'
-//import TermsAndConditions from './pages/public/TermsAndConditions';
-//import PasswordReset from './pages/public/PasswordReset';
-//import HelpPage from './pages/private/HelpPage';
-//import ReportsPage from './pages/private/ReportsPage';
-//import ApiTestPage from './pages/private/ApiTestPage';
 import HomePage from './pages/HomePage';
-//import PaymentHistoryPage from './pages/private/billing_temp/PaymentHistoryPage';
-//import PaymentMethodsPage from './pages/private/billing_temp/PaymentMethodsPage';
-//import PaymentUsagePage from './pages/private/billing_temp/PaymentUsagePage';
-//import PaymentCostsPage from './pages/private/billing_temp/PaymentCostsPage';
-//import PaymentSettingsPage from './pages/private/billing_temp/PaymentSettingsPage';
-//import MyNumbersPage from './pages/private/numbers_temp/MyNumbersPage';
-//import BuyNumbersPage from './pages/private/numbers_temp/BuyNumbersPage';
-import AccountRecharge2 from './pages/AccountRecharge2'
+import PermissionRoute from './components/PermisionRoute'
+import { PERMISSIONS } from './pages/permisions'
+
 function App() {
 
     console.log(`MODE: ${import.meta.env.MODE}`)
@@ -87,130 +75,234 @@ function App() {
                     <BrowserRouter basename='/Quantum/'>
                         <Routes>
                             <Route path="/login" element={<LoginPage />} />
-                         
-                                <Route path="/AccountRecharge2" element={<AccountRecharge2 />} />
-                           
-                            <Route element={<AutentificationRoute />}>
-                                <Route path="/Autentification" element={<AutentificationPage />} />
-                            </Route>
-                             <Route element={<AutentificationRoute />}>
-                                <Route path="/ClientRoomPicker" element={<ClientRoomPicker />} />
-                            </Route>
-                            <Route element={<AutentificationRoute />} >
-                                <Route path="/chooseroom" element={<Chooseroom />} />
-                            </Route>
                             <Route path="/register" element={<RegisterPage />} />
                             <Route path="/ConfigurationAccount" element={<ConfigurationAccount />} />
                             <Route path="/password_reset" element={<PasswordReset />} />
-                            {/*<Route path="/legan/terms" element={<TermsAndConditions />} />*/}
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/' element={<HomePage />} />
+
+                            <Route element={<AutentificationRoute />}>
+                                <Route path="/Autentification" element={<AutentificationPage />} />
+                                <Route path="/chooseroom" element={<Chooseroom />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/TermsAndConditions' element={<TermsAndConditions />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute
+                                        permission={PERMISSIONS.MESA_CLIENT_ROOM_PICKER}
+                                        layout="auth"
+                                    />
+                                }
+                            >
+                                <Route path="/ClientRoomPicker" element={<ClientRoomPicker />} />
                             </Route>
-                              <Route element={<PrivateRoute />}>
-                                <Route path='/Clients' element={<Clients />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.DASHBOARD_VIEW} />
+                                }
+                            >
+                                <Route path="/" element={<HomePage />} />
                             </Route>
-                             <Route element={<PrivateRoute />}>
-                                <Route path='/RoomsAdmin' element={<RoomsAdmin />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.USER_TERMS_VIEW} />
+                                }
+                            >
+                                <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
                             </Route>
-                                <Route element={<PrivateRoute />}>
-                                <Route path='/NumbersDids' element={<NumbersDids />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.USER_PRIVACY_VIEW} />
+                                }
+                            >
+                                <Route path="/PrivacyNotice" element={<PrivacyNotice />} />
                             </Route>
-                             <Route element={<PrivateRoute />}>
-                                <Route path='/ReportsAdmin' element={<ReportsAdmin />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.ROOT_CLIENTS_MANAGE} />
+                                }
+                            >
+                                <Route path="/Clients" element={<Clients />} />
                             </Route>
-                             <Route element={<PrivateRoute />}>
-                                <Route path='/PrivacyNotice' element={<PrivacyNotice />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.ROOT_ROOMS_MANAGE} />
+                                }
+                            >
+                                <Route path="/RoomsAdmin" element={<RoomsAdmin />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/Templates' element={<Templates />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.ROOT_REPORTS_VIEW} />
+                                }
+                            >
+                                <Route path="/ReportsAdmin" element={<ReportsAdmin />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/BlackList' element={<BlackList />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.NUMBERS_DIDS_MANAGE} />
+                                }
+                            >
+                                <Route path="/NumbersDids" element={<NumbersDids />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/TestSMS' element={<TestSMS />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.ADMIN_USERS_MANAGE} />
+                                }
+                            >
+                                <Route path="/UserAdministration" element={<UserAdministration />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/PaymentMethods' element={<PaymentMethods />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.ADMIN_ROOMS_VIEW} />
+                                }
+                            >
+                                <Route path="/rooms" element={<Rooms />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/Reports' element={<Reports />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.SMS_CAMPAIGNS_VIEW} />
+                                }
+                            >
+                                <Route path="/Campains" element={<Campaigns />} />
+                                <Route path="/campains" element={<Campaigns />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/Campains' element={<Campaigns />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.SMS_TEMPLATES_MANAGE} />
+                                }
+                            >
+                                <Route path="/Templates" element={<Templates />} />
+                                <Route path="/templates" element={<Templates />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/Costs' element={<Costs />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.SMS_BLACKLISTS_MANAGE} />
+                                }
+                            >
+                                <Route path="/BlackList" element={<BlackList />} />
+                                <Route path="/blacklists" element={<BlackList />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/Use' element={<Use />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.SMS_TEST_SEND} />
+                                }
+                            >
+                                <Route path="/TestSMS" element={<TestSMS />} />
+                                <Route path="/sms-test" element={<TestSMS />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/PaymentHistoric' element={<PaymentHistoric />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.REPORTS_VIEW} />
+                                }
+                            >
+                                <Route path="/Reports" element={<Reports />} />
+                                <Route path="/reports" element={<Reports />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/PaymentSettings' element={<PaymentSettings />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.BILLING_PAYMENT_METHODS_MANAGE} />
+                                }
+                            >
+                                <Route path="/PaymentMethods" element={<PaymentMethods />} />
+                                <Route path="/Paymentmethods" element={<PaymentMethods />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/BillingInformation' element={<BillingInformation />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.BILLING_DATA_MANAGE} />
+                                }
+                            >
+                                <Route path="/BillingInformation" element={<BillingInformation />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/CreditManagement' element={<CreditManagement />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.BILLING_HISTORY_VIEW} />
+                                }
+                            >
+                                <Route path="/PaymentHistoric" element={<PaymentHistoric />} />
+                                <Route path="/Paymenthistoric" element={<PaymentHistoric />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/AccountRecharge' element={<AccountRecharge />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.BILLING_PAYMENT_SETTINGS_MANAGE} />
+                                }
+                            >
+                                <Route path="/PaymentSettings" element={<PaymentSettings />} />
+                                <Route path="/Paymentsettings" element={<PaymentSettings />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/MyNumbers' element={<MyNumbers />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.BALANCE_TRANSFER_MANAGE} />
+                                }
+                            >
+                                <Route path="/CreditManagement" element={<CreditManagement />} />
                             </Route>
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/users' element={<UsersPage />} />*/}
-                            {/*</Route>*/}
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/rooms' element={<Rooms />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.BALANCE_RECHARGE} />
+                                }
+                            >
+                                <Route path="/AccountRecharge" element={<AccountRecharge />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/UserAdministration' element={<UserAdministration />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.BALANCE_NUMBERS_MANAGE} />
+                                }
+                            >
+                                <Route path="/MyNumbers" element={<MyNumbers />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/ManageAccount' element={<ManageAccount />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.USER_ACCOUNT_EDIT} />
+                                }
+                            >
+                                <Route path="/ManageAccount" element={<ManageAccount />} />
                             </Route>
-                            <Route element={<PrivateRoute />}>
-                                <Route path='/Help' element={<Help />} />
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.USAGE_VIEW} />
+                                }
+                            >
+                                <Route path="/Use" element={<Use />} />
                             </Route>
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/billing/paymenthistory' element={<PaymentHistoryPage />} />*/}
-                            {/*</Route>*/}
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/billing/paymentmethods' element={<PaymentMethodsPage />} />*/}
-                            {/*</Route>*/}
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/billing/paymentusage' element={<PaymentUsagePage />} />*/}
-                            {/*</Route>*/}
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/billing/paymentcost' element={<PaymentCostsPage />} />*/}
-                            {/*</Route>*/}
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/billing/paymentsettings' element={<PaymentSettingsPage />} />*/}
-                            {/*</Route>*/}
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/reports' element={<ReportsPage />} />*/}
-                            {/*</Route>*/}
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/numbers/mynumbers' element={<MyNumbersPage />} />*/}
-                            {/*</Route>*/}
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/numbers/buynumbers' element={<BuyNumbersPage />} />*/}
-                            {/*</Route>*/}
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/apitest' element={<ApiTestPage />} />*/}
-                            {/*</Route>*/}
-                            {/*<Route element={<PrivateRoute />}>*/}
-                            {/*    <Route path='/help' element={<HelpPage />} />*/}
-                            {/*</Route>*/}
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.COSTS_VIEW} />
+                                }
+                            >
+                                <Route path="/Costs" element={<Costs />} />
+                            </Route>
+
+                            <Route
+                                element={
+                                    <PermissionRoute permission={PERMISSIONS.HELP_VIEW} />
+                                }
+                            >
+                                <Route path="/Help" element={<Help />} />
+                                <Route path="/help" element={<Help />} />
+                            </Route>
                         </Routes>
                     </BrowserRouter>
                 </ThemeProvider>

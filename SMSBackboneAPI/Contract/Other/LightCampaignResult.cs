@@ -16,6 +16,7 @@ namespace Contract.Other
         public int? TemplateId { get; set; }
         public bool FlashMessage { get; set; }
         public bool CustomANI { get; set; }
+        public int SenderRotation { get; set; }
         public int NumberType { get; set; }
         public bool concatenate { get; set; }
         public bool shortenUrls { get; set; }

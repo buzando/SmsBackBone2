@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Contract.Other
@@ -12,7 +14,12 @@ namespace Contract.Other
         public string phoneNumber { get; set; }       
         public string registryClient { get; set; }    
         public int encoding { get; set; }             
-        public string senderType { get; set; }        
-                                                      
+        public string senderType { get; set; }
+
+        [Newtonsoft.Json.JsonProperty(
+      NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
+  )]
+        public int? senderRotation { get; set; }
+
     }
 }

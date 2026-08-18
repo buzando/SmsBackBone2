@@ -18,6 +18,7 @@ namespace Modal.Model.Model
         public bool AutoStart { get; set; }
         public bool FlashMessage { get; set; }
         public bool CustomANI { get; set; }
+        public byte SenderRotation { get; set; } = 0;
         public bool RecycleRecords { get; set; }
         public byte NumberType { get; set; } // 1 = Corto, 2 = Largo
         public DateTime CreatedDate { get; set; }

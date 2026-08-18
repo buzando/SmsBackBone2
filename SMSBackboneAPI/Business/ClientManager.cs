@@ -184,30 +184,35 @@ namespace Business
                             {
                                 var dto = new Modal.Model.Model.ClientRoomSummaryDTO
                                 {
-                                    id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    NombreCliente = reader.GetString(reader.GetOrdinal("nombreCliente")),
-                                    CreationDate = reader.GetDateTime(reader.GetOrdinal("CreationDate")),
-                                    RateForShort = reader.GetDecimal(reader.GetOrdinal("RateForShort")),
-                                    RateForLong = reader.GetDecimal(reader.GetOrdinal("RateForLong")),
-                                    ShortRateType = reader.IsDBNull(reader.GetOrdinal("ShortRateType")) ? (byte?)null : reader.GetByte(reader.GetOrdinal("ShortRateType")),
-                                    LongRateType = reader.IsDBNull(reader.GetOrdinal("LongRateType")) ? (byte?)null : reader.GetByte(reader.GetOrdinal("LongRateType")),
-                                    ShortRateQty = reader.GetString(reader.GetOrdinal("ShortRateQty")),
-                                    LongRateQty = reader.GetString(reader.GetOrdinal("LongRateQty")),
-                                    Estatus = reader.IsDBNull(reader.GetOrdinal("Estatus")) ? (byte?)null : reader.GetByte(reader.GetOrdinal("Estatus")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("firstName")),
-                                    LastName = reader.GetString(reader.GetOrdinal("lastName")),
-                                    PhoneNumber = reader.GetString(reader.GetOrdinal("phoneNumber")),
-                                    Email = reader.GetString(reader.GetOrdinal("email")),
-                                    Extension = reader.IsDBNull(reader.GetOrdinal("extension"))
-    ? (int?)null
-    : reader.GetInt32(reader.GetOrdinal("extension")),
-                                    RoomName = reader["RoomName"] == DBNull.Value
-    ? string.Empty
-    : Convert.ToString(reader["RoomName"]) ?? string.Empty,
-                                    TotalCredits = reader.GetDouble(reader.GetOrdinal("TotalCredits")),
-                                    TotalLongSmsCredits = reader.GetDouble(reader.GetOrdinal("TotalLongSmsCredits")),
-                                    TotalShortSmsCredits = reader.GetDouble(reader.GetOrdinal("TotalShortSmsCredits")),
-                                    DeactivationDate = reader.IsDBNull(reader.GetOrdinal("DeactivationDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DeactivationDate"))
+                                    id = GetSafeInt(reader, "id"),
+                                    NombreCliente = GetSafeString(reader, "nombreCliente"),
+                                    CreationDate = GetSafeDateTime(reader, "CreationDate") ?? DateTime.MinValue,
+
+                                    RateForShort = GetSafeDecimal(reader, "RateForShort"),
+                                    RateForLong = GetSafeDecimal(reader, "RateForLong"),
+
+                                    ShortRateType = GetSafeByteNullable(reader, "ShortRateType"),
+                                    LongRateType = GetSafeByteNullable(reader, "LongRateType"),
+
+                                    ShortRateQty = GetSafeString(reader, "ShortRateQty"),
+                                    LongRateQty = GetSafeString(reader, "LongRateQty"),
+
+                                    Estatus = GetSafeByteNullable(reader, "Estatus"),
+
+                                    FirstName = GetSafeString(reader, "firstName"),
+                                    LastName = GetSafeString(reader, "lastName"),
+                                    PhoneNumber = GetSafeString(reader, "phoneNumber"),
+                                    Email = GetSafeString(reader, "email"),
+
+                                    Extension = GetSafeIntNullable(reader, "extension"),
+
+                                    RoomName = GetSafeString(reader, "RoomName"),
+
+                                    TotalCredits = GetSafeDouble(reader, "TotalCredits"),
+                                    TotalLongSmsCredits = GetSafeDouble(reader, "TotalLongSmsCredits"),
+                                    TotalShortSmsCredits = GetSafeDouble(reader, "TotalShortSmsCredits"),
+
+                                    DeactivationDate = GetSafeDateTime(reader, "DeactivationDate")
                                 };
 
                                 result.Items.Add(dto);
@@ -231,6 +236,75 @@ namespace Business
             }
         }
 
+        private static string GetSafeString(SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+
+            if (reader.IsDBNull(ordinal))
+                return string.Empty;
+
+            return reader.GetValue(ordinal)?.ToString() ?? string.Empty;
+        }
+
+        private static int GetSafeInt(SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+
+            if (reader.IsDBNull(ordinal))
+                return 0;
+
+            return Convert.ToInt32(reader.GetValue(ordinal));
+        }
+
+        private static int? GetSafeIntNullable(SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+
+            if (reader.IsDBNull(ordinal))
+                return null;
+
+            return Convert.ToInt32(reader.GetValue(ordinal));
+        }
+
+        private static byte? GetSafeByteNullable(SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+
+            if (reader.IsDBNull(ordinal))
+                return null;
+
+            return Convert.ToByte(reader.GetValue(ordinal));
+        }
+
+        private static decimal GetSafeDecimal(SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+
+            if (reader.IsDBNull(ordinal))
+                return 0m;
+
+            return Convert.ToDecimal(reader.GetValue(ordinal));
+        }
+
+        private static double GetSafeDouble(SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+
+            if (reader.IsDBNull(ordinal))
+                return 0d;
+
+            return Convert.ToDouble(reader.GetValue(ordinal));
+        }
+
+        private static DateTime? GetSafeDateTime(SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+
+            if (reader.IsDBNull(ordinal))
+                return null;
+
+            return Convert.ToDateTime(reader.GetValue(ordinal));
+        }
 
         public (UserDto usuario, int? clientId) RegisterUserAtomic(RegisterUser register)
         {

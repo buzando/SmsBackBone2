@@ -79,6 +79,9 @@ namespace Business
                                             : reader.GetInt32(reader.GetOrdinal("TemplateId")),
                                         FlashMessage = reader.GetBoolean(reader.GetOrdinal("FlashMessage")),
                                         CustomANI = reader.GetBoolean(reader.GetOrdinal("CustomANI")),
+                                        SenderRotation = reader.IsDBNull(reader.GetOrdinal("SenderRotation"))
+    ? 0
+    : Convert.ToInt32(reader["SenderRotation"]),
                                         NumberType = reader.GetInt32(reader.GetOrdinal("NumberType")),
                                         RoomId = reader.GetInt32(reader.GetOrdinal("RoomId")),
                                         RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
@@ -379,28 +382,6 @@ namespace Business
 
                                     estado = contactTimeZone.State ?? "Desconocido";
 
-                                    //var horaLocal = DateTime.UtcNow.AddHours((double)contactTimeZone.WinterTimeDifference.Value);
-                                    //var hora = horaLocal.TimeOfDay;
-
-                                    //if (!IsWithinContactLocalAllowedTime(contactTimeZone, out var horaLocalContacto))
-                                    //{
-                                    //    skippedOutOfSchedule++;
-
-                                    //    _logger.Info(
-                                    //        $"⛔ Fuera de horario local. " +
-                                    //        $"Campaña={campaign.CampaignId} | " +
-                                    //        $"ContactoId={contact.Id} | " +
-                                    //        $"Tel={contact.PhoneNumber} | " +
-                                    //        $"CP={contactZipCode ?? "NULL"} | " +
-                                    //        $"Estado={estado} | " +
-                                    //        $"Zona={contactTimeZone.TimeZoneName} | " +
-                                    //        $"OffsetUTC={contactTimeZone.WinterTimeDifference} | " +
-                                    //        $"HoraLocal={horaLocalContacto:yyyy-MM-dd HH:mm:ss} | " +
-                                    //        $"HorarioPermitido={HorarioInicio:hh\\:mm}-{HorarioFin:hh\\:mm}"
-                                    //    );
-
-                                    //    continue;
-                                    //}
                                     var FormatMessage = PersonalizeMessage(campaign.Message, contact);
 
                                     if (campaign.ShouldShortenUrls || campaign.shortenUrls)
@@ -419,13 +400,22 @@ namespace Business
 
                                     var registryClient = contact.Id.ToString();
 
+                                    int? senderRotation = null;
+
+                                    if (campaign.NumberType == 2 && campaign.CustomANI)
+                                    {
+                                        senderRotation = campaign.SenderRotation;
+                                    }
+
+
                                     messagesToSend.Add(new MessageToSend
                                     {
                                         phoneNumber = contact.PhoneNumber,
                                         text = FormatMessage,
                                         registryClient = registryClient,
                                         encoding = encoding,
-                                        senderType = senderType
+                                        senderType = senderType,
+                                        senderRotation = senderRotation
                                     });
 
                                     timeZoneByRegistryClient[registryClient] = contactTimeZone;

@@ -1844,6 +1844,12 @@ const Campains: React.FC = () => {
           autoStart: autoStart,
           flashMessage: flashEnabled,
           customANI: aniEnabled,
+          senderRotation:
+            tipoNumero === 'largo' &&
+              aniEnabled &&
+              selectedAni === 'rotativo_regionalizado'
+              ? 1
+              : 0,
           recycleRecords: recycleEnabled,
           numberType: tipoNumero === 'corto' ? 1 : 2,
           createdDate: new Date().toISOString(),

@@ -16,6 +16,7 @@ using System.Data.SqlTypes;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using System.Net;
+using Contract;
 
 namespace Business
 {
@@ -57,12 +58,13 @@ namespace Business
                     articulo = "MENSAJES SMS LARGO";
                 }
 
+                var urlvillanet = Common.ConfigurationManagerJson("VILLANET_URL");
 
                 var articuloxml = ObtenerArticulos(articulo);
 
                 var client = new TiendaVirtualSoapClient(
                     TiendaVirtualSoapClient.EndpointConfiguration.TiendaVirtualSoap,
-                    "https://nuxiba.villanett.com/TiendaVirtual.asmx"
+                    urlvillanet
                 );
 
                 // XML esperado por Villanett (solo clave y cantidad)
@@ -131,6 +133,8 @@ namespace Business
                     _ => "1"       // Por defecto: General de Ley Personas Morales
                 };
 
+                var usuariosoap = Common.ConfigurationManagerJson("VILLANET_USUARIO");
+                var contrasenasoap = Common.ConfigurationManagerJson("VILLANET_PASSWORD");
 
                 var response = await client.GenerarFacturaDirectaAsync(
                     tipopago: 4,
@@ -146,8 +150,8 @@ namespace Business
                     email: useremail,
                     usocfdi: user.Cfdi,
                     regimenfiscal: user.TaxRegime,
-                    usuario: "tiendavirtual",
-                    password: "Bkeg3fnwrO2vVcqEhMb43E7OvvKjPv41aDSvvrcboekM18vAf14KJn4nqufvvE3xvrTvLrHwxv4vvvCMCv"
+                    usuario: usuariosoap,
+                    password: contrasenasoap
                 );
 
                 string resultadoXml = response.Body.GenerarFacturaDirectaResult;
@@ -479,13 +483,17 @@ namespace Business
         }
         public ArticuloVillanet ObtenerArticulos(string descripcion)
         {
+            var urlvillanet = Common.ConfigurationManagerJson("VILLANET_URL");
+            var usuariosoap = Common.ConfigurationManagerJson("VILLANET_USUARIO");
+            var contrasenasoap = Common.ConfigurationManagerJson("VILLANET_PASSWORD");
+
             var client = new TiendaVirtualSoapClient(
                 TiendaVirtualSoapClient.EndpointConfiguration.TiendaVirtualSoap,
-                "https://nuxiba.villanett.com/TiendaVirtual.asmx"
+                urlvillanet
             );
 
             var response = client.ObtenerArticulosMultipleAsync(
-                "", "", descripcion, "", "", "", "", 0, 0, "0", 1000, 0, "tiendavirtual", "Bkeg3fnwrO2vVcqEhMb43E7OvvKjPv41aDSvvrcboekM18vAf14KJn4nqufvvE3xvrTvLrHwxv4vvvCMCv"
+                "", "", descripcion, "", "", "", "", 0, 0, "0", 1000, 0, usuariosoap, contrasenasoap
             ).Result;
 
             var resultXmlString = System.Net.WebUtility.HtmlDecode(response.Body.ObtenerArticulosMultipleResult);
