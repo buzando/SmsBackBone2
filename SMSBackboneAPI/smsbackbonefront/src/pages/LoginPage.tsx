@@ -1,4 +1,4 @@
-﻿import { useState, useContext, useEffect } from 'react';
+﻿import { useState, useContext, useEffect, useRef } from 'react';
 import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -60,6 +60,9 @@ const Login: React.FC = () => {
         setShowPasswordu((prev) => !prev);
     };
 
+    const emailInputRef = useRef<HTMLInputElement | null>(null);
+    const passwordInputRef = useRef<HTMLInputElement | null>(null);
+
     const [UnconfirmedEmail, setUnconfirmedEmail] = useState<UnconfirmeEmail>({
         sending: false,
         isUnconfirmed: false,
@@ -80,20 +83,55 @@ const Login: React.FC = () => {
         }
     }, []);
 
+    useEffect(() => {
+        const timer1 = setTimeout(syncAutofillValues, 100);
+        const timer2 = setTimeout(syncAutofillValues, 500);
+        const timer3 = setTimeout(syncAutofillValues, 1000);
+
+        return () => {
+            clearTimeout(timer1);
+            clearTimeout(timer2);
+            clearTimeout(timer3);
+        };
+    }, []);
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    const validateForm = (nextEmail: string, nextPassword: string) => {
+        const emailValid = emailRegex.test(nextEmail.trim());
+        const passwordValid = nextPassword.trim().length >= 8;
+
+        setIsValidEmail(emailValid);
+        setIsValidPassword(passwordValid);
+
+        setEmailErr(emailValid || nextEmail.trim() === '');
+        setPasswordErr(passwordValid || nextPassword.trim() === '');
+
+        setdisabled(!(emailValid && passwordValid));
+    };
+
+    const syncAutofillValues = () => {
+        const currentEmail = emailInputRef.current?.value ?? '';
+        const currentPassword = passwordInputRef.current?.value ?? '';
+
+        if (currentEmail !== email) {
+            setEmail(currentEmail);
+        }
+
+        if (currentPassword !== password) {
+            setPassword(currentPassword);
+        }
+
+        validateForm(currentEmail, currentPassword);
+    };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setEmail(value);
 
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        const isValid = emailRegex.test(value);
+        validateForm(value, password);
 
-        setIsValidEmail(isValid);
-
-        // Deshabilitar el botón si el email no es válido
-        setdisabled(!(isValidEmail && password.length >= 8 && password.trim() !== '' && value.trim() !== ''));
-
-        if (isValidEmail) {
+        if (emailRegex.test(value.trim())) {
             setLoading(false);
         }
     };
@@ -102,13 +140,8 @@ const Login: React.FC = () => {
         const value = event.target.value;
         setPassword(value);
 
-        const isValid = value.length >= 8;
-        setIsValidPassword(isValid);
-
-        // Deshabilitar el botón si email o contraseña son inválidos
-        setdisabled(!(isValidPassword && emailErr && email.trim() !== '' && value.trim() !== ''));
+        validateForm(email, value);
     };
-
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -332,8 +365,11 @@ const Login: React.FC = () => {
                                         Correo electrónico
                                     </Typography>
                                     <TextField
+                                        inputRef={emailInputRef}
                                         value={email}
                                         onChange={handleInputChange}
+                                        onBlur={syncAutofillValues}
+                                        onFocus={syncAutofillValues}
                                         variant="outlined"
                                         fullWidth
                                         margin="dense"
@@ -445,9 +481,13 @@ const Login: React.FC = () => {
                                         Contraseña
                                     </Typography>
                                     <TextField
+                                        inputRef={passwordInputRef}
                                         type={showPasswordu ? "text" : "password"}
                                         value={password}
                                         onChange={handlePasswordChange}
+                                        onBlur={syncAutofillValues}
+                                        onFocus={syncAutofillValues}
+                                        onInput={syncAutofillValues}
                                         variant="outlined"
                                         fullWidth
                                         margin="normal"

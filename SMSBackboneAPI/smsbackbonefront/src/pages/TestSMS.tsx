@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import SnackBar from "../components/commons/ChipBar";
 import ModalError from "../components/commons/ModalError";
+import { removeAccents } from '../utils/textsanitizier';
 export interface Template {
   id: number;
   name: string;
@@ -390,7 +391,7 @@ export default function TestSMS() {
               placeholder={t('pages.testSMS.writeMessageOrSelect')}
               disabled={!!selectedTemplateId}
               onChange={(e) => {
-                let value = e.target.value;
+                let value = removeAccents(e.target.value);
 
                 value = value.replace(
                   /[^0-9A-Za-zÜüÑñ .,;:!?()$\-{}\n\r]/g,

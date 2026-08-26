@@ -107,6 +107,7 @@ import { getSelectedRoom, getSelectedRoomId, SelectedRoom } from "../utils/roomH
 import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
 import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 import { purple, red } from '@mui/material/colors';
+import { removeAccents } from '../utils/textsanitizier';
 interface Horario {
   titulo: string;
   start: Date | null;
@@ -7426,7 +7427,7 @@ const Campains: React.FC = () => {
                   <DynamicCampaignText
                     variables={selectedVariables}
                     value={mensajeTexto}
-                    onChange={setMensajeTexto}
+                     onChange={(value) => setMensajeTexto(removeAccents(value))}
                     allowConcatenation={allowConcatenation}
                     sampleData={sampleData}
                   />

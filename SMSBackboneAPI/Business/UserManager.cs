@@ -459,26 +459,6 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
             };
         }
 
-        public bool NewPassword(string user, string password)
-        {
-            try
-            {
-
-                using (var ctx = new Entities())
-                {
-                    var usuario = ctx.Users.Where(x => x.email == user).FirstOrDefault();
-                    usuario.passwordHash = password;
-                    usuario.lastPasswordChangeDate = DateTime.Now;
-                    ctx.SaveChanges();
-                }
-                return true;
-
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        }
 
         public UserDto AddUserFromRegister(RegisterUser register)
         {
@@ -557,7 +537,7 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                     lastName = "",
                     lastPasswordChangeDate = DateTime.Now,
                     lockoutEnabled = false,
-                    passwordHash = register.Password,
+                    passwordHash = SecurityHelper.GenerarPasswordHash(register.Password),
                     phonenumber = register.PhoneNumber,
                     SMS = false,
                     userName = register.Email,
