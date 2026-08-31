@@ -443,7 +443,7 @@ const HomePage: React.FC = () => {
 
             setcampaigns(
                 response.data.campaigns?.map((c: any) => ({
-                    id:c.id,
+                    id: c.id,
                     name: c.name,
                     numeroInicial: c.numeroInicial,
                     numeroActual: c.numeroActual
@@ -555,7 +555,7 @@ const HomePage: React.FC = () => {
     };
 
     const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
+        let value = e.target.value.replace(/[^a-zA-Z0-9.,:\/$\s]/g, '');
 
         if (value.length > 160) {
             value = value.slice(0, 160);
@@ -1924,10 +1924,17 @@ const HomePage: React.FC = () => {
                                                         }}
                                                     >
                                                         <>
-                                                            · Solo caracteres <br />
-                                                            alfanuméricos<br />
-                                                            · Longitud máxima de <br />
-                                                            160 caracteres
+                                                            • Máximo 7 variables.
+                                                            <br />
+                                                            • No se aceptan caracteres
+                                                            <br />
+                                                            especiales, excepto:
+                                                            <br />
+                                                            números, punto (.), coma (,),
+                                                            <br />
+                                                            símbolo de dinero ($), dos
+                                                            <br />
+                                                            puntos (:) y diagonal (/).
                                                         </>
                                                     </Box>
                                                 }
@@ -1959,7 +1966,7 @@ const HomePage: React.FC = () => {
                             </Typography>
 
                             {/* Opciones de checkbox */}
-                            <Box sx={{ marginTop: '20px', width: '100%' }}>  {/* 🔥 Evita desbordamiento */}
+                            <Box sx={{ marginTop: '20px', width: '100%' }}>  {/* Evita desbordamiento */}
                                 {/*<FormControlLabel
                                 control={
                                     <Checkbox

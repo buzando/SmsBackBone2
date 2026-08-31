@@ -42,7 +42,7 @@ const DynamicCampaignText: React.FC<Props> = ({
   // Solo letras, números, acentos, espacios, puntuación básica y {}
   const sanitizeText = (input: string) => {
     return input.replace(
-      /[^0-9A-Za-zÜüÑñ .,;:!?()$\-{}\n\r]/g,
+      /[^0-9A-Za-zÜüÑñ .,;:!?()$\/\-{}\n\r]/g,
       ''
     );
   };
@@ -330,7 +330,7 @@ const DynamicCampaignText: React.FC<Props> = ({
 
     if (input && input.startsWith('{')) return;
 
-    const allowed = /^[0-9A-Za-zÜüÑñ .,;:!?()$\-]$/;
+    const allowed = /^[0-9A-Za-zÜüÑñ .,;:!?()$\/\-]$/;
 
     if (input && !allowed.test(input)) {
       e.preventDefault();
@@ -348,6 +348,36 @@ const DynamicCampaignText: React.FC<Props> = ({
     if (totalLength >= maxLength) {
       e.preventDefault();
     }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    const pastedText = e.clipboardData.getData('text/plain');
+
+    const sanitizedText = sanitizeText(pastedText);
+
+    if (!sanitizedText) return;
+
+    const selection = window.getSelection();
+
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+
+    range.deleteContents();
+
+    const textNode = document.createTextNode(sanitizedText);
+
+    range.insertNode(textNode);
+
+    range.setStartAfter(textNode);
+    range.setEndAfter(textNode);
+
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    updateRawText();
   };
 
   const buildPreviewMessage = () => {
@@ -440,6 +470,7 @@ const DynamicCampaignText: React.FC<Props> = ({
               dir="ltr"
               style={{ textAlign: 'left' }}
               onInput={updateRawText}
+              onPaste={handlePaste}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onBeforeInput={handleBeforeInput}
@@ -486,9 +517,11 @@ const DynamicCampaignText: React.FC<Props> = ({
                     <br />
                     especiales, excepto:
                     <br />
-                    números, punto (.), coma
+                    números, punto (.), coma (,),
                     <br />
-                    (,) y símbolo de dinero ($).
+                    símbolo de dinero ($), dos
+                    <br />
+                    puntos (:) y diagonal (/).
                   </>
                 </Box>
               }
@@ -590,7 +623,7 @@ const DynamicCampaignText: React.FC<Props> = ({
               padding: '5px',
               gap: 1,
               overflowX: 'hidden',
-              overflowY: 'auto',
+              overflowY: 'auto'
             }}
           >
             {variables.map((variable, i) => (
@@ -635,6 +668,10 @@ const DynamicCampaignText: React.FC<Props> = ({
                     fontFamily: 'Poppins',
                     fontSize: '16px',
                     color: '#8F4D63',
+                    maxWidth: '100px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {variable}

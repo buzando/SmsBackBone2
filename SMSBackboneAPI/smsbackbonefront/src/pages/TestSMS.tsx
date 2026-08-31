@@ -394,7 +394,7 @@ export default function TestSMS() {
                 let value = removeAccents(e.target.value);
 
                 value = value.replace(
-                  /[^0-9A-Za-zÜüÑñ .,;:!?()$\-{}\n\r]/g,
+                  /[^0-9A-Za-zÜüÑñ .,;:!?()$\/\-{}\n\r]/g,
                   ''
                 );
 
@@ -451,9 +451,17 @@ export default function TestSMS() {
                         }}
                       >
                         <>
-                          • Solo caracteres alfanuméricos<br />
-                          • Longitud máxima de 160<br />
-                          caracteres
+                          • Máximo 7 variables.
+                          <br />
+                          • No se aceptan caracteres
+                          <br />
+                          especiales, excepto:
+                          <br />
+                          números, punto (.), coma (,),
+                          <br />
+                          símbolo de dinero ($), dos
+                          <br />
+                          puntos (:) y diagonal (/).
                         </>
                       </Box>
                     }

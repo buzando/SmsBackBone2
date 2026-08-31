@@ -1156,11 +1156,17 @@ const Templates = () => {
                                     }}
                                 >
                                     <>
-                                        • Máximo 7 variables.<br />
-                                        • No se aceptan caracteres<br />
-                                        especiales, excepto:<br />
-                                        numeros, punto (.), coma<br />
-                                        (,) y símbolo de dinero ($).
+                                        • Máximo 7 variables.
+                                        <br />
+                                        • No se aceptan caracteres
+                                        <br />
+                                        especiales, excepto:
+                                        <br />
+                                        números, punto (.), coma (,),
+                                        <br />
+                                        símbolo de dinero ($), dos
+                                        <br />
+                                        puntos (:) y diagonal (/).
                                     </>
                                 </Box>
                             }
