@@ -1287,7 +1287,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
 
                         {/* Usuario */}
                         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, ml: 2 }}>
-                            {/* Ícono de usuario grande */}
                             <img
                                 src={IconUser}
                                 alt="User Icon"
@@ -1296,8 +1295,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                     height: '40px',
                                 }}
                             />
-
-                            {/* Ícono pequeño de la flecha (CHEVRON_USER) */}
                             <img
                                 src={IconUserArrow}
                                 alt="Chevron Icon"
@@ -2113,6 +2110,42 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                     />
                                                 </ListItemButton>
                                             </Link>
+                                            {userMenu === 'Administrador' && (
+                                                <Link to="/Roles" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                                    <ListItemButton
+                                                        sx={{ pl: 4, position: 'relative' }}
+                                                        selected={location.pathname.toLowerCase() === '/roles'}
+                                                        onClick={() => handleSelection('Roles')}
+                                                    >
+                                                        <Box
+                                                            sx={{
+                                                                position: 'absolute',
+                                                                left: '35px',
+                                                                width: '4px',
+                                                                height: '35px',
+                                                                backgroundColor:
+                                                                    location.pathname.toLowerCase() === '/roles'
+                                                                        ? '#FFFFFF'
+                                                                        : '#9F94A5',
+                                                            }}
+                                                        />
+                                                        <ListItemText
+                                                            primary="Roles"
+                                                            primaryTypographyProps={{
+                                                                fontFamily: 'Poppins',
+                                                                marginLeft: '30px',
+                                                                fontSize: '14px',
+                                                                color:
+                                                                    location.pathname.toLowerCase() === '/roles'
+                                                                        ? '#FFFFFF'
+                                                                        : '#9F94A5',
+                                                                marginBottom: '-5px',
+                                                                marginTop: '-5px',
+                                                            }}
+                                                        />
+                                                    </ListItemButton>
+                                                </Link>
+                                            )}
                                         </List>
                                     </Collapse>
 

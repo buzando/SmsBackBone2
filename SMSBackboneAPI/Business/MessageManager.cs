@@ -141,7 +141,123 @@ namespace Business
             }
         }
 
+        public List<BackboneSendMessageResult> SendExternalMessage(SendTestSmsRequest smsRequestDto)
+        {
+            var clientacces = new ClientAccess();
 
+            if (smsRequestDto.To == null || smsRequestDto.To.Count == 0)
+                throw new Exception("Debe indicar al menos un destinatario.");
+
+            if (string.IsNullOrWhiteSpace(smsRequestDto.Message) && smsRequestDto.TemplateId == null)
+                throw new Exception("Debe escribir un mensaje o seleccionar una plantilla.");
+
+            if (!smsRequestDto.Room.HasValue || smsRequestDto.Room.Value <= 0)
+                throw new Exception("La sala seleccionada no es válida.");
+
+            var isShort = string.Equals(smsRequestDto.SmsType, "short", StringComparison.OrdinalIgnoreCase);
+            var senderType = isShort ? "shortcode" : "longcode";
+            var encoding = (isShort && smsRequestDto.Flash == true) ? 1 : 0;
+
+            using (var context = new Entities())
+            {
+                var roomId = smsRequestDto.Room.Value;
+                var room = context.Rooms.FirstOrDefault(r => r.id == roomId);
+
+                if (room == null)
+                    throw new Exception("La sala seleccionada no existe.");
+
+                int qtyToSend = smsRequestDto.To.Count;
+
+                if (room.credits < qtyToSend)
+                    throw new Exception("La sala no tiene créditos totales suficientes para enviar SMS.");
+
+                if (isShort)
+                {
+                    if (room.short_sms < qtyToSend)
+                        throw new Exception("La sala no tiene créditos suficientes para enviar SMS cortos.");
+                }
+                else
+                {
+                    if (room.long_sms < qtyToSend)
+                        throw new Exception("La sala no tiene créditos suficientes para enviar SMS largos.");
+                }
+
+                clientacces = context.Client_Access.FirstOrDefault(ca => ca.client_id == smsRequestDto.ClientID);
+
+                if (clientacces == null)
+                    throw new Exception("El cliente no tiene acceso configurado para el envío.");
+
+                var api = new ApiBackBoneManager();
+
+                var pssw = ClientAccessManager.Decrypt(clientacces.password);
+                var loginResponse = api.LoginResponse(clientacces.username, pssw);
+
+                if (loginResponse == null || loginResponse.Result == null || loginResponse.Result.token == null)
+                    throw new Exception("No se pudo autenticar con el proveedor de SMS.");
+
+                var token = loginResponse.Result.token;
+
+                var credits = api.GetOwnCredit(token).GetAwaiter().GetResult();
+                int backboneCredits = JObject.Parse(credits)["credit"].Value<int>();
+
+                if (backboneCredits == 0)
+                    throw new Exception("No hay créditos disponibles en el proveedor de SMS.");
+
+                string finalMessage = smsRequestDto.Message;
+
+                if (string.IsNullOrWhiteSpace(finalMessage) && smsRequestDto.TemplateId.HasValue)
+                {
+                    var template = context.Template.FirstOrDefault(t => t.Id == smsRequestDto.TemplateId.Value);
+
+                    if (template == null)
+                        throw new Exception("La plantilla seleccionada no existe.");
+
+                    finalMessage = template.Message;
+                }
+
+                finalMessage = finalMessage
+                    .Replace('\u00A0', ' ')
+                    .Replace('\u2007', ' ')
+                    .Replace('\u202F', ' ');
+
+                var messagesToSend = smsRequestDto.To.Select(to => new MessageToSend
+                {
+                    text = finalMessage,
+                    phoneNumber = to,
+                    registryClient = "",
+                    encoding = encoding,
+                    senderType = senderType
+                }).ToList();
+
+                var sendResults = api.SendMessagesAsync(messagesToSend, token)
+                    .GetAwaiter()
+                    .GetResult();
+
+                if (sendResults == null || !sendResults.Any())
+                    throw new Exception("Backbone no regresó resultados del envío.");
+
+                if (isShort)
+                    room.short_sms -= qtyToSend;
+                else
+                    room.long_sms -= qtyToSend;
+
+                room.credits -= qtyToSend;
+
+                if (room.credits < 0)
+                    room.credits = 0;
+
+                context.SaveChanges();
+
+                return sendResults.Select(x => new BackboneSendMessageResult
+                {
+                    Id = x.id,
+                    PhoneNumber = x.phoneNumber,
+                    Status = x.status,
+                    RegistryClient = x.registryClient,
+                    Text = x.text
+                }).ToList();
+            }
+        }
 
 
         public List<SmsDto> SendListMessage(List<SmsRequestDto> smsRequestDto)
@@ -195,7 +311,7 @@ namespace Business
                 var test = await ctx.TestMessage.FirstOrDefaultAsync(t => t.IdBackBone == dto.Id);
                 if (test != null)
                 {
-                    test.Status = dto.Status.ToString(); // tu TestMessage usa string; déjalo igual
+                    test.Status = dto.Status.ToString(); 
                     await ctx.SaveChangesAsync();
                     return true;
                 }

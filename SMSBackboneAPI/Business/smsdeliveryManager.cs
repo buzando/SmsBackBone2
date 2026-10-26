@@ -1096,5 +1096,162 @@ namespace Business
 
             return hora >= HorarioInicio && hora <= HorarioFin;
         }
+
+        public async Task<bool> UpdateExternalSmsStatusesByClient()
+        {
+            try
+            {
+                using var ctx = new Entities();
+
+                // Buscar clientes que tengan mensajes externos pendientes
+                var clientsWithPending = (
+                    from e in ctx.ExternalSmsMessage
+                    join u in ctx.Users on e.IdUser equals u.Id
+                    join cli in ctx.clients on u.IdCliente equals cli.id
+                    where e.Status == "0"
+                          && e.IdBackBone != null
+                          && e.IdBackBone != ""
+                    select cli.id
+                )
+                .Distinct()
+                .ToList();
+
+                if (!clientsWithPending.Any())
+                {
+                    _logger.Info("✅ No hay ExternalSmsMessage pendientes por cliente.");
+                    return true;
+                }
+
+                foreach (var clientId in clientsWithPending)
+                {
+                    var access = ctx.Client_Access
+                        .FirstOrDefault(a => a.client_id == clientId);
+
+                    if (access == null)
+                    {
+                        _logger.Warn(
+                            $"⚠️ Cliente {clientId} no tiene credenciales Backbone para ExternalSmsMessage."
+                        );
+
+                        continue;
+                    }
+
+                    var pssw = ClientAccessManager.Decrypt(access.password);
+
+                    var login = await new ApiBackBoneManager()
+                        .LoginResponse(access.username, pssw);
+
+                    if (login == null)
+                    {
+                        _logger.Error(
+                            $"❌ No se pudo autenticar el cliente {clientId} en Backbone (ExternalSmsMessage)."
+                        );
+
+                        continue;
+                    }
+
+                    var pending = (
+                        from e in ctx.ExternalSmsMessage
+                        join u in ctx.Users on e.IdUser equals u.Id
+                        join cli in ctx.clients on u.IdCliente equals cli.id
+                        where cli.id == clientId
+                              && e.Status == "0"
+                              && e.IdBackBone != null
+                              && e.IdBackBone != ""
+                        select new
+                        {
+                            e.Id,
+                            e.IdBackBone,
+                            e.PhoneNumber
+                        }
+                    )
+                    .AsNoTracking()
+                    .ToList();
+
+                    if (!pending.Any())
+                        continue;
+
+                    _logger.Info(
+                        $"🔄 (ExternalSmsMessage) Cliente {clientId} - " +
+                        $"{pending.Count} mensajes pendientes para verificar."
+                    );
+
+                    var api = new ApiBackBoneManager();
+
+                    foreach (var msg in pending)
+                    {
+                        try
+                        {
+                            var st = await api.GetMessageStatusAsync(
+                                login.token,
+                                msg.IdBackBone
+                            );
+
+                            if (st == null)
+                            {
+                                _logger.Warn(
+                                    $"⚠️ Backbone no regresó estatus para " +
+                                    $"ExternalSmsMessage Id={msg.Id}, BackboneId={msg.IdBackBone}."
+                                );
+
+                                continue;
+                            }
+
+                            var record = ctx.ExternalSmsMessage
+                                .FirstOrDefault(x => x.Id == msg.Id);
+
+                            if (record == null)
+                                continue;
+
+                            var oldStatus = record.Status;
+
+                            // Los estados válidos de Quantum son 0 - 5.
+                            // Cualquier valor inesperado se normaliza a 5 = Excepción.
+                            var newStatus =
+                                st.status >= 0 && st.status <= 5
+                                    ? st.status.ToString()
+                                    : "5";
+
+                            record.Status = newStatus;
+                            record.UpdatedAt = DateTime.Now;
+
+                            _logger.Info(
+                                $"📩 ExternalSmsMessage actualizado. " +
+                                $"Id={record.Id}, " +
+                                $"Teléfono={msg.PhoneNumber}, " +
+                                $"BackboneId={msg.IdBackBone}, " +
+                                $"StatusAnterior={oldStatus}, " +
+                                $"StatusNuevo={newStatus}"
+                            );
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(
+                                $"❌ Error verificando estado ExternalSmsMessage " +
+                                $"{msg.IdBackBone}: {ex.Message}",
+                                ex
+                            );
+                        }
+                    }
+
+                    await ctx.SaveChangesAsync();
+
+                    _logger.Info(
+                        $"✅ (ExternalSmsMessage) Cliente {clientId} actualizado correctamente."
+                    );
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(
+                    $"❌ Error general en UpdateExternalSmsStatusesByClient: {ex.Message}",
+                    ex
+                );
+
+                return false;
+            }
+        }
     }
 }

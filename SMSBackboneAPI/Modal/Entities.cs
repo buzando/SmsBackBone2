@@ -53,6 +53,7 @@ namespace Modal
         public virtual DbSet<UserOnboarding> UserOnboarding { get; set; }
         public virtual DbSet<SmsBalanceReconciliationDetail> SmsBalanceReconciliationDetail { get; set; }
         public virtual DbSet<SmsBalanceReconciliation> SmsBalanceReconciliation { get; set; }
+        public virtual DbSet<ExternalSmsMessage> ExternalSmsMessage { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ClientRoomSummaryDTO>().HasNoKey();
@@ -63,9 +64,23 @@ namespace Modal
             modelBuilder.Entity<CampaignContactScheduleSendDTO>().HasNoKey();
             modelBuilder.Entity<CampaignFullResponse>().Ignore(c => c.RecycleSetting);
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Permissions>(entity =>
+            {
+                entity.ToTable("Permissions", "dbo");
+                entity.HasKey(permission => permission.PermissionId);
+
+                entity.HasOne(permission => permission.ParentPermission)
+                    .WithMany(permission => permission.Children)
+                    .HasForeignKey(permission => permission.ParentPermissionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
         }
         public DbSet<ClientRoomSummaryDTO> ClientRoomSummaryDTO { get; set; }
         public DbSet<CampaignFullResponse> CampaignFullResponse { get; set; }
+        public DbSet<Permissions> Permissions { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
+
+
 
 
 

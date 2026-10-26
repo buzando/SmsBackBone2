@@ -50,9 +50,12 @@ namespace SmsEstatusWorker
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // intervalo en minutos (default 5)
-            int intervalo = int.TryParse(Common.ConfigurationManagerJson("MinutosEjecucion"), out var m)
-                ? m : 5;
+            int intervalo = int.TryParse(
+                Common.ConfigurationManagerJson("MinutosEjecucion"),
+                out var m
+            )
+                ? m
+                : 5;
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -60,27 +63,37 @@ namespace SmsEstatusWorker
                 {
                     var manager = new Business.smsdeliveryManager();
 
-                    // ⚠️ Este método NO envía SMS, solo actualiza estatus.
+                    // Campañas
                     var actualizados = await manager.UpdateSmsStatusesByClient();
 
-                    if (actualizados)
-                        _logger.Info($"🔄 Estatus actualizados: {actualizados} registro(s).");
-                    else
-                        _logger.Info("⏳ No se encontraron mensajes pendientes por actualizar.");
+                    if (!actualizados)
+                        _logger.Error("❌ Error actualizando estatus de campañas.");
 
-                    var actualizadostest = await manager.UpdateTestSmsStatusesByClient();
+                    // Test SMS
+                    var actualizadosTest = await manager.UpdateTestSmsStatusesByClient();
 
-                    if (actualizadostest)
-                        _logger.Info($"🔄 Estatus actualizados: {actualizados} registro(s).");
-                    else
-                        _logger.Info("⏳ No se encontraron mensajes pendientes por actualizar.");
+                    if (!actualizadosTest)
+                        _logger.Error("❌ Error actualizando estatus de TestMessage.");
+
+                    // API Externa / Median
+                    var actualizadosExternal =
+                        await manager.UpdateExternalSmsStatusesByClient();
+
+                    if (!actualizadosExternal)
+                        _logger.Error("❌ Error actualizando estatus de ExternalSmsMessage.");
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error("❌ Error en ciclo de verificación de estatus.", ex);
+                    _logger.Error(
+                        "❌ Error en ciclo de verificación de estatus.",
+                        ex
+                    );
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(intervalo), stoppingToken);
+                await Task.Delay(
+                    TimeSpan.FromMinutes(intervalo),
+                    stoppingToken
+                );
             }
         }
 

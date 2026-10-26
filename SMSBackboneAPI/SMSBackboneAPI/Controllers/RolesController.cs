@@ -38,7 +38,7 @@ namespace SMSBackboneAPI.Controllers
             {
                 _log.Info($"[{rid}] GetRoles start");
 
-                var Roles = new RoleManager().GetRoles();
+                var Roles = new RoleManager().GetPermissions();
 
                 if (Roles != null && Roles.Any())
                 {

@@ -42,6 +42,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import 'dayjs/locale/es-mx';
 import PrivacyNotice from './pages/PrivacyNotice'
 import HomePage from './pages/HomePage';
+import Roles from './pages/Roles';
 import PermissionRoute from './components/PermisionRoute'
 import { PERMISSIONS } from './pages/permisions'
 
@@ -102,7 +103,15 @@ function App() {
                             >
                                 <Route path="/" element={<HomePage />} />
                             </Route>
-
+                            <Route
+                                element={
+                                    <PermissionRoute
+                                        permission={PERMISSIONS.ADMIN_USERS_MANAGE}
+                                    />
+                                }
+                            >
+                                <Route path="/Roles" element={<Roles />} />
+                            </Route>
                             <Route
                                 element={
                                     <PermissionRoute permission={PERMISSIONS.USER_TERMS_VIEW} />
