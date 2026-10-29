@@ -44,6 +44,7 @@ import { isAxiosError } from 'axios';
 import backarrow from '../assets/MoveTable.svg';
 import ModalError from '../components/commons/ModalError';
 import SnackBar from '../components/commons/ChipBar';
+import '../components/commons/CSS/Roles.css';
 
 type Role = {
     id: string;
@@ -851,7 +852,7 @@ const Roles: React.FC = () => {
                 <IconButton aria-label="Regresar" onClick={() => navigate(-1)} size="small" sx={{ color: '#3A1724' }}>
                     <ArrowBackIosNewIcon sx={{ fontSize: 17 }} />
                 </IconButton>
-                <Typography variant="h5" sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: { xs: 21, md: 24 } }}>
+                <Typography variant="h5" className="roles-title" sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: { xs: 21, md: 24 } }}>
                     Roles de usuario
                 </Typography>
             </Box>
@@ -919,7 +920,7 @@ const Roles: React.FC = () => {
                                     setPage(1);
                                 }}
                                 placeholder="Buscar"
-                                inputProps={{ 'aria-label': 'Buscar roles' }}
+                                inputProps={{ 'aria-label': 'Buscar roles', className: 'roles-search-text' }}
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#9A9296' }} /></InputAdornment>,
                                 }}
@@ -933,10 +934,11 @@ const Roles: React.FC = () => {
                     value={activeTab}
                     onChange={(_, value: number) => setActiveTab(value)}
                     aria-label="Secciones de roles"
-                    sx={{ flexShrink: 0, borderBottom: '1px solid #D9D4D6', '& .MuiTabs-indicator': { bgcolor: '#833A53', height: 2 }, '& .MuiTab-root': { color: '#756B70', fontFamily: 'Poppins, sans-serif', fontSize: 12, fontWeight: 600, minHeight: 42, px: 3 }, '& .Mui-selected': { color: '#833A53 !important' } }}
+                    className="roles-tabs"
+                    sx={{ borderBottom: '1px solid #D9D4D6', '& .MuiTabs-indicator': { bgcolor: '#833A53', height: 2 }, '& .MuiTab-root': { fontFamily: 'Poppins, sans-serif', minHeight: 42, px: 3 } }}
                 >
-                    <Tab label="Lista de roles" />
-                    <Tab label="Asignación de roles" />
+                    <Tab label={<span className={activeTab === 0 ? 'roles-subtitle-select' : 'roles-subtitle-unselect'}>Lista de roles</span>} />
+                    <Tab label={<span className={activeTab === 1 ? 'roles-subtitle-select' : 'roles-subtitle-unselect'}>Asignación de roles</span>} />
                 </Tabs>
 
                 {activeTab === 0 ? (
@@ -954,9 +956,9 @@ const Roles: React.FC = () => {
                                             sx={{ color: '#B9B5B7', '&.Mui-checked': { color: '#833A53' } }}
                                         />
                                     </TableCell>
-                                    <TableCell sx={{ bgcolor: '#FFFFFF', color: '#51464B', fontWeight: 600, borderBottom: '1px solid #D9D4D6', minWidth: 170 }}>Nombre</TableCell>
-                                    <TableCell sx={{ bgcolor: '#FFFFFF', color: '#51464B', fontWeight: 600, borderBottom: '1px solid #D9D4D6', minWidth: 180 }}>Fecha de creación</TableCell>
-                                    <TableCell align="right" sx={{ bgcolor: '#FFFFFF', borderBottom: '1px solid #D9D4D6', width: 128 }} />
+                                    <TableCell className='roles-text' sx={{ bgcolor: '#FFFFFF', color: '#51464B', fontWeight: 600, borderBottom: '1px solid #D9D4D6', minWidth: 170 }}>Nombre</TableCell>
+                                    <TableCell className='roles-text' sx={{ bgcolor: '#FFFFFF', color: '#51464B', fontWeight: 600, borderBottom: '1px solid #D9D4D6', minWidth: 180 }}>Fecha de creación</TableCell>
+                                    <TableCell align="right" sx={{ bgcolor: '#FFFFFF', borderBottom: '1px solid #D9D4D6', width: 94 }} />
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -974,12 +976,12 @@ const Roles: React.FC = () => {
                                         </TableCell>
                                         <TableCell sx={{ borderBottom: '1px solid #E1DDDF', maxWidth: 260 }}>
                                             <Tooltip title={role.name.length > 34 ? role.name : ''} placement="top-start">
-                                                <Typography noWrap sx={{ color: role.isSystem ? '#BEB9BC' : '#51464B', maxWidth: 240, fontSize: 14 }}>
+                                                <Typography className='roles-secondary-text' noWrap sx={{ color: role.isSystem ? '#BEB9BC' : '#51464B', maxWidth: 240, fontSize: 14 }}>
                                                     {role.name}
                                                 </Typography>
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell sx={{ borderBottom: '1px solid #E1DDDF', color: role.isSystem ? '#C2BEC0' : '#6F6870', fontSize: 14 }}>
+                                        <TableCell className='roles-secondary-text' sx={{ borderBottom: '1px solid #E1DDDF', color: role.isSystem ? '#C2BEC0' : '#6F6870', fontSize: 14 }}>
                                             {role.createdAt}
                                         </TableCell>
                                         <TableCell align="right" sx={{ borderBottom: '1px solid #E1DDDF', p: 0.5 }}>
@@ -1234,11 +1236,12 @@ const Roles: React.FC = () => {
             </Drawer>
 
             <Dialog open={roleDialogOpen} onClose={closeRoleDialog} fullWidth maxWidth="sm">
-                <DialogTitle sx={{ color: '#3A1724', fontWeight: 600, pr: 6 }}>
+                <DialogTitle className='roles-generic-titles' sx={{ fontWeight: 600, fontSize: '20px', pr: 6, fontFamily: 'Poppins' }}>
                     {editingRoleId ? 'Editar rol' : 'Añadir rol'}
                     <IconButton aria-label="Cerrar" onClick={closeRoleDialog} sx={{ position: 'absolute', right: 12, top: 12 }}><CloseIcon /></IconButton>
                 </DialogTitle>
                 <DialogContent dividers>
+                    <Typography className='roles-generic-subtitles' >Nombre<span style={{ color: "#D01247" }}>*</span></Typography>
                     <TextField
                         autoFocus
                         required
@@ -1250,8 +1253,8 @@ const Roles: React.FC = () => {
                         helperText={`${roleName.length}/40 caracteres · Solo letras y números`}
                         sx={{ mb: 2.5 }}
                     />
-                    <Typography sx={{ color: '#51464B', fontWeight: 600 }}>Permisos*</Typography>
-                    <Typography sx={{ color: '#746B70', fontSize: 12, mb: 1 }}>Selecciona los permisos asignados a este rol.</Typography>
+                    <Typography className='roles-generic-subtitles'>Permisos<span style={{ color: "#D01247" }}>*</span></Typography>
+                    <Typography className='roles-generic-text' sx={{ mb: 1 }}>Seleccione los permisos asignados a este rol.</Typography>
                     <Box sx={{ border: '1px solid #D9D4D6', borderRadius: 1, overflow: 'hidden' }}>
                         <Box sx={{ px: 1.25, py: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6', gap: 1 }}>
                             <Tooltip title="Seleccionar todos los permisos visibles">
@@ -1277,7 +1280,7 @@ const Roles: React.FC = () => {
                         <Box sx={{ maxHeight: 260, overflowY: 'auto', px: 1.25, py: 0.5 }}>
                             {visiblePermissionGroups.length > 0 ? visiblePermissionGroups.map(group => (
                                 <Box key={group.code}>
-                                    <FormControlLabel
+                                    <FormControlLabel className='roles-generic-text-two'
                                         sx={{ display: 'flex', m: 0, minHeight: 34 }}
                                         control={
                                             <Checkbox
@@ -1310,6 +1313,7 @@ const Roles: React.FC = () => {
                                     />
                                     {group.permissions.map(permission => (
                                         <FormControlLabel
+                                            className='roles-generic-text-two'
                                             key={permission.code}
                                             sx={{ display: 'flex', ml: 3.25, mr: 0, mt: 0, mb: 0, minHeight: 32 }}
                                             control={
