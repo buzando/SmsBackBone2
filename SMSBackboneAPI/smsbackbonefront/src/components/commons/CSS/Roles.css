@@ -1,0 +1,95 @@
+/* Estilos de la pantalla Roles.tsx */
+
+/* Titulo */
+.roles-title {
+    font-weight: 500;
+    color: #330F1B;
+     font-family: 'Poppins', sans-serif !important;
+    font-size: 26px;
+}
+
+/* Texto del placeholder de búsqueda */
+.roles-search-text {
+     font-family: 'Poppins', sans-serif !important;
+    color: #9B9295;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0%;
+}
+
+/* Selecciones de Roles */
+/* Texto de pestaña seleccionada */
+.roles-subtitle-select {
+     font-family: 'Poppins', sans-serif !important;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #833A53;
+}
+
+/* Texto de pestaña no seleccionada */
+.roles-subtitle-unselect {
+     font-family: 'Poppins', sans-serif !important;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #6C535C;
+}
+
+/* Pestaña seleccionada */
+.roles-tabs .MuiTab-root.Mui-selected {
+    color: #833A53;
+}
+
+/* Pestaña no seleccionada */
+.roles-tabs .MuiTab-root:not(.Mui-selected) {
+    color: #6C535C;
+}
+
+/* Texto */
+.roles-text {
+     font-family: 'Poppins', sans-serif !important;
+    font-weight: 500;
+    color: #330F1B;
+    font-size: 14px;
+}
+
+/* Texto secundario */
+.roles-secondary-text {
+     font-family: 'Poppins', sans-serif !important;
+    font-weight: 400;
+    color: #B8B8B8;
+    font-size: 16px;
+}
+
+.roles-generic-titles {
+    color: #574B4F;
+     font-family: 'Poppins', sans-serif !important;
+    text-transform: none;
+}
+
+.roles-generic-subtitles {
+    color: #330F1B;
+    font-family: 'Poppins', sans-serif !important;
+    text-transform: none;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.roles-generic-text {
+    color: #574B4F;
+    font-family: 'Poppins', sans-serif !important;
+    text-transform: none;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+}
+.roles-generic-text-two {
+    color: #574B4F !important;
+    font-family: 'Poppins', sans-serif !important;
+    text-transform: none;
+    font-weight: 400 !important;
+    font-size: 16px !important;
+}
