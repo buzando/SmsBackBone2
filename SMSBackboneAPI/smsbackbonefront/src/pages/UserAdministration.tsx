@@ -25,6 +25,11 @@ import {
     Grid,
     Backdrop,
     CircularProgress,
+    Alert,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -72,7 +77,31 @@ type Account = {
     rooms: string;
     status: boolean;
     role: string;
+    roleIds?: number[];
+    idRole?: number;
     phoneNumber?: string;
+};
+
+type UserRoleOption = {
+    id: number;
+    name: string;
+    isSystem: boolean;
+};
+
+type ApiRoleOption = {
+    id?: number;
+    Id?: number;
+    role?: string;
+    Role?: string;
+    idCliente?: number | null;
+    IdCliente?: number | null;
+};
+
+type ApiRolePage = {
+    items?: ApiRoleOption[];
+    Items?: ApiRoleOption[];
+    totalPages?: number;
+    TotalPages?: number;
 };
 
 type Room = {
@@ -105,6 +134,12 @@ const ManageAccounts: React.FC = () => {
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
     const [openAddUserModal, setOpenAddUserModal] = useState(false);
+    const [availableRoles, setAvailableRoles] = useState<UserRoleOption[]>([]);
+    const [isLoadingAvailableRoles, setIsLoadingAvailableRoles] = useState(false);
+    const [availableRolesError, setAvailableRolesError] = useState("");
+    const [selectedCustomRoleIds, setSelectedCustomRoleIds] = useState<number[]>([]);
+    const [initialCustomRoleIds, setInitialCustomRoleIds] = useState<number[]>([]);
+    const [openNavigateRolesConfirm, setOpenNavigateRolesConfirm] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [rooms, setRooms] = useState<Room[]>([]);
     const [selectedRooms, setSelectedRooms] = useState<number[]>([]);
@@ -126,6 +161,63 @@ const ManageAccounts: React.FC = () => {
         profile: "",
         rooms: "",
     });
+    const selectedDefaultRole = availableRoles.find(role =>
+        role.isSystem && role.name.toLocaleLowerCase("es-MX") === formData.profile.toLocaleLowerCase("es-MX")
+    );
+    const selectedRoleIds = selectedDefaultRole
+        ? [selectedDefaultRole.id]
+        : selectedCustomRoleIds;
+    const customRoles = availableRoles.filter(role => !role.isSystem);
+
+    useEffect(() => {
+        if (!openAddUserModal) return;
+
+        let cancelled = false;
+        const loadRoles = async () => {
+            setIsLoadingAvailableRoles(true);
+            setAvailableRolesError("");
+            try {
+                const apiUrl = import.meta.env.VITE_API_GET_ROLES || "api/Roles";
+                const firstResponse = await axios.get<ApiRoleOption[] | ApiRolePage>(apiUrl, {
+                    params: { page: 1, search: "" },
+                });
+                const firstData = firstResponse.data;
+                const firstItems = Array.isArray(firstData) ? firstData : firstData.items ?? firstData.Items ?? [];
+                const totalPages = Array.isArray(firstData) ? 1 : Number(firstData.totalPages ?? firstData.TotalPages ?? 1);
+                const remaining = await Promise.all(Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) =>
+                    axios.get<ApiRoleOption[] | ApiRolePage>(apiUrl, {
+                        params: { page: index + 2, search: "" },
+                    })
+                ));
+                const allRows = [
+                    ...firstItems,
+                    ...remaining.flatMap(response => Array.isArray(response.data)
+                        ? response.data
+                        : response.data.items ?? response.data.Items ?? []),
+                ];
+                const normalized = allRows.flatMap(role => {
+                    const id = Number(role.id ?? role.Id);
+                    const name = String(role.role ?? role.Role ?? "").trim();
+                    const idCliente = role.idCliente ?? role.IdCliente ?? null;
+                    return Number.isInteger(id) && id > 0 && name
+                        ? [{ id, name, isSystem: idCliente == null }]
+                        : [];
+                });
+                if (!cancelled) setAvailableRoles(normalized);
+            } catch (error) {
+                console.error("Error al cargar roles para el formulario de usuarios", error);
+                if (!cancelled) {
+                    setAvailableRoles([]);
+                    setAvailableRolesError("No se pudieron cargar los roles. Inténtalo de nuevo.");
+                }
+            } finally {
+                if (!cancelled) setIsLoadingAvailableRoles(false);
+            }
+        };
+
+        void loadRoles();
+        return () => { cancelled = true; };
+    }, [openAddUserModal]);
     const [runSearchCreateTour, setRunSearchCreateTour] = useState(false);
 
     const joyrideTextStyle: CSSProperties = {
@@ -347,7 +439,10 @@ const ManageAccounts: React.FC = () => {
 
     const hasFormChanged = (): boolean => {
         if (!initialFormData) return false;
-        return JSON.stringify(formData) !== JSON.stringify(initialFormData);
+        const currentRoleIds = [...selectedCustomRoleIds].sort((a, b) => a - b);
+        const originalRoleIds = [...initialCustomRoleIds].sort((a, b) => a - b);
+        const rolesChanged = JSON.stringify(currentRoleIds) !== JSON.stringify(originalRoleIds);
+        return JSON.stringify(formData) !== JSON.stringify(initialFormData) || rolesChanged;
     };
 
 
@@ -401,6 +496,7 @@ const ManageAccounts: React.FC = () => {
 
     const handleOpenModal = () => {
         fetchRooms();
+        setSelectedCustomRoleIds([]);
         setOpenAddUserModal(true);
     };
 
@@ -408,8 +504,40 @@ const ManageAccounts: React.FC = () => {
         setFormData(INITIAL_FORM_DATA);
         setShowErrors(INITIAL_SHOW_ERRORS);
         setSelectedRooms([]);
+        setSelectedCustomRoleIds([]);
+        setInitialCustomRoleIds([]);
         setConfirmationEmail("");
         setIsEditing(false);
+    };
+
+    const hasUserFormData = () =>
+        JSON.stringify(formData) !== JSON.stringify(INITIAL_FORM_DATA) ||
+        selectedRooms.length > 0 ||
+        selectedCustomRoleIds.length > 0;
+
+    const goToRolesFromForm = () => {
+        if (hasUserFormData()) {
+            setOpenNavigateRolesConfirm(true);
+            return;
+        }
+        setOpenAddUserModal(false);
+        navigate("/Roles");
+    };
+
+    const continueToRolesAndDiscardForm = () => {
+        setOpenNavigateRolesConfirm(false);
+        handleCloseModal();
+        navigate("/Roles");
+    };
+
+    const toggleCustomRole = (roleId: number, checked: boolean) => {
+        // Una selección personalizada reemplaza el rol predeterminado.
+        if (checked) {
+            setFormData(current => ({ ...current, profile: "" }));
+        }
+        setSelectedCustomRoleIds(current => checked
+            ? Array.from(new Set([...current, roleId]))
+            : current.filter(id => id !== roleId));
     };
 
     const handleCloseModal = () => {
@@ -490,6 +618,7 @@ const ManageAccounts: React.FC = () => {
                 ConfirmationEmail: ConfirmationEmail,
                 FutureRooms: formData.allAndFuture,
                 Profile: formData.profile,
+                RoleIds: selectedRoleIds,
                 PhoneNumber: formData.phone,
                 Password: !isEditing ? formData.password : '123',
                 Rooms: selectedRooms.join(","),
@@ -653,7 +782,17 @@ const ManageAccounts: React.FC = () => {
             .filter((room) => selectedRoomNames.includes(room.name))
             .map((room) => room.id);
 
+        const defaultRoleNames = ["Monitor", "Supervisor", "Administrador"];
+        const isDefaultRole = defaultRoleNames.some(name =>
+            name.toLocaleLowerCase("es-MX") === String(account.role || "").toLocaleLowerCase("es-MX")
+        );
+        const assignedCustomRoleIds = isDefaultRole
+            ? []
+            : (account.roleIds ?? (account.idRole ? [account.idRole] : [])).map(Number).filter(id => Number.isInteger(id) && id > 0);
+
         setSelectedRooms(selectedRoomIds);
+        setSelectedCustomRoleIds(assignedCustomRoleIds);
+        setInitialCustomRoleIds(assignedCustomRoleIds);
 
 
         setFormData({
@@ -665,7 +804,7 @@ const ManageAccounts: React.FC = () => {
             password: "",
             confirmPassword: "",
             allAndFuture: false,
-            profile: account.role || "",
+            profile: isDefaultRole ? account.role : "",
             rooms: selectedRoomIds.join(","),
         });
 
@@ -678,7 +817,7 @@ const ManageAccounts: React.FC = () => {
             password: "",
             confirmPassword: "",
             allAndFuture: false,
-            profile: account.role || "",
+            profile: isDefaultRole ? account.role : "",
             rooms: selectedRoomIds.join(","),
         });
 
@@ -697,7 +836,8 @@ const ManageAccounts: React.FC = () => {
             phoneRegex.test(formData.phone.trim()) &&
             emailRegex.test(formData.email) &&
             formData.email === formData.confirmEmail &&
-            formData.profile.trim() !== "" &&
+            selectedRoleIds.length > 0 &&
+            !(formData.profile.trim() && selectedCustomRoleIds.length > 0) &&
             selectedRooms.length > 0 &&
             (isEditing || (
                 isPasswordValid(formData.password) &&
@@ -1829,7 +1969,10 @@ const ManageAccounts: React.FC = () => {
                         <RadioGroup
                             row
                             value={formData.profile}
-                            onChange={(e) => setFormData({ ...formData, profile: e.target.value })}
+                            onChange={(e) => {
+                                setFormData(current => ({ ...current, profile: e.target.value }));
+                                setSelectedCustomRoleIds([]);
+                            }}
                         >
                             <Box display="flex" justifyContent="space-between" gap={2}>
                                 <Box
@@ -1951,9 +2094,62 @@ const ManageAccounts: React.FC = () => {
                             </Box>
                         </RadioGroup>
 
+                        <Box sx={{ mt: 2, p: 2, border: "1px solid #D9D4D6", borderRadius: 2 }}>
+                            <Typography sx={{ fontFamily: "Poppins", fontSize: 15, fontWeight: 600, color: "#574B4F", mb: 1 }}>
+                                Roles personalizados
+                            </Typography>
+                            <Typography sx={{ fontFamily: "Poppins", fontSize: 13, color: "#746B70", mb: 1.5 }}>
+                                Puedes seleccionar uno o más roles personalizados. Son excluyentes con los roles predeterminados.
+                            </Typography>
+
+                            {formData.profile && (
+                                <Alert
+                                    severity="info"
+                                    action={<Button color="inherit" size="small" onClick={() => setFormData(current => ({ ...current, profile: "" }))}>Elegir personalizados</Button>}
+                                    sx={{ mb: 1.5 }}
+                                >
+                                    Los roles personalizados están deshabilitados porque seleccionaste un rol predeterminado.
+                                </Alert>
+                            )}
+
+                            {isLoadingAvailableRoles ? (
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1, py: 1 }}>
+                                    <CircularProgress size={18} sx={{ color: "#833A53" }} />
+                                    <Typography sx={{ fontFamily: "Poppins", fontSize: 13, color: "#746B70" }}>Cargando roles…</Typography>
+                                </Box>
+                            ) : availableRolesError ? (
+                                <Alert severity="error">{availableRolesError}</Alert>
+                            ) : customRoles.length === 0 ? (
+                                <Alert
+                                    severity="info"
+                                    action={<Button color="inherit" size="small" onClick={goToRolesFromForm}>Ir a Roles</Button>}
+                                >
+                                    Aún no tienes roles personalizados disponibles. Ve al módulo de Roles para crear uno.
+                                </Alert>
+                            ) : (
+                                <Box sx={{ maxHeight: 190, overflowY: "auto", border: "1px solid #E1DDDF", borderRadius: 1 }}>
+                                    {customRoles.map(role => (
+                                        <FormControlLabel
+                                            key={role.id}
+                                            disabled={Boolean(formData.profile)}
+                                            control={
+                                                <Checkbox
+                                                    checked={selectedCustomRoleIds.includes(role.id)}
+                                                    onChange={event => toggleCustomRole(role.id, event.target.checked)}
+                                                    sx={{ color: "#B9B5B7", "&.Mui-checked": { color: "#833A53" } }}
+                                                />
+                                            }
+                                            label={role.name}
+                                            sx={{ display: "flex", mx: 1, minHeight: 40, borderBottom: "1px solid #EEE9EB", "& .MuiFormControlLabel-label": { fontFamily: "Poppins", fontSize: 14, color: "#574B4F" } }}
+                                        />
+                                    ))}
+                                </Box>
+                            )}
+                        </Box>
+
                         <Divider sx={{ my: 2, backgroundColor: "#F2F2F2" }} />
 
-                        {formData.profile && (
+                        {selectedRoleIds.length > 0 && (
                             <Box p={2}>
                                 <Typography variant="h6" mb={2} mt={-2} sx={{ fontFamily: "Poppins", fontSize: "16px" }}>
                                     Salas a las que podrá acceder <span style={{ color: "red", }}>*</span>
@@ -2229,6 +2425,30 @@ const ManageAccounts: React.FC = () => {
                     </Box>
                 </Box>
             </Modal>
+
+            <Dialog
+                open={openNavigateRolesConfirm}
+                onClose={() => setOpenNavigateRolesConfirm(false)}
+                fullWidth
+                maxWidth="xs"
+            >
+                <DialogTitle sx={{ fontFamily: "Poppins", fontWeight: 600, color: "#3A1724" }}>
+                    Salir del formulario
+                </DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ fontFamily: "Poppins", color: "#574B4F" }}>
+                        Si continúas al módulo de Roles, perderás los datos y las configuraciones realizadas en este formulario. ¿Deseas continuar?
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={() => setOpenNavigateRolesConfirm(false)} sx={{ color: "#833A53", fontWeight: 600 }}>
+                        Cancelar
+                    </Button>
+                    <Button onClick={continueToRolesAndDiscardForm} variant="contained" sx={{ bgcolor: "#833A53", "&:hover": { bgcolor: "#6D2F45" }, fontWeight: 600 }}>
+                        Continuar
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Modal
                 open={openDeleteModal}

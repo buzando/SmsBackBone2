@@ -34,21 +34,49 @@ namespace Business
         }
 
         // Devuelve roles globales y roles personalizados del cliente.
-        public List<RoleResponse> GetRolesByClient(int idCliente)
+        public RolePageResponse GetRolesByClient(
+     int idCliente,
+     int page = 1,
+     string search = null)
         {
+            const int pageSize = 25;
+            page = Math.Max(page, 1);
+
             using (var ctx = new Entities())
             {
-                var roles = ctx.Roles
+                var query = ctx.Roles
                     .AsNoTracking()
+                    .Where(role =>
+                        (role.idCliente == null || role.idCliente == idCliente) &&
+                        role.Role != null &&
+                        role.Role.ToLower() != "mesa" &&
+                        role.Role.ToLower() != "root" &&
+                        role.Role.ToLower() != "telco");
+
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    var term = search.Trim().ToLower();
+                    query = query.Where(role => role.Role.ToLower().Contains(term));
+                }
+
+                var totalRecords = query.Count();
+
+                var roles = query
+                    .OrderBy(role => role.Role)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .Include(role => role.RolePermissions)
                         .ThenInclude(rolePermission => rolePermission.Permission)
-                    .Where(role =>
-                        role.idCliente == null ||
-                        role.idCliente == idCliente)
-                    .OrderBy(role => role.Role)
                     .ToList();
 
-                return roles.Select(ToResponse).ToList();
+                return new RolePageResponse
+                {
+                    Items = roles.Select(ToResponse).ToList(),
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalRecords = totalRecords,
+                    TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+                };
             }
         }
 
@@ -91,10 +119,40 @@ namespace Business
 
                 var permissionIds = GetPermissionIds(ctx, request.Permissions);
 
+                var requestedPermissionIds = permissionIds
+    .Distinct()
+    .OrderBy(permissionId => permissionId)
+    .ToArray();
+
+                var rolesToCompare = ctx.Roles
+                    .AsNoTracking()
+                    .Include(existingRole => existingRole.RolePermissions)
+                    .Where(existingRole =>
+                        (existingRole.idCliente == null ||
+                         existingRole.idCliente == idCliente) &&
+                        existingRole.Role != null &&
+                        existingRole.Role.ToLower() != "mesa" &&
+                        existingRole.Role.ToLower() != "root" &&
+                        existingRole.Role.ToLower() != "telco")
+                    .ToList();
+
+                var samePermissionsExist = rolesToCompare.Any(existingRole =>
+                    existingRole.RolePermissions
+                        .Select(rolePermission => rolePermission.PermissionId)
+                        .OrderBy(permissionId => permissionId)
+                        .SequenceEqual(requestedPermissionIds));
+
+                if (samePermissionsExist)
+                {
+                    throw new InvalidOperationException(
+                        "Ya existe un rol con los mismos permisos.");
+                }
+
                 var role = new Roles
                 {
                     Role = roleName,
-                    idCliente = idCliente
+                    idCliente = idCliente,
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 ctx.Roles.Add(role);
@@ -175,6 +233,7 @@ namespace Business
                     Id = role.id,
                     Role = role.Role,
                     IdCliente = role.idCliente,
+                    CreatedAt = role.CreatedAt,
                     Permissions = request.Permissions.Distinct().ToList()
                 };
             }
@@ -191,7 +250,8 @@ namespace Business
                 if (role == null)
                     return false; // No existe para ese cliente o es un rol global.
 
-                if (ctx.Users.Any(user => user.idRole == idRole))
+                if (ctx.Users.Any(user => user.idRole == idRole) ||
+                    ctx.UserRoles.Any(link => link.RoleId == idRole))
                 {
                     throw new InvalidOperationException(
                         "No se puede eliminar el rol porque tiene usuarios asignados.");
@@ -212,6 +272,7 @@ namespace Business
                 Id = role.id,
                 Role = role.Role,
                 IdCliente = role.idCliente,
+                CreatedAt = role.CreatedAt,
                 Permissions = role.RolePermissions
                     .Where(item =>
                         item.Permission != null &&
@@ -266,6 +327,84 @@ namespace Business
             if (request.Role.Trim().Length > 50)
                 throw new ArgumentException(
                     "El nombre del rol no puede exceder 50 caracteres.");
+        }
+        public bool AssignRoleToUser(
+            int idCliente,
+            int userId,
+            IEnumerable<int> requestedRoleIds)
+        {
+            if (idCliente <= 0 || userId <= 0)
+                throw new ArgumentException("Los identificadores de cliente y usuario deben ser válidos.");
+
+            var roleIds = (requestedRoleIds ?? Enumerable.Empty<int>())
+                .Distinct()
+                .ToList();
+
+            if (roleIds.Count == 0 || roleIds.Any(roleId => roleId <= 0))
+                throw new ArgumentException("Selecciona al menos un rol válido.");
+
+            using (var ctx = new Entities())
+            using (var transaction = ctx.Database.BeginTransaction())
+            {
+                var user = ctx.Users.FirstOrDefault(item =>
+                    item.Id == userId && item.IdCliente == idCliente);
+
+                if (user == null)
+                    return false;
+
+                var roles = ctx.Roles
+                    .Where(item =>
+                    roleIds.Contains(item.id) &&
+                    (item.idCliente == null || item.idCliente == idCliente) &&
+                    item.Role != null &&
+                    item.Role.ToLower() != "mesa" &&
+                    item.Role.ToLower() != "root" &&
+                    item.Role.ToLower() != "telco")
+                    .ToList();
+
+                if (roles.Count != roleIds.Count)
+                    throw new ArgumentException("Uno o más roles no existen o no están disponibles para este cliente.");
+
+                var defaultRoles = roles.Where(role => role.idCliente == null).ToList();
+                var customRoles = roles.Where(role => role.idCliente != null).ToList();
+
+                // Un rol predeterminado es excluyente; se pueden combinar roles personalizados.
+                if (defaultRoles.Count > 1 ||
+                    (defaultRoles.Count == 1 && customRoles.Count > 0))
+                {
+                    throw new ArgumentException(
+                        "Selecciona un solo rol predeterminado o uno o más roles personalizados.");
+                }
+
+                var currentAssignments = ctx.UserRoles
+                    .Where(link => link.UserId == userId)
+                    .ToList();
+                var requestedRoleIdSet = new HashSet<int>(roleIds);
+
+                ctx.UserRoles.RemoveRange(currentAssignments.Where(link =>
+                    !requestedRoleIdSet.Contains(link.RoleId)));
+
+                var currentRoleIdSet = new HashSet<int>(
+                    currentAssignments.Select(link => link.RoleId));
+                foreach (var roleId in roleIds.Where(roleId =>
+                    !currentRoleIdSet.Contains(roleId)))
+                {
+                    ctx.UserRoles.Add(new UserRole
+                    {
+                        UserId = userId,
+                        RoleId = roleId,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+
+                // Mantiene el campo legado para código que todavía lee users.idRole.
+                user.idRole = defaultRoles.Count == 1
+                    ? defaultRoles[0].id
+                    : roleIds[0];
+                ctx.SaveChanges();
+                transaction.Commit();
+                return true;
+            }
         }
     }
 }

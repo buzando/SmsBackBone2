@@ -11,7 +11,6 @@ namespace Modal.Model.Model
     [Table("RolePermission", Schema = "dbo")]
     public class RolePermission
     {
-        [Key]
         public int RoleId { get; set; }
 
         public int PermissionId { get; set; }

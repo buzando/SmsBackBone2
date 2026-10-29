@@ -80,7 +80,8 @@ namespace SMSBackboneAPI.Controllers
                         {
                             new Claim(ClaimTypes.NameIdentifier, responseDto.Id.ToString()),
                             new Claim(ClaimTypes.Email, responseDto.email),
-                            new Claim(ClaimTypes.Role, responseDto.rol)
+                            new Claim(ClaimTypes.Role, responseDto.rol),
+                            new Claim("idCliente", responseDto.IdCliente.ToString())
                         }),
                         Expires = DateTime.UtcNow.AddDays(30),
                         Issuer = JwtIssuer,
@@ -659,9 +660,10 @@ namespace SMSBackboneAPI.Controllers
                 // === 2) Validaciones básicas ===
                 if (string.IsNullOrWhiteSpace(user?.Email) ||
                     string.IsNullOrWhiteSpace(user.FirstName) ||
-                    string.IsNullOrWhiteSpace(user.Profile))
+                    ((user.RoleIds == null || user.RoleIds.Count == 0) &&
+                     string.IsNullOrWhiteSpace(user.Profile)))
                 {
-                    return BadRequest("Faltan campos obligatorios: FirstName, Email y Profile.");
+                    return BadRequest("Faltan campos obligatorios: FirstName, Email y al menos un rol.");
                 }
                 if (string.IsNullOrWhiteSpace(user.Password))
                 {

@@ -56,10 +56,10 @@ namespace Business
                             ctx.roomsbyuser.Add(rommbuyser);
                             ctx.SaveChanges();
                         }
-                      
+
                     }
 
-                    foreach(var room in allroms)
+                    foreach (var room in allroms)
                     {
                         var exiteroom = rooms.Split(",").Where(x => x == room.idRoom.ToString()).FirstOrDefault();
                         if (exiteroom != null)
@@ -68,8 +68,9 @@ namespace Business
                         }
                         else
                         {
-                            var roomdelete = ctx.roomsbyuser.Where(x => x.idRoom == room.idRoom).FirstOrDefault();
-                            ctx.roomsbyuser.Remove(roomdelete);
+                            // `room` ya es la relación de esta sala con este usuario.
+                            // Buscar solo por idRoom podía borrar la asignación de otra persona.
+                            ctx.roomsbyuser.Remove(room);
                             ctx.SaveChanges();
                         }
                     }
@@ -102,7 +103,7 @@ namespace Business
                             ctx.roomsbyuser.Add(rommbyuser);
                             ctx.SaveChanges();
                         }
-                     
+
                     }
 
 
@@ -263,14 +264,14 @@ namespace Business
                 using (var ctx = new Entities())
                 {
                     var oldroomdb = (from r in ctx.Rooms
-                                join rbu in ctx.roomsbyuser on r.id equals rbu.idRoom
-                                where r.name == room.oldRoom && rbu.idUser == room.idUser
-                                select r).FirstOrDefault();
+                                     join rbu in ctx.roomsbyuser on r.id equals rbu.idRoom
+                                     where r.name == room.oldRoom && rbu.idUser == room.idUser
+                                     select r).FirstOrDefault();
 
                     oldroomdb.credits = oldroomdb.credits - room.transfer;
                     if (room.Channel == "SMS Cortos")
                     {
-                        oldroomdb.short_sms = oldroomdb.short_sms - room.transfer; 
+                        oldroomdb.short_sms = oldroomdb.short_sms - room.transfer;
                     }
                     if (room.Channel == "SMS Largos")
                     {

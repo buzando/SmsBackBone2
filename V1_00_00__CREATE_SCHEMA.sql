@@ -1229,7 +1229,81 @@ BEGIN
     ORDER BY RowNum;
 END
 GO
+select * from users
+IF COL_LENGTH(N'dbo.Roles', N'CreatedAt') IS NULL
+    ALTER TABLE dbo.Roles ADD CreatedAt DATETIME2(0) NULL;
+GO
 
+/*
+  Multi-role assignment migration for SQL Server.
+  Keeps dbo.users.idRole temporarily for compatibility with existing code.
+  dbo.UserRole becomes the source of truth for the complete assignment set.
+*/
+SET XACT_ABORT ON;
+GO
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF OBJECT_ID(N'dbo.users', N'U') IS NULL
+        THROW 51100, 'No existe dbo.users.', 1;
+    IF OBJECT_ID(N'dbo.Roles', N'U') IS NULL
+        THROW 51101, 'No existe dbo.Roles.', 1;
+    IF COL_LENGTH(N'dbo.users', N'Id') IS NULL
+       OR COL_LENGTH(N'dbo.users', N'idRole') IS NULL
+       OR COL_LENGTH(N'dbo.users', N'IdCliente') IS NULL
+        THROW 51102, 'dbo.users debe tener Id, IdCliente e idRole.', 1;
+    IF COL_LENGTH(N'dbo.Roles', N'id') IS NULL
+       OR COL_LENGTH(N'dbo.Roles', N'idCliente') IS NULL
+        THROW 51103, 'dbo.Roles debe tener id e idCliente.', 1;
+
+    IF OBJECT_ID(N'dbo.UserRole', N'U') IS NULL
+    BEGIN
+        CREATE TABLE dbo.UserRole
+        (
+            UserId    INT NOT NULL,
+            RoleId    INT NOT NULL,
+            CreatedAt DATETIME2(0) NOT NULL
+                CONSTRAINT DF_UserRole_CreatedAt DEFAULT (SYSUTCDATETIME()),
+            CONSTRAINT PK_UserRole PRIMARY KEY CLUSTERED (UserId, RoleId),
+            CONSTRAINT FK_UserRole_users FOREIGN KEY (UserId)
+                REFERENCES dbo.users(Id) ON DELETE CASCADE,
+            CONSTRAINT FK_UserRole_Roles FOREIGN KEY (RoleId)
+                REFERENCES dbo.Roles(id) ON DELETE NO ACTION
+        );
+
+        CREATE INDEX IX_UserRole_RoleId ON dbo.UserRole(RoleId, UserId);
+    END;
+
+    /* Migrate each user's existing single role into the new relation. */
+    INSERT INTO dbo.UserRole (UserId, RoleId)
+    SELECT u.Id, u.idRole
+    FROM dbo.users AS u
+    INNER JOIN dbo.Roles AS r ON r.id = u.idRole
+    WHERE u.idRole > 0
+      AND NOT EXISTS
+      (
+          SELECT 1
+          FROM dbo.UserRole AS ur
+          WHERE ur.UserId = u.Id AND ur.RoleId = u.idRole
+      );
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+GO
+
+/*
+  After deploying this migration, update all create/update/assignment endpoints
+  to write dbo.UserRole transactionally. Keep dbo.users.idRole synchronized to
+  the selected default role or the first custom role only while legacy readers
+  still require it. Authorization must read every UserRole and combine role
+  permissions. Validate custom roles against users.IdCliente in the API; the
+  tenant rule cannot be enforced by a basic FK.
+*/
 
 
 /* ============================================================

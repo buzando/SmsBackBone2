@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace Contract.Request
 {
-    public  class UserAddDTO
+    public class UserAddDTO
     {
-        public string FirstName { get; set; } 
+        public string FirstName { get; set; }
         public string Email { get; set; }
         public string ConfirmationEmail { get; set; }
         public string PhoneNumber { get; set; }
         public string Profile { get; set; }
+        public List<int> RoleIds { get; set; } = new List<int>();
         public string Rooms { get; set; }
         public bool? FutureRooms { get; set; }
         public int IdCliente { get; set; }

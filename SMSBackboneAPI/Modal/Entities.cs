@@ -23,6 +23,7 @@ namespace Modal
         public DbSet<rooms> Rooms { get; set; }
         public DbSet<clients> clients { get; set; }
         public DbSet<Roles> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<roomsbyuser> roomsbyuser { get; set; }
         public DbSet<creditcards> creditcards { get; set; }
         public DbSet<MyNumbers> MyNumbers { get; set; }
@@ -42,7 +43,7 @@ namespace Modal
         public DbSet<CampaignSchedules> CampaignSchedules { get; set; }
 
         public DbSet<ClientAccess> Client_Access { get; set; }
-        public DbSet<tpm_CampaignContacts> tpm_CampaignContacts { get; set; }  
+        public DbSet<tpm_CampaignContacts> tpm_CampaignContacts { get; set; }
         public DbSet<CampaignContactScheduleSend> CampaignContactScheduleSend { get; set; }
         public DbSet<IFTLadas> IFTLadas { get; set; }
         public DbSet<SmsDisplayRate> SmsDisplayRate { get; set; }
@@ -58,11 +59,29 @@ namespace Modal
         {
             modelBuilder.Entity<ClientRoomSummaryDTO>().HasNoKey();
             modelBuilder.Entity<CampaignFullResponse>().HasNoKey();
-            modelBuilder.Entity<CampaignRecycleSettingDto>().HasNoKey(); 
+            modelBuilder.Entity<CampaignRecycleSettingDto>().HasNoKey();
             modelBuilder.Entity<CampaignScheduleDto>().HasNoKey();
             modelBuilder.Entity<CampaignContactDto>().HasNoKey();
             modelBuilder.Entity<CampaignContactScheduleSendDTO>().HasNoKey();
             modelBuilder.Entity<CampaignFullResponse>().Ignore(c => c.RecycleSetting);
+            modelBuilder.Entity<RolePermission>()
+    .HasKey(rp => new { rp.RoleId, rp.PermissionId });
+
+            modelBuilder.Entity<UserRole>(entity =>
+            {
+                entity.ToTable("UserRole", "dbo");
+                entity.HasKey(link => new { link.UserId, link.RoleId });
+                entity.Property(link => link.CreatedAt)
+                    .HasDefaultValueSql("SYSUTCDATETIME()");
+                entity.HasOne(link => link.User)
+                    .WithMany(user => user.UserRoles)
+                    .HasForeignKey(link => link.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(link => link.Role)
+                    .WithMany(role => role.UserRoles)
+                    .HasForeignKey(link => link.RoleId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Permissions>(entity =>
             {

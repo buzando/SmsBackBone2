@@ -11,6 +11,7 @@ namespace Contract.Response
         public int Id { get; set; }
         public string Role { get; set; } = string.Empty;
         public int? IdCliente { get; set; }
+        public DateTime? CreatedAt { get; set; }
         public List<string> Permissions { get; set; } = new List<string>();
     }
 }

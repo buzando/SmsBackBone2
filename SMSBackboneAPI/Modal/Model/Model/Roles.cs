@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Modal.Model;
 
@@ -21,6 +15,7 @@ namespace Modal.Model.Model
         [Required]
         [MaxLength(50)]
         public string Role { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         // Nullable para conservar los roles principales existentes.
         public int? idCliente { get; set; }
@@ -30,5 +25,8 @@ namespace Modal.Model.Model
 
         public virtual ICollection<RolePermission> RolePermissions { get; set; }
             = new List<RolePermission>();
+
+        public virtual ICollection<UserRole> UserRoles { get; set; }
+            = new List<UserRole>();
     }
 }

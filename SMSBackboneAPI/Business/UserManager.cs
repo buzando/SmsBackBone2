@@ -181,6 +181,29 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
                 userDtoList = userDtoList.Where(x => x.Role != "Root" && x.Role != "Telco").ToList();
 
+                // UserRole es la fuente de verdad para las asignaciones múltiples.
+                // Conserva idRole como respaldo para usuarios anteriores a la migración.
+                using (var assignmentContext = new Entities())
+                {
+                    var userIds = userDtoList.Select(user => user.id).Distinct().ToList();
+                    var assignments = assignmentContext.UserRoles
+                        .AsNoTracking()
+                        .Where(link => userIds.Contains(link.UserId))
+                        .Select(link => new { link.UserId, link.RoleId })
+                        .ToList()
+                        .GroupBy(link => link.UserId)
+                        .ToDictionary(
+                            group => group.Key,
+                            group => group.Select(link => link.RoleId).Distinct().ToList());
+
+                    foreach (var user in userDtoList)
+                    {
+                        user.RoleIds = assignments.TryGetValue(user.id, out var assignedRoleIds)
+                            ? assignedRoleIds
+                            : new List<int> { user.idRole };
+                    }
+                }
+
                 return userDtoList;
             }
             catch (Exception e)
@@ -494,11 +517,26 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
                     user.IdCliente = cliente.id;
                     using (var ctx = new Entities())
+                    using (var transaction = ctx.Database.BeginTransaction())
                     {
-                        var idrole = ctx.Roles.Where(x => x.Role.ToLower() == "administrador").Select(x => x.id).FirstOrDefault();
+                        var idrole = ctx.Roles
+                            .Where(x => x.Role != null && x.Role.ToLower() == "administrador")
+                            .Select(x => x.id)
+                            .FirstOrDefault();
+                        if (idrole <= 0)
+                            throw new InvalidOperationException("No se encontró el rol Administrador.");
+
                         user.idRole = idrole;
                         ctx.Users.Add(user);
                         ctx.SaveChanges();
+                        ctx.UserRoles.Add(new UserRole
+                        {
+                            UserId = user.Id,
+                            RoleId = idrole,
+                            CreatedAt = DateTime.UtcNow
+                        });
+                        ctx.SaveChanges();
+                        transaction.Commit();
                     }
                     var config = new MapperConfiguration(cfg =>
 
@@ -519,6 +557,53 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
                 log.Error(e.Message);
                 return null;
             }
+        }
+
+        private static List<Roles> ResolveAssignableRoles(
+            Entities ctx,
+            UserAddDTO register,
+            int idCliente)
+        {
+            var roleIds = (register.RoleIds ?? new List<int>())
+                .Where(roleId => roleId > 0)
+                .Distinct()
+                .ToList();
+
+            // Compatibilidad para formularios antiguos que todavía mandan Profile.
+            if (roleIds.Count == 0 && !string.IsNullOrWhiteSpace(register.Profile))
+            {
+                var legacyRole = ctx.Roles.FirstOrDefault(role =>
+                    role.Role != null &&
+                    role.Role.ToLower() == register.Profile.Trim().ToLower() &&
+                    (role.idCliente == null || role.idCliente == idCliente));
+
+                if (legacyRole != null)
+                    roleIds.Add(legacyRole.id);
+            }
+
+            if (roleIds.Count == 0)
+                throw new ArgumentException("Selecciona al menos un rol válido.");
+
+            var roles = ctx.Roles
+                .Where(role =>
+                    roleIds.Contains(role.id) &&
+                    (role.idCliente == null || role.idCliente == idCliente) &&
+                    role.Role != null &&
+                    role.Role.ToLower() != "mesa" &&
+                    role.Role.ToLower() != "root" &&
+                    role.Role.ToLower() != "telco")
+                .ToList();
+
+            if (roles.Count != roleIds.Count)
+                throw new ArgumentException("Uno o más roles no existen o no están disponibles para este cliente.");
+
+            var defaultRoles = roles.Where(role => role.idCliente == null).ToList();
+            var customRoles = roles.Where(role => role.idCliente != null).ToList();
+            if (defaultRoles.Count > 1 || (defaultRoles.Count == 1 && customRoles.Count > 0))
+                throw new ArgumentException("Selecciona un solo rol predeterminado o uno o más roles personalizados.");
+
+            // Conserva el orden solicitado para que el idRole legado sea determinista.
+            return roleIds.Select(roleId => roles.First(role => role.id == roleId)).ToList();
         }
 
         public int AddUserFromManage(UserAddDTO register)
@@ -552,10 +637,24 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
 
                 using (var ctx = new Entities())
+                using (var transaction = ctx.Database.BeginTransaction())
                 {
-                    user.idRole = ctx.Roles.Where(x => x.Role == register.Profile.ToLower()).Select(x => x.id).FirstOrDefault();
+                    var selectedRoles = ResolveAssignableRoles(ctx, register, register.IdCliente);
+                    var defaultRole = selectedRoles.FirstOrDefault(role => role.idCliente == null);
+                    user.idRole = defaultRole?.id ?? selectedRoles[0].id;
                     ctx.Users.Add(user);
                     ctx.SaveChanges();
+                    foreach (var role in selectedRoles)
+                    {
+                        ctx.UserRoles.Add(new UserRole
+                        {
+                            UserId = user.Id,
+                            RoleId = role.id,
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                    ctx.SaveChanges();
+                    transaction.Commit();
                 }
 
                 return user.Id;
@@ -572,14 +671,39 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
             try
             {
                 using (var ctx = new Entities())
+                using (var transaction = ctx.Database.BeginTransaction())
                 {
                     var usuarer = ctx.Users.Where(u => u.Id == register.IdUsuario).FirstOrDefault();
+                    if (usuarer == null)
+                        return false;
+
+                    var selectedRoles = ResolveAssignableRoles(ctx, register, usuarer.IdCliente);
+                    var defaultRole = selectedRoles.FirstOrDefault(role => role.idCliente == null);
+
                     usuarer.firstName = register.FirstName;
                     usuarer.phonenumber = register.PhoneNumber;
-                    usuarer.idRole = ctx.Roles.Where(x => x.Role == register.Profile.ToLower()).Select(x => x.id).FirstOrDefault();
+                    usuarer.idRole = defaultRole?.id ?? selectedRoles[0].id;
+
+                    var existingAssignments = ctx.UserRoles
+                        .Where(link => link.UserId == usuarer.Id)
+                        .ToList();
+                    var selectedRoleIdSet = new HashSet<int>(selectedRoles.Select(role => role.id));
+                    ctx.UserRoles.RemoveRange(existingAssignments.Where(link =>
+                        !selectedRoleIdSet.Contains(link.RoleId)));
+                    var existingRoleIdSet = new HashSet<int>(existingAssignments.Select(link => link.RoleId));
+                    foreach (var role in selectedRoles.Where(role => !existingRoleIdSet.Contains(role.id)))
+                    {
+                        ctx.UserRoles.Add(new UserRole
+                        {
+                            UserId = usuarer.Id,
+                            RoleId = role.id,
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
 
 
                     ctx.SaveChanges();
+                    transaction.Commit();
                 }
 
                 return true;
@@ -648,6 +772,9 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
             {
                 using (var ctx = new Entities())
                 {
+                    var roleAssignments = ctx.UserRoles.Where(x => x.UserId == id).ToList();
+                    ctx.UserRoles.RemoveRange(roleAssignments);
+
                     var roomforeign = ctx.roomsbyuser.Where(x => x.idUser == id).ToList();
                     ctx.roomsbyuser.RemoveRange(roomforeign);
                     ctx.SaveChanges();
