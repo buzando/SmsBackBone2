@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import axios from "../components/commons/AxiosInstance";
 import ChipBar from "../components/commons/ChipBar";
 import { Box, Divider, Typography, Checkbox, Radio, Modal, Select, MenuItem, SelectChangeEvent, TextField, FormControlLabel } from '@mui/material';
@@ -76,6 +77,9 @@ type Errors = {
 };
 
 const AccountRecharge: React.FC = () => {
+    const canRechargeSmsCredits = hasAssignedPermission(ROLE_PERMISSION_CODES.SMS_CREDITS_RECHARGE);
+    const canManagePaymentMethods = hasAssignedPermission(ROLE_PERMISSION_CODES.BILLING_PAYMENT_METHODS_MANAGE);
+
     const [selectedChannel, setSelectedChannel] = useState('');
     const [creditAmount, setCreditAmount] = useState('');
     const [rechargeAmount, setRechargeAmount] = useState('0.00');
@@ -268,6 +272,7 @@ const AccountRecharge: React.FC = () => {
 
     // Funciones para abrir y cerrar el modal
     const handleOpenModal = () => {
+        if (!canManagePaymentMethods) return;
         resetAddCardForm();
         setIsModalOpen(true);
     };
@@ -348,6 +353,7 @@ const AccountRecharge: React.FC = () => {
     }, []); // Este useEffect se ejecutará solo una vez cuando el componente se monte
 
     const handleRecharge = async () => {
+        if (!canRechargeSmsCredits) return;
         setLoading(true);
         const usuario = localStorage.getItem("userData");
         const obj = usuario ? JSON.parse(usuario) : null;
@@ -400,6 +406,7 @@ const AccountRecharge: React.FC = () => {
     };
 
     const addCreditCard = async () => {
+        if (!canManagePaymentMethods) return;
         setLoading(false);
         const usuario = localStorage.getItem("userData");
         const obj = usuario ? JSON.parse(usuario) : null;
@@ -553,6 +560,7 @@ const AccountRecharge: React.FC = () => {
     };
 
     const handleDeleteCard = async () => {
+        if (!canManagePaymentMethods) return;
         if (!cardToDelete) return;
         try {
             const requestUrl = `${import.meta.env.VITE_API_DELETE_CREDITCARD + cardToDelete.id}`;
@@ -1048,7 +1056,7 @@ const AccountRecharge: React.FC = () => {
                             ))}
                         </Box>
 
-                        <MainButtonIcon onClick={handleOpenModal} text='Agregar Tarjeta' width='210px' />
+                        <MainButtonIcon onClick={handleOpenModal} disabled={!canManagePaymentMethods} text='Agregar Tarjeta' width='210px' />
 
                         <Box
                             sx={{
@@ -1280,7 +1288,7 @@ const AccountRecharge: React.FC = () => {
                                     <MainButton
                                         text="Recargar"
                                         onClick={handleRecharge}
-                                        disabled={isRechargeButtonDisabled()}
+                                        disabled={!canRechargeSmsCredits || isRechargeButtonDisabled()}
                                         isLoading={Loading}
                                     />
                                 </Box>

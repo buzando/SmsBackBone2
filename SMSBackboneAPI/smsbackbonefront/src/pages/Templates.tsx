@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import { Box, Typography, IconButton, Divider, Modal, FormControl, TextField, InputLabel, Select, MenuItem, Menu, Tooltip, ListItemText, ListItemIcon, Checkbox, Table, TableHead } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import MainIcon from '../components/commons/MainButtonIcon';
@@ -45,6 +46,9 @@ export interface Template {
     idRoom: number;
 }
 const Templates = () => {
+    const canCreateEditTemplates = hasAssignedPermission(ROLE_PERMISSION_CODES.TEMPLATES_CREATE_EDIT);
+    const canDeleteTemplates = hasAssignedPermission(ROLE_PERMISSION_CODES.TEMPLATES_DELETE);
+
     const [searchTerm, setSearchTerm] = React.useState('');
     const navigate = useNavigate();
 
@@ -105,6 +109,7 @@ const Templates = () => {
 
 
     const handleOpenEditTemplate = (template: Template) => {
+        if (!canCreateEditTemplates) return;
         setIdEdit(true);
         setIsEditingTemplate(true);
         setTemplateToEdit(template);
@@ -124,6 +129,7 @@ const Templates = () => {
 
 
     const handleOpenDeleteModal = (template: Template) => {
+        if (!canDeleteTemplates) return;
         setTemplateToDelete(template);
         setOpenDeleteModal(true);
     };
@@ -204,6 +210,7 @@ const Templates = () => {
     };
 
     const handleDeleteSelectedTemplates = async () => {
+        if (!canDeleteTemplates) return;
         try {
             const room = JSON.parse(localStorage.getItem('selectedRoom') || '{}');
 
@@ -358,6 +365,7 @@ const Templates = () => {
     }, []);
 
     const handleSaveTemplate = async () => {
+        if (!canCreateEditTemplates) return;
         setIsSavingTemplate(true); // 🔥 Activa spinner
 
         const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
@@ -432,7 +440,7 @@ const Templates = () => {
 
 
 
-    const handleOpenModal = () => setOpenModal(true);
+    const handleOpenModal = () => { if (!canCreateEditTemplates) return; setOpenModal(true); };
     const handleCloseModal = () => {
         setOpenModal(false)
         resetTemplateForm();
@@ -520,6 +528,7 @@ const Templates = () => {
                         text="Nueva plantilla"
                         isLoading={false}
                         onClick={handleOpenModal}
+                        disabled={!canCreateEditTemplates}
                         width="218px"
                     >
                         <span className="flex items-center">
@@ -863,7 +872,7 @@ const Templates = () => {
                                                         ]
                                                     }}
                                                 >
-                                                    <IconButton onClick={handleOpenDeleteSelectedTemplates}>
+                                                    <IconButton disabled={!canDeleteTemplates} onClick={handleOpenDeleteSelectedTemplates}>
                                                         <img src={DeleteIcon} alt="Eliminar" style={{ width: 20, height: 20 }} />
                                                     </IconButton>
                                                 </Tooltip>
@@ -1240,7 +1249,7 @@ const Templates = () => {
                         <MainButton
                             text="Aceptar"
                             onClick={handleSaveTemplate}
-                            disabled={isAcceptDisabled}
+                            disabled={!canCreateEditTemplates || isAcceptDisabled}
                         />
                     </Box>
                 </Box>
@@ -1313,7 +1322,7 @@ const Templates = () => {
                     }
                 }}
             >
-                <MenuItem disabled={hasAssignedCampaigns} onClick={() => !hasAssignedCampaigns && handleOpenEditTemplate(selectedTemplate!)}
+                <MenuItem disabled={!canCreateEditTemplates || hasAssignedCampaigns} onClick={() => canCreateEditTemplates && !hasAssignedCampaigns && handleOpenEditTemplate(selectedTemplate!)}
                     sx={{
                         fontFamily: 'Poppins',
                         fontSize: '14px',
@@ -1409,7 +1418,7 @@ const Templates = () => {
                 </MenuItem>
                 <MenuItem
                     onClick={() => { handleMenuClose(); handleOpenDeleteModal(selectedTemplate!); }}
-                    disabled={hasAssignedCampaigns}
+                    disabled={!canDeleteTemplates || hasAssignedCampaigns}
 
                 >
                     <Box display="flex" alignItems="center" gap={1}>

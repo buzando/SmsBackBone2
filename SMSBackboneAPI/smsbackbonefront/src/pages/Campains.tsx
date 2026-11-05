@@ -89,6 +89,7 @@ import {
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import RestoreIcon from "@mui/icons-material/Restore";
 import { Tooltip } from "@mui/material";
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import IconSMS from '../assets/IconSMS.svg';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Tooltip as RechartsTooltip } from "recharts";
 import { scaleLinear } from "d3-scale";
@@ -216,6 +217,9 @@ export interface CampaignContactDto {
 }
 
 const Campains: React.FC = () => {
+  const canCreateDeleteCampaigns = hasAssignedPermission(ROLE_PERMISSION_CODES.CAMPAIGNS_CREATE_DELETE);
+  const canStartStopCampaigns = hasAssignedPermission(ROLE_PERMISSION_CODES.CAMPAIGNS_START_STOP);
+  const canDuplicateCampaigns = hasAssignedPermission(ROLE_PERMISSION_CODES.CAMPAIGNS_DUPLICATE);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | undefined>(undefined);
   const [campaignName, setCampaignName] = useState('');
   const [Serchterm, setSerchterm] = useState('');
@@ -602,6 +606,7 @@ const Campains: React.FC = () => {
   }, []);
 
   const handleOpenEditCampaignModal = (campaign: CampaignFullResponse) => {
+    if (!canCreateDeleteCampaigns) return;
     setSelectedCampaign(campaign);
 
     setEditCampaignName(campaign.name);
@@ -1615,6 +1620,7 @@ const Campains: React.FC = () => {
   const currentSelected = selectedTab === 'telefonos' ? selectedTelefonos : selectedVariables;
 
   const handleOpenModal = () => {
+    if (!canCreateDeleteCampaigns) return;
     if (templates.length === 0) {
       fetchTemplates();
     }
@@ -1831,6 +1837,7 @@ const Campains: React.FC = () => {
     setSelectedCampaign(pinned);
   }, [campaigns, pinnedCampaignId]);
   const handleSaveCampaign = async () => {
+    if (!canCreateDeleteCampaigns) return;
     setLoading(true);
     try {
       const salaId = selectedRoom?.id;
@@ -2014,6 +2021,7 @@ const Campains: React.FC = () => {
   };
 
   const handleEditCampaign = async () => {
+    if (!canCreateDeleteCampaigns) return;
     try {
       if (!selectedCampaign?.id) return;
 
@@ -2074,6 +2082,7 @@ const Campains: React.FC = () => {
   };
 
   const handleDeleteCampaign = async (ids?: number | number[]) => {
+    if (!canCreateDeleteCampaigns) return;
     setLoading(true);
     try {
       const idArray = Array.isArray(ids) ? ids : ids ? [ids] : [];
@@ -2123,6 +2132,7 @@ const Campains: React.FC = () => {
   };
 
   const handleConfirmDuplicateCampaign = async () => {
+    if (!canDuplicateCampaigns) return;
     try {
       const horariosInvalidos =
         duplicateHorarios.length === 0 ||
@@ -2175,6 +2185,7 @@ const Campains: React.FC = () => {
   };
 
   const handleStartCampaign = async (campaign: any) => {
+    if (!canStartStopCampaigns) return;
     const updated = {
       ...campaign,
       autoStart: !campaign.autoStart,
@@ -2191,6 +2202,7 @@ const Campains: React.FC = () => {
   };
 
   const handleOpenDuplicateModal = (campaign: CampaignFullResponse) => {
+    if (!canDuplicateCampaigns) return;
     setSelectedCampaign(campaign);
     setDuplicateAutoStart(campaign.autoStart);
     setDuplicateHorarios([{ start: null, end: null, operationMode: 1 }]);
@@ -3101,10 +3113,10 @@ const Campains: React.FC = () => {
                         <span>
                           <IconButton
                             onClick={handleOpenModal}
-                            disabled={isLimitReached}
+                            disabled={isLimitReached || !canCreateDeleteCampaigns}
                             sx={{
-                              opacity: isLimitReached ? 0.5 : 1,
-                              cursor: isLimitReached ? "not-allowed" : "pointer"
+                              opacity: isLimitReached || !canCreateDeleteCampaigns ? 0.5 : 1,
+                              cursor: isLimitReached || !canCreateDeleteCampaigns ? "not-allowed" : "pointer"
                             }}
                           >
                             <img
@@ -3339,11 +3351,11 @@ const Campains: React.FC = () => {
                       >
                         <IconButton
                           onClick={() => {
-                            if (selectedCampaigns.length === 0) return;
+                            if (!canCreateDeleteCampaigns || selectedCampaigns.length === 0) return;
                             setCampaignToDelete(null);
                             setOpenDeleteModal(true);
                           }}
-                          disabled={selectedCampaigns.length === 0}>
+                          disabled={!canCreateDeleteCampaigns || selectedCampaigns.length === 0}>
                           <Box
                             component="img"
                             src={IconTrash}
@@ -3732,7 +3744,7 @@ const Campains: React.FC = () => {
                   <Box sx={{ display: "flex", justifyContent: "right", marginTop: "8px" }}>
                     <MainButton
                       text={buttonText}
-                      disabled={buttonDisabled}
+                      disabled={buttonDisabled || !canStartStopCampaigns}
                       onClick={() => selectedCampaign && handleStartCampaign(selectedCampaign)}
                     />
 
@@ -5166,6 +5178,7 @@ const Campains: React.FC = () => {
                         >
                           <Checkbox
                             checked={autoStart}
+                            disabled={!canStartStopCampaigns}
                             onChange={(e) => {
                               setAutoStart(e.target.checked);
                               setIsChecked(e.target.checked);
@@ -5242,6 +5255,7 @@ const Campains: React.FC = () => {
                       >
                         <Checkbox
                           checked={autoStart}
+                          disabled={!canStartStopCampaigns}
                           onChange={(e) => setAutoStart(e.target.checked)}
                           icon={
                             <Box
@@ -8554,7 +8568,7 @@ const Campains: React.FC = () => {
 
                     handleMenuClose();
                   }}
-                  disabled={menuIndex !== null && selectedCampaign?.autoStart}
+                  disabled={!canCreateDeleteCampaigns || (menuIndex !== null && selectedCampaign?.autoStart)}
                   sx={{
                     opacity: menuIndex !== null && selectedCampaign?.autoStart ? 0.5 : 1,
                     fontFamily: "Poppins",
@@ -8638,7 +8652,7 @@ const Campains: React.FC = () => {
               )}
             </Box>
 
-            <MenuItem onClick={() => {
+            <MenuItem disabled={!canDuplicateCampaigns} onClick={() => {
               if (menuIndex !== null && menuIndex >= 0) {
                 handleOpenDuplicateModal(selectedCampaign!);
               } else if (selectedCampaign) {
@@ -8658,6 +8672,7 @@ const Campains: React.FC = () => {
               <ContentCopyIcon sx={{ width: 24, height: 24, marginRight: 1, ml: 0.5 }} /> Duplicar
             </MenuItem>
             <MenuItem
+              disabled={!canCreateDeleteCampaigns}
               onClick={() => {
                 setCampaignToDelete(selectedCampaign);
                 setOpenDeleteModal(true);
@@ -8704,7 +8719,7 @@ const Campains: React.FC = () => {
                     }
                     handleMenuClose();
                   }}
-                  disabled={!!editDisabledReason}
+                  disabled={!canCreateDeleteCampaigns || !!editDisabledReason}
                   sx={{
                     opacity: menuIndex !== null && campaigns[menuIndex]?.autoStart ? 0.5 : 1,
                     fontFamily: "Poppins",
@@ -8786,7 +8801,7 @@ const Campains: React.FC = () => {
               )}
             </Box>
 
-            <MenuItem onClick={() => {
+            <MenuItem disabled={!canDuplicateCampaigns} onClick={() => {
               if (menuIndex !== null && menuIndex >= 0) {
                 handleOpenDuplicateModal(campaigns[menuIndex]);
               } else if (selectedCampaign) {
@@ -8806,6 +8821,7 @@ const Campains: React.FC = () => {
               <ContentCopyIcon sx={{ width: 24, height: 24, marginRight: 1, ml: 0.5 }} /> Duplicar
             </MenuItem>
             <MenuItem
+              disabled={!canCreateDeleteCampaigns}
               onClick={() => {
                 setCampaignToDelete(filteredCampaigns[menuIndex ?? 0]);
                 setOpenDeleteModal(true);
@@ -11170,6 +11186,7 @@ const Campains: React.FC = () => {
               control={
                 <Checkbox
                   checked={duplicateAutoStart}
+                  disabled={!canStartStopCampaigns}
                   onChange={(e) => setDuplicateAutoStart(e.target.checked)}
                   icon={
                     <Box
@@ -11236,7 +11253,7 @@ const Campains: React.FC = () => {
             <MainButton
               onClick={handleConfirmDuplicateCampaign}
               text='Duplicar'
-              disabled={!canDuplicate}
+              disabled={!canDuplicateCampaigns || !canDuplicate}
             />
           </DialogActions>
         </Box>

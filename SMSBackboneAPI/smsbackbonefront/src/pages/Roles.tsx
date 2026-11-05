@@ -45,6 +45,7 @@ import backarrow from '../assets/MoveTable.svg';
 import ModalError from '../components/commons/ModalError';
 import SnackBar from '../components/commons/ChipBar';
 import '../components/commons/CSS/Roles.css';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 
 type Role = {
     id: string;
@@ -233,6 +234,9 @@ const getFirstAccessDate = () => {
 
 const Roles: React.FC = () => {
     const navigate = useNavigate();
+    const canCreateEditRole = hasAssignedPermission(ROLE_PERMISSION_CODES.ROLES_CREATE_EDIT);
+    const canDeleteRole = hasAssignedPermission(ROLE_PERMISSION_CODES.ROLES_DELETE);
+    const canAssignRoles = hasAssignedPermission(ROLE_PERMISSION_CODES.ROLES_ASSIGN);
     const firstAccessDate = useMemo(getFirstAccessDate, []);
     const [roles, setRoles] = useState<Role[]>([]);
     const [activeTab, setActiveTab] = useState(0);
@@ -509,7 +513,7 @@ const Roles: React.FC = () => {
     };
 
     const handleSaveAssignment = async () => {
-        if (!selectedAssignmentUser || selectedAssignmentRoleId === null || !canSaveAssignment) return;
+        if (!canAssignRoles || !selectedAssignmentUser || selectedAssignmentRoleId === null || !canSaveAssignment) return;
 
         setIsSavingAssignment(true);
         try {
@@ -556,6 +560,7 @@ const Roles: React.FC = () => {
     };
 
     const openCreateRole = () => {
+        if (!canCreateEditRole) return;
         setEditingRoleId(null);
         setRoleName('');
         setSelectedPermissions([]);
@@ -565,7 +570,7 @@ const Roles: React.FC = () => {
     };
 
     const openEditRole = (role: Role) => {
-        if (role.isSystem) return;
+        if (role.isSystem || !canCreateEditRole) return;
         setEditingRoleId(role.id);
         setRoleName(role.name);
         setSelectedPermissions(role.permissions);
@@ -641,6 +646,7 @@ const Roles: React.FC = () => {
     };
 
     const handleDeleteSelected = () => {
+        if (!canDeleteRole) return;
         const selected = roles.filter(role => selectedRoles.includes(role.id));
         if (selected.some(role => role.assignedUsers > 0)) {
             setDeleteErrorOpen(true);
@@ -651,7 +657,7 @@ const Roles: React.FC = () => {
     };
 
     const requestDeleteRole = (role: Role) => {
-        if (role.isSystem) return;
+        if (role.isSystem || !canDeleteRole) return;
 
         if (role.assignedUsers > 0) {
             setDeleteErrorOpen(true);
@@ -668,6 +674,7 @@ const Roles: React.FC = () => {
     };
 
     const confirmDelete = async () => {
+        if (!canDeleteRole) return;
         const idsToDelete = roleToDelete
             ? [roleToDelete.id]
             : [...selectedRoles];
@@ -740,6 +747,7 @@ const Roles: React.FC = () => {
 
 
     const handleSaveRole = async () => {
+        if (!canCreateEditRole) return;
         const normalizedName = roleName.trim();
 
         if (!normalizedName || !/^[A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ]{1,40}$/.test(normalizedName)) {
@@ -894,7 +902,7 @@ const Roles: React.FC = () => {
                         </Box>
                     ) : <Box />}
                     <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap', ml: 'auto' }}>
-                        {activeTab === 0 && selectedRoles.length > 0 && (
+                        {activeTab === 0 && canDeleteRole && selectedRoles.length > 0 && (
                             <Button
                                 startIcon={<DeleteOutlineIcon />}
                                 onClick={handleDeleteSelected}
@@ -903,14 +911,14 @@ const Roles: React.FC = () => {
                                 Eliminar ({selectedRoles.length})
                             </Button>
                         )}
-                        <Button
+                        {canCreateEditRole && <Button
                             variant="contained"
                             startIcon={<AddIcon />}
                             onClick={openCreateRole}
                             sx={{ bgcolor: '#833A53', '&:hover': { bgcolor: '#6D2F45' }, textTransform: 'uppercase', fontWeight: 600, px: 2.2, height: 40, whiteSpace: 'nowrap' }}
                         >
                             Añadir rol
-                        </Button>
+                        </Button>}
                         {activeTab === 0 && (
                             <TextField
                                 size="small"
@@ -938,7 +946,7 @@ const Roles: React.FC = () => {
                     sx={{ borderBottom: '1px solid #D9D4D6', '& .MuiTabs-indicator': { bgcolor: '#833A53', height: 2 }, '& .MuiTab-root': { fontFamily: 'Poppins, sans-serif', minHeight: 42, px: 3 } }}
                 >
                     <Tab label={<span className={activeTab === 0 ? 'roles-subtitle-select' : 'roles-subtitle-unselect'}>Lista de roles</span>} />
-                    <Tab label={<span className={activeTab === 1 ? 'roles-subtitle-select' : 'roles-subtitle-unselect'}>Asignación de roles</span>} />
+                    <Tab disabled={!canAssignRoles} label={<span className={activeTab === 1 ? 'roles-subtitle-select' : 'roles-subtitle-unselect'}>Asignación de roles</span>} />
                 </Tabs>
 
                 {activeTab === 0 ? (
@@ -968,7 +976,7 @@ const Roles: React.FC = () => {
                                             <Checkbox
                                                 size="small"
                                                 checked={selectedRoles.includes(role.id)}
-                                                disabled={role.isSystem}
+                                                disabled={role.isSystem || !canDeleteRole}
                                                 onChange={() => toggleRoleSelection(role)}
                                                 inputProps={{ 'aria-label': `Seleccionar ${role.name}` }}
                                                 sx={{ color: '#B9B5B7', '&.Mui-checked': { color: '#833A53' }, '&.Mui-disabled': { color: '#C7C3C5' } }}
@@ -987,7 +995,7 @@ const Roles: React.FC = () => {
                                         <TableCell align="right" sx={{ borderBottom: '1px solid #E1DDDF', p: 0.5 }}>
                                             {!role.isSystem && (
                                                 <Tooltip title="Editar rol">
-                                                    <IconButton aria-label={`Editar rol ${role.name}`} onClick={() => openEditRole(role)} size="small" sx={{ color: '#382039' }}>
+                                                    <IconButton aria-label={`Editar rol ${role.name}`} onClick={() => openEditRole(role)} disabled={!canCreateEditRole} size="small" sx={{ color: '#382039' }}>
                                                         <EditOutlinedIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
@@ -997,7 +1005,7 @@ const Roles: React.FC = () => {
                                                     <VisibilityOutlinedIcon fontSize="small" />
                                                 </IconButton>
                                             </Tooltip>
-                                            {!role.isSystem && (
+                                            {!role.isSystem && canDeleteRole && (
                                                 <Tooltip title="Eliminar rol">
                                                     <IconButton aria-label={`Eliminar rol ${role.name}`} onClick={() => requestDeleteRole(role)} size="small" sx={{ color: '#382039' }}>
                                                         <DeleteOutlineIcon fontSize="small" />
@@ -1195,7 +1203,7 @@ const Roles: React.FC = () => {
                             <Button
                                 variant="contained"
                                 onClick={() => void handleSaveAssignment()}
-                                disabled={!canSaveAssignment}
+                                disabled={!canAssignRoles || !canSaveAssignment}
                                 sx={{ bgcolor: '#833A53', color: '#FFFFFF', fontSize: 11, fontWeight: 600, '&:hover': { bgcolor: '#6D2F45' }, '&.Mui-disabled': { bgcolor: '#E2DFE0', color: '#A9A5A6' } }}
                             >
                                 {isSavingAssignment ? 'Guardando…' : 'Guardar cambios'}
@@ -1342,7 +1350,7 @@ const Roles: React.FC = () => {
                     <Button
                         variant="contained"
                         onClick={handleSaveRole}
-                        disabled={!roleName || selectedPermissions.length === 0}
+                        disabled={!canCreateEditRole || !roleName || selectedPermissions.length === 0}
                         sx={{ bgcolor: '#833A53', '&:hover': { bgcolor: '#6D2F45' }, '&.Mui-disabled': { bgcolor: '#E2DFE0', color: '#A9A5A6' }, textTransform: 'uppercase' }}
                     >
                         {editingRoleId ? 'Guardar' : 'Crear'}
@@ -1385,7 +1393,7 @@ const Roles: React.FC = () => {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={closeDeleteConfirm} sx={{ color: '#746B70' }}>Cancelar</Button>
-                    <Button onClick={confirmDelete} variant="contained" color="error">Eliminar</Button>
+                    <Button onClick={confirmDelete} variant="contained" color="error" disabled={!canDeleteRole}>Eliminar</Button>
                 </DialogActions>
             </Dialog>
 

@@ -14,6 +14,7 @@ import i18n from '../i18n';
 import SnackBar from "../components/commons/ChipBar";
 import ModalError from "../components/commons/ModalError";
 import { removeAccents } from '../utils/textsanitizier';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 export interface Template {
   id: number;
   name: string;
@@ -26,6 +27,9 @@ export interface Template {
 import Iconeyesopen from '../assets/Iconeyesopen.svg';
 
 export default function TestSMS() {
+  const canSendShortSms = hasAssignedPermission(ROLE_PERMISSION_CODES.SMS_TEST_SHORT);
+  const canSendLongSms = hasAssignedPermission(ROLE_PERMISSION_CODES.SMS_TEST_LONG);
+  const canSendTemplateSms = hasAssignedPermission(ROLE_PERMISSION_CODES.SMS_TEST_TEMPLATE);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [numbersData, setNumbersData] = useState<{ id: number; number: string }[]>([]);
@@ -113,6 +117,8 @@ export default function TestSMS() {
   };
 
   const handleSend = async () => {
+    const canSendByType = fromNumber === 'short' ? canSendShortSms : fromNumber === 'long' ? canSendLongSms : false;
+    if (selectedTemplateId ? !canSendTemplateSms : !canSendByType) return;
     if (!toNumber || (message.length === 0 && !selectedTemplateId)) {
       console.error('Faltan datos obligatorios');
       return;
@@ -673,6 +679,7 @@ export default function TestSMS() {
             isLoading={Loading}
             disabled={
               !fromNumber ||
+              (selectedTemplateId ? !canSendTemplateSms : fromNumber === 'short' ? !canSendShortSms : !canSendLongSms) ||
               toNumber.trim().length === 0 ||
               toNumberError ||
               messageError ||
@@ -711,7 +718,7 @@ export default function TestSMS() {
             <SecondaryButton text={t('pages.testSMS.cancel')} onClick={() => setIsPreviewOpen(false)} />
             <MainButton text={t('pages.testSMS.send')} onClick={() => {
               handleSend();
-            }} isLoading={Loading} />
+            }} isLoading={Loading} disabled={selectedTemplateId ? !canSendTemplateSms : (fromNumber === 'short' ? !canSendShortSms : !canSendLongSms)} />
           </Box>
         </Box>
       </Modal>

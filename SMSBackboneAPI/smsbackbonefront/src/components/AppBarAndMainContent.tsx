@@ -68,6 +68,7 @@ import ApiIconDownload from '../assets/ApiIconDownload.svg';
 import logorq from '../assets/quantum-logov25.svg';
 import PrivacityIcon from '../assets/Icon_privacidad.svg'
 import api from '../assets/api.svg'
+import { hasPermission, hasAssignedPermission, PERMISSIONS, ROLE_PERMISSION_CODES } from '../pages/permisions';
 import apihover from '../assets/apihover.svg'
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -769,6 +770,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
     };
 
     const handleDownload = async () => {
+        if (!hasAssignedPermission(ROLE_PERMISSION_CODES.API_DOWNLOAD)) return;
         const response = await fetch("/Quantum/Files/Documentacion_API_Quantum.pdf");
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -1859,50 +1861,6 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                             />
                                         </ListItemButton>
                                     </Link>
-                                    {/* Salas */}
-                                    <Link to="/RoomsAdmin" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                        <ListItemButton
-                                            sx={{
-                                                pl: 4,
-                                                position: 'relative',
-                                                '&.Mui-selected': {
-                                                    color: '#FFFFFF',
-                                                    '&::before': {
-                                                        content: '""',
-                                                        position: 'absolute',
-                                                        left: 0,
-                                                        top: 0,
-                                                        bottom: 0,
-                                                    },
-                                                },
-                                            }}
-                                            selected={location.pathname === '/RoomsAdmin'}
-                                            onClick={() => handleSelection('RoomsAdmin')}
-                                        >
-
-                                            {/*Linea Gris*/}
-                                            <Box
-                                                sx={{
-                                                    position: "absolute",
-                                                    left: "35px",
-                                                    width: "4px",
-                                                    height: "35px",
-                                                    backgroundColor: selectedLink === 'RoomsAdmin' ? '#FFFFFF' : '#9F94A5',
-                                                }} />
-
-                                            <ListItemText
-                                                primary="Salas"
-                                                primaryTypographyProps={{
-                                                    fontFamily: "Poppins",
-                                                    marginLeft: '30px',
-                                                    fontSize: '14px',
-                                                    color: selectedLink === 'RoomsAdmin' ? '#FFFFFF' : '#9F94A5',
-                                                    marginBottom: "-5px",
-                                                    marginTop: "-5px"
-                                                }}
-                                            />
-                                        </ListItemButton>
-                                    </Link>
                                 </List>
                             </Collapse>
 
@@ -2110,7 +2068,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                                     />
                                                 </ListItemButton>
                                             </Link>
-                                            {userMenu === 'Administrador' && (
+                                            {hasPermission(PERMISSIONS.ROLES_MANAGE) && (
                                                 <Link to="/Roles" style={{ textDecoration: 'none', color: 'inherit' }}>
                                                     <ListItemButton
                                                         sx={{ pl: 4, position: 'relative' }}
@@ -2580,6 +2538,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                     <ListItem disablePadding>
                                         <ListItemButton
                                             onClick={handleDownload}
+                                            disabled={!hasAssignedPermission(ROLE_PERMISSION_CODES.API_DOWNLOAD)}
                                             sx={{ borderRadius: '8px', marginLeft: "5px" }}>
                                             <img alt="DownloadApi" src={ApiIconDownload} style={{ width: 24, height: 24, filter: "brightness(0) invert(1)" }} />
                                             <ListItemText

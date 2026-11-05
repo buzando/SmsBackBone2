@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import MainIcon from '../components/commons/MainButtonIcon';
 import axios from "../components/commons/AxiosInstance";
 import ModalError from "../components/commons/ModalError"
@@ -65,6 +66,8 @@ type Errors = {
     [K in keyof FormData]?: string;
 };
 const PaymentMethods: React.FC = () => {
+    const canManagePaymentMethods = hasAssignedPermission(ROLE_PERMISSION_CODES.BILLING_PAYMENT_METHODS_MANAGE);
+
     const [Loading, setLoading] = useState(false);
     const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
     const [selectedCard, setSelectedCard] = useState<CreditCard | null>(null);
@@ -184,6 +187,7 @@ const PaymentMethods: React.FC = () => {
 
 
     const handleDeleteCard = async () => {
+        if (!canManagePaymentMethods) return;
         if (!cardToDelete) return;
         try {
             const requestUrl = `${import.meta.env.VITE_API_DELETE_CREDITCARD + cardToDelete.id}`;
@@ -243,6 +247,7 @@ const PaymentMethods: React.FC = () => {
     }, []);
 
     const handleAddCardSubmit = (event: React.FormEvent) => {
+        if (!canManagePaymentMethods) { event.preventDefault(); return; }
         event.preventDefault();
         console.log("Formulario enviado");
         setIsAddCardModalOpen(false);
@@ -259,6 +264,7 @@ const PaymentMethods: React.FC = () => {
     const years = Array.from(new Array(30), (_, index) => `${new Date().getFullYear() + index}`);
 
     const addCreditCard = async () => {
+        if (!canManagePaymentMethods) return;
         setLoading(true);
         const usuario = localStorage.getItem("userData");
         const obj = usuario ? JSON.parse(usuario) : null;
@@ -533,6 +539,7 @@ const PaymentMethods: React.FC = () => {
                 </Box>
                 <MainIcon
                     text="Agregar Tarjeta"
+                    disabled={!canManagePaymentMethods}
                     isLoading={Loading}
                     onClick={() => setIsAddCardModalOpen(true)}
                     width="210px"
@@ -1620,7 +1627,7 @@ const PaymentMethods: React.FC = () => {
                                     text="Agregar"
                                     isLoading={Loading}
                                     onClick={() => addCreditCard()}
-                                    disabled={!areRequiredFieldsFilled()}
+                                    disabled={!canManagePaymentMethods || !areRequiredFieldsFilled()}
                                 />
                             </Box>
                         </Box>

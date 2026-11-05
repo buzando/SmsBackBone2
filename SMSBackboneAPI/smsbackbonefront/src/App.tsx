@@ -106,7 +106,7 @@ function App() {
                             <Route
                                 element={
                                     <PermissionRoute
-                                        permission={PERMISSIONS.ADMIN_USERS_MANAGE}
+                                        permission={PERMISSIONS.ROLES_MANAGE}
                                     />
                                 }
                             >

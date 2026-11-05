@@ -1,4 +1,5 @@
 ﻿import React, { useState } from 'react';
+import { hasAssignedPermission, hasPermission, PERMISSIONS, ROLE_PERMISSION_CODES } from './permisions';
 import { Button, Typography, Box, CircularProgress, IconButton, Menu, MenuItem, Tooltip, Modal, Divider, TableRow } from "@mui/material";
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
@@ -50,6 +51,9 @@ export interface FacturaResumen {
 }
 
 const PaymentHistoric: React.FC = () => {
+    const canManageBillingHistory = hasAssignedPermission(ROLE_PERMISSION_CODES.BILLING_HISTORY_MANAGE);
+    const canManageInvoices = hasPermission(PERMISSIONS.BILLING_INVOICES_MANAGE);
+
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedDates, setSelectedDates] = useState<{ start: Date, end: Date, startHour: number, startMinute: number, endHour: number, endMinute: number } | null>(null);
     const [loading, setLoading] = useState(false);
@@ -130,6 +134,7 @@ const PaymentHistoric: React.FC = () => {
     };
 
     const handleAsyncAction = async (actionType: 'Consultar' | 'Descargar') => {
+        if (!canManageInvoices) return;
         try {
             const userId =
                 Number(JSON.parse(localStorage.getItem('userData') ?? '{}')?.id);
@@ -198,6 +203,8 @@ const PaymentHistoric: React.FC = () => {
 
 
     const handleCreateInvoice = async () => {
+        if (!canManageInvoices) return;
+        if (!canManageBillingHistory) return;
         if (!selectedRecarga) return;
 
         const userId =
@@ -671,7 +678,7 @@ const PaymentHistoric: React.FC = () => {
                             anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
                             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                         >
-                            <MenuItem disabled={selectedRow?.facturadaPreviamente} style={menuItemStyle} onClick={() => {
+                            <MenuItem disabled={!canManageInvoices || selectedRow?.facturadaPreviamente} style={menuItemStyle} onClick={() => {
                                 setIsInvoiceModalOpen(true);
                                 handleClose();
                             }} >
@@ -679,7 +686,7 @@ const PaymentHistoric: React.FC = () => {
 
                                 Generar Factura
                             </MenuItem>
-                            <MenuItem disabled={!canConsult} onClick={() => { handleAsyncAction('Consultar'); handleClose(); }} style={menuItemStyle}
+                            <MenuItem disabled={!canManageInvoices || !canConsult} onClick={() => { handleAsyncAction('Consultar'); handleClose(); }} style={menuItemStyle}
                                 sx={{
                                     fontFamily: 'Poppins',
                                     fontSize: '14px',
@@ -691,7 +698,7 @@ const PaymentHistoric: React.FC = () => {
                                 <img src={EyeIcon} alt="Consultar" style={iconStyle} />
                                 Consultar Factura
                             </MenuItem>
-                            <MenuItem disabled={!canDownload} onClick={() => { handleAsyncAction('Descargar'); handleClose(); }} style={menuItemStyle}
+                            <MenuItem disabled={!canManageInvoices || !canDownload} onClick={() => { handleAsyncAction('Descargar'); handleClose(); }} style={menuItemStyle}
                                 sx={{
                                     fontFamily: 'Poppins',
                                     fontSize: '14px',
@@ -776,7 +783,7 @@ const PaymentHistoric: React.FC = () => {
                         <MainButton
                             text={creatingInvoice ? 'Generando…' : 'Aceptar'}
                             onClick={handleCreateInvoice}
-                            disabled={creatingInvoice}
+                            disabled={!canManageInvoices || creatingInvoice}
                             isLoading={creatingInvoice}
                         />
                     </Box>
@@ -945,6 +952,7 @@ const FacturaResumenContent: React.FC<FacturaResumenProps> = ({
     const canXml = !!facturaResumen?.urlXml;
 
     const handleDownloadPdf = () => {
+        if (!canManageBillingHistory) return;
         const src = facturaResumen?.urlPdf;
         if (!src) return;
         if (looksBase64(src)) {
@@ -956,6 +964,7 @@ const FacturaResumenContent: React.FC<FacturaResumenProps> = ({
     };
 
     const handleDownloadXml = () => {
+        if (!canManageBillingHistory) return;
         const src = facturaResumen?.urlXml;
         if (!src) return;
         if (looksBase64(src)) {

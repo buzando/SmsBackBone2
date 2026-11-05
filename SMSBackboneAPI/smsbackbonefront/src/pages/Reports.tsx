@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import {
     Box,
     Button,
@@ -115,6 +116,8 @@ type DateRangeType = {
 };
 
 const Reports: React.FC = () => {
+    const canManageReports = hasAssignedPermission(ROLE_PERMISSION_CODES.REPORTS_MANAGE);
+
     const [Reports, setReports] = useState<Reports[] | null | undefined>(undefined);
     const [loading, setLoading] = useState(false);
     const [selectedTab, setSelectedTab] = useState("SMS");
@@ -418,11 +421,11 @@ const Reports: React.FC = () => {
 
 
 
-    {/*Spinner*/ }
     const handleExportClick = async (
         format: 'csv' | 'xlsx' | 'pdf',
         setThisLoading: React.Dispatch<React.SetStateAction<boolean>>
     ) => {
+        if (!canManageReports) return;
         setThisLoading(true);
 
         try {
@@ -1204,7 +1207,7 @@ const Reports: React.FC = () => {
                         >
                             <IconButton sx={{ p: 0, opacity: !isExportingCSV && anyExporting ? 0.3 : 1 }}
                                 onClick={() => handleExportClick('csv', setIsExportingCSV)}
-                                disabled={anyExporting && !isExportingCSV}
+                                disabled={!canManageReports || (anyExporting && !isExportingCSV)}
                             >
                                 <Tooltip title="Exportar a CSV" placement="top"
                                     arrow
@@ -1247,7 +1250,7 @@ const Reports: React.FC = () => {
 
                             <IconButton sx={{ p: 0, opacity: !isExportingXLSX && anyExporting ? 0.3 : 1 }}
                                 onClick={() => handleExportClick('xlsx', setIsExportingXLSX)}
-                                disabled={anyExporting && !isExportingXLSX}
+                                disabled={!canManageReports || (anyExporting && !isExportingXLSX)}
                             >
                                 <Tooltip title="Exportar a Excel"
                                     placement="top"
@@ -1292,7 +1295,7 @@ const Reports: React.FC = () => {
 
                             <IconButton sx={{ p: 0, opacity: !isExportingPDF && anyExporting ? 0.3 : 1 }}
                                 onClick={() => handleExportClick('pdf', setIsExportingPDF)}
-                                disabled={anyExporting && !isExportingPDF}
+                                disabled={!canManageReports || (anyExporting && !isExportingPDF)}
                             >
                                 <Tooltip title="Exportar a PDF"
                                     placement="top"

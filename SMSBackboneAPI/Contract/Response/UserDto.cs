@@ -31,5 +31,6 @@ namespace Contract.Response
         public bool? futurerooms { get; set; }
         public string Client { get; set; }
         public string rol { get; set; }
+        public List<string> permissions { get; set; } = new List<string>();
     }
 }

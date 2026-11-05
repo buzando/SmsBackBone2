@@ -62,6 +62,27 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
                     userdto = mapper.Map<UserDto>(userdb);
                     userdto.rol = context.Roles.Where(x => x.id == userdb.idRole).Select(x => x.Role).FirstOrDefault();
+                    var assignedRoleIds = context.UserRoles
+    .AsNoTracking()
+    .Where(assignment => assignment.UserId == userdb.Id)
+    .Select(assignment => assignment.RoleId)
+    .Distinct()
+    .ToList();
+
+                    if (assignedRoleIds.Count == 0 && userdb.idRole > 0)
+                    {
+                        assignedRoleIds.Add(userdb.idRole);
+                    }
+
+                    userdto.permissions = context.RolePermissions
+                        .AsNoTracking()
+                        .Where(rolePermission =>
+                            assignedRoleIds.Contains(rolePermission.RoleId) &&
+                            rolePermission.Permission.IsActive)
+                        .Select(rolePermission => rolePermission.Permission.PermissionCode)
+                        .Where(code => code != null && code != "")
+                        .Distinct()
+                        .ToList();
                 }
                 else
                 {
@@ -70,15 +91,6 @@ cfg.CreateMap<Modal.Model.Model.Users, UserDto>()
 
             }
 
-            //UserDto result = new UserDto
-            //{
-            //    userName = user,
-            //    email = "user@correo.com",
-            //    accessFailedCount = 0,
-            //    lockoutEnabled = false,
-            //    rol = 0,
-            //    status = true
-            //};
             return userdto;
         }
 

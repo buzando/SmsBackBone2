@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import { TextField, InputAdornment, MenuItem, Typography, Paper, Box, IconButton, Divider } from '@mui/material';
 import SecondaryButton from '../components/commons/SecondaryButton';
 import MainButton from '../components/commons/MainButton';
@@ -14,6 +15,8 @@ import infoicon from '../assets/Icon-info.svg';
 import infoiconerror from '../assets/Icon-infoerror.svg';
 
 const BillingInformation: React.FC = () => {
+    const canManageBillingData = hasAssignedPermission(ROLE_PERMISSION_CODES.BILLING_DATA_MANAGE);
+
     const navigate = useNavigate();
 
     const [businessName, setBusinessName] = useState('');
@@ -56,6 +59,7 @@ const BillingInformation: React.FC = () => {
 
     const [showChipBarAdd, setshowChipBarAdd] = useState(false);
     const handleSave = async () => {
+        if (!canManageBillingData) return;
         const usuario = localStorage.getItem("userData");
         const obj = usuario ? JSON.parse(usuario) : null;
 
@@ -1541,7 +1545,7 @@ const BillingInformation: React.FC = () => {
                         <MainButton
                             onClick={handleSave}
                             text="GUARDAR"
-                            disabled={!isFormValid() || hasErrors() || !hasChanges()}
+                            disabled={!canManageBillingData || !isFormValid() || hasErrors() || !hasChanges()}
                         />
                     </Box>
                 </Box>

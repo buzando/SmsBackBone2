@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect, type CSSProperties } from 'react';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import { Checkbox, TextField, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, Backdrop, CircularProgress, Typography, FormControlLabel, Divider } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import axios from "../components/commons/AxiosInstance";
@@ -78,6 +79,9 @@ type Errors = {
     [K in keyof FormData]?: string;
 };
 const PaymentSettings: React.FC = () => {
+    const canManagePaymentMethods = hasAssignedPermission(ROLE_PERMISSION_CODES.BILLING_PAYMENT_METHODS_MANAGE);
+    const canManagePaymentSettings = hasAssignedPermission(ROLE_PERMISSION_CODES.BILLING_PAYMENT_SETTINGS_MANAGE);
+
     const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
     const [isAutoRechargeEnabled, setIsAutoRechargeEnabled] = useState(false);
     const [selectedCard, setSelectedCard] = useState<CreditCard | null>(null);
@@ -544,6 +548,7 @@ useEffect(() => {
     };
 
     const handleAddCardSubmit = (event: React.FormEvent) => {
+        if (!canManagePaymentMethods) { event.preventDefault(); return; }
         event.preventDefault();
         console.log("Formulario enviado");
         setIsAddCardModalOpen(false);
@@ -661,6 +666,7 @@ useEffect(() => {
     }
 
     const addCreditCard = async () => {
+        if (!canManagePaymentMethods) return;
         setLoading(true);
         const usuario = localStorage.getItem("userData");
         const obj = usuario ? JSON.parse(usuario) : null;
@@ -710,6 +716,7 @@ useEffect(() => {
     };
 
     const addRechargeSetting = async () => {
+        if (!canManagePaymentSettings) return;
         setLoading(true);
         const usuario = localStorage.getItem("userData");
         const obj = usuario ? JSON.parse(usuario) : null;
@@ -1280,7 +1287,7 @@ useEffect(() => {
                                 <SecondaryButton text="Cancelar" />
                                 <MainButton text='Guardar'
                                     onClick={addRechargeSetting}
-                                    disabled={isAcceptButtonDisabled}
+                                    disabled={!canManagePaymentSettings || isAcceptButtonDisabled}
                                     isLoading={loading} />
                             </Box>
                         </Box>
@@ -1457,6 +1464,7 @@ useEffect(() => {
                 <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '10px' }}>
                     <MainIcon
                         text="Agregar Tarjeta"
+                        disabled={!canManagePaymentMethods}
                         isLoading={loading}
                         onClick={() => setIsAddCardModalOpen(true)}
                         width="210px"
@@ -2063,7 +2071,7 @@ useEffect(() => {
                                     />
                                 </div>
                                 <div style={{ gridColumn: '2 / 3', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <MainButton text="Agregar" isLoading={loading} onClick={() => addCreditCard()} disabled={!areRequiredFieldsFilled()}
+                                    <MainButton text="Agregar" isLoading={loading} onClick={() => addCreditCard()} disabled={!canManagePaymentMethods || !areRequiredFieldsFilled()}
 
                                     />
                                 </div>

@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import axios from 'axios';
 import ChipBar from "../components/commons/ChipBar";
 import { Button, Box, Divider, Typography, Checkbox, Radio, Modal, Select, MenuItem, SelectChangeEvent, TextField } from '@mui/material';
@@ -71,6 +72,9 @@ type Errors = {
     [K in keyof FormData]?: string;
 };
 const AccountRecharge2: React.FC = () => {
+    const canRechargeSmsCredits = hasAssignedPermission(ROLE_PERMISSION_CODES.SMS_CREDITS_RECHARGE);
+    const canManagePaymentMethods = hasAssignedPermission(ROLE_PERMISSION_CODES.BILLING_PAYMENT_METHODS_MANAGE);
+
     const [selectedChannel, setSelectedChannel] = useState('');
     const [creditAmount, setCreditAmount] = useState('');
     const [rechargeAmount, setRechargeAmount] = useState('0.00');
@@ -143,6 +147,7 @@ const AccountRecharge2: React.FC = () => {
 
     // Funciones para abrir y cerrar el modal
     const handleOpenModal = () => {
+        if (!canManagePaymentMethods) return;
         setIsModalOpen(true);
     };
 
@@ -209,6 +214,7 @@ const AccountRecharge2: React.FC = () => {
     }, []); // Este useEffect se ejecutará solo una vez cuando el componente se monte
 
     const handleRecharge = async () => {
+        if (!canRechargeSmsCredits) return;
         setLoading(true);
 
 
@@ -244,6 +250,7 @@ const AccountRecharge2: React.FC = () => {
     };
 
     const addCreditCard = async () => {
+        if (!canManagePaymentMethods) return;
         setLoading(false);
         const usuario = localStorage.getItem("userData");
         const obj = usuario ? JSON.parse(usuario) : null;
@@ -378,6 +385,7 @@ const AccountRecharge2: React.FC = () => {
 
 
     const handleDeleteCard = async () => {
+        if (!canManagePaymentMethods) return;
         if (!cardToDelete) return;
         try {
             const requestUrl = `${import.meta.env.VITE_SMS_API_URL + import.meta.env.VITE_API_DELETE_CREDITCARD + cardToDelete.id}`;
@@ -1121,7 +1129,7 @@ const AccountRecharge2: React.FC = () => {
                         }}>Seleccione el método de pago</Typography>
                     </div>
 
-                    <MainButtonIcon type="button" onClick={handleOpenModal} text='Agregar Tarjeta' width='210px' />
+                    <MainButtonIcon type="button" onClick={handleOpenModal} disabled={!canManagePaymentMethods} text='Agregar Tarjeta' width='210px' />
 
 
                     <div style={{
@@ -1268,7 +1276,7 @@ const AccountRecharge2: React.FC = () => {
                             <SecondaryButton text='Cancelar' onClick={() => {
                                 resetForm();
                             }} />
-                            <MainButton text='Recargar' onClick={() => handleRecharge()} disabled={isRechargeButtonDisabled()} isLoading={Loading} />
+                            <MainButton text='Recargar' onClick={() => handleRecharge()} disabled={!canRechargeSmsCredits || isRechargeButtonDisabled()} isLoading={Loading} />
                         </div>
                     </div>
                 </form>

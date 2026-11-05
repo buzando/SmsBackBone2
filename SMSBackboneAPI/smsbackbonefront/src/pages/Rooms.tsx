@@ -40,6 +40,7 @@ import seachicon from '../assets/icon-lupa.svg';
 import Iconseachred from "../assets/Iconseachred.svg";
 import iconclose from '../assets/icon-close.svg';
 import MainButton from "../components/commons/MainButton";
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 
 type Room = {
     id: string | number;
@@ -53,6 +54,8 @@ type Room = {
 };
 
 const Rooms: React.FC = () => {
+    const canCreateEditRooms = hasAssignedPermission(ROLE_PERMISSION_CODES.ROOMS_CREATE_EDIT);
+    const canDeleteRooms = hasAssignedPermission(ROLE_PERMISSION_CODES.ROOMS_DELETE);
     const navigate = useNavigate();
     const [rooms, setRooms] = useState<Room[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
@@ -96,6 +99,7 @@ const Rooms: React.FC = () => {
     };
 
     const handleOpenEditModal = () => {
+        if (!canCreateEditRooms) return;
         if (selectedRoom!) {
             const roomData = {
                 name: selectedRoom.name,
@@ -122,6 +126,7 @@ const Rooms: React.FC = () => {
         setSelectedRoom(null); // Limpia la sala seleccionada
     };
     const handleDeleteRoom = async () => {
+        if (!canDeleteRooms) return;
         if (selectedRoom) {
             setLoading(true);
             try {
@@ -174,6 +179,7 @@ const Rooms: React.FC = () => {
     }, []);
 
     const handleOpenModal = () => {
+        if (!canCreateEditRooms) return;
         setNewRoom({ name: "", description: "" });
         setErrors({ name: false, description: false });
         setModalOpen(true);
@@ -194,6 +200,7 @@ const Rooms: React.FC = () => {
 
 
     const handleUpdateRoom = async () => {
+        if (!canCreateEditRooms) return;
         setLoading(true); // Muestra el loader mientras se procesa la solicitud
         const usuario = localStorage.getItem("userData");
         const formData = JSON.parse(usuario!);
@@ -242,6 +249,7 @@ const Rooms: React.FC = () => {
 
 
     const handleCreateRoom = async () => {
+        if (!canCreateEditRooms) return;
         setLoading(true);
         const usuario = localStorage.getItem("userData");
 
@@ -377,6 +385,7 @@ const Rooms: React.FC = () => {
                             marginRight: "16px",
                         }}
                         onClick={handleOpenModal}
+                        disabled={!canCreateEditRooms}
                     >
                         Añadir Sala
                     </Button>
@@ -729,7 +738,7 @@ const Rooms: React.FC = () => {
                                                                 },
                                                             }}
                                                         >
-                                                            <MenuItem onClick={handleOpenEditModal}
+                                                            <MenuItem disabled={!canCreateEditRooms} onClick={handleOpenEditModal}
                                                                 sx={{
                                                                     width: "184px", height: "40px",
                                                                     fontFamily: 'Poppins',
@@ -745,7 +754,7 @@ const Rooms: React.FC = () => {
                                                                     Editar
                                                                 </Typography>
                                                             </MenuItem>
-                                                            <MenuItem onClick={() => handleOpenDeleteModal(room)}
+                                                            <MenuItem disabled={!canDeleteRooms} onClick={() => handleOpenDeleteModal(room)}
                                                                 sx={{
                                                                     fontFamily: 'Poppins',
                                                                     fontSize: '14px',
@@ -1047,7 +1056,7 @@ const Rooms: React.FC = () => {
                                 variant="contained"
                                 color="primary"
                                 onClick={handleCreateRoom}
-                                disabled={
+                                disabled={!canCreateEditRooms ||
                                     !newRoom.name ||
 
                                     errors.name
@@ -1336,7 +1345,7 @@ const Rooms: React.FC = () => {
                                 variant="contained"
                                 color="primary"
                                 onClick={handleUpdateRoom}
-                                disabled={
+                                disabled={!canCreateEditRooms ||
                                     !hasChanges() || !newRoom.name || !newRoom.description || errors.name || errors.description
                                 }
                                 sx={{

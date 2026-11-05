@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, type CSSProperties } from 'react';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import MainIcon from '../components/commons/MainButtonIcon';
 import axios from "../components/commons/AxiosInstance";
 import ModalError from "../components/commons/ModalError"
@@ -111,6 +112,10 @@ type Errors = {
     [K in keyof FormData]?: string;
 };
 const BlackList: React.FC = () => {
+    const canEditBlacklists = hasAssignedPermission(ROLE_PERMISSION_CODES.BLACKLISTS_CREATE_EDIT);
+    const canDeleteBlacklists = hasAssignedPermission(ROLE_PERMISSION_CODES.BLACKLISTS_DELETE);
+    const canManageBlacklistRecords = hasAssignedPermission(ROLE_PERMISSION_CODES.BLACKLISTS_RECORDS_MANAGE);
+
     const [Loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [BlackList, setBlackList] = useState<BlackList[]>([]);
@@ -450,6 +455,7 @@ const BlackList: React.FC = () => {
     };
 
     const handleUpdateBlackList = async () => {
+        if (!canEditBlacklists) return;
         if (!editData) return;
 
         setLoading(true);
@@ -617,6 +623,7 @@ const BlackList: React.FC = () => {
 
 
     const handleSendToServer = async () => {
+        if (!canEditBlacklists && !canManageBlacklistRecords) return;
         const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
 
         const payload: ManageRecordsPayload = {
@@ -866,6 +873,7 @@ const BlackList: React.FC = () => {
     };
 
     const handleAddPhone = () => {
+        if (!canManageBlacklistRecords) return;
         if (formData.Phones.length < 5) {
             setFormData((prev) => ({ ...prev, Phones: [...prev.Phones, ''] }));
         }
@@ -985,6 +993,7 @@ const BlackList: React.FC = () => {
     };
 
     const handleAddIndividualPhone = () => {
+        if (!canManageBlacklistRecords) return;
         if (individualPhones.length < 5) {
             setIndividualPhones(prev => [...prev, '']);
         }
@@ -1006,6 +1015,7 @@ const BlackList: React.FC = () => {
     };
 
     const handleDeleteSelected = async (blackList: BlackList | null) => {
+        if (!canDeleteBlacklists) return;
         const salaId = JSON.parse(localStorage.getItem('selectedRoom') || '{}')?.id;
         const tieneProtegidas = selectedRows.some((row) => row.hasActiveCampaign);
 
@@ -1060,6 +1070,7 @@ const BlackList: React.FC = () => {
 
 
     const handleOpenDeleteModal = (blackList: BlackList) => {
+        if (!canDeleteBlacklists) return;
         setRowToDelete(blackList);
         setOpenDeleteModal(true);
     };
@@ -1069,6 +1080,7 @@ const BlackList: React.FC = () => {
     };
 
     const handleConfirmDelete = async () => {
+        if (!canDeleteBlacklists) return;
         if (rowToDelete) {
             await handleDeleteSelected(rowToDelete);
             handleCloseDeleteModal();
@@ -1230,6 +1242,7 @@ const BlackList: React.FC = () => {
                         }}>
                         <MainIcon
                             text="Nueva Lista Negra"
+                            disabled={!canEditBlacklists}
                             isLoading={Loading}
                             onClick={() => {
                                 setFormData({

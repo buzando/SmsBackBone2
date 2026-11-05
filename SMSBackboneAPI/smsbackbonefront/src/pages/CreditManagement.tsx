@@ -1,4 +1,5 @@
 ﻿import React, { useEffect, useState } from "react";
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import {
     Box,
     Typography,
@@ -55,6 +56,8 @@ type Rooms = {
 };
 
 const CreditManagement: React.FC = () => {
+    const canTransferSmsCredits = hasAssignedPermission(ROLE_PERMISSION_CODES.SMS_CREDITS_MANAGE);
+
     const [rooms, setrooms] = useState<Rooms[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -113,6 +116,7 @@ const CreditManagement: React.FC = () => {
     };
 
     const handleOpenModal = () => {
+        if (!canTransferSmsCredits) return;
         if (selectedRoom2) {
             setSearchTerm3(selectedRoom2.name); // Preselecciona el nombre en el campo de búsqueda
         }
@@ -187,6 +191,7 @@ const CreditManagement: React.FC = () => {
     };
 
     const handleTransferSubmit = async () => {
+        if (!canTransferSmsCredits) return;
         if (!selectedRoom2 || !selectedRoom || !selectedChannel || !transferAmount) {
 
             return;
