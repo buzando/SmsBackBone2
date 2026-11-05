@@ -31,7 +31,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -45,7 +45,26 @@ import backarrow from '../assets/MoveTable.svg';
 import ModalError from '../components/commons/ModalError';
 import SnackBar from '../components/commons/ChipBar';
 import '../components/commons/CSS/Roles.css';
-import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
+import IconEditTwo from "../assets/IconEditTwo.svg";
+import IconEditOne from "../assets/IconEditOne.svg";
+import IconInspecTwo from "../assets/IconInspecTwo.svg";
+import IconInspecOne from "../assets/IconInspecOne.svg";
+import IconDeleteTwo from "../assets/IconDeleteTwo.svg";
+import IconDeleteOne from "../assets/IconDeleteOne.svg";
+import CheckboxUnselect from "../assets/CheckboxUnselect.svg";
+import CheckboxSelect from "../assets/CheckboxSelect.svg";
+import CheckboxDefault from "../assets/CheckboxDefault.svg";
+import Iconseachred from "../assets/Iconseachred.svg";
+import seachicon from '../assets/icon-lupa.svg';
+import iconclose from "../assets/icon-close.svg";
+import MainModal from "../components/commons/MainModal";
+import CheckboxMinusOne from "../assets/CheckboxMinusOne.svg";
+import MainIcon from '../components/commons/MainButtonIcon';
+import infoicon from '../assets/Icon-info.svg';
+import IconCloseModal from "../assets/IconCloseModal.svg";
+import SecondaryButton from '../components/commons/SecondaryButton';
+import MainButton from '../components/commons/MainButton';
+
 
 type Role = {
     id: string;
@@ -490,7 +509,7 @@ const Roles: React.FC = () => {
 
         const roleByName = user.roleName
             ? assignmentRoleCatalog.find(role => role.name.toLocaleLowerCase('es-MX') === user.roleName.toLocaleLowerCase('es-MX'))
-                ?? assignmentRoles.find(role => role.name.toLocaleLowerCase('es-MX') === user.roleName.toLocaleLowerCase('es-MX'))
+            ?? assignmentRoles.find(role => role.name.toLocaleLowerCase('es-MX') === user.roleName.toLocaleLowerCase('es-MX'))
             : undefined;
         const currentRoleId = user.roleId ?? (roleByName ? Number(roleByName.id) : null);
         const currentRole = assignmentRoleCatalog.find(role => Number(role.id) === currentRoleId)
@@ -745,6 +764,9 @@ const Roles: React.FC = () => {
     const allVisibleCustomSelected = filteredRoles.filter(role => !role.isSystem).length > 0
         && filteredRoles.filter(role => !role.isSystem).every(role => selectedRoles.includes(role.id));
 
+    const someVisibleCustomSelected = filteredRoles.some(
+        role => !role.isSystem && selectedRoles.includes(role.id)
+    );
 
     const handleSaveRole = async () => {
         if (!canCreateEditRole) return;
@@ -855,172 +877,453 @@ const Roles: React.FC = () => {
 
 
     return (
-        <Box sx={{ height: 'calc(100vh - 140px)', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: '#F4F3F4', p: { xs: 2, md: 3 }, fontFamily: 'Poppins, sans-serif' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, color: '#3A1724' }}>
-                <IconButton aria-label="Regresar" onClick={() => navigate(-1)} size="small" sx={{ color: '#3A1724' }}>
-                    <ArrowBackIosNewIcon sx={{ fontSize: 17 }} />
+        //<Box sx={{ height: 'calc(100vh - 140px)', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: '#F4F3F4', p: { xs: 2, md: 3 }, fontFamily: 'Poppins, sans-serif' }}>
+        <Box p={3}
+            sx={{
+                width: "100%",
+
+                mx: "auto",
+
+                px: {
+                    sm: 2,
+                    md: 3,
+                    lg: 3,
+                },
+
+                pt: {
+                    sm: 2,
+                    md: 3,
+                },
+
+                minHeight: "calc(100vh - 64px)",
+
+                overflowX: "hidden", marginTop: "-80px"
+            }}
+        >
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
+                <IconButton
+                    onClick={() => navigate('/')} sx={{ p: 0, mr: 1 }}>
+                    <img
+                        src={ArrowBackIosNewIcon}
+                        alt="Regresar"
+                        style={{
+                            width: 24,
+                            height: 24,
+                            transform: 'rotate(270deg)',
+                            display: 'block'
+                        }}
+                    />
                 </IconButton>
                 <Typography variant="h5" className="roles-title" sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: { xs: 21, md: 24 } }}>
                     Roles de usuario
                 </Typography>
             </Box>
+            <Divider sx={{ marginBottom: '17px', marginTop: '16px' }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', px: { xs: 0, md: 1 }, pb: 1.5, ml: 2 }}>
+                {activeTab === 0 ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+                        <Typography variant="body2" sx={{ color: '#574B4F', mr: 0.5, fontFamily: 'Poppins', fontWeight: 400, fontSize: '14px' }}>
+                            {firstRecord}–{lastRecord} | Página {page} de {totalPages}
+                        </Typography>
 
-            <Paper elevation={0} sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', borderRadius: 1.5, p: { xs: 1.5, md: 2 }, bgcolor: '#FFFFFF', overflow: 'hidden' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', px: { xs: 0, md: 1 }, pb: 1.5 }}>
-                    {activeTab === 0 ? (
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <Typography variant="body2" sx={{ color: '#6F6870', mr: 0.5 }}>
-                                {firstRecord}–{lastRecord} | Página {page} de {totalPages}
-                            </Typography>
-
-                            <IconButton size="small" aria-label="Primera página"
-                                onClick={handleFirstPage} disabled={isFirstPage}>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <img src={backarrow} alt="" />
-                                    <img src={backarrow} alt="" style={{ marginLeft: '-12px' }} />
-                                </Box>
-                            </IconButton>
-
-                            <IconButton size="small" aria-label="Página anterior"
-                                onClick={handlePreviousPage} disabled={isFirstPage}>
+                        <IconButton size="small" aria-label="Primera página"
+                            onClick={handleFirstPage} disabled={isFirstPage}>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <img src={backarrow} alt="" />
-                            </IconButton>
+                                <img src={backarrow} alt="" style={{ marginLeft: '-14px' }} />
+                            </Box>
+                        </IconButton>
 
-                            <IconButton size="small" aria-label="Página siguiente"
-                                onClick={handleNextPage} disabled={isLastPage}>
+                        <IconButton size="small" aria-label="Página anterior"
+                            onClick={handlePreviousPage} disabled={isFirstPage}>
+                            <img src={backarrow} alt="" />
+                        </IconButton>
+
+                        <IconButton size="small" aria-label="Página siguiente"
+                            onClick={handleNextPage} disabled={isLastPage}>
+                            <img src={backarrow} alt="" style={{ transform: 'scaleX(-1)' }} />
+                        </IconButton>
+
+                        <IconButton size="small" aria-label="Última página"
+                            onClick={handleLastPage} disabled={isLastPage}>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <img src={backarrow} alt="" style={{ transform: 'scaleX(-1)' }} />
-                            </IconButton>
-
-                            <IconButton size="small" aria-label="Última página"
-                                onClick={handleLastPage} disabled={isLastPage}>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <img src={backarrow} alt="" style={{ transform: 'scaleX(-1)' }} />
-                                    <img src={backarrow} alt=""
-                                        style={{ transform: 'scaleX(-1)', marginLeft: '-12px' }} />
-                                </Box>
-                            </IconButton>
-                        </Box>
-                    ) : <Box />}
-                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap', ml: 'auto' }}>
-                        {activeTab === 0 && canDeleteRole && selectedRoles.length > 0 && (
-                            <Button
-                                startIcon={<DeleteOutlineIcon />}
-                                onClick={handleDeleteSelected}
-                                sx={{ color: '#833A53', textTransform: 'none', fontWeight: 600 }}
-                            >
-                                Eliminar ({selectedRoles.length})
-                            </Button>
-                        )}
-                        {canCreateEditRole && <Button
-                            variant="contained"
-                            startIcon={<AddIcon />}
-                            onClick={openCreateRole}
-                            sx={{ bgcolor: '#833A53', '&:hover': { bgcolor: '#6D2F45' }, textTransform: 'uppercase', fontWeight: 600, px: 2.2, height: 40, whiteSpace: 'nowrap' }}
-                        >
-                            Añadir rol
-                        </Button>}
-                        {activeTab === 0 && (
-                            <TextField
-                                size="small"
-                                value={searchTerm}
-                                onChange={event => {
-                                    setSearchTerm(event.target.value);
-                                    setPage(1);
-                                }}
-                                placeholder="Buscar"
-                                inputProps={{ 'aria-label': 'Buscar roles', className: 'roles-search-text' }}
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#9A9296' }} /></InputAdornment>,
-                                }}
-                                sx={{ width: { xs: '100%', sm: 210 }, '& .MuiOutlinedInput-root': { height: 40, borderRadius: 1, bgcolor: '#FFFFFF' } }}
-                            />
-                        )}
+                                <img src={backarrow} alt=""
+                                    style={{ transform: 'scaleX(-1)', marginLeft: '-12px' }} />
+                            </Box>
+                        </IconButton>
                     </Box>
-                </Box>
+                ) : <Box />}
+                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap', ml: 'auto' }}>
+                    <MainIcon
+                        text="Añadir rol"
+                        onClick={openCreateRole}
+                        width="156px"
+                    >
+                        <span className="flex items-center">
+                            <span className="mr-2">+</span> Add Card
+                        </span>
+                    </MainIcon>
+                    {activeTab === 0 && (
+                        <TextField
+                            size="small"
+                            value={searchTerm}
+                            onChange={event => {
+                                setSearchTerm(event.target.value);
+                                setPage(1);
+                            }}
+                            placeholder="Buscar"
+                            inputProps={{ 'aria-label': 'Buscar roles', className: 'roles-search-text' }}
+                            InputProps={{
+                                startAdornment: (<InputAdornment position="start">
+                                    <img
+                                        src={searchTerm ? Iconseachred : seachicon}
+                                        alt="Buscar"
+                                        style={{ marginRight: 8, width: 24 }} />
+                                </InputAdornment>),
+                                endAdornment: searchTerm && (
+                                    <InputAdornment position="end">
+                                        <img src={iconclose} alt="Limpiar búsqueda"
+                                            onClick={() => {
+                                                setSearchTerm('');
+                                                setPage(1);
+                                            }}
+                                            style={{ width: 24, height: 24, cursor: 'pointer' }}
+                                        />
+                                    </InputAdornment>
+                                ),
+                            }}
+                            sx={{
+                                width: { xs: '100%', sm: 210 },
+                                '& .MuiOutlinedInput-root': {
+                                    height: 40,
+                                    borderRadius: 1,
+                                    bgcolor: '#FFFFFF',
 
+                                    '& fieldset': {
+                                        borderColor: searchTerm ? '#6F1E3A' : '#9B9295',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: searchTerm ? '#6F1E3A' : '#9B9295',
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: searchTerm ? '#6F1E3A' : '#9B9295',
+                                        borderWidth: '1px',
+                                    },
+                                    '& .MuiOutlinedInput-input': {
+                                        color: '#6F1E3A',
+                                    },
+                                    '& .MuiOutlinedInput-input::placeholder': {
+                                        color: '#9B9295',
+                                        opacity: 1,
+                                    },
+                                },
+                            }}
+                        />
+                    )}
+                </Box>
+            </Box>
+            <Paper elevation={0} sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: { xs: 1.5, md: 2 }, bgcolor: '#F2F2F2', overflow: 'hidden' }}>
                 <Tabs
                     value={activeTab}
                     onChange={(_, value: number) => setActiveTab(value)}
                     aria-label="Secciones de roles"
                     className="roles-tabs"
-                    sx={{ borderBottom: '1px solid #D9D4D6', '& .MuiTabs-indicator': { bgcolor: '#833A53', height: 2 }, '& .MuiTab-root': { fontFamily: 'Poppins, sans-serif', minHeight: 42, px: 3 } }}
+                    sx={{
+                        borderBottom: '1px solid #D9D4D6', bgcolor: '#FFFFFF', borderRadius: '8px 8px 0px 0px', '& .MuiTab-root': { minHeight: 42, px: 3 },
+                        '& .MuiTabs-indicator': {
+                            height: '3px',
+                            backgroundColor: '#833A53'
+                        },
+                    }}
                 >
-                    <Tab label={<span className={activeTab === 0 ? 'roles-subtitle-select' : 'roles-subtitle-unselect'}>Lista de roles</span>} />
-                    <Tab disabled={!canAssignRoles} label={<span className={activeTab === 1 ? 'roles-subtitle-select' : 'roles-subtitle-unselect'}>Asignación de roles</span>} />
+                    <Tab sx={{ padding: '18px 34px', width: '183px' }} label={<span className={activeTab === 0 ? 'roles-subtitle-select' : 'roles-subtitle-unselect'}>Lista de roles</span>} />
+                    <Tab sx={{ padding: '18px 34px', width: '240px' }} label={<span className={activeTab === 1 ? 'roles-subtitle-select' : 'roles-subtitle-unselect'}>Asignación de roles</span>} />
                 </Tabs>
 
                 {activeTab === 0 ? (
-                    <TableContainer sx={{ flex: 1, minHeight: 0, maxHeight: 'none', overflow: 'auto' }}>
-                        <Table stickyHeader aria-label="Lista de roles" size="small">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell padding="checkbox" sx={{ bgcolor: '#FFFFFF', borderBottom: '1px solid #D9D4D6', width: 34 }}>
-                                        <Checkbox
-                                            size="small"
-                                            checked={allVisibleCustomSelected}
-                                            disabled={!filteredRoles.some(role => !role.isSystem)}
-                                            onChange={toggleAllCustomRoles}
-                                            inputProps={{ 'aria-label': 'Seleccionar roles personalizados' }}
-                                            sx={{ color: '#B9B5B7', '&.Mui-checked': { color: '#833A53' } }}
-                                        />
-                                    </TableCell>
-                                    <TableCell className='roles-text' sx={{ bgcolor: '#FFFFFF', color: '#51464B', fontWeight: 600, borderBottom: '1px solid #D9D4D6', minWidth: 170 }}>Nombre</TableCell>
-                                    <TableCell className='roles-text' sx={{ bgcolor: '#FFFFFF', color: '#51464B', fontWeight: 600, borderBottom: '1px solid #D9D4D6', minWidth: 180 }}>Fecha de creación</TableCell>
-                                    <TableCell align="right" sx={{ bgcolor: '#FFFFFF', borderBottom: '1px solid #D9D4D6', width: 94 }} />
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
+                    <TableContainer sx={{ flex: 1, minHeight: '524px', maxHeight: 'none', overflow: 'auto', bgcolor: '#FFFFFF', borderRadius: '0px 0px 8px 8px' }}>
+                        <Table
+                            stickyHeader
+                            aria-label="Lista de roles"
+                            size="small"
+                            sx={{
+                                tableLayout: 'fixed',
+                                width: '100%'
+                            }}
+                        >
+                            <colgroup>
+                                <col style={{ width: '34px' }} />
+                                <col style={{ width: '184px', }} />
+                                <col />
+                                <col style={{ width: '94px' }} />
+                            </colgroup>
+                            {filteredRoles.length > 0 && (
+                                <TableHead>
+                                    <TableRow sx={{ height: '52px' }}>
+                                        <TableCell padding="checkbox" sx={{ borderBottom: '1px solid #D9D4D6', width: 34 }}>
+                                            <Checkbox
+                                                size="small"
+                                                checked={allVisibleCustomSelected}
+                                                indeterminate={someVisibleCustomSelected && !allVisibleCustomSelected}
+                                                disabled={!filteredRoles.some(role => !role.isSystem)}
+                                                onChange={toggleAllCustomRoles}
+                                                inputProps={{ 'aria-label': 'Seleccionar roles personalizados' }}
+                                                icon={
+                                                    <img src={CheckboxDefault} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '2px' }} />
+                                                }
+                                                checkedIcon={
+                                                    <img src={CheckboxSelect} alt="Checked" style={{ width: 22, height: 21, marginRight: '-2px', marginLeft: '-2px' }} />
+                                                }
+                                                indeterminateIcon={
+                                                    <img src={CheckboxMinusOne} alt="Checked" style={{ width: 18, height: 18 }} />
+                                                }
+                                                sx={{
+                                                    color: '#B9B5B7', '&.Mui-checked': { color: '#833A53' }
+                                                }}
+                                            />
+                                        </TableCell>
+                                        <TableCell className='roles-text' sx={{ color: '#51464B', fontWeight: 600, borderBottom: '1px solid #D9D4D6' }}
+                                        >
+                                            {selectedRoles.length > 0 ? (
+                                                <Tooltip title="Eliminar" arrow placement="top"
+                                                    componentsProps={{
+                                                        tooltip: {
+                                                            sx: {
+                                                                backgroundColor: "#312D2E",
+                                                                color: "#DEDADA",
+                                                                fontFamily: "Poppins",
+                                                                fontWeight: 500,
+                                                                fontSize: "12px",
+                                                                padding: '8px 16px',
+                                                                borderRadius: '5px 5px 8px 8px',
+                                                                boxShadow: "0px 8px 16px 0px #00131F7A",
+                                                                border: '1px #312D2E'
+                                                            }
+                                                        },
+                                                        arrow: {
+                                                            sx: {
+                                                                color: "#312D2E"
+                                                            }
+                                                        }
+                                                    }}
+                                                    PopperProps={{
+                                                        modifiers: [
+                                                            {
+                                                                name: 'offset',
+                                                                options: {
+                                                                    offset: [0, -10]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }}
+                                                >
+                                                    <IconButton onClick={handleDeleteSelected}>
+                                                        <img src={IconDeleteTwo} alt="Eliminar" style={{ width: 16, height: 20, marginLeft: '-5px' }} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            ) : (
+                                                'Nombre'
+                                            )}
+                                        </TableCell>
+                                        <TableCell className='roles-text' sx={{ color: '#51464B', fontWeight: 600, borderBottom: '1px solid #D9D4D6' }}>Fecha de creación</TableCell>
+                                        <TableCell align="right" sx={{ bgcolor: '#FFFFFF', borderBottom: '1px solid #D9D4D6' }} />
+                                    </TableRow>
+                                </TableHead>
+                            )}
+                            <TableBody sx={{ bgcolor: '#FFFFFF' }}>
                                 {filteredRoles.map(role => (
-                                    <TableRow key={role.id} hover sx={{ height: 45 }}>
-                                        <TableCell padding="checkbox" sx={{ borderBottom: '1px solid #E1DDDF' }}>
+                                    <TableRow key={role.id} sx={{ height: 45, backgroundColor: selectedRoles.includes(role.id) ? 'rgba(143, 77, 99, 0.18)' : '#FFFFFF' }}>
+                                        <TableCell padding="checkbox" sx={{ borderBottom: '1px solid #C6BFC2' }}>
                                             <Checkbox
                                                 size="small"
                                                 checked={selectedRoles.includes(role.id)}
                                                 disabled={role.isSystem || !canDeleteRole}
                                                 onChange={() => toggleRoleSelection(role)}
                                                 inputProps={{ 'aria-label': `Seleccionar ${role.name}` }}
+                                                icon={
+                                                    <img src={role.isSystem ? CheckboxUnselect : CheckboxDefault} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '2px' }} />
+                                                }
+                                                checkedIcon={
+                                                    <img src={role.isSystem ? CheckboxUnselect : CheckboxSelect} style={{ width: 22, height: 21, marginRight: '-2px', marginLeft: '-2px' }} />
+                                                }
                                                 sx={{ color: '#B9B5B7', '&.Mui-checked': { color: '#833A53' }, '&.Mui-disabled': { color: '#C7C3C5' } }}
                                             />
                                         </TableCell>
-                                        <TableCell sx={{ borderBottom: '1px solid #E1DDDF', maxWidth: 260 }}>
-                                            <Tooltip title={role.name.length > 34 ? role.name : ''} placement="top-start">
-                                                <Typography className='roles-secondary-text' noWrap sx={{ color: role.isSystem ? '#BEB9BC' : '#51464B', maxWidth: 240, fontSize: 14 }}>
+                                        <TableCell sx={{ borderBottom: '1px solid #C6BFC2', }}>
+                                            <Tooltip title={role.name.length > 18 ? role.name : ''}
+                                                arrow placement="top"
+                                                componentsProps={{
+                                                    tooltip: {
+                                                        sx: {
+                                                            backgroundColor: "#312D2E",
+                                                            color: "#DEDADA",
+                                                            fontFamily: "Poppins",
+                                                            fontWeight: 500,
+                                                            fontSize: "12px",
+                                                            padding: '8px 16px',
+                                                            borderRadius: '5px 5px 8px 8px',
+                                                            boxShadow: "0px 8px 16px 0px #00131F7A",
+                                                            border: '1px #312D2E'
+                                                        }
+                                                    },
+                                                    arrow: {
+                                                        sx: {
+                                                            color: "#312D2E"
+                                                        }
+                                                    }
+                                                }}
+                                                PopperProps={{
+                                                    modifiers: [
+                                                        {
+                                                            name: 'offset',
+                                                            options: {
+                                                                offset: [0, -10]
+                                                            }
+                                                        }
+                                                    ]
+                                                }}
+                                            >
+                                                <Typography className='roles-secondary-text' noWrap
+                                                    sx={{ color: role.isSystem ? '#BEB9BC' : selectedRoles.includes(role.id) ? '#8F4D63' : '#574B4F', maxWidth: 240, fontSize: 14 }}>
                                                     {role.name}
                                                 </Typography>
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell className='roles-secondary-text' sx={{ borderBottom: '1px solid #E1DDDF', color: role.isSystem ? '#C2BEC0' : '#6F6870', fontSize: 14 }}>
+                                        <TableCell className='roles-secondary-text' sx={{ borderBottom: '1px solid #C6BFC2', color: role.isSystem ? '#BEB9BC' : selectedRoles.includes(role.id) ? '#8F4D63' : '#574B4F', fontSize: 14, width: 180 }}>
                                             {role.createdAt}
                                         </TableCell>
-                                        <TableCell align="right" sx={{ borderBottom: '1px solid #E1DDDF', p: 0.5 }}>
-                                            {!role.isSystem && (
-                                                <Tooltip title="Editar rol">
-                                                    <IconButton aria-label={`Editar rol ${role.name}`} onClick={() => openEditRole(role)} disabled={!canCreateEditRole} size="small" sx={{ color: '#382039' }}>
-                                                        <EditOutlinedIcon fontSize="small" />
+                                        <TableCell align="right" sx={{ borderBottom: '1px solid #C6BFC2', p: 0.5 }}>
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'flex-end',
+                                                    gap: '4px',
+                                                }}
+                                            >
+                                                <Tooltip title="Inspeccionar" arrow placement="top"
+                                                    componentsProps={{
+                                                        tooltip: {
+                                                            sx: {
+                                                                backgroundColor: "#312D2E",
+                                                                color: "#DEDADA",
+                                                                fontFamily: "Poppins",
+                                                                fontWeight: 500,
+                                                                fontSize: "12px",
+                                                                padding: '8px 16px',
+                                                                borderRadius: '5px 5px 8px 8px',
+                                                                boxShadow: "0px 8px 16px 0px #00131F7A",
+                                                                border: '1px #312D2E'
+                                                            }
+                                                        },
+                                                        arrow: {
+                                                            sx: {
+                                                                color: "#312D2E"
+                                                            }
+                                                        }
+                                                    }}
+                                                    PopperProps={{
+                                                        modifiers: [
+                                                            {
+                                                                name: 'offset',
+                                                                options: {
+                                                                    offset: [0, -10]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }}
+                                                >
+                                                    <IconButton aria-label={`Inspeccionar permisos de ${role.name}`} onClick={() => setInspectedRole(role)} size="small" sx={{ color: '#382039' }}>
+                                                        <img src={selectedRoles.includes(role.id) ? IconInspecOne : IconInspecTwo} alt="Inspeccionar" style={{ width: 20, height: 16 }} />
                                                     </IconButton>
                                                 </Tooltip>
-                                            )}
-                                            <Tooltip title="Inspeccionar permisos">
-                                                <IconButton aria-label={`Inspeccionar permisos de ${role.name}`} onClick={() => setInspectedRole(role)} size="small" sx={{ color: '#382039' }}>
-                                                    <VisibilityOutlinedIcon fontSize="small" />
-                                                </IconButton>
-                                            </Tooltip>
-                                            {!role.isSystem && canDeleteRole && (
-                                                <Tooltip title="Eliminar rol">
-                                                    <IconButton aria-label={`Eliminar rol ${role.name}`} onClick={() => requestDeleteRole(role)} size="small" sx={{ color: '#382039' }}>
-                                                        <DeleteOutlineIcon fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            )}
+                                                {!role.isSystem && (
+                                                    <Tooltip title="Editar" arrow placement="top"
+                                                        componentsProps={{
+                                                            tooltip: {
+                                                                sx: {
+                                                                    backgroundColor: "#312D2E",
+                                                                    color: "#DEDADA",
+                                                                    fontFamily: "Poppins",
+                                                                    fontWeight: 500,
+                                                                    fontSize: "12px",
+                                                                    padding: '8px 16px',
+                                                                    borderRadius: '5px 5px 8px 8px',
+                                                                    boxShadow: "0px 8px 16px 0px #00131F7A",
+                                                                    border: '1px #312D2E'
+                                                                }
+                                                            },
+                                                            arrow: {
+                                                                sx: {
+                                                                    color: "#312D2E"
+                                                                }
+                                                            }
+                                                        }}
+                                                        PopperProps={{
+                                                            modifiers: [
+                                                                {
+                                                                    name: 'offset',
+                                                                    options: {
+                                                                        offset: [0, -10]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }}
+                                                    >
+                                                        <IconButton aria-label={`Editar rol ${role.name}`} onClick={() => openEditRole(role)} size="small">
+                                                            <img src={selectedRoles.includes(role.id) ? IconEditOne : IconEditTwo} alt="Editar" style={{ width: 18, height: 18 }} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                                {!role.isSystem && (
+                                                    <Tooltip title="Eliminar" arrow placement="top"
+                                                        componentsProps={{
+                                                            tooltip: {
+                                                                sx: {
+                                                                    backgroundColor: "#312D2E",
+                                                                    color: "#DEDADA",
+                                                                    fontFamily: "Poppins",
+                                                                    fontWeight: 500,
+                                                                    fontSize: "12px",
+                                                                    padding: '8px 16px',
+                                                                    borderRadius: '5px 5px 8px 8px',
+                                                                    boxShadow: "0px 8px 16px 0px #00131F7A",
+                                                                    border: '1px #312D2E'
+                                                                }
+                                                            },
+                                                            arrow: {
+                                                                sx: {
+                                                                    color: "#312D2E"
+                                                                }
+                                                            }
+                                                        }}
+                                                        PopperProps={{
+                                                            modifiers: [
+                                                                {
+                                                                    name: 'offset',
+                                                                    options: {
+                                                                        offset: [0, -10]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }}
+                                                    >
+                                                        <IconButton aria-label={`Eliminar rol ${role.name}`} onClick={() => requestDeleteRole(role)} size="small" sx={{ color: '#382039' }}>
+                                                            <img src={selectedRoles.includes(role.id) ? IconDeleteOne : IconDeleteTwo} alt="Eliminar" style={{ width: 16, height: 20 }} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                            </Box>
                                         </TableCell>
                                     </TableRow>
                                 ))}
                                 {filteredRoles.length === 0 && (
                                     <TableRow>
                                         <TableCell colSpan={4} sx={{ border: 0 }}>
-                                            <Box sx={{ minHeight: 280, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.5, color: '#746B70' }}>
-                                                <Box component="img" src={NoResult} alt="No se encontraron resultados" sx={{ width: 116, height: 116, objectFit: 'contain' }} />
-                                                <Typography sx={{ fontWeight: 500 }}>No se encontraron resultados</Typography>
+                                            <Box sx={{ minHeight: 280, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.5, color: '#746B70', marginTop: 8 }}>
+                                                <Box component="img" src={NoResult} alt="No se encontraron resultados" sx={{ width: 176, height: 149, objectFit: 'contain' }} />
+                                                <Typography sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#8F4D63', fontSize: '16px' }}>No hay información para mostrar.</Typography>
                                             </Box>
                                         </TableCell>
                                     </TableRow>
@@ -1029,7 +1332,7 @@ const Roles: React.FC = () => {
                         </Table>
                     </TableContainer>
                 ) : (
-                    <Box sx={{ mt: 0, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', border: '1px solid #D9D4D6', borderTop: 0, borderRadius: '0 0 6px 6px', overflow: 'hidden' }}>
+                    <Box sx={{ mt: 0, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', border: '1px solid #D9D4D6', borderTop: 0, borderRadius: '0 0 6px 6px', overflow: 'hidden', backgroundColor: '#FFFFFF' }}>
                         <Box sx={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gridTemplateRows: { xs: '1fr 1fr', md: '1fr' }, overflow: 'hidden' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0, borderRight: { xs: 0, md: '1px solid #D9D4D6' }, borderBottom: { xs: '1px solid #D9D4D6', md: 0 } }}>
                                 <Box sx={{ minHeight: 48, px: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6' }}>
@@ -1044,7 +1347,7 @@ const Roles: React.FC = () => {
                                             sx={{ flex: 1, mr: 1, '& .MuiOutlinedInput-root': { height: 34 } }}
                                         />
                                     ) : (
-                                        <Typography sx={{ color: '#51464B', fontSize: 13, fontWeight: 600 }}>Usuarios</Typography>
+                                        <Typography className='roles-generic-subtitles' sx={{ color: '#330F1B', fontSize: '14px', fontWeight: 500 }}>Usuarios</Typography>
                                     )}
                                     <IconButton
                                         size="small"
@@ -1083,7 +1386,7 @@ const Roles: React.FC = () => {
                                             <Typography sx={{ color: '#8D858A', fontSize: 13 }}>No se encontraron usuarios.</Typography>
                                         </Box>
                                     ) : assignmentVisibleUsers.map(user => (
-                                        <Box key={user.id} sx={{ minHeight: 56, px: 1.2, display: 'flex', alignItems: 'center', gap: 1, borderBottom: '1px solid #E1DDDF' }}>
+                                        <Box key={user.id} sx={{ minHeight: 56, px: 1.2, display: 'flex', alignItems: 'center', gap: 1, borderBottom: '1px solid #C6BFC2' }}>
                                             <Checkbox
                                                 size="small"
                                                 checked={selectedAssignmentUserId === user.id}
@@ -1096,7 +1399,7 @@ const Roles: React.FC = () => {
                                                 <PersonOutlineIcon sx={{ fontSize: 19 }} />
                                             </Avatar>
                                             <Box sx={{ minWidth: 0, flex: 1 }}>
-                                                <Typography noWrap sx={{ color: '#51464B', fontSize: 13, fontWeight: 500 }}>
+                                                <Typography noWrap className='roles-generic-text-two' sx={{ color: '#51464B', fontSize: 13, fontWeight: 500 }}>
                                                     {user.name || user.email || `Usuario ${user.id}`}
                                                 </Typography>
                                                 {user.email && (
@@ -1129,7 +1432,7 @@ const Roles: React.FC = () => {
                                             sx={{ flex: 1, '& .MuiOutlinedInput-root': { height: 34 } }}
                                         />
                                     ) : (
-                                        <Typography sx={{ color: '#51464B', fontSize: 13, fontWeight: 600, flex: 1 }}>Roles</Typography>
+                                        <Typography className='roles-generic-subtitles' sx={{ color: '#330F1B', fontSize: '14px', fontWeight: 500, flex: 1 }}>Roles</Typography>
                                     )}
                                     <IconButton
                                         size="small"
@@ -1156,7 +1459,7 @@ const Roles: React.FC = () => {
                                     ) : assignmentRolesError ? (
                                         <Alert severity="error" sx={{ m: 2 }}>{assignmentRolesError}</Alert>
                                     ) : assignmentVisibleRoles.map(role => (
-                                        <Box key={role.id} sx={{ minHeight: 37, px: 1.2, display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #E1DDDF' }}>
+                                        <Box key={role.id} sx={{ minHeight: 37, px: 1.2, display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #C6BFC2' }}>
                                             <Checkbox
                                                 size="small"
                                                 checked={selectedAssignmentRoleId === Number(role.id)}
@@ -1169,7 +1472,7 @@ const Roles: React.FC = () => {
                                                 sx={{ p: 0.5, color: '#B9B5B7', '&.Mui-checked': { color: '#833A53' }, '&.Mui-disabled': { color: '#C7C3C5' } }}
                                             />
                                             <Box sx={{ minWidth: 0, flex: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                <Typography noWrap sx={{ color: selectedAssignmentRoleId === Number(role.id) ? '#51464B' : '#6F6870', fontSize: 13 }}>
+                                                <Typography noWrap className='roles-generic-text-two' sx={{ color: selectedAssignmentRoleId === Number(role.id) ? '#51464B' : '#6F6870', fontSize: 13 }}>
                                                     {role.name}
                                                 </Typography>
                                                 {role.isSystem && (
@@ -1178,8 +1481,8 @@ const Roles: React.FC = () => {
                                                     </Tooltip>
                                                 )}
                                             </Box>
-                                            <Box sx={{ borderRadius: 10, bgcolor: '#F0EFF0', px: 1, py: 0.25, mr: 0.2 }}>
-                                                <Typography sx={{ color: '#B9B5B7', fontSize: 8, lineHeight: 1.5 }}>
+                                            <Box sx={{ borderRadius: 10, bgcolor: '#F2EBED', px: 1, py: 0.25, mr: 0.2 }}>
+                                                <Typography sx={{ color: '#786E71', fontSize: '9px', lineHeight: 1.5, fontWeight: 400, fontFamily: 'Poppins' }}>
                                                     {role.isSystem ? 'Predeterminado' : 'Personalizado'}
                                                 </Typography>
                                             </Box>
@@ -1213,8 +1516,27 @@ const Roles: React.FC = () => {
                 )}
             </Paper>
 
-            <Drawer anchor="right" open={Boolean(inspectedRole)} onClose={() => setInspectedRole(null)}>
-                <Box sx={{ width: { xs: '100vw', sm: 390 }, height: '100%', display: 'flex', flexDirection: 'column', color: '#3A1724' }}>
+            <Drawer
+                anchor="right"
+                open={Boolean(inspectedRole)}
+                onClose={() => setInspectedRole(null)}
+                sx={{
+                    '& .MuiDrawer-paper': {
+                        display: 'flex',
+                        width: '260px',
+                        height: '672px',
+                        padding: '0 10px 24px 10px',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        boxSizing: 'border-box',
+                        borderRadius: '8px',
+                        background: '#FFF',
+                        top: '12%',
+                        right: '1.5%',
+                    }
+                }}
+            >
+                <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', color: '#3A1724' }}>
                     <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <Box>
                             <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>Permisos del rol</Typography>
@@ -1246,32 +1568,132 @@ const Roles: React.FC = () => {
             <Dialog open={roleDialogOpen} onClose={closeRoleDialog} fullWidth maxWidth="sm">
                 <DialogTitle className='roles-generic-titles' sx={{ fontWeight: 600, fontSize: '20px', pr: 6, fontFamily: 'Poppins' }}>
                     {editingRoleId ? 'Editar rol' : 'Añadir rol'}
-                    <IconButton aria-label="Cerrar" onClick={closeRoleDialog} sx={{ position: 'absolute', right: 12, top: 12 }}><CloseIcon /></IconButton>
+                    <IconButton aria-label="Cerrar" onClick={closeRoleDialog} sx={{ position: 'absolute', right: 12, top: 12 }}>
+                        <img
+                            src={IconCloseModal}
+                            alt="x"
+                            width="24"
+                            height="24"
+                        />
+                    </IconButton>
                 </DialogTitle>
                 <DialogContent dividers>
                     <Typography className='roles-generic-subtitles' >Nombre<span style={{ color: "#D01247" }}>*</span></Typography>
-                    <TextField
-                        autoFocus
-                        required
-                        fullWidth
-                        label="Nombre"
-                        value={roleName}
-                        onChange={event => updateRoleName(event.target.value)}
-                        inputProps={{ maxLength: 40, 'aria-label': 'Nombre del rol' }}
-                        helperText={`${roleName.length}/40 caracteres · Solo letras y números`}
-                        sx={{ mb: 2.5 }}
-                    />
+                    <Box sx={{ position: 'relative' }}>
+                        <TextField
+                            autoFocus
+                            required
+                            fullWidth
+                            value={roleName}
+                            onChange={event => updateRoleName(event.target.value)}
+                            inputProps={{ maxLength: 40, 'aria-label': 'Nombre del rol' }}
+                            sx={{
+                                mb: 2.5, '& input': {
+                                    fontFamily: 'Poppins', color: '#574B4F', fontSize: '16px',
+                                }
+                            }}
+                        />
+                        <Tooltip
+                            title={
+                                <Box
+                                    sx={{
+                                        backgroundColor: "#FFFFFF",
+                                        borderRadius: "8px",
+                                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                                        padding: "8px 12px",
+                                        fontFamily: "Poppins",
+                                        fontSize: "14px",
+                                        color: "#574B4F",
+                                        whiteSpace: "pre-line",
+                                        transform: "translate(-10px, -22px)",
+                                        borderColor: "#00131F3D",
+                                        borderStyle: "solid",
+                                        borderWidth: "1px"
+                                    }}
+                                >
+                                    <>
+                                        • Caracteres alfabéticos<br />
+                                        • Longitud máxima de 40<br />
+                                        caracteres
+                                    </>
+                                </Box>
+                            }
+                            placement="bottom-end"
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        backgroundColor: "transparent",
+                                        padding: 0,
+
+                                    },
+                                },
+                            }}
+                        >
+                            <IconButton
+                                size="small"
+                                sx={{ position: 'absolute', marginLeft: "-50px", marginTop: "11px" }}
+                            >
+                                <img
+                                    src={infoicon}
+                                    alt={"info"}
+                                    style={{ width: 24, height: 24 }}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+
+
                     <Typography className='roles-generic-subtitles'>Permisos<span style={{ color: "#D01247" }}>*</span></Typography>
                     <Typography className='roles-generic-text' sx={{ mb: 1 }}>Seleccione los permisos asignados a este rol.</Typography>
                     <Box sx={{ border: '1px solid #D9D4D6', borderRadius: 1, overflow: 'hidden' }}>
                         <Box sx={{ px: 1.25, py: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6', gap: 1 }}>
-                            <Tooltip title="Seleccionar todos los permisos visibles">
+                            <Tooltip title="Seleccionar todos los permisos visibles" arrow placement="top"
+                                componentsProps={{
+                                    tooltip: {
+                                        sx: {
+                                            backgroundColor: "#312D2E",
+                                            color: "#DEDADA",
+                                            fontFamily: "Poppins",
+                                            fontWeight: 500,
+                                            fontSize: "12px",
+                                            padding: '8px 16px',
+                                            borderRadius: '5px 5px 8px 8px',
+                                            boxShadow: "0px 8px 16px 0px #00131F7A",
+                                            border: '1px #312D2E'
+                                        }
+                                    },
+                                    arrow: {
+                                        sx: {
+                                            color: "#312D2E"
+                                        }
+                                    }
+                                }}
+                                PopperProps={{
+                                    modifiers: [
+                                        {
+                                            name: 'offset',
+                                            options: {
+                                                offset: [0, -10]
+                                            }
+                                        }
+                                    ]
+                                }}
+                            >
                                 <Checkbox
                                     size="small"
                                     checked={allVisiblePermissionsSelected}
                                     indeterminate={visiblePermissionCodes.some(code => selectedPermissions.includes(code)) && !allVisiblePermissionsSelected}
                                     onChange={toggleVisiblePermissions}
                                     inputProps={{ 'aria-label': 'Seleccionar todos los permisos visibles' }}
+                                    icon={
+                                        <img src={CheckboxDefault} alt="UnChecked" style={{ width: 20, height: 20 }} />
+                                    }
+                                    checkedIcon={
+                                        <img src={CheckboxSelect} alt="Checked" style={{ width: 20, height: 20 }} />
+                                    }
+                                    indeterminateIcon={
+                                        <img src={CheckboxMinusOne} alt="Checked" style={{ width: 20, height: 20 }} />
+                                    }
                                     sx={{ color: '#B9B5B7', '&.Mui-checked, &.MuiCheckbox-indeterminate': { color: '#833A53' } }}
                                 />
                             </Tooltip>
@@ -1280,15 +1702,56 @@ const Roles: React.FC = () => {
                                 value={permissionSearch}
                                 onChange={event => setPermissionSearch(event.target.value)}
                                 placeholder="Buscar"
-                                inputProps={{ 'aria-label': 'Buscar permisos' }}
-                                InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#9A9296', fontSize: 19 }} /></InputAdornment> }}
-                                sx={{ width: 190, '& .MuiOutlinedInput-root': { height: 34 } }}
+                                style={{ marginLeft: 'auto' }}
+                                inputProps={{ 'aria-label': 'Buscar permisos', className: 'roles-search-text' }}
+                                InputProps={{
+                                    startAdornment: (<InputAdornment position="start">
+                                        <img
+                                            src={permissionSearch ? Iconseachred : seachicon}
+                                            alt="Buscar"
+                                            style={{ marginRight: 8, width: 24 }} />
+                                    </InputAdornment>),
+                                    endAdornment: permissionSearch && (
+                                        <InputAdornment position="end">
+                                            <img src={iconclose} alt="Limpiar búsqueda"
+                                                onClick={() => setPermissionSearch('')}
+                                                style={{ width: 24, height: 24, cursor: 'pointer' }}
+                                            />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{
+                                    width: '224px',
+                                    '& .MuiOutlinedInput-root': {
+                                        height: 40,
+                                        borderRadius: 1,
+                                        bgcolor: '#FFFFFF',
+
+                                        '& fieldset': {
+                                            borderColor: searchTerm ? '#6F1E3A' : '#9B9295',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: searchTerm ? '#6F1E3A' : '#9B9295',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: searchTerm ? '#6F1E3A' : '#9B9295',
+                                            borderWidth: '1px',
+                                        },
+                                        '& .MuiOutlinedInput-input': {
+                                            color: '#6F1E3A',
+                                        },
+                                        '& .MuiOutlinedInput-input::placeholder': {
+                                            color: '#9B9295',
+                                            opacity: 1,
+                                        },
+                                    },
+                                }}
                             />
                         </Box>
                         <Box sx={{ maxHeight: 260, overflowY: 'auto', px: 1.25, py: 0.5 }}>
                             {visiblePermissionGroups.length > 0 ? visiblePermissionGroups.map(group => (
                                 <Box key={group.code}>
-                                    <FormControlLabel className='roles-generic-text-two'
+                                    <FormControlLabel
                                         sx={{ display: 'flex', m: 0, minHeight: 34 }}
                                         control={
                                             <Checkbox
@@ -1314,10 +1777,31 @@ const Roles: React.FC = () => {
                                                         ? togglePermission(group.code, event.target.checked)
                                                         : toggleGroupPermissions(group, event.target.checked)
                                                 }
+                                                icon={
+                                                    <img src={CheckboxDefault} alt="UnChecked" style={{ width: 20, height: 20 }} />
+                                                }
+                                                checkedIcon={
+                                                    <img src={CheckboxSelect} alt="Checked" style={{ width: 20, height: 20 }} />
+                                                }
+                                                indeterminateIcon={
+                                                    <img src={CheckboxMinusOne} alt="Checked" style={{ width: 20, height: 20 }} />
+                                                }
                                                 sx={{ color: '#B9B5B7', '&.Mui-checked': { color: '#833A53' } }}
                                             />
                                         }
-                                        label={<Typography sx={{ fontSize: 13 }}>{group.label}</Typography>}
+                                        label={<Typography className='roles-generic-text-two' sx={{
+                                            color: (group.permissions.length === 0
+                                                ? selectedPermissions.includes(group.code)
+                                                : group.permissions.every(permission =>
+                                                    selectedPermissions.includes(permission.code)
+                                                )
+                                            ) || (
+                                                    group.permissions.length > 0 &&
+                                                    group.permissions.some(permission =>
+                                                        selectedPermissions.includes(permission.code)
+                                                    )
+                                                ) ? '#8F4D63' : '#51464B'
+                                        }}>{group.label}</Typography>}
                                     />
                                     {group.permissions.map(permission => (
                                         <FormControlLabel
@@ -1329,32 +1813,41 @@ const Roles: React.FC = () => {
                                                     size="small"
                                                     checked={selectedPermissions.includes(permission.code)}
                                                     onChange={event => togglePermission(permission.code, event.target.checked)}
+                                                    icon={
+                                                        <img src={CheckboxDefault} alt="UnChecked" style={{ width: 20, height: 20 }} />
+                                                    }
+                                                    checkedIcon={
+                                                        <img src={CheckboxSelect} alt="Checked" style={{ width: 20, height: 20 }} />
+                                                    }
                                                     sx={{ color: '#B9B5B7', '&.Mui-checked': { color: '#833A53' } }}
                                                 />
                                             }
-                                            label={<Typography sx={{ fontSize: 13 }}>{permission.label}</Typography>}
+                                            label={<Typography className='roles-generic-text-two' sx={{
+                                                color: selectedPermissions.includes(permission.code) ? '#8F4D63' : '#51464B'
+                                            }}>{permission.label}</Typography>}
                                         />
                                     ))}
                                 </Box>
                             )) : (
-                                <Box sx={{ minHeight: 130, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#746B70' }}>
-                                    <Typography sx={{ fontSize: 13 }}>No se encontraron permisos</Typography>
+                                <Box sx={{ minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#746B70' }}>
+                                    <Box component="img" src={NoResult} alt="No se encontraron resultados" sx={{ width: 176, height: 149, objectFit: 'contain' }} />
+                                    <Typography sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#8F4D63', fontSize: '16px' }}>No se encontraron resultados.</Typography>
                                 </Box>
                             )}
                         </Box>
                     </Box>
                     {formError && <Alert severity="error" sx={{ mt: 2 }}>{formError}</Alert>}
                 </DialogContent>
-                <DialogActions sx={{ p: 2.5, justifyContent: 'space-between' }}>
-                    <Button onClick={closeRoleDialog} sx={{ color: '#833A53', textTransform: 'uppercase' }}>Cancelar</Button>
-                    <Button
-                        variant="contained"
+                <DialogActions sx={{ p: 2, justifyContent: 'space-between', display: 'flex' }}>
+
+                    <SecondaryButton text='Cancelar' onClick={closeRoleDialog} />
+
+                    <MainButton
+                        text={editingRoleId ? 'Guardar' : 'Crear'}
                         onClick={handleSaveRole}
-                        disabled={!canCreateEditRole || !roleName || selectedPermissions.length === 0}
-                        sx={{ bgcolor: '#833A53', '&:hover': { bgcolor: '#6D2F45' }, '&.Mui-disabled': { bgcolor: '#E2DFE0', color: '#A9A5A6' }, textTransform: 'uppercase' }}
-                    >
-                        {editingRoleId ? 'Guardar' : 'Crear'}
-                    </Button>
+                        disabled={!roleName || selectedPermissions.length === 0}
+                        width='116px'
+                    />
                 </DialogActions>
             </Dialog>
 
@@ -1380,22 +1873,18 @@ const Roles: React.FC = () => {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={deleteConfirmOpen} onClose={closeDeleteConfirm}>
-                <DialogTitle sx={{ color: '#3A1724', fontWeight: 600 }}>
-                    {roleToDelete ? 'Eliminar rol' : 'Eliminar roles'}
-                </DialogTitle>
-                <DialogContent>
-                    <Typography>
-                        {roleToDelete
-                            ? '¿Está seguro de que desea eliminar el rol de usuario seleccionado? Esta acción no se puede revertir.'
-                            : `¿Deseas eliminar los ${selectedRoles.length} roles seleccionados?`}
-                    </Typography>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={closeDeleteConfirm} sx={{ color: '#746B70' }}>Cancelar</Button>
-                    <Button onClick={confirmDelete} variant="contained" color="error" disabled={!canDeleteRole}>Eliminar</Button>
-                </DialogActions>
-            </Dialog>
+
+            <MainModal
+                isOpen={deleteConfirmOpen}
+                Title={roleToDelete ? 'Eliminar rol' : 'Eliminar roles'}
+                message={roleToDelete
+                    ? '¿Está seguro de que desea eliminar el rol de usuario seleccionado? Esta acción no se puede revertir.'
+                    : `¿Deseas eliminar los ${selectedRoles.length} roles seleccionados?`}
+                primaryButtonText="Eliminar"
+                secondaryButtonText="Cancelar"
+                onPrimaryClick={confirmDelete}
+                onSecondaryClick={closeDeleteConfirm}
+            />
 
             <Dialog open={deleteErrorOpen} onClose={() => setDeleteErrorOpen(false)}>
                 <DialogTitle sx={{ color: '#3A1724', fontWeight: 600 }}>No se pueden eliminar los roles</DialogTitle>
