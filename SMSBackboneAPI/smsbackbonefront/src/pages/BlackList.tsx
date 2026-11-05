@@ -1747,7 +1747,7 @@ const BlackList: React.FC = () => {
             />
             <MainModal
                 isOpen={openDeleteModal}
-                Title='Elimianr lista negra'
+                Title='Eliminar lista negra'
                 message='Estas seguro de eliminar la lista negra'
                 primaryButtonText="Aceptar"
                 secondaryButtonText="Cancelar"
