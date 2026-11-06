@@ -76,6 +76,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
 import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 const drawerWidth = 278;
+const tabletDrawerWidth = 240;
 
 type Page = {
     id: number,
@@ -161,6 +162,9 @@ type Props = {
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
+    '@media (min-width: 768px) and (max-width: 1023.95px)': {
+        width: tabletDrawerWidth,
+    },
     transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.enteringScreen,
@@ -875,7 +879,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                 sx={{
                                     position: "absolute",
                                     display: "block",
-                                    height: { xs: 38, sm: 42, md: 110 },
+                                    height: { xs: 38, sm: 42, md: 42, lg: 110 },
                                     width: "auto",
                                     objectFit: "contain",
                                     filter: "brightness(0) invert(1)",
@@ -891,7 +895,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '16px',
+                            gap: { sm: '8px', lg: '16px' },
                         }}
                     >
                         <Box
@@ -899,7 +903,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 position: 'relative',
-                                marginRight: '50px',
+                                marginRight: { sm: '12px', lg: '50px' },
                             }}
                         >
                             {/* Buscador */}
@@ -918,7 +922,7 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                                         boxShadow: 2,
                                         border: '1px solid #7B354D',
                                         height: '40px',
-                                        width: '300px',
+                                        width: { sm: '220px', lg: '300px' },
                                     }}
                                 >
                                     {/* Campo de texto para búsqueda */}
@@ -2611,6 +2615,10 @@ const NavBarAndDrawer: React.FC<Props> = props => {
                     display: 'flex',
                     flexDirection: 'column',
                     boxSizing: 'border-box',
+                    '@media (min-width: 768px) and (max-width: 1023.95px)': {
+                        width: `calc(100% - ${tabletDrawerWidth - 1}px)`,
+                        marginLeft: `${tabletDrawerWidth - 1}px`,
+                    },
                 }}
             >
                 <Box sx={{ height: '4.5rem' }} />

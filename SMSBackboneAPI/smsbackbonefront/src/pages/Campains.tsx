@@ -2867,9 +2867,14 @@ const Campains: React.FC = () => {
           md: 3,
         },
 
-        minHeight: "calc(100vh - 64px)",
+        height: "calc(100vh - 110px)",
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        boxSizing: "border-box",
+        marginTop: "-80px",
 
-        overflowX: "hidden", marginTop: "-80px"
       }}
     >
       <Joyride
@@ -3017,9 +3022,9 @@ const Campains: React.FC = () => {
         </Typography>
       </Box>
 
-      <Box sx={{ marginLeft: "32px", }}>
+      <Box sx={{ marginLeft: "32px", display: "flex", flexDirection: "column", flex: 1, minHeight: 0, overflow: "hidden" }}>
         <Divider sx={{ marginBottom: "17px", marginTop: "16px" }} />
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ flex: 1, minHeight: 0, height: 0, overflow: "hidden", flexWrap: "nowrap" }}>
           {/* Listado de campañas */}
 
           <Grid item sx={{ display: 'flex', }}>
@@ -3031,16 +3036,9 @@ const Campains: React.FC = () => {
                     padding: "15px",
                     borderRadius: "8px 0 0 8px",
                     width: "370px",
-                    minHeight: {
-                      xs: "391px",
-                      md: "431px",
-                      lg: "520px",
-                    },
-                    maxHeight: {
-                      xs: "478px",
-                      md: "588px",
-                      lg: "698px",
-                    },
+                    height: "100%",
+                    minHeight: 0,
+                    maxHeight: "100%",
                     display: "flex",
                     flexDirection: "column",
                   }}
@@ -3528,16 +3526,9 @@ const Campains: React.FC = () => {
               <IconButton
                 onClick={() => setPanelAbierto(!panelAbierto)}
                 sx={{
-                  minHeight: {
-                    xs: "391px",
-                    md: "431px",
-                    lg: "520px",
-                  },
-                  maxHeight: {
-                    xs: "478px",
-                    md: "588px",
-                    lg: "698px",
-                  },
+                  height: "100%",
+                  minHeight: 0,
+                  maxHeight: "100%",
                   width: "30px",
                   borderRadius: "0 8px 8px 0",
                   borderLeft: "1px solid #D6D6D6",
@@ -3561,8 +3552,18 @@ const Campains: React.FC = () => {
 
           {/* Visualización de campaña */}
           {filteredCampaigns.length > 0 && (
-            <Grid item xs >
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1, }}>
+            <Grid
+              item
+              xs
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+                minHeight: 0,
+                overflow: "hidden",
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1, flexShrink: 0 }}>
 
                 <Typography
                   variant="h6"
@@ -3623,16 +3624,9 @@ const Campains: React.FC = () => {
 
               <Box
                 sx={{
-                  minHeight: {
-                    xs: "391px",
-                    md: "431px",
-                    lg: "520px",
-                  },
-                  maxHeight: {
-                    xs: "431px",
-                    md: "541px",
-                    lg: "651px",
-                  },
+                  flex: 1,
+                  minHeight: 0,
+                  maxHeight: "100%",
                   overflowY: "auto",
                   pr: 1,
                   display: "flex",
@@ -7441,7 +7435,7 @@ const Campains: React.FC = () => {
                   <DynamicCampaignText
                     variables={selectedVariables}
                     value={mensajeTexto}
-                     onChange={(value) => setMensajeTexto(removeAccents(value))}
+                    onChange={(value) => setMensajeTexto(removeAccents(value))}
                     allowConcatenation={allowConcatenation}
                     sampleData={sampleData}
                   />

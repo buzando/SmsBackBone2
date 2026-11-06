@@ -489,7 +489,7 @@ const Templates = () => {
 
                 minHeight: "calc(100vh - 64px)",
 
-                overflowX: "hidden", marginTop: "-80px"
+                overflowX: "hidden"
             }}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
@@ -523,7 +523,7 @@ const Templates = () => {
             <Box sx={{ marginLeft: "32px" }}>
                 <Divider sx={{ marginBottom: '17px', marginTop: '16px' }} />
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '25px', marginBottom: '20px' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: { xs: 1, lg: 3 }, marginBottom: 2.5, flexWrap: 'wrap' }}>
                     <MainIcon
                         text="Nueva plantilla"
                         isLoading={false}
@@ -580,7 +580,7 @@ const Templates = () => {
                             )}
                         </Box>
                     </div>
-                </div>
+                </Box>
 
                 {templates.length > 0 && (
                     <Box sx={{
