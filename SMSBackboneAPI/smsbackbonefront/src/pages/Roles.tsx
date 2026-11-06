@@ -895,13 +895,15 @@ const Roles: React.FC = () => {
 
                 pt: {
                     sm: 2,
-                    md: 3,
+                    md: 0,
                 },
 
-                minHeight: "calc(100vh - 64px)",
-
-                overflowX: "hidden",
-                marginTop: 0
+                height: 'calc(100vh - 112px)',
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                boxSizing: 'border-box',
             }}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
@@ -1027,7 +1029,7 @@ const Roles: React.FC = () => {
                     )}
                 </Box>
             </Box>
-            <Paper elevation={0} sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: { xs: 1.5, md: 2 }, bgcolor: '#F2F2F2', overflow: 'hidden' }}>
+            <Paper elevation={0} sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', p: { xs: 1.5, md: 2 }, bgcolor: '#F2F2F2', overflow: 'hidden' }}>
                 <Tabs
                     value={activeTab}
                     onChange={(_, value: number) => setActiveTab(value)}
@@ -1046,7 +1048,14 @@ const Roles: React.FC = () => {
                 </Tabs>
 
                 {activeTab === 0 ? (
-                    <TableContainer sx={{ flex: 1, minHeight: '524px', maxHeight: '600px', overflow: 'auto', bgcolor: '#FFF', borderRadius: '0px 0px 8px 8px' }}>
+                    <TableContainer sx={{
+                        flex: 1,
+                        minHeight: 0,
+                        overflow: 'auto',
+                        pb: 1,
+                        bgcolor: '#FFF',
+                        borderRadius: '0px 0px 8px 8px',
+                    }}>
                         <Table
                             stickyHeader
                             aria-label="Lista de roles"
@@ -1337,7 +1346,7 @@ const Roles: React.FC = () => {
                     </TableContainer>
                 ) : (
                     <Box sx={{ mt: 0, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', border: '1px solid #D9D4D6', borderTop: 0, borderRadius: '0 0 6px 6px', overflow: 'hidden', backgroundColor: '#FFFFFF' }}>
-                        <Box sx={{ flex: 1, minHeight: '534px', display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gridTemplateRows: { xs: '1fr 1fr', md: '1fr' }, overflow: 'hidden' }}>
+                        <Box sx={{ flex: 1, minHeight: '0', display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gridTemplateRows: { xs: '1fr 1fr', md: '1fr' }, overflow: 'hidden' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0, borderRight: { xs: 0, md: '1px solid #D9D4D6' }, borderBottom: { xs: '1px solid #D9D4D6', md: 0 } }}>
                                 <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6' }}>
                                     {showAssignmentUserSearch ? (
