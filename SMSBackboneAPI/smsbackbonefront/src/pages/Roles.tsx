@@ -900,7 +900,8 @@ const Roles: React.FC = () => {
 
                 minHeight: "calc(100vh - 64px)",
 
-                overflowX: "hidden", marginTop: "-80px"
+                overflowX: "hidden",
+                marginTop: 0
             }}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, }}>
@@ -1598,7 +1599,10 @@ const Roles: React.FC = () => {
                     </Box>
                     <Divider />
                     <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button onClick={() => setInspectedRole(null)} sx={{ color: '#833A53', fontWeight: 600, textTransform: 'uppercase' }}>Cerrar</Button>
+                        <SecondaryButton
+                            text="Cerrar"
+                            onClick={() => setInspectedRole(null)}
+                        />
                     </Box>
                 </Box>
             </Drawer>

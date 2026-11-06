@@ -1,5 +1,6 @@
 #root {
-    width: 100vw; /* 🔥 Ocupa todo el ancho */
+    width: 100%;
+    min-width: 768px; /* 🔥 Ocupa todo el ancho */
     height: 100vh; /* 🔥 Ocupa toda la altura */
     margin: 0;
     padding: 0;

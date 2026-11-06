@@ -61,6 +61,7 @@ import MainButton from "../components/commons/MainButton";
 import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyride';
 import Userblue from "../assets/User-blue.png"
 import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 const INITIAL_FORM_DATA: FormData = {
     name: "", email: "", confirmEmail: "", phone: "",
     useRecoveryEmail: false, password: "", confirmPassword: "",
@@ -169,7 +170,8 @@ const ManageAccounts: React.FC = () => {
         ? [selectedDefaultRole.id]
         : selectedCustomRoleIds;
     const customRoles = availableRoles.filter(role => !role.isSystem);
-
+    const canCreateEditUsers = hasAssignedPermission(ROLE_PERMISSION_CODES.USERS_CREATE_EDIT);
+    const canDeleteUsers = hasAssignedPermission(ROLE_PERMISSION_CODES.USERS_DELETE);
     useEffect(() => {
         if (!openAddUserModal) return;
 
@@ -496,6 +498,7 @@ const ManageAccounts: React.FC = () => {
     };
 
     const handleOpenModal = () => {
+        if (!canCreateEditUsers) return;
         fetchRooms();
         setSelectedCustomRoleIds([]);
         setOpenAddUserModal(true);
@@ -575,6 +578,7 @@ const ManageAccounts: React.FC = () => {
     };
 
     const handleDeleteUser = async () => {
+        if (!canDeleteUsers || !selectedAccount) return;
         if (selectedAccount) {
             try {
                 const requestUrl = `${import.meta.env.VITE_API_DELETE_USERS}?id=${selectedAccount.id}`;
@@ -598,6 +602,7 @@ const ManageAccounts: React.FC = () => {
     };
 
     const handleAddUser = async () => {
+        if (!canCreateEditUsers) return;
         try {
             const userData = localStorage.getItem("userData");
             if (!userData) {
@@ -768,6 +773,7 @@ const ManageAccounts: React.FC = () => {
     }, []);
 
     const handleEditClick = async (account: Account) => {
+        if (!canCreateEditUsers) return;
 
         if (rooms.length === 0) {
             await fetchRooms();
@@ -976,6 +982,7 @@ const ManageAccounts: React.FC = () => {
                         startIcon={<AddIcon />}
                         sx={{ backgroundColor: "#833A53", fontFamily: "Poppins", border: "1px solid #60293C", }}
                         onClick={handleOpenModal}
+                        disabled={!canCreateEditUsers}
                     >
                         Añadir usuario
                     </Button>
@@ -1300,6 +1307,7 @@ const ManageAccounts: React.FC = () => {
                                                     }}
                                                 >
                                                     <MenuItem
+                                                        disabled={!canCreateEditUsers}
                                                         onClick={() => {
                                                             handleEditClick(selectedAccount!);
                                                             handleMenuClose();
@@ -1320,6 +1328,7 @@ const ManageAccounts: React.FC = () => {
                                                         </Typography>
                                                     </MenuItem>
                                                     <MenuItem
+                                                        disabled={!canDeleteUsers}
                                                         onClick={() => {
                                                             setOpenDeleteModal(true);
                                                             handleMenuClose();
@@ -2643,6 +2652,7 @@ const ManageAccounts: React.FC = () => {
                             </Typography>
                         </Button>
                         <Button onClick={handleDeleteUser}
+                            disabled={!canDeleteUsers}
                             sx={{
                                 width: "92px", height: "32px", borderRadius: "4px", border: "transparent",
                                 backgroundColor: "#FFFFFF",

@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { hasAssignedPermission, hasPermission, PERMISSIONS, ROLE_PERMISSION_CODES } from './permisions';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import { Button, Typography, Box, CircularProgress, IconButton, Menu, MenuItem, Tooltip, Modal, Divider, TableRow } from "@mui/material";
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
@@ -52,8 +52,7 @@ export interface FacturaResumen {
 
 const PaymentHistoric: React.FC = () => {
     const canManageBillingHistory = hasAssignedPermission(ROLE_PERMISSION_CODES.BILLING_HISTORY_MANAGE);
-    const canManageInvoices = hasPermission(PERMISSIONS.BILLING_INVOICES_MANAGE);
-
+    const canManageInvoices = hasAssignedPermission(ROLE_PERMISSION_CODES.BILLING_INVOICES_MANAGE);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedDates, setSelectedDates] = useState<{ start: Date, end: Date, startHour: number, startMinute: number, endHour: number, endMinute: number } | null>(null);
     const [loading, setLoading] = useState(false);
@@ -204,7 +203,6 @@ const PaymentHistoric: React.FC = () => {
 
     const handleCreateInvoice = async () => {
         if (!canManageInvoices) return;
-        if (!canManageBillingHistory) return;
         if (!selectedRecarga) return;
 
         const userId =
