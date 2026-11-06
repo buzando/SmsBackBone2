@@ -43,6 +43,7 @@ import NoResult from '../assets/NoResultados.svg';
 import axios from "../components/commons/AxiosInstance";
 import { isAxiosError } from 'axios';
 import backarrow from '../assets/MoveTable.svg';
+import backarrowD from '../assets/MoveTabledesactivated.svg';
 import ModalError from '../components/commons/ModalError';
 import SnackBar from '../components/commons/ChipBar';
 import '../components/commons/CSS/Roles.css';
@@ -67,7 +68,7 @@ import SecondaryButton from '../components/commons/SecondaryButton';
 import MainButton from '../components/commons/MainButton';
 import IconUserOff from '../assets/IconUserOff.svg';
 import IconUserOn from '../assets/IconUserOn.svg';
-
+import IconSearchDefault from '../assets/IconSearchDefault.svg';
 
 type Role = {
     id: string;
@@ -927,39 +928,119 @@ const Roles: React.FC = () => {
             <Divider sx={{ marginBottom: '17px', marginTop: '16px' }} />
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', px: { xs: 0, md: 1 }, pb: 1.5, ml: 2 }}>
                 {activeTab === 0 ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-                        <Typography variant="body2" sx={{ color: '#574B4F', mr: 0.5, fontFamily: 'Poppins', fontWeight: 400, fontSize: '14px' }}>
-                            {firstRecord}–{lastRecord} | Página {page} de {totalPages}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: '#574B4F',
+                                mr: 0.5,
+                                fontFamily: 'Poppins',
+                                fontWeight: 400,
+                                fontSize: '14px',
+                                minWidth: '120px'
+                            }}
+                        >
+                            {firstRecord}–{lastRecord} de {totalRecords}
                         </Typography>
 
-                        <IconButton size="small" aria-label="Primera página"
-                            onClick={handleFirstPage} disabled={isFirstPage}>
+                        {/* Primera página */}
+                        <IconButton
+                            size="small"
+                            aria-label="Primera página"
+                            onClick={handleFirstPage}
+                            disabled={isFirstPage}
+                            sx={{ p: 0 }}
+                        >
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <img src={backarrow} alt="" />
-                                <img src={backarrow} alt="" style={{ marginLeft: '-14px' }} />
+                                <img
+                                    src={isFirstPage ? backarrowD : backarrow}
+                                    alt=""
+                                    style={{ width: 22, height: 22, display: 'block' }}
+                                />
+                                <img
+                                    src={isFirstPage ? backarrowD : backarrow}
+                                    alt=""
+                                    style={{
+                                        width: 22,
+                                        height: 22,
+                                        display: 'block',
+                                        marginLeft: '-16px'
+                                    }}
+                                />
                             </Box>
                         </IconButton>
 
-                        <IconButton size="small" aria-label="Página anterior"
-                            onClick={handlePreviousPage} disabled={isFirstPage}>
-                            <img src={backarrow} alt="" />
+                        {/* Página anterior */}
+                        <IconButton
+                            size="small"
+                            aria-label="Página anterior"
+                            onClick={handlePreviousPage}
+                            disabled={isFirstPage}
+                            sx={{ p: 0 }}
+                        >
+                            <img
+                                src={isFirstPage ? backarrowD : backarrow}
+                                alt=""
+                                style={{ width: 22, height: 22, display: 'block' }}
+                            />
                         </IconButton>
 
-                        <IconButton size="small" aria-label="Página siguiente"
-                            onClick={handleNextPage} disabled={isLastPage}>
-                            <img src={backarrow} alt="" style={{ transform: 'scaleX(-1)' }} />
+                        {/* Página siguiente */}
+                        <IconButton
+                            size="small"
+                            aria-label="Página siguiente"
+                            onClick={handleNextPage}
+                            disabled={isLastPage}
+                            sx={{ p: 0 }}
+                        >
+                            <img
+                                src={isLastPage ? backarrowD : backarrow}
+                                alt=""
+                                style={{
+                                    width: 22,
+                                    height: 22,
+                                    display: 'block',
+                                    transform: 'scaleX(-1)'
+                                }}
+                            />
                         </IconButton>
 
-                        <IconButton size="small" aria-label="Última página"
-                            onClick={handleLastPage} disabled={isLastPage}>
+                        {/* Última página */}
+                        <IconButton
+                            size="small"
+                            aria-label="Última página"
+                            onClick={handleLastPage}
+                            disabled={isLastPage}
+                            sx={{ p: 0 }}
+                        >
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <img src={backarrow} alt="" style={{ transform: 'scaleX(-1)' }} />
-                                <img src={backarrow} alt=""
-                                    style={{ transform: 'scaleX(-1)', marginLeft: '-12px' }} />
+                                <img
+                                    src={isLastPage ? backarrowD : backarrow}
+                                    alt=""
+                                    style={{
+                                        width: 22,
+                                        height: 22,
+                                        display: 'block',
+                                        transform: 'scaleX(-1)'
+                                    }}
+                                />
+                                <img
+                                    src={isLastPage ? backarrowD : backarrow}
+                                    alt=""
+                                    style={{
+                                        width: 22,
+                                        height: 22,
+                                        display: 'block',
+                                        transform: 'scaleX(-1)',
+                                        marginLeft: '-16px'
+                                    }}
+                                />
                             </Box>
                         </IconButton>
                     </Box>
-                ) : <Box />}
+                ) : (
+                    <Box />
+                )}
                 <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap', ml: 'auto' }}>
                     <MainIcon
                         text="Añadir rol"
@@ -1333,7 +1414,7 @@ const Roles: React.FC = () => {
                                 ))}
                                 {filteredRoles.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={4} sx={{ border: 0 }}>
+                                        <TableCell colSpan={4} sx={{ border: 0, height: '481px' }}>
                                             <Box sx={{ minHeight: 280, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.5, color: '#746B70', marginTop: 8 }}>
                                                 <Box component="img" src={NoResult} alt="No se encontraron resultados" sx={{ width: 176, height: 149, objectFit: 'contain' }} />
                                                 <Typography sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#8F4D63', fontSize: '16px' }}>No hay información para mostrar.</Typography>
@@ -1371,10 +1452,13 @@ const Roles: React.FC = () => {
                                         }}
                                         sx={{ color: '#8D858A' }}
                                     >
-                                        <SearchIcon fontSize="small" />
+                                        <img
+                                            src={IconSearchDefault}
+                                            alt="Buscar"
+                                            style={{ width: 24, height: 24 }} />
                                     </IconButton>
                                 </Box>
-                                <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain' }}>
+                                <Box sx={{ flex: 1, maxHeight: 346, overflowY: 'auto', overscrollBehavior: 'contain' }}>
                                     {isLoadingAssignmentUsers ? (
                                         <Box sx={{ minHeight: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <CircularProgress size={26} sx={{ color: '#833A53' }} />
@@ -1395,8 +1479,8 @@ const Roles: React.FC = () => {
                                             </Button>
                                         </Box>
                                     ) : assignmentVisibleUsers.length === 0 ? (
-                                        <Box sx={{ minHeight: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, textAlign: 'center' }}>
-                                            <Typography sx={{ color: '#8D858A', fontSize: 13 }}>No se encontraron usuarios.</Typography>
+                                        <Box sx={{ minHeight: 346, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, textAlign: 'center' }}>
+                                            <Typography sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#8F4D63', fontSize: '16px' }}>No se encontraron usuarios.</Typography>
                                         </Box>
                                     ) : assignmentVisibleUsers.map(user => (
                                         <Box
@@ -1484,7 +1568,10 @@ const Roles: React.FC = () => {
                                         }}
                                         sx={{ color: '#8D858A' }}
                                     >
-                                        <SearchIcon fontSize="small" />
+                                        <img
+                                            src={IconSearchDefault}
+                                            alt="Buscar"
+                                            style={{ width: 24, height: 24 }} />
                                     </IconButton>
                                 </Box>
                                 {selectedRoleIsSystem && (
@@ -1492,7 +1579,7 @@ const Roles: React.FC = () => {
                                         Los roles personalizados están deshabilitados porque seleccionaste un rol predeterminado. Desmarca ese rol para elegir uno personalizado.
                                     </Alert>
                                 )}
-                                <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain' }}>
+                                <Box sx={{ flex: 1, maxHeight: 346, overflowY: 'auto', overscrollBehavior: 'contain' }}>
                                     {isLoadingAssignmentRoles ? (
                                         <Box sx={{ minHeight: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <CircularProgress size={26} sx={{ color: '#833A53' }} />
@@ -1540,8 +1627,8 @@ const Roles: React.FC = () => {
                                         </Box>
                                     ))}
                                     {!isLoadingAssignmentRoles && !assignmentRolesError && assignmentVisibleRoles.length === 0 && (
-                                        <Box sx={{ minHeight: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2 }}>
-                                            <Typography sx={{ color: '#8D858A', fontSize: 13 }}>No se encontraron roles.</Typography>
+                                        <Box sx={{ minHeight: 346, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2 }}>
+                                            <Typography sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#8F4D63', fontSize: '16px' }}>No se encontraron roles.</Typography>
                                         </Box>
                                     )}
                                 </Box>
