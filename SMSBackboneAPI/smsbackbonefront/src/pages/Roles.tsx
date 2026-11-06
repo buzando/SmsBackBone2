@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
 import {
     Alert,
     Avatar,
@@ -64,6 +65,8 @@ import infoicon from '../assets/Icon-info.svg';
 import IconCloseModal from "../assets/IconCloseModal.svg";
 import SecondaryButton from '../components/commons/SecondaryButton';
 import MainButton from '../components/commons/MainButton';
+import IconUserOff from '../assets/IconUserOff.svg';
+import IconUserOn from '../assets/IconUserOn.svg';
 
 
 type Role = {
@@ -1042,7 +1045,7 @@ const Roles: React.FC = () => {
                 </Tabs>
 
                 {activeTab === 0 ? (
-                    <TableContainer sx={{ flex: 1, minHeight: '524px', maxHeight: 'none', overflow: 'auto', bgcolor: '#FFFFFF', borderRadius: '0px 0px 8px 8px' }}>
+                    <TableContainer sx={{ flex: 1, minHeight: '524px', maxHeight: '600px', overflow: 'auto', bgcolor: '#FFF', borderRadius: '0px 0px 8px 8px' }}>
                         <Table
                             stickyHeader
                             aria-label="Lista de roles"
@@ -1333,9 +1336,9 @@ const Roles: React.FC = () => {
                     </TableContainer>
                 ) : (
                     <Box sx={{ mt: 0, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', border: '1px solid #D9D4D6', borderTop: 0, borderRadius: '0 0 6px 6px', overflow: 'hidden', backgroundColor: '#FFFFFF' }}>
-                        <Box sx={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gridTemplateRows: { xs: '1fr 1fr', md: '1fr' }, overflow: 'hidden' }}>
+                        <Box sx={{ flex: 1, minHeight: '534px', display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gridTemplateRows: { xs: '1fr 1fr', md: '1fr' }, overflow: 'hidden' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0, borderRight: { xs: 0, md: '1px solid #D9D4D6' }, borderBottom: { xs: '1px solid #D9D4D6', md: 0 } }}>
-                                <Box sx={{ minHeight: 48, px: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6' }}>
+                                <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6' }}>
                                     {showAssignmentUserSearch ? (
                                         <TextField
                                             autoFocus
@@ -1386,39 +1389,67 @@ const Roles: React.FC = () => {
                                             <Typography sx={{ color: '#8D858A', fontSize: 13 }}>No se encontraron usuarios.</Typography>
                                         </Box>
                                     ) : assignmentVisibleUsers.map(user => (
-                                        <Box key={user.id} sx={{ minHeight: 56, px: 1.2, display: 'flex', alignItems: 'center', gap: 1, borderBottom: '1px solid #C6BFC2' }}>
-                                            <Checkbox
-                                                size="small"
-                                                checked={selectedAssignmentUserId === user.id}
-                                                disabled={isLoadingAssignmentRoles}
-                                                onChange={event => handleAssignmentUserSelection(user, event.target.checked)}
-                                                inputProps={{ 'aria-label': `Seleccionar usuario ${user.name || user.email}` }}
-                                                sx={{ p: 0.5, color: '#B9B5B7', '&.Mui-checked': { color: '#833A53' } }}
+                                        <Box
+                                            key={user.id}
+                                            onClick={() => handleAssignmentUserSelection(
+                                                user,
+                                                selectedAssignmentUserId !== user.id
+                                            )}
+                                            sx={{
+                                                height: '48px',
+                                                padding: '8px 16px 8px 11px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '16px',
+                                                borderBottom: '1px solid #C6BFC2',
+                                                cursor: isLoadingAssignmentRoles ? 'default' : 'pointer',
+                                                backgroundColor: selectedAssignmentUserId === user.id
+                                                    ? 'rgba(143, 77, 99, 0.12)'
+                                                    : '#FFFFFF',
+                                                '&:hover': {
+                                                    backgroundColor: isLoadingAssignmentRoles
+                                                        ? undefined
+                                                        : '#F8F3F5'
+                                                }
+                                            }}
+                                        >
+                                            <img
+                                                src={selectedAssignmentUserId === user.id ? IconUserOn : IconUserOff}
+                                                alt="User"
+                                                style={{ width: 34, height: 34 }}
                                             />
-                                            <Avatar sx={{ width: 30, height: 30, bgcolor: '#F2EBED', color: '#833A53' }}>
-                                                <PersonOutlineIcon sx={{ fontSize: 19 }} />
-                                            </Avatar>
-                                            <Box sx={{ minWidth: 0, flex: 1 }}>
-                                                <Typography noWrap className='roles-generic-text-two' sx={{ color: '#51464B', fontSize: 13, fontWeight: 500 }}>
-                                                    {user.name || user.email || `Usuario ${user.id}`}
-                                                </Typography>
-                                                {user.email && (
-                                                    <Typography noWrap sx={{ color: '#8D858A', fontSize: 11 }}>
-                                                        {user.email}
-                                                    </Typography>
-                                                )}
-                                            </Box>
+
+                                            <Typography
+                                                noWrap
+                                                className='roles-generic-text-two'
+                                                sx={{
+                                                    color: selectedAssignmentUserId === user.id
+                                                        ? '#8F4D63'
+                                                        : '#51464B',
+                                                    fontSize: 13,
+                                                    fontWeight: 500
+                                                }}
+                                            >
+                                                {user.name || user.email || `Usuario ${user.id}`}
+                                            </Typography>
                                         </Box>
-                                    ))}
+                                    ))
+                                    }
                                 </Box>
                             </Box>
 
                             <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0 }}>
-                                <Box sx={{ minHeight: 48, px: 1.2, display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #D9D4D6' }}>
+                                <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #D9D4D6' }}>
                                     <Checkbox
                                         size="small"
                                         disabled
                                         inputProps={{ 'aria-label': 'Seleccionar todos los roles' }}
+                                        icon={
+                                            <img src={CheckboxUnselect} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '2px' }} />
+                                        }
+                                        checkedIcon={
+                                            <img src={CheckboxSelect} style={{ width: 22, height: 21, marginLeft: '-2px' }} />
+                                        }
                                         sx={{ p: 0.5, color: '#B9B5B7' }}
                                     />
                                     {showAssignmentRoleSearch ? (
@@ -1459,7 +1490,7 @@ const Roles: React.FC = () => {
                                     ) : assignmentRolesError ? (
                                         <Alert severity="error" sx={{ m: 2 }}>{assignmentRolesError}</Alert>
                                     ) : assignmentVisibleRoles.map(role => (
-                                        <Box key={role.id} sx={{ minHeight: 37, px: 1.2, display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #C6BFC2' }}>
+                                        <Box key={role.id} sx={{ height: '48px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #C6BFC2' }}>
                                             <Checkbox
                                                 size="small"
                                                 checked={selectedAssignmentRoleId === Number(role.id)}
@@ -1469,17 +1500,27 @@ const Roles: React.FC = () => {
                                                 }
                                                 onChange={event => handleAssignmentRoleSelection(role, event.target.checked)}
                                                 inputProps={{ 'aria-label': `Asignar rol ${role.name}` }}
+                                                icon={
+                                                    <img src={selectedAssignmentUserId === null || (!role.isSystem && selectedRoleIsSystem) ? CheckboxUnselect : CheckboxDefault}
+                                                        alt="UnChecked"
+                                                        style={{ width: 18, height: 18, marginRight: '2px' }} />
+                                                }
+                                                checkedIcon={
+                                                    <img src={CheckboxSelect} style={{ width: 22, height: 21, marginLeft: '-2px' }} />
+                                                }
                                                 sx={{ p: 0.5, color: '#B9B5B7', '&.Mui-checked': { color: '#833A53' }, '&.Mui-disabled': { color: '#C7C3C5' } }}
                                             />
                                             <Box sx={{ minWidth: 0, flex: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                <Typography noWrap className='roles-generic-text-two' sx={{ color: selectedAssignmentRoleId === Number(role.id) ? '#51464B' : '#6F6870', fontSize: 13 }}>
+                                                <Typography noWrap className='roles-generic-text-two' sx={{ color: selectedAssignmentRoleId === Number(role.id) ? '#574B4F' : '#B8B8B8', fontSize: 13 }}>
                                                     {role.name}
                                                 </Typography>
+                                                {/*  
                                                 {role.isSystem && (
                                                     <Tooltip title={getSystemRoleDescription(role.name)}>
                                                         <InfoOutlinedIcon sx={{ color: '#9A9296', fontSize: 15, flexShrink: 0 }} />
                                                     </Tooltip>
                                                 )}
+*/}
                                             </Box>
                                             <Box sx={{ borderRadius: 10, bgcolor: '#F2EBED', px: 1, py: 0.25, mr: 0.2 }}>
                                                 <Typography sx={{ color: '#786E71', fontSize: '9px', lineHeight: 1.5, fontWeight: 400, fontFamily: 'Poppins' }}>
@@ -1496,21 +1537,18 @@ const Roles: React.FC = () => {
                                 </Box>
                             </Box>
                         </Box>
-                        <Box sx={{ minHeight: 52, flexShrink: 0, px: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #D9D4D6' }}>
-                            <Button
+                        <Box sx={{ minHeight: 69, flexShrink: 0, padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #D9D4D6' }}>
+                            <SecondaryButton
+                                text="Cancelar"
                                 onClick={() => setCancelAssignmentConfirmOpen(true)}
-                                sx={{ color: '#833A53', fontSize: 11, fontWeight: 600 }}
-                            >
-                                Cancelar
-                            </Button>
-                            <Button
-                                variant="contained"
+                            />
+
+                            <MainButton
+                                text={isSavingAssignment ? 'Guardando…' : 'Guardar cambios'}
                                 onClick={() => void handleSaveAssignment()}
                                 disabled={!canAssignRoles || !canSaveAssignment}
-                                sx={{ bgcolor: '#833A53', color: '#FFFFFF', fontSize: 11, fontWeight: 600, '&:hover': { bgcolor: '#6D2F45' }, '&.Mui-disabled': { bgcolor: '#E2DFE0', color: '#A9A5A6' } }}
-                            >
-                                {isSavingAssignment ? 'Guardando…' : 'Guardar cambios'}
-                            </Button>
+                                width="180px"
+                            />
                         </Box>
                     </Box>
                 )}
