@@ -107,3 +107,33 @@
     padding-left: 16px !important;
     text-align: left;
 }
+
+.roles-inspection-modal-text{
+    display: flex;
+    padding: 16px 10px 10px 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
+    align-self: stretch;
+}
+
+.roles-inspection-modal-text-two {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.roles-close-icon-box{
+    display: flex;
+    width: 35px;
+    height: 35px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    border: 1px solid #E3E2E2;
+}

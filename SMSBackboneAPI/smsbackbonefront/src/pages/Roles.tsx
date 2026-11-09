@@ -64,11 +64,13 @@ import CheckboxMinusOne from "../assets/CheckboxMinusOne.svg";
 import MainIcon from '../components/commons/MainButtonIcon';
 import infoicon from '../assets/Icon-info.svg';
 import IconCloseModal from "../assets/IconCloseModal.svg";
+import IconCloseModalTwo from "../assets/IconCloseModalTwo.svg";
 import SecondaryButton from '../components/commons/SecondaryButton';
 import MainButton from '../components/commons/MainButton';
 import IconUserOff from '../assets/IconUserOff.svg';
 import IconUserOn from '../assets/IconUserOn.svg';
 import IconSearchDefault from '../assets/IconSearchDefault.svg';
+import IconInfoRol from '../assets/IconInfoRol.svg';
 
 type Role = {
     id: string;
@@ -885,7 +887,6 @@ const Roles: React.FC = () => {
         <Box p={3}
             sx={{
                 width: "100%",
-
                 mx: "auto",
 
                 px: {
@@ -899,7 +900,7 @@ const Roles: React.FC = () => {
                     md: 0,
                 },
 
-                height: 'calc(100vh - 112px)',
+                height: 'calc(100vh - 86px)',
                 minHeight: 0,
                 display: 'flex',
                 flexDirection: 'column',
@@ -1575,9 +1576,20 @@ const Roles: React.FC = () => {
                                     </IconButton>
                                 </Box>
                                 {selectedRoleIsSystem && (
-                                    <Alert severity="info" icon={<InfoOutlinedIcon />} sx={{ mx: 1.25, mt: 1, py: 0, fontSize: 11 }}>
-                                        Los roles personalizados están deshabilitados porque seleccionaste un rol predeterminado. Desmarca ese rol para elegir uno personalizado.
-                                    </Alert>
+                                    <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6' }}>
+                                        <Box sx={{
+                                            display: 'flex', padding: '8px 16px', justifyContent: 'center', alignItems: 'center', gap: '12px', alignSelf: 'stretch',
+                                            borderRadius: '4px', border: '1px solid #833A53', backgroundColor: '#F8F8F8', width: '100%'
+                                        }}>
+                                            <img src={IconInfoRol}
+                                                alt="Regresar"
+                                                style={{ width: 24, height: 24 }}
+                                            />
+                                            <Typography sx={{ fontSize: 12, fontWeight: 500, color: '#833A53', fontFamily: 'Poppins' }}>
+                                                Desmarca el rol predeterminado si deseas asignar roles personalizados.
+                                            </Typography>
+                                        </Box>
+                                    </Box>
                                 )}
                                 <Box sx={{ flex: 1, maxHeight: 346, overflowY: 'auto', overscrollBehavior: 'contain' }}>
                                     {isLoadingAssignmentRoles ? (
@@ -1654,13 +1666,13 @@ const Roles: React.FC = () => {
             <Drawer
                 anchor="right"
                 open={Boolean(inspectedRole)}
-                onClose={() => setInspectedRole(null)}
+                onClose={(_, reason) => { if (reason === 'escapeKeyDown') { setInspectedRole(null); } }}
                 sx={{
                     '& .MuiDrawer-paper': {
                         display: 'flex',
                         width: '260px',
                         height: '672px',
-                        padding: '0 10px 24px 10px',
+                        padding: '0px 10px 24px 10px',
                         flexDirection: 'column',
                         alignItems: 'flex-start',
                         boxSizing: 'border-box',
@@ -1674,31 +1686,27 @@ const Roles: React.FC = () => {
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', color: '#3A1724' }}>
                     <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <Box>
-                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>Permisos del rol</Typography>
-                            <Typography sx={{ color: '#746B70', fontSize: 14 }}>{inspectedRole?.name}</Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 500, fontSize: '12px', lineHeight: 'normal', letterSpacing: '0.72px', fontFamily: 'Poppins', color: '#312D2E', textTransform: 'uppercase' }}>
+                                {inspectedRole?.name}
+                            </Typography>
+                            <Typography sx={{ fontFamily: 'Poppins', fontSize: '11px', color: '#6F5E75', fontWeight: 500, lineHeight: 'normal', letterSpacing: '0.66px' }}>
+                                Permisos ({inspectedRole?.permissions.length ?? 0})
+                            </Typography>
                         </Box>
-                        <IconButton aria-label="Cerrar" onClick={() => setInspectedRole(null)}><CloseIcon /></IconButton>
+                        <Box className='roles-close-icon-box'>
+                            <IconButton aria-label="Cerrar" onClick={() => setInspectedRole(null)} >
+                                <img src={IconCloseModalTwo} alt="close" width="14px" height="14px" />
+                            </IconButton>
+                        </Box>
                     </Box>
-                    <Divider />
-                    <Box sx={{ px: 2.5, py: 2 }}>
-                        <Typography sx={{ color: '#746B70', fontSize: 14, mb: 1 }}>Permisos asignados</Typography>
-                        <Typography sx={{ fontSize: 28, fontWeight: 600, color: '#833A53' }}>{inspectedRole?.permissions.length ?? 0}</Typography>
-                    </Box>
-                    <Divider />
-                    <Box sx={{ p: 2.5, overflowY: 'auto', flex: 1 }}>
+                    <Divider sx={{ border: '1px solid #C6BFC2' }} /><Divider />
+                    <Box className='roles-inspection-modal-text'>
                         {inspectedRole?.permissions.map(permission => (
-                            <Box key={permission} sx={{ display: 'flex', alignItems: 'center', gap: 1.25, py: 1.25, borderBottom: '1px solid #EEE9EB' }}>
-                                <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#833A53', flexShrink: 0 }} />
-                                <Typography sx={{ color: '#51464B', fontSize: 14 }}>{ALL_PERMISSION_OPTIONS.find(option => option.code === permission)?.label ?? permission}</Typography>
+                            <Box key={permission} sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                                <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: '#000000', flexShrink: 0 }} />
+                                <Typography className='.roles-inspection-modal-text-two'>{ALL_PERMISSION_OPTIONS.find(option => option.code === permission)?.label ?? permission}</Typography>
                             </Box>
                         ))}
-                    </Box>
-                    <Divider />
-                    <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'flex-end' }}>
-                        <SecondaryButton
-                            text="Cerrar"
-                            onClick={() => setInspectedRole(null)}
-                        />
                     </Box>
                 </Box>
             </Drawer>
