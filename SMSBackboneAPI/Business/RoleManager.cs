@@ -128,8 +128,7 @@ namespace Business
                     .AsNoTracking()
                     .Include(existingRole => existingRole.RolePermissions)
                     .Where(existingRole =>
-                        (existingRole.idCliente == null ||
-                         existingRole.idCliente == idCliente) &&
+                        existingRole.idCliente == idCliente &&
                         existingRole.Role != null &&
                         existingRole.Role.ToLower() != "mesa" &&
                         existingRole.Role.ToLower() != "root" &&
