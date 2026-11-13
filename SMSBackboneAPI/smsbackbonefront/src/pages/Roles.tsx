@@ -51,6 +51,7 @@ import IconEditTwo from "../assets/IconEditTwo.svg";
 import IconEditOne from "../assets/IconEditOne.svg";
 import IconInspecTwo from "../assets/IconInspecTwo.svg";
 import IconInspecOne from "../assets/IconInspecOne.svg";
+import IconInspecHover from "../assets/IconInspecHover.svg";
 import IconDeleteTwo from "../assets/IconDeleteTwo.svg";
 import IconDeleteOne from "../assets/IconDeleteOne.svg";
 import CheckboxUnselect from "../assets/CheckboxUnselect.svg";
@@ -665,7 +666,7 @@ const Roles: React.FC = () => {
     };
 
     const updateRoleName = (value: string) => {
-        const alphanumericValue = value.replace(/[^A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ]/g, '').slice(0, 40);
+        const alphanumericValue = value.replace(/[^A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ ]/g, '').slice(0, 40);
         setRoleName(alphanumericValue);
         setFormError('');
     };
@@ -922,7 +923,7 @@ const Roles: React.FC = () => {
                         }}
                     />
                 </IconButton>
-                <Typography variant="h5" className="roles-title" sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: { xs: 21, md: 24 } }}>
+                <Typography variant="h5" className="roles-title" sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 500, fontSize: { xs: 21, md: 24 } }}>
                     Roles de usuario
                 </Typography>
             </Box>
@@ -1132,11 +1133,14 @@ const Roles: React.FC = () => {
                 {activeTab === 0 ? (
                     <TableContainer sx={{
                         flex: 1,
-                        minHeight: 0,
+                        //maxHeight: '490px',
+                        height: '62vh',
+                        maxHeight: '62vh',
                         overflow: 'auto',
                         pb: 1,
                         bgcolor: '#FFF',
                         borderRadius: '0px 0px 8px 8px',
+
                     }}>
                         <Table
                             stickyHeader
@@ -1288,7 +1292,7 @@ const Roles: React.FC = () => {
                                         <TableCell className='roles-secondary-text' sx={{ borderBottom: '1px solid #C6BFC2', color: role.isSystem ? '#BEB9BC' : selectedRoles.includes(role.id) ? '#8F4D63' : '#574B4F', fontSize: 14, width: 180 }}>
                                             {role.createdAt}
                                         </TableCell>
-                                        <TableCell align="right" sx={{ borderBottom: '1px solid #C6BFC2', p: 0.5 }}>
+                                        <TableCell align="right" sx={{ borderBottom: '1px solid #C6BFC2', paddingRight: '8px' }}>
                                             <Box
                                                 sx={{
                                                     display: 'flex',
@@ -1329,7 +1333,12 @@ const Roles: React.FC = () => {
                                                         ]
                                                     }}
                                                 >
-                                                    <IconButton aria-label={`Inspeccionar permisos de ${role.name}`} onClick={() => setInspectedRole(role)} size="small" sx={{ color: '#382039' }}>
+                                                    <IconButton aria-label={`Inspeccionar permisos de ${role.name}`} onClick={() => setInspectedRole(role)} size="small"
+                                                        sx={{
+                                                            '&:hover img': {
+                                                                filter: 'brightness(0) saturate(100%) invert(5%) sepia(35%) saturate(4000%) hue-rotate(230deg) brightness(40%)',
+                                                            }
+                                                        }}>
                                                         <img src={selectedRoles.includes(role.id) ? IconInspecOne : IconInspecTwo} alt="Inspeccionar" style={{ width: 20, height: 16 }} />
                                                     </IconButton>
                                                 </Tooltip>
@@ -1366,7 +1375,12 @@ const Roles: React.FC = () => {
                                                             ]
                                                         }}
                                                     >
-                                                        <IconButton aria-label={`Editar rol ${role.name}`} onClick={() => openEditRole(role)} size="small">
+                                                        <IconButton aria-label={`Editar rol ${role.name}`} onClick={() => openEditRole(role)} size="small"
+                                                            sx={{
+                                                                '&:hover img': {
+                                                                    filter: 'brightness(0) saturate(100%) invert(5%) sepia(35%) saturate(4000%) hue-rotate(230deg) brightness(40%)',
+                                                                }
+                                                            }}>
                                                             <img src={selectedRoles.includes(role.id) ? IconEditOne : IconEditTwo} alt="Editar" style={{ width: 18, height: 18 }} />
                                                         </IconButton>
                                                     </Tooltip>
@@ -1404,7 +1418,12 @@ const Roles: React.FC = () => {
                                                             ]
                                                         }}
                                                     >
-                                                        <IconButton aria-label={`Eliminar rol ${role.name}`} onClick={() => requestDeleteRole(role)} size="small" sx={{ color: '#382039' }}>
+                                                        <IconButton aria-label={`Eliminar rol ${role.name}`} onClick={() => requestDeleteRole(role)} size="small"
+                                                            sx={{
+                                                                '&:hover img': {
+                                                                    filter: 'brightness(0) saturate(100%) invert(5%) sepia(35%) saturate(4000%) hue-rotate(230deg) brightness(40%)',
+                                                                }
+                                                            }}>
                                                             <img src={selectedRoles.includes(role.id) ? IconDeleteOne : IconDeleteTwo} alt="Eliminar" style={{ width: 16, height: 20 }} />
                                                         </IconButton>
                                                     </Tooltip>
@@ -1427,10 +1446,15 @@ const Roles: React.FC = () => {
                         </Table>
                     </TableContainer>
                 ) : (
-                    <Box sx={{ mt: 0, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', border: '1px solid #D9D4D6', borderTop: 0, borderRadius: '0 0 6px 6px', overflow: 'hidden', backgroundColor: '#FFFFFF' }}>
+                    <Box sx={{
+                        mt: 0, flex: 1, display: 'flex', flexDirection: 'column', border: '1px solid #D9D4D6', borderTop: 0, borderRadius: '0 0 6px 6px', overflow: 'hidden', backgroundColor: '#FFFFFF',
+                        //maxHeight: '490px', 
+                        height: '62vh', maxHeight: '62vh'
+                    }}>
                         <Box sx={{ flex: 1, minHeight: '0', display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gridTemplateRows: { xs: '1fr 1fr', md: '1fr' }, overflow: 'hidden' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0, borderRight: { xs: 0, md: '1px solid #D9D4D6' }, borderBottom: { xs: '1px solid #D9D4D6', md: 0 } }}>
                                 <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6' }}>
+                                    <Typography className='roles-generic-subtitles' sx={{ color: '#330F1B', fontSize: '14px', fontWeight: 500 }}>Usuarios</Typography>
                                     {showAssignmentUserSearch ? (
                                         <TextField
                                             autoFocus
@@ -1438,34 +1462,99 @@ const Roles: React.FC = () => {
                                             value={assignmentUserSearch}
                                             onChange={event => setAssignmentUserSearch(event.target.value)}
                                             placeholder="Buscar usuario"
-                                            inputProps={{ 'aria-label': 'Buscar usuarios para asignar' }}
-                                            sx={{ flex: 1, mr: 1, '& .MuiOutlinedInput-root': { height: 34 } }}
+                                            inputProps={{ 'aria-label': 'Buscar usuarios para asignar', className: 'roles-search-text' }}
+                                            InputProps={{
+                                                startAdornment: (<InputAdornment position="start">
+                                                    <img
+                                                        src={assignmentUserSearch ? Iconseachred : seachicon}
+                                                        alt="Buscar"
+                                                        style={{ marginRight: 8, width: 24 }} />
+                                                </InputAdornment>),
+                                                endAdornment: assignmentUserSearch && (
+                                                    <InputAdornment position="end">
+                                                        <img
+                                                            src={iconclose}
+                                                            alt="Cerrar búsqueda"
+                                                            onClick={() => {
+                                                                setAssignmentUserSearch('');
+                                                                setShowAssignmentUserSearch(false);
+                                                            }}
+                                                            style={{
+                                                                width: 24,
+                                                                height: 24,
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        />
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                            sx={{
+                                                width: 224,
+                                                '& .MuiOutlinedInput-root': {
+                                                    height: 40,
+                                                    borderRadius: 1,
+                                                    bgcolor: '#FFFFFF',
+
+                                                    '& fieldset': {
+                                                        borderColor: assignmentUserSearch ? '#6F1E3A' : '#9B9295',
+                                                    },
+                                                    '&:hover fieldset': {
+                                                        borderColor: assignmentUserSearch ? '#6F1E3A' : '#9B9295',
+                                                    },
+                                                    '&.Mui-focused fieldset': {
+                                                        borderColor: assignmentUserSearch ? '#6F1E3A' : '#9B9295',
+                                                        borderWidth: '1px',
+                                                    },
+                                                    '& .MuiOutlinedInput-input': {
+                                                        color: '#6F1E3A',
+                                                    },
+                                                    '& .MuiOutlinedInput-input::placeholder': {
+                                                        color: '#9B9295',
+                                                        opacity: 1,
+                                                    },
+                                                },
+                                            }}
                                         />
                                     ) : (
-                                        <Typography className='roles-generic-subtitles' sx={{ color: '#330F1B', fontSize: '14px', fontWeight: 500 }}>Usuarios</Typography>
+                                        <IconButton
+                                            size="small"
+                                            aria-label="Buscar usuarios"
+                                            onClick={() => setShowAssignmentUserSearch(true)}
+                                        >
+                                            <img
+                                                src={IconSearchDefault}
+                                                alt="Buscar"
+                                                style={{ width: 20, height: 20 }} />
+                                        </IconButton>
                                     )}
-                                    <IconButton
-                                        size="small"
-                                        aria-label={showAssignmentUserSearch ? 'Cerrar búsqueda de usuarios' : 'Buscar usuarios'}
-                                        onClick={() => {
-                                            setShowAssignmentUserSearch(open => !open);
-                                            setAssignmentUserSearch('');
-                                        }}
-                                        sx={{ color: '#8D858A' }}
-                                    >
-                                        <img
-                                            src={IconSearchDefault}
-                                            alt="Buscar"
-                                            style={{ width: 24, height: 24 }} />
-                                    </IconButton>
+
+
+
                                 </Box>
-                                <Box sx={{ flex: 1, maxHeight: 346, overflowY: 'auto', overscrollBehavior: 'contain' }}>
+                                <Box sx={{
+                                    flex: 1, overflowY: 'auto', overscrollBehavior: 'contain',
+                                    //maxHeight: '490px', 
+                                    height: '62vh', maxHeight: '62vh'
+                                }}>
                                     {isLoadingAssignmentUsers ? (
                                         <Box sx={{ minHeight: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <CircularProgress size={26} sx={{ color: '#833A53' }} />
                                         </Box>
                                     ) : assignmentUsersError ? (
-                                        <Alert severity="error" sx={{ m: 2 }}>{assignmentUsersError}</Alert>
+                                        <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <Box sx={{
+                                                display: 'flex', padding: '8px 16px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', alignSelf: 'stretch',
+                                                borderRadius: '4px', backgroundColor: '#FFF', width: '100%'
+                                            }}>
+                                                <img src={IconInfoRol}
+                                                    alt="Regresar"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                                <Typography sx={{ fontSize: 12, fontWeight: 500, color: '#833A53', fontFamily: 'Poppins' }}>
+                                                    {assignmentUsersError}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
                                     ) : assignmentUsers.length === 0 ? (
                                         <Box sx={{ minHeight: 220, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', px: 2, py: 3, textAlign: 'center' }}>
                                             <Typography sx={{ color: '#A4516A', fontSize: 13, mb: 1.2 }}>
@@ -1480,7 +1569,7 @@ const Roles: React.FC = () => {
                                             </Button>
                                         </Box>
                                     ) : assignmentVisibleUsers.length === 0 ? (
-                                        <Box sx={{ minHeight: 346, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, textAlign: 'center' }}>
+                                        <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, textAlign: 'center' }}>
                                             <Typography sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#8F4D63', fontSize: '16px' }}>No se encontraron usuarios.</Typography>
                                         </Box>
                                     ) : assignmentVisibleUsers.map(user => (
@@ -1535,18 +1624,21 @@ const Roles: React.FC = () => {
 
                             <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0 }}>
                                 <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #D9D4D6' }}>
-                                    <Checkbox
-                                        size="small"
-                                        disabled
-                                        inputProps={{ 'aria-label': 'Seleccionar todos los roles' }}
-                                        icon={
-                                            <img src={CheckboxUnselect} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '2px' }} />
-                                        }
-                                        checkedIcon={
-                                            <img src={CheckboxSelect} style={{ width: 22, height: 21, marginLeft: '-2px' }} />
-                                        }
-                                        sx={{ p: 0.5, color: '#B9B5B7' }}
-                                    />
+                                    {/* {!showAssignmentRoleSearch && (
+                                        <Checkbox
+                                            size="small"
+                                            disabled
+                                            inputProps={{ 'aria-label': 'Seleccionar todos los roles' }}
+                                            icon={
+                                                <img src={CheckboxUnselect} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '2px' }} />
+                                            }
+                                            checkedIcon={
+                                                <img src={CheckboxSelect} style={{ width: 22, height: 21, marginLeft: '-2px' }} />
+                                            }
+                                            sx={{ p: 0.5, color: '#B9B5B7' }}
+                                        />
+                                    )} */}
+                                    <Typography className='roles-generic-subtitles' sx={{ color: '#330F1B', fontSize: '14px', fontWeight: 500, flex: 1 }}>Roles</Typography>
                                     {showAssignmentRoleSearch ? (
                                         <TextField
                                             autoFocus
@@ -1554,31 +1646,78 @@ const Roles: React.FC = () => {
                                             value={assignmentRoleSearch}
                                             onChange={event => setAssignmentRoleSearch(event.target.value)}
                                             placeholder="Buscar rol"
-                                            inputProps={{ 'aria-label': 'Buscar roles para asignar' }}
-                                            sx={{ flex: 1, '& .MuiOutlinedInput-root': { height: 34 } }}
+                                            inputProps={{ 'aria-label': 'Buscar roles para asignar', className: 'roles-search-text' }}
+                                            InputProps={{
+                                                startAdornment: (<InputAdornment position="start">
+                                                    <img
+                                                        src={assignmentRoleSearch ? Iconseachred : seachicon}
+                                                        alt="Buscar"
+                                                        style={{ marginRight: 8, width: 24 }} />
+                                                </InputAdornment>),
+                                                endAdornment: assignmentRoleSearch && (
+                                                    <InputAdornment position="end">
+                                                        <img
+                                                            src={iconclose}
+                                                            alt="Cerrar búsqueda"
+                                                            onClick={() => {
+                                                                setAssignmentRoleSearch('');
+                                                                setShowAssignmentRoleSearch(false);
+                                                            }}
+                                                            style={{
+                                                                width: 24,
+                                                                height: 24,
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        />
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                            sx={{
+                                                width: 224,
+                                                '& .MuiOutlinedInput-root': {
+                                                    height: 40,
+                                                    borderRadius: 1,
+                                                    bgcolor: '#FFFFFF',
+
+                                                    '& fieldset': {
+                                                        borderColor: assignmentRoleSearch ? '#6F1E3A' : '#9B9295',
+                                                    },
+                                                    '&:hover fieldset': {
+                                                        borderColor: assignmentRoleSearch ? '#6F1E3A' : '#9B9295',
+                                                    },
+                                                    '&.Mui-focused fieldset': {
+                                                        borderColor: assignmentRoleSearch ? '#6F1E3A' : '#9B9295',
+                                                        borderWidth: '1px',
+                                                    },
+                                                    '& .MuiOutlinedInput-input': {
+                                                        color: '#6F1E3A',
+                                                    },
+                                                    '& .MuiOutlinedInput-input::placeholder': {
+                                                        color: '#9B9295',
+                                                        opacity: 1,
+                                                    },
+                                                },
+                                            }}
                                         />
                                     ) : (
-                                        <Typography className='roles-generic-subtitles' sx={{ color: '#330F1B', fontSize: '14px', fontWeight: 500, flex: 1 }}>Roles</Typography>
+                                        <IconButton
+                                            size="small"
+                                            aria-label="Buscar usuarios"
+                                            onClick={() => setShowAssignmentRoleSearch(true)}
+                                        >
+                                            <img
+                                                src={IconSearchDefault}
+                                                alt="Buscar"
+                                                style={{ width: 20, height: 20 }} />
+                                        </IconButton>
+
                                     )}
-                                    <IconButton
-                                        size="small"
-                                        aria-label={showAssignmentRoleSearch ? 'Cerrar búsqueda de roles' : 'Buscar roles'}
-                                        onClick={() => {
-                                            setShowAssignmentRoleSearch(open => !open);
-                                            setAssignmentRoleSearch('');
-                                        }}
-                                        sx={{ color: '#8D858A' }}
-                                    >
-                                        <img
-                                            src={IconSearchDefault}
-                                            alt="Buscar"
-                                            style={{ width: 24, height: 24 }} />
-                                    </IconButton>
+
                                 </Box>
                                 {selectedRoleIsSystem && (
                                     <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6' }}>
                                         <Box sx={{
-                                            display: 'flex', padding: '8px 16px', justifyContent: 'center', alignItems: 'center', gap: '12px', alignSelf: 'stretch',
+                                            display: 'flex', padding: '8px 16px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', alignSelf: 'stretch',
                                             borderRadius: '4px', border: '1px solid #833A53', backgroundColor: '#F8F8F8', width: '100%'
                                         }}>
                                             <img src={IconInfoRol}
@@ -1591,15 +1730,33 @@ const Roles: React.FC = () => {
                                         </Box>
                                     </Box>
                                 )}
-                                <Box sx={{ flex: 1, maxHeight: 346, overflowY: 'auto', overscrollBehavior: 'contain' }}>
+                                <Box sx={{ flex: 1, height: '100%', overflowY: 'auto', overscrollBehavior: 'contain' }}>
                                     {isLoadingAssignmentRoles ? (
                                         <Box sx={{ minHeight: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <CircularProgress size={26} sx={{ color: '#833A53' }} />
                                         </Box>
                                     ) : assignmentRolesError ? (
-                                        <Alert severity="error" sx={{ m: 2 }}>{assignmentRolesError}</Alert>
+                                        <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <Box sx={{
+                                                display: 'flex', padding: '8px 16px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', alignSelf: 'stretch',
+                                                borderRadius: '4px', backgroundColor: '#FFF', width: '100%'
+                                            }}>
+                                                <img src={IconInfoRol}
+                                                    alt="Regresar"
+                                                    style={{ width: 24, height: 24 }}
+                                                />
+                                                <Typography sx={{ fontSize: 12, fontWeight: 500, color: '#833A53', fontFamily: 'Poppins' }}>
+                                                    {assignmentRolesError}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
                                     ) : assignmentVisibleRoles.map(role => (
-                                        <Box key={role.id} sx={{ height: '48px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #C6BFC2' }}>
+                                        <Box key={role.id} sx={{
+                                            height: '48px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #C6BFC2',
+                                            backgroundColor: selectedAssignmentRoleId === Number(role.id)
+                                                ? 'rgba(143, 77, 99, 0.12)'
+                                                : '#FFFFFF',
+                                        }}>
                                             <Checkbox
                                                 size="small"
                                                 checked={selectedAssignmentRoleId === Number(role.id)}
@@ -1639,7 +1796,7 @@ const Roles: React.FC = () => {
                                         </Box>
                                     ))}
                                     {!isLoadingAssignmentRoles && !assignmentRolesError && assignmentVisibleRoles.length === 0 && (
-                                        <Box sx={{ minHeight: 346, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2 }}>
+                                        <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2 }}>
                                             <Typography sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#8F4D63', fontSize: '16px' }}>No se encontraron roles.</Typography>
                                         </Box>
                                     )}
@@ -1670,26 +1827,27 @@ const Roles: React.FC = () => {
                 sx={{
                     '& .MuiDrawer-paper': {
                         display: 'flex',
-                        width: '260px',
-                        height: '672px',
+                        width: '270px',
+                        height: '80vh',
                         padding: '0px 10px 24px 10px',
                         flexDirection: 'column',
                         alignItems: 'flex-start',
                         boxSizing: 'border-box',
                         borderRadius: '8px',
                         background: '#FFF',
-                        top: '12%',
+                        top: '10%',
                         right: '1.5%',
+
                     }
                 }}
             >
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', color: '#3A1724' }}>
-                    <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <Box sx={{ padding: '20px 10px 8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', }}>
                         <Box>
                             <Typography variant="h6" sx={{ fontWeight: 500, fontSize: '12px', lineHeight: 'normal', letterSpacing: '0.72px', fontFamily: 'Poppins', color: '#312D2E', textTransform: 'uppercase' }}>
                                 {inspectedRole?.name}
                             </Typography>
-                            <Typography sx={{ fontFamily: 'Poppins', fontSize: '11px', color: '#6F5E75', fontWeight: 500, lineHeight: 'normal', letterSpacing: '0.66px' }}>
+                            <Typography sx={{ fontFamily: 'Poppins', fontSize: '12px', color: '#6F5E75', fontWeight: 500, lineHeight: 'normal', letterSpacing: '0.66px' }}>
                                 Permisos ({inspectedRole?.permissions.length ?? 0})
                             </Typography>
                         </Box>
@@ -1700,7 +1858,7 @@ const Roles: React.FC = () => {
                         </Box>
                     </Box>
                     <Divider sx={{ border: '1px solid #C6BFC2' }} /><Divider />
-                    <Box className='roles-inspection-modal-text'>
+                    <Box className='roles-inspection-modal-text' sx={{ overflowY: 'auto', height: '100%' }}>
                         {inspectedRole?.permissions.map(permission => (
                             <Box key={permission} sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
                                 <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: '#000000', flexShrink: 0 }} />
@@ -2003,7 +2161,7 @@ const Roles: React.FC = () => {
                 fullWidth
                 maxWidth="xs"
             >
-                <DialogTitle sx={{ color: '#3A1724', fontWeight: 600 }}>Descartar cambios</DialogTitle>
+                <DialogTitle sx={{ color: '#3A1724', fontWeight: 600, textTransform: 'none' }}>Descartar cambios</DialogTitle>
                 <DialogContent>
                     <Typography sx={{ color: '#51464B' }}>
                         ¿Está seguro de que desea descartar los cambios realizados en la asignación de roles? Esta acción no se puede revertir.
@@ -2059,5 +2217,6 @@ const Roles: React.FC = () => {
         </Box>
     );
 };
+
 
 export default Roles;
