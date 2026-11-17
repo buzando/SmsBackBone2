@@ -62,6 +62,10 @@ import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyrid
 import Userblue from "../assets/User-blue.png"
 import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
+import IconInfoRol from '../assets/IconInfoRol.svg';
+import CheckboxSelect from "../assets/CheckboxSelect.svg";
+import CheckboxDefault from "../assets/CheckboxDefault.svg";
+
 const INITIAL_FORM_DATA: FormData = {
     name: "", email: "", confirmEmail: "", phone: "",
     useRecoveryEmail: false, password: "", confirmPassword: "",
@@ -495,6 +499,12 @@ const ManageAccounts: React.FC = () => {
 
     const handleMenuClose = () => {
         setMenuAnchorEl(null);
+    };
+
+    const handleDefaultRoleClick = (role: string) => {
+        if (formData.profile === role) {
+            setFormData(current => ({ ...current, profile: "" }));
+        }
     };
 
     const handleOpenModal = () => {
@@ -1042,9 +1052,9 @@ const ManageAccounts: React.FC = () => {
                         alignItems="center"
                         justifyContent="center"
                         sx={{
-                            width: '100%',
-                            minHeight: '450px',
-                            backgroundColor: '#F9F9F9',
+                            width: '100%', height: '70vh', maxHeight: '70vh',
+                            //minHeight: '450px',
+                            backgroundColor: '#FFFFFF',
                             padding: 4,
                             borderRadius: '12px',
                             border: '1px solid #E0E0E0',
@@ -1068,7 +1078,8 @@ const ManageAccounts: React.FC = () => {
                 {!(searchTerm && accounts.length > 0 && filteredAccounts.length === 0) && (
                     <TableContainer component={Paper}
                         sx={{
-                            width: "100%", height: "450px",
+                            width: "100%", height: '70vh', maxHeight: '70vh',
+                            //height: "450px",
                             marginLeft: "-200 auto",
                             overflowX: "hidden", overflowY: "auto", marginTop: "8px", borderRadius: "8px"
                         }}
@@ -1422,7 +1433,9 @@ const ManageAccounts: React.FC = () => {
                     </Typography>
                     <Divider sx={{ width: 'calc(100% + 64px)', marginLeft: '-32px', my: 2 }} />
 
-                    <Box sx={{ overflowX: "hidden", overflowY: "auto", mt: -1, pt: 4, pr: 4, pb: 4, pl: 0, flexGrow: 1, width: "755px" }}>
+                    <Box sx={{
+                        overflowX: "hidden", overflowY: "auto", mt: -1, pt: 4, pr: 4, pb: 4, pl: 0, flexGrow: 1, width: "755px"
+                    }}>
                         <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
 
                             <Box gridColumn="span 6">
@@ -1982,6 +1995,7 @@ const ManageAccounts: React.FC = () => {
                         <Typography variant="body2" mb={3} mt={-1} sx={{ fontFamily: "Poppins", color: "#574B4F", fontSize: "14px" }}>
                             Seleccione el rol que el colaborador podrá desempeñar.
                         </Typography>
+
                         <RadioGroup
                             row
                             value={formData.profile}
@@ -2009,6 +2023,7 @@ const ManageAccounts: React.FC = () => {
                                     <Radio
                                         value="Monitor"
                                         checked={formData.profile === "Monitor"}
+                                        onClick={() => handleDefaultRoleClick("Monitor")}
                                         sx={{
                                             position: "absolute",
                                             top: 8,
@@ -2045,6 +2060,8 @@ const ManageAccounts: React.FC = () => {
                                 >
                                     <Radio
                                         value="Supervisor"
+                                        checked={formData.profile === "Supervisor"}
+                                        onClick={() => handleDefaultRoleClick("Supervisor")}
                                         sx={{
                                             position: "absolute",
                                             top: 8,
@@ -2084,6 +2101,8 @@ const ManageAccounts: React.FC = () => {
                                 >
                                     <Radio
                                         value="Administrador"
+                                        checked={formData.profile === "Administrador"}
+                                        onClick={() => handleDefaultRoleClick("Administrador")}
                                         sx={{
                                             position: "absolute",
                                             top: 8,
@@ -2113,16 +2132,17 @@ const ManageAccounts: React.FC = () => {
                         <Box
                             sx={{
                                 mt: 2,
-                                border: "1px solid #D9D4D6",
+                                border: formData.profile ? "none" : "1px solid #D9D4D6",
                                 borderRadius: "8px",
                                 overflow: "hidden",
+                                maxHeight: formData.profile ? "100px" : "none",
                             }}
                         >
                             <Box
                                 sx={{
                                     px: 2,
-                                    py: 1.25,
-                                    borderBottom: "1px solid #D9D4D6",
+                                    py: 1,
+                                    borderBottom: formData.profile ? "none" : "1px solid #D9D4D6",
                                 }}
                             >
                                 <Typography
@@ -2137,36 +2157,52 @@ const ManageAccounts: React.FC = () => {
                                     Rol de usuario personalizado
                                     <span style={{ color: "#D11247" }}>*</span>
                                 </Typography>
-                                <Typography
-                                    sx={{
-                                        fontFamily: "Poppins",
-                                        fontSize: 14,
-                                        fontWeight: 400,
-                                        color: "#574B4F",
-                                        lineHeight: 1.4,
-                                    }}
-                                >
-                                    Seleccione el rol que el colaborador podrá desempeñar.
-                                </Typography>
+                                {!formData.profile && (
+                                    <Typography
+                                        sx={{
+                                            fontFamily: "Poppins",
+                                            fontSize: 14,
+                                            fontWeight: 400,
+                                            color: "#574B4F",
+                                            lineHeight: 1.4,
+                                        }}
+                                    >
+                                        Seleccione el rol que el colaborador podrá desempeñar.
+                                    </Typography>
+                                )}
                             </Box>
 
                             {formData.profile && (
-                                <Alert
-                                    severity="info"
-                                    action={
-                                        <Button
-                                            color="inherit"
-                                            size="small"
-                                            onClick={() => setFormData(current => ({ ...current, profile: "" }))}
-                                            sx={{ fontFamily: "Poppins", fontSize: 12, whiteSpace: "nowrap" }}
-                                        >
-                                            Elegir personalizados
-                                        </Button>
-                                    }
-                                    sx={{ mx: 1.5, mt: 1.5, mb: 0.5, fontFamily: "Poppins", fontSize: 13 }}
-                                >
-                                    Los roles personalizados están deshabilitados porque seleccionaste un rol predeterminado.
-                                </Alert>
+                                // <Alert
+                                //     severity="info"
+                                //     action={
+                                //         <Button
+                                //             color="inherit"
+                                //             size="small"
+                                //             onClick={() => setFormData(current => ({ ...current, profile: "" }))}
+                                //             sx={{ fontFamily: "Poppins", fontSize: 12, whiteSpace: "nowrap" }}
+                                //         >
+                                //             Elegir personalizados
+                                //         </Button>
+                                //     }
+                                //     sx={{ mx: 1.5, mt: 1.5, mb: 0.5, fontFamily: "Poppins", fontSize: 13 }}
+                                // >
+                                //     Los roles personalizados están deshabilitados porque seleccionaste un rol predeterminado.
+                                // </Alert>
+                                <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Box sx={{
+                                        display: 'flex', padding: '8px 16px', justifyContent: 'center', alignItems: 'flex-start', gap: '12px', alignSelf: 'stretch',
+                                        borderRadius: '4px', border: '1px solid #833A53', backgroundColor: '#F8F8F8', width: '100%'
+                                    }}>
+                                        <img src={IconInfoRol}
+                                            alt="Regresar"
+                                            style={{ width: 24, height: 24 }}
+                                        />
+                                        <Typography sx={{ fontSize: 12, fontWeight: 500, color: '#833A53', fontFamily: 'Poppins' }}>
+                                            Los roles predeterminados y personalizados son excluyentes entre sí. Desmarca el rol predeterminado para activarlos.
+                                        </Typography>
+                                    </Box>
+                                </Box>
                             )}
 
                             {isLoadingAvailableRoles ? (
@@ -2252,47 +2288,57 @@ const ManageAccounts: React.FC = () => {
                                         }}
                                     >
                                         {customRoles.map(role => (
-                                            <FormControlLabel
-                                                key={role.id}
-                                                disabled={Boolean(formData.profile)}
-                                                control={
-                                                    <Checkbox
-                                                        checked={selectedCustomRoleIds.includes(role.id)}
-                                                        onChange={event => toggleCustomRole(role.id, event.target.checked)}
-                                                        sx={{
-                                                            p: 0.5,
-                                                            color: "#8A8185",
-                                                            "&.Mui-checked": { color: "#8F4D63" },
-                                                        }}
-                                                    />
-                                                }
-                                                label={role.name}
-                                                sx={{
-                                                    m: 0,
-                                                    minWidth: 0,
-                                                    minHeight: 32,
-                                                    "& .MuiFormControlLabel-label": {
-                                                        overflow: "hidden",
-                                                        textOverflow: "ellipsis",
-                                                        whiteSpace: "nowrap",
-                                                        fontFamily: "Poppins",
-                                                        fontSize: 14,
-                                                        color: "#574B4F",
-                                                    },
-                                                    "&.Mui-disabled .MuiFormControlLabel-label": {
-                                                        color: "#B9B5B7",
-                                                    },
-                                                }}
-                                            />
+                                            !formData.profile && (
+
+                                                <FormControlLabel
+                                                    key={role.id}
+                                                    disabled={Boolean(formData.profile)}
+                                                    control={
+                                                        <Checkbox
+                                                            checked={selectedCustomRoleIds.includes(role.id)}
+                                                            onChange={event => toggleCustomRole(role.id, event.target.checked)}
+                                                            icon={
+                                                                <img src={CheckboxDefault} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '4px' }} />
+                                                            }
+                                                            checkedIcon={
+                                                                <img src={CheckboxSelect} alt="Checked" style={{ width: 22, height: 21, marginRight: '2px', marginLeft: '-2px' }} />
+                                                            }
+                                                            sx={{
+                                                                p: 0.5,
+                                                                color: "#8A8185",
+                                                                "&.Mui-checked": { color: "#8F4D63" },
+                                                            }}
+                                                        />
+                                                    }
+                                                    label={role.name}
+                                                    sx={{
+                                                        m: 0,
+                                                        minWidth: 0,
+                                                        minHeight: 32,
+                                                        "& .MuiFormControlLabel-label": {
+                                                            overflow: "hidden",
+                                                            textOverflow: "ellipsis",
+                                                            whiteSpace: "nowrap",
+                                                            fontFamily: "Poppins",
+                                                            fontSize: 14,
+                                                            color: "#574B4F",
+                                                        },
+                                                        "&.Mui-disabled .MuiFormControlLabel-label": {
+                                                            color: "#B9B5B7",
+                                                        },
+                                                    }}
+                                                />
+                                            )
                                         ))}
+
                                     </Box>
                                 </Box>
                             )}
                         </Box>
 
-                        <Divider sx={{ my: 2, backgroundColor: "#F2F2F2" }} />
 
-                        {selectedRoleIds.length > 0 && (
+
+                        {!formData.profile && selectedRoleIds.length > 0 && (
                             <Box p={2}>
                                 <Typography variant="h6" mb={2} mt={-2} sx={{ fontFamily: "Poppins", fontSize: "16px" }}>
                                     Salas a las que podrá acceder <span style={{ color: "red", }}>*</span>
