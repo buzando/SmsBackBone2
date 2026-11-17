@@ -10,6 +10,7 @@ import IconCheckBox2 from "../assets/IconCheckBox2.svg";
 import IconCloseModal from "../assets/IconCloseModal.svg";
 import BoxEmpty from '../assets/Nousers.svg';
 import CloseIcon from '@mui/icons-material/Close';
+import '../components/commons/CSS/Templates.css';
 import ArrowBackIosNewIcon from '../assets/icon-punta-flecha-bottom.svg';
 import SecondaryButton from '../components/commons/SecondaryButton'
 import MainButton from '../components/commons/MainButton'
@@ -33,6 +34,8 @@ import IconSMS from '../assets/IconSMS.svg';
 import infoiconerror from '../assets/Icon-infoerror.svg';
 import DynamicMessageEditText from '../components/commons/DynamicMessageEditText'; // ajusta el path si está en otra carpeta
 import { position } from 'html2canvas/dist/types/css/property-descriptors/position';
+import CheckboxSelect from "../assets/CheckboxSelect.svg";
+import CheckboxDefault from "../assets/CheckboxDefault.svg";
 
 interface CampañaAsignada {
     chanel: string;
@@ -1007,7 +1010,7 @@ const Templates = () => {
                 <Box
                     sx={{
                         width: '580px',
-                        height: "646px",
+                        minHeight: "646px",
                         fontFamily: 'Poppins',
                         backgroundColor: 'white',
                         borderRadius: 2,
@@ -1237,6 +1240,87 @@ const Templates = () => {
                             }}
                         >
                             VISTA PREVIA
+                        </Box>
+
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-Start', alignSelf: 'stretch', flexDirection: 'column', gap: '4px' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Checkbox
+                                icon={
+                                    <img src={CheckboxDefault} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '0px' }} />
+                                }
+                                checkedIcon={
+                                    <img src={CheckboxSelect} alt="Checked" style={{ width: 22, height: 21, marginLeft: '-2px', marginRight: '-2px' }} />
+                                }
+                                sx={{
+                                    p: 0.5,
+                                    color: "#8A8185",
+                                    "&.Mui-checked": { color: "#8F4D63" },
+                                }}
+                            />
+                            <Typography className='templates-text'>
+                                Mensaje concatenado
+                            </Typography>
+                            <Tooltip
+                                title={
+                                    <Box className='templates-tooltip-one'>
+                                        <Typography className='templates-tooltip-two'>
+                                            Mensaje con más de 160 caracteres que se divide en 3 partes. Cada parte se cobra por separado.
+                                        </Typography>
+                                    </Box>
+                                }
+                                placement="top"
+                                componentsProps={{
+                                    tooltip: {
+                                        sx: {
+                                            backgroundColor: "transparent",
+                                            padding: 0,
+
+                                        },
+                                    },
+                                }}
+                            >
+                                <img src={infoicon} alt={"info"} style={{ width: 24, height: 24 }} />
+                            </Tooltip>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Checkbox
+                                icon={
+                                    <img src={CheckboxDefault} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '0px' }} />
+                                }
+                                checkedIcon={
+                                    <img src={CheckboxSelect} alt="Checked" style={{ width: 22, height: 21, marginLeft: '-2px', marginRight: '-2px' }} />
+                                }
+                                sx={{
+                                    p: 0.5,
+                                    color: "#8A8185",
+                                    "&.Mui-checked": { color: "#8F4D63" },
+                                }}
+                            />
+                            <Typography className='templates-text'>
+                                Caracteres especiales
+                            </Typography>
+                            <Tooltip
+                                title={
+                                    <Box className='templates-tooltip-one'>
+                                        <Typography className='templates-tooltip-two'>
+                                            Límite de 70 caracteres por mensaje: aplicable al ingresar tildes, símbolos o caracteres especiales.
+                                        </Typography>
+                                    </Box>
+                                }
+                                placement="top"
+                                componentsProps={{
+                                    tooltip: {
+                                        sx: {
+                                            backgroundColor: "transparent",
+                                            padding: 0,
+
+                                        },
+                                    },
+                                }}
+                            >
+                                <img src={infoicon} alt={"info"} style={{ width: 24, height: 24 }} />
+                            </Tooltip>
                         </Box>
 
                     </Box>
