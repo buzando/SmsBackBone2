@@ -62,6 +62,7 @@ import { Joyride, EVENTS, STATUS, type EventData, type Step } from 'react-joyrid
 import Userblue from "../assets/User-blue.png"
 import { joyrideBaseStyles } from '../components/commons/CSS/joyrideBaseStyles';
 import { hasAssignedPermission, ROLE_PERMISSION_CODES } from './permisions';
+import MainModal from "../components/commons/MainModal";
 const INITIAL_FORM_DATA: FormData = {
     name: "", email: "", confirmEmail: "", phone: "",
     useRecoveryEmail: false, password: "", confirmPassword: "",
@@ -539,9 +540,7 @@ const ManageAccounts: React.FC = () => {
         if (checked) {
             setFormData(current => ({ ...current, profile: "" }));
         }
-        setSelectedCustomRoleIds(current => checked
-            ? Array.from(new Set([...current, roleId]))
-            : current.filter(id => id !== roleId));
+        setSelectedCustomRoleIds(checked ? [roleId] : []);
     };
 
     const handleCloseModal = () => {
@@ -2569,29 +2568,15 @@ const ManageAccounts: React.FC = () => {
                 </Box>
             </Modal>
 
-            <Dialog
-                open={openNavigateRolesConfirm}
-                onClose={() => setOpenNavigateRolesConfirm(false)}
-                fullWidth
-                maxWidth="xs"
-            >
-                <DialogTitle sx={{ fontFamily: "Poppins", fontWeight: 600, color: "#3A1724" }}>
-                    Salir del formulario
-                </DialogTitle>
-                <DialogContent>
-                    <Typography sx={{ fontFamily: "Poppins", color: "#574B4F" }}>
-                        Si continúas al módulo de Roles, perderás los datos y las configuraciones realizadas en este formulario. ¿Deseas continuar?
-                    </Typography>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setOpenNavigateRolesConfirm(false)} sx={{ color: "#833A53", fontWeight: 600 }}>
-                        Cancelar
-                    </Button>
-                    <Button onClick={continueToRolesAndDiscardForm} variant="contained" sx={{ bgcolor: "#833A53", "&:hover": { bgcolor: "#6D2F45" }, fontWeight: 600 }}>
-                        Continuar
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <MainModal
+                isOpen={openNavigateRolesConfirm}
+                Title="SALIR DEL FORMULARIO"
+                message="Si continúas al módulo de Roles, perderás los datos y las configuraciones realizadas en este formulario. ¿Deseas continuar?"
+                primaryButtonText="Continuar"
+                secondaryButtonText="Cancelar"
+                onPrimaryClick={continueToRolesAndDiscardForm}
+                onSecondaryClick={() => setOpenNavigateRolesConfirm(false)}
+            />
 
             <Modal
                 open={openDeleteModal}

@@ -335,9 +335,7 @@ const Roles: React.FC = () => {
                 isSystem: role.idCliente == null,
                 permissions: role.permissions ?? [],
                 assignedUsers: 0,
-                createdAt: role.idCliente == null
-                    ? '—'
-                    : formatRoleDate(role.createdAt ?? role.CreatedAt),
+                createdAt: formatRoleDate(role.createdAt ?? role.CreatedAt),
             })));
 
             setTotalRecords(response.data.totalRecords);
@@ -1535,18 +1533,6 @@ const Roles: React.FC = () => {
 
                             <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0 }}>
                                 <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #D9D4D6' }}>
-                                    <Checkbox
-                                        size="small"
-                                        disabled
-                                        inputProps={{ 'aria-label': 'Seleccionar todos los roles' }}
-                                        icon={
-                                            <img src={CheckboxUnselect} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '2px' }} />
-                                        }
-                                        checkedIcon={
-                                            <img src={CheckboxSelect} style={{ width: 22, height: 21, marginLeft: '-2px' }} />
-                                        }
-                                        sx={{ p: 0.5, color: '#B9B5B7' }}
-                                    />
                                     {showAssignmentRoleSearch ? (
                                         <TextField
                                             autoFocus

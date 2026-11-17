@@ -44,6 +44,30 @@ namespace Business
 
             using (var ctx = new Entities())
             {
+                // La HU pide mostrar una fecha para los roles predeterminados.
+                // Si los roles legacy aún no tienen CreatedAt, se fija una sola
+                // fecha al primer acceso y se conserva en la base de datos.
+                var legacyRolesWithoutDate = ctx.Roles
+                    .Where(role =>
+                        role.idCliente == null &&
+                        role.CreatedAt == null &&
+                        role.Role != null &&
+                        role.Role.ToLower() != "mesa" &&
+                        role.Role.ToLower() != "root" &&
+                        role.Role.ToLower() != "telco")
+                    .ToList();
+
+                if (legacyRolesWithoutDate.Count > 0)
+                {
+                    var firstAccessDate = DateTime.UtcNow;
+                    foreach (var legacyRole in legacyRolesWithoutDate)
+                    {
+                        legacyRole.CreatedAt = firstAccessDate;
+                    }
+
+                    ctx.SaveChanges();
+                }
+
                 var query = ctx.Roles
                     .AsNoTracking()
                     .Where(role =>
