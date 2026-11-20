@@ -17,7 +17,8 @@ namespace Modal.Model.Model
 
         // Relación 1:1 con Room
         public int IdRoom { get; set; }
-
+        public bool Concatenated { get; set; }
+        public bool SpecialCharacters { get; set; }
 
     }
 }

@@ -12,6 +12,8 @@ namespace Contract.Request
         public int idRoom { get; set; }
         public string newName { get; set; }
         public string newMessage { get; set; }
+        public bool newConcatenated { get; set; }
+        public bool newSpecial { get; set; }
 
     }
 }

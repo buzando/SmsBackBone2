@@ -110,7 +110,6 @@
 
 .roles-inspection-modal-text{
     display: flex;
-    padding: 16px 10px 10px 10px;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;

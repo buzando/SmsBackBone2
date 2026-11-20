@@ -1136,7 +1136,6 @@ const Roles: React.FC = () => {
                         maxHeight: '62vh',
                         overflow: 'auto',
                         pb: 1,
-                        bgcolor: '#FFF',
                         borderRadius: '0px 0px 8px 8px',
 
                     }}>
@@ -1223,14 +1222,15 @@ const Roles: React.FC = () => {
                                                 'Nombre'
                                             )}
                                         </TableCell>
-                                        <TableCell className='roles-text' sx={{ color: '#51464B', fontWeight: 600, borderBottom: '1px solid #D9D4D6' }}>Fecha de creación</TableCell>
-                                        <TableCell align="right" sx={{ bgcolor: '#FFFFFF', borderBottom: '1px solid #D9D4D6' }} />
+                                        <TableCell className='roles-text' sx={{ color: '#51464B', fontWeight: 600, borderBottom: '1px solid #C6BFC2' }}>Fecha de creación</TableCell>
+                                        <TableCell align="right" sx={{ borderBottom: '1px solid #C6BFC2' }} />
                                     </TableRow>
                                 </TableHead>
                             )}
-                            <TableBody sx={{ bgcolor: '#FFFFFF' }}>
+                            <TableBody sx={{}}>
                                 {filteredRoles.map(role => (
-                                    <TableRow key={role.id} sx={{ height: 45, backgroundColor: selectedRoles.includes(role.id) ? 'rgba(143, 77, 99, 0.18)' : '#FFFFFF' }}>
+                                    <TableRow key={role.id} sx={{ height: 45, backgroundColor: selectedRoles.includes(role.id) ? '#EAE4E5 !important' : '#FFFFFF' }}>
+
                                         <TableCell padding="checkbox" sx={{ borderBottom: '1px solid #C6BFC2' }}>
                                             <Checkbox
                                                 size="small"
@@ -1432,7 +1432,7 @@ const Roles: React.FC = () => {
                                 ))}
                                 {filteredRoles.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={4} sx={{ border: 0, height: '481px' }}>
+                                        <TableCell colSpan={4} sx={{ border: 0, height: '58vh', backgroundColor: '#FFF', }}>
                                             <Box sx={{ minHeight: 280, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.5, color: '#746B70', marginTop: 8 }}>
                                                 <Box component="img" src={NoResult} alt="No se encontraron resultados" sx={{ width: 176, height: 149, objectFit: 'contain' }} />
                                                 <Typography sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#8F4D63', fontSize: '16px' }}>No hay información para mostrar.</Typography>
@@ -1445,13 +1445,13 @@ const Roles: React.FC = () => {
                     </TableContainer>
                 ) : (
                     <Box sx={{
-                        mt: 0, flex: 1, display: 'flex', flexDirection: 'column', border: '1px solid #D9D4D6', borderTop: 0, borderRadius: '0 0 6px 6px', overflow: 'hidden', backgroundColor: '#FFFFFF',
+                        mt: 0, flex: 1, display: 'flex', flexDirection: 'column', borderRadius: '0 0 6px 6px', overflow: 'hidden',
                         //maxHeight: '490px', 
-                        height: '62vh', maxHeight: '62vh'
+                        height: '62vh', maxHeight: '62vh', backgroundColor: '#FFF'
                     }}>
                         <Box sx={{ flex: 1, minHeight: '0', display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gridTemplateRows: { xs: '1fr 1fr', md: '1fr' }, overflow: 'hidden' }}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0, borderRight: { xs: 0, md: '1px solid #D9D4D6' }, borderBottom: { xs: '1px solid #D9D4D6', md: 0 } }}>
-                                <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6' }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0, borderRight: { xs: 0, md: '1px solid #C6BFC2' }, borderBottom: { xs: '1px solid #C6BFC2', md: 0 } }}>
+                                <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #C6BFC2', backgroundColor: '#FFF', }}>
                                     <Typography className='roles-generic-subtitles' sx={{ color: '#330F1B', fontSize: '14px', fontWeight: 500 }}>Usuarios</Typography>
                                     {showAssignmentUserSearch ? (
                                         <TextField
@@ -1532,14 +1532,15 @@ const Roles: React.FC = () => {
                                 <Box sx={{
                                     flex: 1, overflowY: 'auto', overscrollBehavior: 'contain',
                                     //maxHeight: '490px', 
-                                    height: '62vh', maxHeight: '62vh'
+                                    height: '62vh', maxHeight: '62vh',
+                                    backgroundColor: '#FFF'
                                 }}>
                                     {isLoadingAssignmentUsers ? (
-                                        <Box sx={{ minHeight: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
                                             <CircularProgress size={26} sx={{ color: '#833A53' }} />
                                         </Box>
                                     ) : assignmentUsersError ? (
-                                        <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Box sx={{ height: '100%', padding: '8px 16px 8px 11px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', backgroundColor: '#FFF', }}>
                                             <Box sx={{
                                                 display: 'flex', padding: '8px 16px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', alignSelf: 'stretch',
                                                 borderRadius: '4px', backgroundColor: '#FFF', width: '100%'
@@ -1554,7 +1555,7 @@ const Roles: React.FC = () => {
                                             </Box>
                                         </Box>
                                     ) : assignmentUsers.length === 0 ? (
-                                        <Box sx={{ minHeight: 220, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', px: 2, py: 3, textAlign: 'center' }}>
+                                        <Box sx={{ minHeight: 220, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', px: 2, py: 3, textAlign: 'center', backgroundColor: '#FFF' }}>
                                             <Typography sx={{ color: '#A4516A', fontSize: 13, mb: 1.2 }}>
                                                 Añade un usuario para comenzar la asignación de roles.
                                             </Typography>
@@ -1567,7 +1568,7 @@ const Roles: React.FC = () => {
                                             </Button>
                                         </Box>
                                     ) : assignmentVisibleUsers.length === 0 ? (
-                                        <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, textAlign: 'center' }}>
+                                        <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, textAlign: 'center', backgroundColor: '#FFF', }}>
                                             <Typography sx={{ fontWeight: 500, fontFamily: 'Poppins', color: '#8F4D63', fontSize: '16px' }}>No se encontraron usuarios.</Typography>
                                         </Box>
                                     ) : assignmentVisibleUsers.map(user => (
@@ -1586,7 +1587,7 @@ const Roles: React.FC = () => {
                                                 borderBottom: '1px solid #C6BFC2',
                                                 cursor: isLoadingAssignmentRoles ? 'default' : 'pointer',
                                                 backgroundColor: selectedAssignmentUserId === user.id
-                                                    ? 'rgba(143, 77, 99, 0.12)'
+                                                    ? '#EAE4E5 !important'
                                                     : '#FFFFFF',
                                                 '&:hover': {
                                                     backgroundColor: isLoadingAssignmentRoles
@@ -1621,7 +1622,8 @@ const Roles: React.FC = () => {
                             </Box>
 
                             <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0 }}>
-                                <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #D9D4D6' }}>
+                                <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6', backgroundColor: '#FFF', }}>
+                                    <Typography className='roles-generic-subtitles' sx={{ color: '#330F1B', fontSize: '14px', fontWeight: 500 }}>Roles</Typography>
                                     {showAssignmentRoleSearch ? (
                                         <TextField
                                             autoFocus
@@ -1698,7 +1700,7 @@ const Roles: React.FC = () => {
 
                                 </Box>
                                 {selectedRoleIsSystem && (
-                                    <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6' }}>
+                                    <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #D9D4D6', backgroundColor: '#FFF' }}>
                                         <Box sx={{
                                             display: 'flex', padding: '8px 16px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', alignSelf: 'stretch',
                                             borderRadius: '4px', border: '1px solid #833A53', backgroundColor: '#F8F8F8', width: '100%'
@@ -1715,11 +1717,11 @@ const Roles: React.FC = () => {
                                 )}
                                 <Box sx={{ flex: 1, height: '100%', overflowY: 'auto', overscrollBehavior: 'contain' }}>
                                     {isLoadingAssignmentRoles ? (
-                                        <Box sx={{ minHeight: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
                                             <CircularProgress size={26} sx={{ color: '#833A53' }} />
                                         </Box>
                                     ) : assignmentRolesError ? (
-                                        <Box sx={{ height: '65px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Box sx={{ height: '100%', padding: '8px 16px 8px 11px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', backgroundColor: '#FFF', }}>
                                             <Box sx={{
                                                 display: 'flex', padding: '8px 16px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', alignSelf: 'stretch',
                                                 borderRadius: '4px', backgroundColor: '#FFF', width: '100%'
@@ -1737,7 +1739,7 @@ const Roles: React.FC = () => {
                                         <Box key={role.id} sx={{
                                             height: '48px', padding: '8px 16px 8px 11px', display: 'flex', alignItems: 'center', gap: 0.75, borderBottom: '1px solid #C6BFC2',
                                             backgroundColor: selectedAssignmentRoleId === Number(role.id)
-                                                ? 'rgba(143, 77, 99, 0.12)'
+                                                ? '#EAE4E5 !important'
                                                 : '#FFFFFF',
                                         }}>
                                             <Checkbox
@@ -1786,7 +1788,7 @@ const Roles: React.FC = () => {
                                 </Box>
                             </Box>
                         </Box>
-                        <Box sx={{ minHeight: 69, flexShrink: 0, padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #D9D4D6' }}>
+                        <Box sx={{ minHeight: 69, flexShrink: 0, padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #C6BFC2', backgroundColor: '#FFF' }}>
                             <SecondaryButton
                                 text="Cancelar"
                                 onClick={() => setCancelAssignmentConfirmOpen(true)}
@@ -1811,21 +1813,21 @@ const Roles: React.FC = () => {
                     '& .MuiDrawer-paper': {
                         display: 'flex',
                         width: '270px',
-                        height: '80vh',
-                        padding: '0px 10px 24px 10px',
+                        height: '82vh',
+                        padding: '20px 12px 10px 12px',
                         flexDirection: 'column',
                         alignItems: 'flex-start',
                         boxSizing: 'border-box',
                         borderRadius: '8px',
                         background: '#FFF',
-                        top: '10%',
-                        right: '1.5%',
+                        top: '10.2%',
+                        right: '1.6%',
 
                     }
                 }}
             >
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', color: '#3A1724' }}>
-                    <Box sx={{ padding: '20px 10px 8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', }}>
+                    <Box sx={{ padding: '7px 0px 16px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #C6BFC2' }}>
                         <Box>
                             <Typography variant="h6" sx={{ fontWeight: 500, fontSize: '12px', lineHeight: 'normal', letterSpacing: '0.72px', fontFamily: 'Poppins', color: '#312D2E', textTransform: 'uppercase' }}>
                                 {inspectedRole?.name}
@@ -1840,12 +1842,12 @@ const Roles: React.FC = () => {
                             </IconButton>
                         </Box>
                     </Box>
-                    <Divider sx={{ border: '1px solid #C6BFC2' }} /><Divider />
-                    <Box className='roles-inspection-modal-text' sx={{ overflowY: 'auto', height: '100%' }}>
+
+                    <Box className='roles-inspection-modal-text' sx={{ overflowY: 'auto', height: '100%', width: '240px', padding: '16px 12px 10px 10px' }}>
                         {inspectedRole?.permissions.map(permission => (
-                            <Box key={permission} sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-                                <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: '#000000', flexShrink: 0 }} />
-                                <Typography className='.roles-inspection-modal-text-two'>{ALL_PERMISSION_OPTIONS.find(option => option.code === permission)?.label ?? permission}</Typography>
+                            <Box key={permission} sx={{ display: 'flex', alignItems: 'center', gap: 1.1 }}>
+                                <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: '#000000', flexShrink: 0, marginLeft: '3px' }} />
+                                <Typography className='roles-inspection-modal-text-two' sx={{ color: '#3E2F4E', fontSize: '12px', fontWeight: 400 }}>{ALL_PERMISSION_OPTIONS.find(option => option.code === permission)?.label ?? permission}</Typography>
                             </Box>
                         ))}
                     </Box>

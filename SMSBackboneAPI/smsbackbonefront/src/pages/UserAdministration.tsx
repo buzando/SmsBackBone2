@@ -1075,12 +1075,12 @@ const ManageAccounts: React.FC = () => {
                 )}
 
                 {!(searchTerm && accounts.length > 0 && filteredAccounts.length === 0) && (
-                    <TableContainer component={Paper}
+                    <TableContainer
                         sx={{
                             width: "100%", height: '70vh', maxHeight: '70vh',
                             //height: "450px",
                             marginLeft: "-200 auto",
-                            overflowX: "hidden", overflowY: "auto", marginTop: "8px", borderRadius: "8px"
+                            overflowX: "hidden", overflowY: "auto", marginTop: "8px", borderRadius: "8px", backgroundColor: '#FFF'
                         }}
                     >
                         <Table
@@ -2616,7 +2616,7 @@ const ManageAccounts: React.FC = () => {
 
             <MainModal
                 isOpen={openNavigateRolesConfirm}
-                Title="SALIR DEL FORMULARIO"
+                Title="Salir del Formulario"
                 message="Si continúas al módulo de Roles, perderás los datos y las configuraciones realizadas en este formulario. ¿Deseas continuar?"
                 primaryButtonText="Continuar"
                 secondaryButtonText="Cancelar"

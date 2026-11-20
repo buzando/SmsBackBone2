@@ -4,7 +4,7 @@
 /* Texto */
 .templates-text {
     color: var(--Paleta-Gris-574B4F, #574B4F);
-    font-family: Poppins;
+    font-family: 'Poppins', sans-serif !important;
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
@@ -14,10 +14,10 @@
 .templates-tooltip-one {
 display: flex;
 max-width: 240px;
-padding: 16px;
+padding: 14px 18px 14px 18px !important;
 justify-content: center;
 align-items: center;
-gap: 10px;
+gap: 10px !important;
 border-radius: 5px 5px 8px 8px;
 border: 1px solid var(--GRIS-200, #CCCFD2);
 background: var(--FONDO-BG-DROPDOWN-CONFIG, #FFF);
@@ -28,11 +28,30 @@ box-shadow: 0 8px 16px 0 var(--gris-98016, rgba(0, 19, 31, 0.16));
 
 .templates-tooltip-two {
     color: var(--COLORS-GRIS-4C5961, var(--GRIS-910, #4C5961));
-    text-align: center;
-    font-family: Poppins;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
+    text-align: center !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 14px !important;
+    font-style: normal !important;
+    font-weight: 500 !important;
+    line-height: 22px !important;
+    white-space: nowrap !important;
+}
+
+
+.templates-limit-box {
+display: flex;
+padding: 4px 8px;
+align-items: center;
+border-radius: 4px;
+background: var(--Paleta-Morado-F2E9EC, #F2E9EC);
+}
+
+.templates-limit-text {
+color: var(--Paleta-Morado-60293C, #60293C);
+font-family: 'Poppins', sans-serif !important;
+font-size: 10px;
+font-style: normal;
+font-weight: 500;
+line-height: normal;
 }
 

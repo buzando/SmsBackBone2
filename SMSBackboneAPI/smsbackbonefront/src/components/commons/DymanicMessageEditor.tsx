@@ -6,6 +6,7 @@ import IconCloseRedN from "../../assets/IconCloseRedN.svg";
 interface Props {
   onChange?: (text: string) => void;
   initialMessage?: string;
+  mensajeConcatenado?: boolean;
 }
 
 const MAX_CHARACTERS = 160;
@@ -36,7 +37,7 @@ const ALLOWED_EDITOR_WHITELIST = /^[a-zA-Z0-9.,:\/$\s{}]+$/;
 const CLEAN_EDITOR = /[^\p{L}0-9\.,:\/\$\s{}]/gu;
 const ALLOWED_VAR = /[^A-Za-z0-9_]/g;
 
-const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => {
+const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage, mensajeConcatenado = false }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const savedSelection = useRef<Range | null>(null);
   const didInitFromInitial = useRef(false);
@@ -779,17 +780,49 @@ const DynamicMessageEditor: React.FC<Props> = ({ onChange, initialMessage }) => 
           },
         }}
       />
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '3px', justifyContent: 'space-between', width: '100%' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '3px', mt: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                fontFamily: 'Poppins',
+                color: '#9E9E9E',
+              }}
+            >
+              {charCount}/{MAX_CHARACTERS}
+            </Typography>
 
-      <Typography
-        variant="caption"
-        mt={1}
-        sx={{
-          fontFamily: 'Poppins',
-          color: '#9E9E9E',
-        }}
-      >
-        {charCount}/{MAX_CHARACTERS} caracteres para que el mensaje se realice en un sólo envío.
-      </Typography>
+            {!mensajeConcatenado && (
+              <Typography
+                variant="caption"
+                sx={{
+                  fontFamily: 'Poppins',
+                  color: '#9E9E9E',
+                }}
+              >
+                caracteres para que el mensaje se realice en un sólo envío.
+              </Typography>
+            )}
+
+            {/* <Box sx={{ display: 'flex', padding: '4px 8px', alignItems: 'center', borderRadius: '4px', backgroundColor: '#F2E9EC', ml: 1 }}>
+              <Typography variant="caption" sx={{ fontFamily: 'Poppins', color: '#60293C', fontSize: '10px', fontWeight: 500, lineHeight: 'normal' }}>
+                Límite de caracteres alcanzado.
+              </Typography>
+            </Box> */}
+          </Box>
+          {mensajeConcatenado && (
+            <Typography sx={{ fontFamily: 'Poppins', color: '#8F4D63', fontSize: '12px', fontWeight: 400, lineHeight: 'normal', textAlign: 'right' }}>
+              Mensajes concatenados: 3/3
+            </Typography>
+          )}
+        </Box>
+        {/* <Box sx={{ display: 'flex', padding: '4px 8px', alignItems: 'center', borderRadius: '4px', backgroundColor: '#F2E9EC' }}>
+          <Typography variant="caption" sx={{ fontFamily: 'Poppins', color: '#60293C', fontSize: '10px', fontWeight: 500, lineHeight: 'normal' }}>
+            Límite de caracteres excedido. El texto pegado fue truncado.
+          </Typography>
+        </Box> */}
+      </Box>
     </Box>
   );
 };

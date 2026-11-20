@@ -47,6 +47,8 @@ export interface Template {
     message: string;
     creationDate: string; // DateTime en C# es string en JS/TS
     idRoom: number;
+    concatenated: boolean;
+    specialCharacters: boolean;
 }
 const Templates = () => {
     const canCreateEditTemplates = hasAssignedPermission(ROLE_PERMISSION_CODES.TEMPLATES_CREATE_EDIT);
@@ -91,6 +93,8 @@ const Templates = () => {
     const itemsPerPage = 50;
 
     const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+    const [mensajeConcatenado, setMensajeConcatenado] = useState(false);
+    const [caracterEspecial, setCaracterEspecial] = useState(false);
 
     const isTemplateNameInvalid = !!(
         templateName &&
@@ -118,6 +122,9 @@ const Templates = () => {
         setTemplateToEdit(template);
         setTemplateName(template.name);
         setMensaje(template.message);
+        setMensajeConcatenado(template.concatenated);
+        setCaracterEspecial(template.specialCharacters);
+        console.log(template);
         setOpenModal(true);
     };
 
@@ -380,6 +387,8 @@ const Templates = () => {
                     idRoom: salaId,
                     newName: templateName,
                     newMessage: mensaje,
+                    newConcatenated: mensajeConcatenado,
+                    newSpecial: caracterEspecial,
                 };
 
                 const response = await axios.post(
@@ -404,6 +413,8 @@ const Templates = () => {
                     name: templateName,
                     message: mensaje,
                     idRoom: salaId,
+                    newConcatenated: mensajeConcatenado,
+                    newSpecial: caracterEspecial,
                 };
 
                 const response = await axios.post(
@@ -1139,11 +1150,13 @@ const Templates = () => {
                                 setMensaje(value);
                                 setEditMessage(value);
                             }}
+                            mensajeConcatenado={mensajeConcatenado}
                         />
                     ) : (
                         <DynamicMessageEditor
                             initialMessage={mensaje}
                             onChange={handleMessageChange}
+                            mensajeConcatenado={mensajeConcatenado}
                         />
 
                     )}
@@ -1243,9 +1256,9 @@ const Templates = () => {
                         </Box>
 
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-Start', alignSelf: 'stretch', flexDirection: 'column', gap: '4px' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-Start', alignSelf: 'stretch', flexDirection: 'column', gap: '6px' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Checkbox
+                            <Checkbox checked={mensajeConcatenado} onChange={(event) => setMensajeConcatenado(event.target.checked)}
                                 icon={
                                     <img src={CheckboxDefault} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '0px' }} />
                                 }
@@ -1265,7 +1278,10 @@ const Templates = () => {
                                 title={
                                     <Box className='templates-tooltip-one'>
                                         <Typography className='templates-tooltip-two'>
-                                            Mensaje con más de 160 caracteres que se divide en 3 partes. Cada parte se cobra por separado.
+                                            Mensaje con más de 160<br />
+                                            caracteres que se divide en 3<br />
+                                            partes. Cada parte se cobra<br />
+                                            por separado.
                                         </Typography>
                                     </Box>
                                 }
@@ -1284,7 +1300,7 @@ const Templates = () => {
                             </Tooltip>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Checkbox
+                            <Checkbox checked={caracterEspecial} onChange={(event) => setCaracterEspecial(event.target.checked)}
                                 icon={
                                     <img src={CheckboxDefault} alt="UnChecked" style={{ width: 18, height: 18, marginRight: '0px' }} />
                                 }
@@ -1304,7 +1320,10 @@ const Templates = () => {
                                 title={
                                     <Box className='templates-tooltip-one'>
                                         <Typography className='templates-tooltip-two'>
-                                            Límite de 70 caracteres por mensaje: aplicable al ingresar tildes, símbolos o caracteres especiales.
+                                            Límite de 70 caracteres por<br />
+                                            mensaje: aplicable al<br />
+                                            ingresar tildes, símbolos o<br />
+                                            caracteres especiales.
                                         </Typography>
                                     </Box>
                                 }

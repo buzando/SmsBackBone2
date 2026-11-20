@@ -55,7 +55,9 @@ namespace Business
                         Name = Addtemplate.Name.Trim(),
                         Message = Addtemplate.Message,
                         CreationDate = DateTime.Now,
-                        IdRoom = Addtemplate.idroom
+                        IdRoom = Addtemplate.idroom,
+                        Concatenated = Addtemplate.newConcatenated,
+                        SpecialCharacters = Addtemplate.newSpecial
                     };
 
                     ctx.Template.Add(template);
@@ -138,6 +140,8 @@ namespace Business
 
                     template.Name = templaterequest.newName;
                     template.Message = templaterequest.newMessage;
+                    template.Concatenated = templaterequest.newConcatenated;
+                    template.SpecialCharacters = templaterequest.newSpecial;
 
                     ctx.SaveChanges();
                     return true;

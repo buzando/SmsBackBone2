@@ -12,5 +12,7 @@ namespace Contract.Request
         public string Message { get; set; } = string.Empty;
         public int idroom { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
+        public bool newConcatenated { get; set; }
+        public bool newSpecial { get; set; }
     }
 }
